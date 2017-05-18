@@ -34,10 +34,10 @@ DATA_CHECK = 0.0;
 
 MATERIAL = 'SAE-950C.mat';
 
-% USE S-N DATA FOR FATIGUE ANALYSIS
+% STRESS-LIFE CURVE
 %{
-    0: Derived (Sf' and b)
-    1: Direct (S-N data points)
+    0: Coefficients (Sf' and b)
+    1: S-N datapoints
 %}
 USE_SN = 1.0;
 
