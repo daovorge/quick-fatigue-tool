@@ -6,7 +6,7 @@ classdef jobFile < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.10-08 Copyright Louis Vallance 2017
-%   Last modified 25-Apr-2017 12:13:25 GMT
+%   Last modified 18-May-2017 15:26:37 GMT
     
     %%
     
@@ -1907,7 +1907,10 @@ classdef jobFile < handle
                     end
                 end
             elseif (autoExportODB == 1.0) && ((isempty(partInstance) == 0.0 && strcmpi(partInstance, 'PART-1-1') == 0.0) || isempty(stepName) == 0.0)
-                % A part instance or step name was specified without an ODB file
+                %{
+                    A part instance or step name was specified without an
+                    ODB file
+                %}
                 msg = sprintf('A non-default part instance and/or results step name has been specified without an output database.\n\nResults will not be exported to the output database. OK to continue with job submission?');
                 response = questdlg(msg, 'Quick Fatigue Tool', 'Yes', 'No', 'Yes');
                 
@@ -1915,6 +1918,22 @@ classdef jobFile < handle
                     fprintf('\n[NOTICE] Job %s was aborted by the user\n', jobName);
                     error = 1.0;
                     return
+                end
+            elseif (autoExportODB == 0.0) && (isempty(outputDatabase) == 0.0) && (isempty(partInstance) == 0.0)
+                %{
+                    An output database was specified, but automatic export
+                    is disabled
+                %}
+                msg = sprintf('An output database and part instance have been specified, but automatic export is disabled.');
+                response = questdlg(msg, 'Quick Fatigue Tool', 'Enable automatic export', 'Continue without export', 'Cancel', 'Enable automatic export');
+                
+                if strcmpi('Cancel', response)
+                    fprintf('\n[NOTICE] Job %s was aborted by the user\n', jobName);
+                    error = 1.0;
+                    return
+                elseif strcmpi('Enable automatic export', response)
+                    outputField = 1.0;
+                    setappdata(0, 'autoExport_ODB', 1.0)
                 end
             end
         end
