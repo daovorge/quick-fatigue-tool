@@ -5,7 +5,7 @@ classdef jobFile < handle
 %   JOBFILE is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %   
-%   Quick Fatigue Tool 6.10-07 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.10-08 Copyright Louis Vallance 2017
 %   Last modified 25-Apr-2017 12:13:25 GMT
     
     %%
@@ -1684,8 +1684,10 @@ classdef jobFile < handle
             end
             
             %% COLLAPSE LOAD HISTORY (IF APPLICABLE)
-            if (length(Sxx) > 3.0) && (gateHistories == 1.0)
-                [Sxx, Syy, Szz, Txy, Txz, Tyz] = constantAmplitude(Sxx, Syy, Szz, Txy, Txz, Tyz, repeats, historyGate);
+            [~, nPoints] = size(Sxx);
+            
+            if (nPoints > 3.0) && (gateHistories == 1.0)
+                [Sxx, Syy, Szz, Txy, Txz, Tyz] = constantAmplitude(Sxx, Syy, Szz, Txy, Txz, Tyz, repeats, historyGate, nPoints);
             end
             
             %% Save stress tensors in the appdata

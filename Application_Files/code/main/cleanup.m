@@ -5,8 +5,8 @@ function [] = cleanup(status)
 %   CLEANUP is used internally by Quick Fatigue Tool. The user
 %   is not required to run this file.
 %   
-%   Quick Fatigue Tool 6.10-07 Copyright Louis Vallance 2017
-%   Last modified 25-Apr-2017 12:13:25 GMT
+%   Quick Fatigue Tool 6.10-08 Copyright Louis Vallance 2017
+%   Last modified 17-May-2017 14:54:51 GMT
     
     %%
     
@@ -36,6 +36,13 @@ setappdata(0, 'twops', [])
 setappdata(0, 'TfPrime', [])
 setappdata(0, 'Tfs', [])
 
+%% Close the status file
+fid_status = getappdata(0, 'fid_status');
+try %#ok<TRYNC>
+    fprintf(fid_status, '\r\n\r\nTHE ANALYSIS HAS NOT BEEN COMPLETED');
+    fclose(fid_status);
+end
+
 %% If the analysis exited with errors, create error log
 if status == 1.0
     % Create an error log file
@@ -63,9 +70,9 @@ if status == 1.0
     fid = fopen(errLogFile, 'w');
     
     % Write file header
-    fprintf(fid, 'Quick Fatigue Tool 6.10-07\r\n');
+    fprintf(fid, 'Quick Fatigue Tool 6.10-08\r\n');
     fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-    fprintf(fid, 'Last modified 25-Apr-2017 12:13:25 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 17-May-2017 14:54:51 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');
@@ -84,7 +91,7 @@ if status == 1.0
         fprintf(fid, '\r\n\r\n***ERROR: No material was specified in the job file');
         fprintf(fid, '\r\n-> Materials are defined using the Material Manager app or by running ''MaterialManager.m''');
         fprintf(fid, '\r\n-> The material is specified in the job file with the option MATERIAL');
-        fprintf(fid, '\r\n-> For detailed guidance on creating and managing material data, consult Section 5 of the Quick Fatigue Tool User Guide');
+        fprintf(fid, '\r\n-> For guidance on creating and managing material data, consult Section 5 of the Quick Fatigue Tool User Guide');
         fprintf(fid, '\r\n\r\nError code: E001');
         rmappdata(0, 'E001')
     elseif getappdata(0, 'E002') == 1.0
@@ -92,11 +99,12 @@ if status == 1.0
             fprintf(fid, '\r\n\r\n***ERROR: No material was specified in the job file');
             fprintf(fid, '\r\n-> Materials are defined using the Material Manager app or by running ''MaterialManager.m''');
             fprintf(fid, '\r\n-> The material is specified in the job file with the option MATERIAL');
-            fprintf(fid, '\r\n-> For detailed guidance on creating and managing material data, consult Section 5 of the Quick Fatigue Tool User Guide');
+            fprintf(fid, '\r\n-> For guidance on creating and managing material data, consult Section 5 of the Quick Fatigue Tool User Guide');
             fprintf(fid, '\r\n\r\nError code: E001');
         else
             fprintf(fid, '\r\n\r\n***ERROR: The material ''%s'' could not be found', getappdata(0, 'material'));
             fprintf(fid, '\r\n-> Make sure the file exists in Data/material/local and is spelled correctly in the job file');
+            fprintf(fid, '\r\n-> For guidance on creating and managing material data, consult Section 5 of the Quick Fatigue Tool User Guide');
             fprintf(fid, '\r\n\r\nError code: E002');
         end
         rmappdata(0, 'E002')
@@ -371,7 +379,7 @@ if status == 1.0
         fprintf(fid, '\r\n\r\n***ERROR: The input file reader returned one or more empty datasets');
         fprintf(fid, '\r\n-> This can happen if the input file reader encounters a problem with a dataset');
         fprintf(fid, '\r\n-> Make sure the data file(s) are formatted correctly');
-        fprintf(fid, '\r\n-> For detailed guidance on creating a loading definition, consult the Quick Fatigue Tool User Guide');
+        fprintf(fid, '\r\n-> For guidance on creating a loading definition, consult the Quick Fatigue Tool User Guide');
         fprintf(fid, '\r\n\r\nError code: E015');
         rmappdata(0, 'E015')
     end
@@ -494,7 +502,7 @@ if status == 1.0
         fprintf(fid, '\r\n-> MException ID: %s', getappdata(0, 'error_log_027_exceptionMessage'));
         fprintf(fid, '\r\n-> Check the header of the data file for irregularities');
         fprintf(fid, '\r\n-> Stress datasets must contain between four and eight columns, depending on the format of the data');
-        fprintf(fid, '\r\n-> For detailed guidance on creating stress datasets, consult the Quick Fatigue Tool User Guide');
+        fprintf(fid, '\r\n-> For guidance on creating stress datasets, consult the Quick Fatigue Tool User Guide');
         fprintf(fid, '\r\n-> Please contact the developer for further assistance: louisvallance@hotmail.co.uk');
         fprintf(fid, '\r\n\r\nError code: E027');
         rmappdata(0, 'E027')
@@ -1256,7 +1264,7 @@ if status == 1.0
             fprintf(fid, '\r\n\r\n***ERROR: The user MSC amplitude definition for ''%s'' contains invalid amplitude values', getappdata(0, 'E137_file'));
         end
         fprintf(fid, '\r\n-> The straight line from (0,0) to the cycle (Sm,Sa) may not extend across the envelope more than once');
-        fprintf(fid, '\r\n-> For detailed guidance on creating user-defined .msc files, consult Section 7.9 of the Quick Fatigue Tool User Guide');
+        fprintf(fid, '\r\n-> For guidance on creating user-defined .msc files, consult Section 7.9 of the Quick Fatigue Tool User Guide');
         fprintf(fid, '\r\n\r\nError code: E137');
         rmappdata(0, 'E137')
         rmappdata(0, 'E137_file')
@@ -1269,7 +1277,7 @@ if status == 1.0
             fprintf(fid, '\r\n\r\n***ERROR: The user MSC amplitude definition for ''%s'' contains invalid amplitude values', getappdata(0, 'E138_file'));
         end
         fprintf(fid, '\r\n-> Negative amplitude values are not permitted');
-        fprintf(fid, '\r\n-> For detailed guidance on creating user-defined .msc files, consult Section 7.9 of the Quick Fatigue Tool User Guide');
+        fprintf(fid, '\r\n-> For guidance on creating user-defined .msc files, consult Section 7.9 of the Quick Fatigue Tool User Guide');
         fprintf(fid, '\r\n\r\nError code: E137');
         rmappdata(0, 'E138')
         rmappdata(0, 'E138_file')
@@ -1284,7 +1292,7 @@ if status == 1.0
         fprintf(fid, '\r\n-> The file must contain two columns of data');
         fprintf(fid, '\r\n-> The first column must be values of mean stress (in descending order)');
         fprintf(fid, '\r\n-> The second column must be the corresponding stress ampliitude values');
-        fprintf(fid, '\r\n-> For detailed guidance on creating user-defined .msc files, consult Section 7.9 of the Quick Fatigue Tool User Guide');
+        fprintf(fid, '\r\n-> For guidance on creating user-defined .msc files, consult Section 7.9 of the Quick Fatigue Tool User Guide');
         fprintf(fid, '\r\n\r\nError code: E139');
         rmappdata(0, 'E139')
         rmappdata(0, 'E139_file')
@@ -1297,7 +1305,7 @@ if status == 1.0
             fprintf(fid, '\r\n\r\n***ERROR: The user MSC definition for ''%s'' is invalid', getappdata(0, 'E140_file'));
         end
         fprintf(fid, '\r\n-> The file must contain at least two user-defined (Sm,Sa) pairs');
-        fprintf(fid, '\r\n-> For detailed guidance on creating user-defined .msc files, consult Section 7.9 of the Quick Fatigue Tool User Guide');
+        fprintf(fid, '\r\n-> For guidance on creating user-defined .msc files, consult Section 7.9 of the Quick Fatigue Tool User Guide');
         fprintf(fid, '\r\n\r\nError code: E140');
         rmappdata(0, 'E140')
         rmappdata(0, 'E140_file')
@@ -1310,7 +1318,7 @@ if status == 1.0
             fprintf(fid, '\r\n\r\n***ERROR: The user MSC definition for ''%s'' contains invalid amplitude values', getappdata(0, 'E141_file'));
         end
         fprintf(fid, '\r\n-> On a given side of the Sa-axis, duplicate amplitude values may not be defined');
-        fprintf(fid, '\r\n-> For detailed guidance on creating user-defined .msc files, consult Section 7.9 of the Quick Fatigue Tool User Guide');
+        fprintf(fid, '\r\n-> For guidance on creating user-defined .msc files, consult Section 7.9 of the Quick Fatigue Tool User Guide');
         fprintf(fid, '\r\n\r\nError code: E141');
         rmappdata(0, 'E141')
         rmappdata(0, 'E141_file')
@@ -1332,9 +1340,9 @@ if status == 1.0
     
     % Prompt user if they would like to view the analysis log
     if (ispc == 1.0) && (ismac == 0.0)
-        answer = questdlg('The analysis exited with and error - Please see the log file for more information.', 'Quick Fatigue Tool', 'View log', 'Close', 'View log');
+        answer = questdlg('The analysis exited with an error - Please see the log file for more information.', 'Quick Fatigue Tool', 'View log', 'Close', 'View log');
     elseif (ispc == 0.0) && (ismac == 1.0)
-        answer = errordlg('The analysis exited with and error - Please see the log file for more information.', 'Quick Fatigue Tool');
+        answer = errordlg('The analysis exited with an error - Please see the log file for more information.', 'Quick Fatigue Tool');
     else
         answer = -1.0;
     end

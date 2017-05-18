@@ -6,8 +6,8 @@ classdef messenger < handle
 %   MESSENGER is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %   
-%   Quick Fatigue Tool 6.10-07 Copyright Louis Vallance 2017
-%   Last modified 25-Apr-2017 12:13:25 GMT
+%   Quick Fatigue Tool 6.10-08 Copyright Louis Vallance 2017
+%   Last modified 12-May-2017 15:25:52 GMT
     
     %%
     
@@ -172,6 +172,13 @@ classdef messenger < handle
                         if getappdata(0, 'twops_status') == 1.0
                             fprintf(fidType(i), [returnType{i}, '***NOTE: The proof stress for material %s (group %.0f) was not specified', returnType{i}], getappdata(0, 'getMaterial_currentMaterial'), getappdata(0, 'getMaterial_currentGroup'));
                             fprintf(fidType(i), ['-> A derived value of %.4gMPa will be used', returnType{i}], getappdata(0, 'twops'));
+                            
+                            if getappdata(0, 'modifiedGoodman') == 1.0
+                                fprintf(fidType(i), [returnType{i}, '***WARNING: The modified Goodman mean stress correction is enabled', returnType{i}]);
+                                fprintf(fidType(i), ['-> Derived values of the proof stress may lead to unrealistic damage values when used with this algorithm', returnType{i}]);
+                                
+                                setappdata(0, 'messageFileWarnings', 1.0)
+                            end
                             
                             setappdata(0, 'messageFileNotes', 1.0)
                         elseif getappdata(0, 'twops_status') == -1.0
@@ -1497,7 +1504,7 @@ classdef messenger < handle
                             if elementType == 0.0
                                 fprintf(fidType(i), ['-> The results at these locations are assumed to be 3D stress at an unknown element position, based on the value of PLANE_STRESS = 0.0 in the job file', returnType{i}]);
                                 fprintf(fidType(i), ['-> If the model contains plane stress elements with results at element-nodal or integration point element positions, it is likely that they have been incorrectly identified as 3D stress', returnType{i}]);
-                                fprintf(fidType(i), ['-> If this is the case, set PLANE_STRESS = 1.0 to correctly resolve the ambiguity', returnType{i}]);
+                                fprintf(fidType(i), ['-> If this is the case, set PLANE_STRESS = 1.0 to resolve the ambiguity', returnType{i}]);
                             else
                                 fprintf(fidType(i), ['-> The results at these locations are assumed to be plane stress at element-nodal or integration point element positions, based on the value of PLANE_STRESS = 1.0 in the job file', returnType{i}]);
                                 fprintf(fidType(i), ['-> If the model does not contain plane stress elements, set PLANE_STRESS = 0.0 to correctly resolve the ambiguity. The ambiguous region(s) will be interpreted as 3D stress at an unknown element position', returnType{i}]);
@@ -2053,9 +2060,9 @@ classdef messenger < handle
             
             % Write file header
             try
-                fprintf(fid, 'Quick Fatigue Tool 6.10-07 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
+                fprintf(fid, 'Quick Fatigue Tool 6.10-08 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
             catch
-                fprintf(fid, 'Quick Fatigue Tool 6.10-07\r\n');
+                fprintf(fid, 'Quick Fatigue Tool 6.10-08\r\n');
             end
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
             fprintf(fid, 'Last modified 15-Apr-2017 19:34:54 GMT\r\n\r\n');

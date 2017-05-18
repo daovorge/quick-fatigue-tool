@@ -12,8 +12,8 @@
 %   Reference section in Quick Fatigue Tool User Settings Reference Guide
 %      2 Environment variables
 %   
-%   Quick Fatigue Tool 6.10-07 Copyright Louis Vallance 2017
-%   Last modified 19-Apr-2017 14:29:55 GMT
+%   Quick Fatigue Tool 6.10-08 Copyright Louis Vallance 2017
+%   Last modified 12-May-2017 15:25:52 GMT
 
 %% GATE TENSORS
 %{
@@ -53,9 +53,9 @@ setappdata(0, 'groupDefinition', 0.0)
 % GOODMAN ENVELOPE DEFINITION
 %{
     0: Use standard envelope for Goodman mean stress correction
-    1: Use intersection of Buch and Goodman envelopes
+    1: Use intersection of Buch and Goodman envelopes (if applicable)
 %}
-setappdata(0, 'modifiedGoodman', 1.0)
+setappdata(0, 'modifiedGoodman', 0.0)
 
 % GOODMAN MEAN STRESS LIMIT
 %{
@@ -375,6 +375,10 @@ setappdata(0, 'file_H_OUTPUT_LOAD', 1.0)
 setappdata(0, 'file_H_OUTPUT_CYCLE', 1.0)
 setappdata(0, 'file_H_OUTPUT_ANGLE', 1.0)
 setappdata(0, 'file_H_OUTPUT_TENSOR', 1.0)
+
+% OUTPUT FORMAT STRING
+setappdata(0, 'fieldFormatString', 'f')
+setappdata(0, 'historyFormatString', 'f')
 
 % COMMAND WINDOW OUTPUT
 setappdata(0, 'echoMessagesToCWIN', 0.0)

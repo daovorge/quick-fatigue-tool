@@ -11,7 +11,7 @@ function varargout = ExportTool(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool User Guide
 %      10.4 The ODB Interface
 %   
-%   Quick Fatigue Tool 6.10-07 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.10-08 Copyright Louis Vallance 2017
 %   Last modified 04-Apr-2017 13:26:59 GMT
     
     %%
@@ -627,8 +627,8 @@ end
 % Open the log file for writing
 fid_debug = fopen(sprintf('%s\\%s.log', resultsDatabasePath, resultsDatabaseName), 'w+');
 clc
-fprintf(fid_debug, 'Quick Fatigue Tool 6.10-07 ODB Interface Log');
-fprintf('Quick Fatigue Tool 6.10-07 ODB Interface Log\n');
+fprintf(fid_debug, 'Quick Fatigue Tool 6.10-08 ODB Interface Log');
+fprintf('Quick Fatigue Tool 6.10-08 ODB Interface Log\n');
 
 % Get the selected position
 userPosition = get(handles.pMenu_elementPosition, 'value');
@@ -1287,6 +1287,7 @@ set(handles.pButton_modelFileHelp, 'enable', 'off')
 set(handles.pButton_resultsFileHelp, 'enable', 'off')
 set(handles.pButton_dataPositionHelp, 'enable', 'off')
 set(handles.frame_modelInfo, 'enable', 'off')
+set(handles.text_execution, 'enable', 'off')
 set(handles.text_hint, 'enable', 'off')
 set(handles.check_resultFile, 'enable', 'off')
 set(handles.edit_resultFile, 'enable', 'off')
@@ -1347,6 +1348,7 @@ set(handles.pButton_modelFileHelp, 'enable', 'on')
 set(handles.pButton_resultsFileHelp, 'enable', 'on')
 set(handles.pButton_dataPositionHelp, 'enable', 'on')
 set(handles.frame_modelInfo, 'enable', 'inactive')
+set(handles.text_execution, 'enable', 'on')
 set(handles.text_hint, 'enable', 'on')
 set(handles.check_resultFile, 'enable', 'on')
 if get(handles.check_resultFile, 'value') == 1.0
