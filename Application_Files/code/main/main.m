@@ -11,7 +11,7 @@ function [] = main(flags)
 %   Author contact: louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.10-08 Copyright Louis Vallance 2017
-%   Last modified 18-May-2017 15:26:37 GMT
+%   Last modified 19-May-2017 16:27:36 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all')
@@ -48,7 +48,7 @@ setappdata(0, 'messageFileWarnings', 0.0)
 %% PRINT COMMAND WINDOW HEADER
 fprintf('[NOTICE] Quick Fatigue Tool 6.10-08')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2017)')
-fprintf('\n[NOTICE] Last modified 18-May-2017 15:26:37 GMT')
+fprintf('\n[NOTICE] Last modified 19-May-2017 16:27:36 GMT')
 
 cleanExit = 0.0;
 
@@ -598,7 +598,7 @@ for groups = 1:G
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%%%%%%%%%%%%%%%%%%%FATIGUE ANALYSIS ALGORITHM%%%%%%%%%%%%%%%%%%%%%%%
-
+        
         switch algorithm
             case 3.0 % UNIAXIAL STRESS-LIFE
                 [nodalAmplitudes, nodalPairs, nodalDamage, nodalDamageParameter, damageParameter]...
@@ -661,6 +661,8 @@ for groups = 1:G
                     = algorithm_nasa.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, signalLength,...
                     totalCounter, nodalDamage, nodalAmplitudes, nodalPairs, nodalDamageParameter,...
                     s1i, s2i, s3i, signConvention, gateTensors, tensorGate, vonMises_i, nasalifeParameter);
+            case 10.0 % USER-DEFINED
+                [nodalDamageParameter, nodalAmplitudes, nodalPairs, nodalDamage] = algorithm_user.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, totalCounter, msCorrection);
             otherwise
         end
 
