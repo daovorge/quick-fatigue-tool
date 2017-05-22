@@ -8,11 +8,11 @@ classdef material < handle
 %   MATERIAL contains the following utility functions:
 %   MATERIAL.manage()
 %   MATERIAL.list()
-%   MATERIAL.import(MATERIALNAME)
+%   MATERIAL.import(USERMATERIAL)
 %   MATERIAL.fetch()
 %   MATERIAL.edit(MATERIALNAME)
 %   MATERIAL.rename(OLDNAME, NEWNAME)
-%   MATERIAL.remove(MATERIALNAME)
+%   MATERIAL.remove(VARARGIN)
 %   MATERIAL.evaluate(MATERIALNAME)
 %   MATERIAL.copy(OLDNAME, NEWNAME)
 %   MATERIAL.query(MATERIALNAME)
@@ -37,8 +37,6 @@ classdef material < handle
         %% List materials in local database
         function [] = list()
             %MATERIAL.LIST    List materials in the local database.
-            %   This function lists the materials saved in the local
-            %   material databse.
             %
             %   MATERIAL.LIST() is called without arguments.
             %
@@ -60,14 +58,14 @@ classdef material < handle
         end
         
         %% Import material into local database from text file
-        function [] = import(material)
+        function [] = import(userMaterial)
             %MATERIAL.IMPORT    QFT function to import material text file.
             %   This function imports a material text file into the local
             %   material database.
             %
-            %   MATERIAL.IMPORT(MATERIAL) imports material data from a text
-            %   file 'MATERIAL.*' containing valid material definitioins.
-            %   The file must begin and end with the keywords
+            %   MATERIAL.IMPORT(USERMATERIAL) imports material data from a
+            %   text file 'USERMATERIAL.*' containing valid material
+            %   definitioins. The file must begin and end with the keywords
             %   *USER MATERIAL and *END MATERIAL, respectively.
             %
             %   Example material text file:
@@ -92,12 +90,12 @@ classdef material < handle
             setappdata(0, 'materialManagerImport', 1.0)
             
             % Check that the material exists
-            if exist(material, 'file') == 0.0
-                fprintf('ERROR: Unable to locate material ''%s''\n', material)
+            if exist(userMaterial, 'file') == 0.0
+                fprintf('ERROR: Unable to locate material ''%s''.\n', userMaterial)
                 return
             end
             
-            [error, material_properties, materialName, ~, ~] = importMaterial.processFile(material, -1.0); %#ok<ASGLU>
+            [error, material_properties, materialName, ~, ~] = importMaterial.processFile(userMaterial, -1.0); %#ok<ASGLU>
             
             if exist(['Data/material/local/', materialName, '.mat'], 'file') == 2.0
                 % User is attempting to overwrite an existing material
@@ -121,9 +119,12 @@ classdef material < handle
             try
                 save(['Data/material/local/', materialName], 'material_properties')
             catch
-                fprintf('ERROR: Unable to save material ''%s''. Make sure the material save location has read/write access\n', materialName)
+                fprintf('ERROR: Unable to save material ''%s''. Make sure the material save location has read/write access.\n', materialName)
                 return
             end
+            
+            % List materials in the local database
+            material.list()
         end
         
         %% Fetch material from system database
@@ -144,19 +145,19 @@ classdef material < handle
             quest2 = sprintf('1: Steel (SAE)\n');
             quest3 = sprintf('2: Steel (BS)\n');
             quest4 = sprintf('3: Steel (ASTM)\n');
-            quest5 = sprintf('4: Aluminium\n');
+            quest5 = sprintf('4: Aluminium (AL)\n');
             quest6 = sprintf('5: Iron (ADI)\n');
             quest7 = sprintf('6: Iron (DI)\n');
             quest8 = sprintf('7: Iron (CGI)\n');
-            quest9 = sprintf('8: Iron (GI)\n');
+            quest9 = sprintf('8: Iron (GI)\n>> ');
             
             databaseToFetch = input([quest1, quest2, quest3, quest4, quest5,...
                 quest6, quest7, quest8, quest9]);
             
             % Check validity of user selection
-            if isnumeric(databaseToFetch) == 0.0 || (databaseToFetch < 1.0 || databaseToFetch > 8.0 || mod(databaseToFetch, 2.0) ~= 0.0)
+            if isnumeric(databaseToFetch) == 0.0 || (databaseToFetch < 1.0 || databaseToFetch > 8.0 || rem(databaseToFetch, 1.0) ~= 0.0)
                 clc
-                fprintf('Invalid selection.\n');
+                fprintf('ERROR: Invalid selection.\n');
                 return
             end
             
@@ -165,14 +166,14 @@ classdef material < handle
                 case 1.0 % SAE
                     quest2 = sprintf('Select a material from the SAE database:\n\n');
                     quest3 = sprintf('1: SAE-950C\n2: SAE-0030\n3: SAE-0080\n4: SAE-1005\n5: SAE-1006\n');
-                    quest4 = sprintf('6: SAE-1006\n7: SAE-1008\n8: SAE-1015\n9: SAE-1020\n10: SAE-1020\n');
-                    quest5 = sprintf('11: SAE-1022\n12: SAE-1025\n13: SAE-1025\n14: SAE-1030\n15: SAE-1035\n');
-                    quest6 = sprintf('16: SAE-1040\n17: SAE-1045_2\n18: SAE-1045_3\n19: SAE-1045_4\n20: SAE-1045_5\n');
-                    quest7 = sprintf('21: SAE-1045_6\n22: SAE-1055\n23: SAE-1080\n24: SAE-1137\n25: SAE-1144\n');
-                    quest8 = sprintf('26: SAE-1522\n27: SAE-30302\n28: SAE-30304\n29: SAE-4130\n30: SAE-4140\n');
-                    quest9 = sprintf('31: SAE-4142\n32: SAE-4340\n33: SAE-52100\n');
+                    quest4 = sprintf('6: SAE-1008\n7: SAE-1015\n8: SAE-1020\n9: SAE-1022\n10: SAE-1025\n');
+                    quest5 = sprintf('11: SAE-1030\n12: SAE-1035\n13: SAE-1040\n14: SAE-1040\n15: SAE-1045_2\n');
+                    quest6 = sprintf('16: SAE-1045_3\n17: SAE-1045_4\n18: SAE-1045_5\n19: SAE-1045_6\n20: SAE-1055\n');
+                    quest7 = sprintf('21: SAE-1080\n22: SAE-1137\n23: SAE-1144\n24: SAE-1522\n25: SAE-30302\n');
+                    quest8 = sprintf('26: SAE-30304\n27: SAE-4130\n28: SAE-4140\n29: SAE-4142\n30: SAE-4340\n');
+                    quest9 = sprintf('31: SAE-52100\n>> ');
                     quest = [quest1, quest2, quest3, quest4, quest5, quest6, quest7, quest8, quest9];
-                    limit = 33.0;
+                    limit = 31.0;
                 case 2.0 % BS
                     quest2 = sprintf('Select a material from the BS database:\n\n');
                     quest3 = sprintf('1: BS 1480 G5083\n2: BS 1490 LM13\n3: BS 1490 LM16\n4: BS 1490 LM25\n5: BS 1490\n');
@@ -180,25 +181,25 @@ classdef material < handle
                     quest5 = sprintf('11: BS 4360 G43D2\n12: BS 970 G040A10\n13: BS 970 G53M40\n14: BS 970 G150M19\n15: BS 4360 G50A\n');
                     quest6 = sprintf('16: BS 970 G225M44\n17: BS 980 G605M36\n18: BS 970 G817M40\n19: BS 970 G835M40\n20: BS 1452 300 4\n');
                     quest7 = sprintf('21: BS 1452 300 6\n22: BS 2789370\n23: BS 2789420\n24: BS 2789420 3\n25: BS 2789600\n');
-                    quest8 = sprintf('26: BS 2789700\n27: BS 2789700\n28: BS 1452 5260\n');
+                    quest8 = sprintf('26: BS 2789700\n27: BS 2789700\n28: BS 1452 5260\n>> ');
                     quest = [quest1, quest2, quest3, quest4, quest5, quest6, quest7, quest8];
                     limit = 28.0;
                 case 3.0 % ASTM
                     quest1 = sprintf('Select a material from the ASTM database:\n\n');
                     quest2 = sprintf('1: ASTM A514F\n2: ASTM A579 G71\n3: ASTM A579 G72\n4: ASTM A579 G73\n5: ASTM A715 G50\n');
-                    quest3 = sprintf('6: ASTM A715 G80 1\n7: ASTM A715 G80 2\n');
+                    quest3 = sprintf('6: ASTM A715 G80 1\n7: ASTM A715 G80 2\n>> ');
                     quest = [quest1, quest2, quest3];
                     limit = 7.0;
-                case 4.0 % Aluminium
-                    quest1 = sprintf('Select a material from the aluminium database:\n\n');
+                case 4.0 % AL
+                    quest1 = sprintf('Select a material from the AL database:\n\n');
                     quest2 = sprintf('1: AL1100 T6\n2: AL2014 T6\n3: AL 2024 T351\n4: AL 2024 T4\n5: AL5456 H311\n');
-                    quest3 = sprintf('6: AL7075 T6\n');
+                    quest3 = sprintf('6: AL7075 T6\n>> ');
                     quest = [quest1, quest2, quest3];
                     limit = 6.0;
                 case 5.0 % ADI
                     quest1 = sprintf('Select a material from the ADI database:\n\n');
                     quest2 = sprintf('1: ADI GRD1 AUS 25mm\n2: ADI GRD1 AUS LIT\n3: ADI GRD2 AUS 25mm\n4: ADI GRD2 AUS CONTRB\n5: ADI GRD3 AUS 25mm\n');
-                    quest3 = sprintf('6: ADI GRD3 AUS CONTRB\n7: ADI GRD4 AUS 25mm\n8: ADI GRD4 AUS CONTRB');
+                    quest3 = sprintf('6: ADI GRD3 AUS CONTRB\n7: ADI GRD4 AUS 25mm\n8: ADI GRD4 AUS CONTRB\n>> ');
                     quest = [quest1, quest2, quest3];
                     limit = 8.0;
                 case 6.0 % DI
@@ -206,18 +207,18 @@ classdef material < handle
                     quest2 = sprintf('1: DI 4018 FAN 25mm\n2: DI 4018 SCAN 25mm\n3: DI 4018 AC 25mm\n4: DI 4512 AC 25mm\n5: DI 4512 AC CONTR1\n');
                     quest3 = sprintf('6: DI 4512 AC CONTR2\n7: DI 4512 AC CONTR3\n8: DI 4512 FAN CONTR\n9: DI 5506 AC CONTR1\n10: DI 5506 AC CONTR2');
                     quest4 = sprintf('11: DI 5506 AC CONTR3\n12: DI 5506 AC CONTR4\n13: DI 5506 AC CONTR5\n14: DI 5506 N CONTR\n15: DI 7703 AC 25mm');
-                    quest5 = sprintf('16: DI 7703 N 25mm\n17: DI 7703 N 76mm\n18: DI 7703 N CONTR\n19: DI 9002 QT 25mm\n');
+                    quest5 = sprintf('16: DI 7703 N 25mm\n17: DI 7703 N 76mm\n18: DI 7703 N CONTR\n19: DI 9002 QT 25mm\n>> ');
                     quest = [quest1, quest2, quest3, quest4, quest5];
                     limit = 19.0;
                 case 7.0 % CGI
                     quest1 = sprintf('Select a material from the CGI database:\n\n');
-                    quest2 = sprintf('1: CGI 300HN AC 25mm\n2: CGI 350HN AC 25mm\n3: CGI 400HN AC 25mm\n');
+                    quest2 = sprintf('1: CGI 300HN AC 25mm\n2: CGI 350HN AC 25mm\n3: CGI 400HN AC 25mm\n>> ');
                     quest = [quest1, quest2];
                     limit = 3.0;
                 case 8.0 % GI
                     quest1 = sprintf('Select a material from the GI database:\n\n');
                     quest2 = sprintf('1: GI 20B AC 25mm\n2: GI 30B AC 13mm\n3: GI 30B AC 25mm\n4: GI 30B AC 76mm\n5: GI 30 AC 25mm CONTR');
-                    quest3 = sprintf('6: GI 35B AC 25mm\n7: GI 40B AC 25mm\n8: GI AGI AUS 25mm\n');
+                    quest3 = sprintf('6: GI 35B AC 25mm\n7: GI 40B AC 25mm\n8: GI AGI AUS 25mm\n>> ');
                     quest = [quest1, quest2, quest3];
                     limit = 8.0;
                 otherwise
@@ -225,9 +226,9 @@ classdef material < handle
             materialToFetch = input(quest);
             
             % Check validity of user selection
-            if isnumeric(materialToFetch) == 0.0 || (materialToFetch < 1.0 || materialToFetch > limit || mod(materialToFetch, 2.0) ~= 0.0)
+            if isnumeric(materialToFetch) == 0.0 || (materialToFetch < 1.0 || materialToFetch > limit || rem(materialToFetch, 1.0) ~= 0.0)
                 clc
-                fprintf('Invalid selection.\n');
+                fprintf('ERROR: Invalid selection.\n');
                 return
             end
             
@@ -235,7 +236,7 @@ classdef material < handle
             if exist('mat.mat', 'file') == 2.0
                 load('mat.mat')
             else
-                fprintf('Missing file ''mat.mat''. Check that the file exists in Data\\material\\system.\n')
+                fprintf('ERROR: Missing file ''mat.mat''. Check that the file exists in Data\\material\\system.\n')
                 return
             end
             
@@ -398,7 +399,7 @@ classdef material < handle
             
             for i = 1:length(userMaterials)
                 if strcmpi([materialName, '.mat'], userMaterials(i).name) == 1.0
-                    fprintf(sprintf('%s already exists in the local database and cannot be overwritten.\n', materialName));
+                    fprintf(sprintf('ERROR: %s already exists in the local database and cannot be overwritten.\n', materialName));
                     return
                 end
             end
@@ -407,9 +408,12 @@ classdef material < handle
             try
                 save(['Data\material\local\', materialName, '.mat'], 'material_properties')
             catch
-                fprintf('Cannot fetch ''%s'' because the local database is not currently on the MATLAB path.\n', copiedMaterial);
+                fprintf('ERROR: Cannot fetch ''%s'' because the local database is not currently on the MATLAB path.\n', copiedMaterial);
                 return
             end
+            
+            % List materials in the local database
+            material.list()
         end
         
         %% Edit material in local database
@@ -437,7 +441,6 @@ classdef material < handle
         %% Rename material in local database
         function [] = rename(oldName, newName)
             %MATERIAL.RENAME    Rename material in the local database.
-            %   This function renames a material in the local database.
             %
             %   MATERIAL.RENAME(OLDNAME, NEWNAME) renames the material
             %   OLDNAME to the material NEWNAME.
@@ -449,14 +452,14 @@ classdef material < handle
             if isempty(newName) == 1.0
                 return
             elseif isempty(regexp(newName, '[/\\*:?"<>|]', 'once')) == 0.0
-                fprintf('The material name cannot contain any of the following characters: / \\ * : ? " < > |\n');
+                fprintf('ERROR: The material name cannot contain any of the following characters: / \\ * : ? " < > |\n');
                 return
             elseif strcmp(newName, oldName) == 1.0
                 % Material already exists
                 if exist([newName, '.mat'], 'file') == 0.0
-                    fprintf('Could not rename %s because it no longer exists in the local database.\n', oldName);
+                    fprintf('ERROR: Could not rename %s because it no longer exists in the local database.\n', oldName);
                 else
-                    fprintf('%s already exists in the local database and cannot be overwritten.\n', newName);
+                    fprintf('ERROR: %s already exists in the local database and cannot be overwritten.\n', newName);
                 end
                 return
             else
@@ -469,44 +472,55 @@ classdef material < handle
                     movefile(fullpathOld, fullpathNew)
                 catch
                     if exist(fullpathOld, 'file') == 0.0
-                        fprintf('Could not rename %s because it does not exist in the local database.\n', newName);
+                        fprintf('ERROR: Could not rename %s because it does not exist in the local database.\n', newName);
                     else
-                        fprintf('Material name %s is invalid.\n', newName);
+                        fprintf('ERROR: Material name %s is invalid.\n', newName);
                     end
                     return
                 end
             end
+            
+            % List materials in the local database
+            material.list()
         end
         
         %% Delete material from local database
-        function [] = remove(material)
-            %MATERIAL.REMOVE    Remove material in the local database.
-            %   This function removes a material in the local database.
+        function [] = remove(varargin)
+            %MATERIAL.REMOVE    Remove material from the local database.
             %
-            %   MATERIAL.REMOVE(MATERIAL) removes the material MATERIAL
-            %   from the local database.
+            %   MATERIAL.REMOVE(VARARGIN) removes the materials specified
+            %   with VARARGIN from the local database.
+            %
+            %   VARARGIN is specified as a series of strings:
+            %   MATERIAL.REMOVE('material-1', 'material-2'..., 'material-3')
             %
             %   Reference section in Quick Fatigue Tool User Guide
             %      5 Materials
             
             clc
             
-            if strcmpi(material(end - 3.0:end), '.mat') == 1.0
-                material = material(1.0:end - 4.0);
+            for i = 1:nargin
+                materialToRemove = varargin{i};
+                
+                if strcmpi(materialToRemove(end - 3.0:end), '.mat') == 1.0
+                    materialToRemove = materialToRemove(1.0:end - 4.0);
+                end
+                
+                fullpath = [pwd, '\Data\material\local\', materialToRemove, '.mat'];
+                if exist(fullpath, 'file') ~= 0.0
+                    delete(fullpath);
+                else
+                    fprintf('ERROR: Could not delete %s because it does not exist in the local database.\n', materialToRemove);
+                end
             end
             
-            fullpath = [pwd, '\Data\material\local\', material, '.mat'];
-            if exist(fullpath, 'file') ~= 0.0
-                delete(fullpath);
-            else
-                fprintf('Could not delete %s because it does not exist in the local database.\n', material);
-            end
+            % List materials in the local database
+            material.list()
         end
         
         %% Evaluate material in local database
         function [] = evaluate(material)
             %MATERIAL.EVALUATE    Evaluate material in the local database.
-            %   This function evaluates a material in the local database.
             %
             %   MATERIAL.EVALUATE(MATERIAL) evaluates the material MATERIAL
             %   in the local database.
@@ -562,7 +576,6 @@ classdef material < handle
         %% Copy material in local database
         function [] = copy(oldName, newName)
             %MATERIAL.COPY    Copy material in the local database.
-            %   This function copies a material in the local database.
             %
             %   MATERIAL.COPY(OLDNAME, NEWNAME) copies the material OLDNAME
             %   to the material NEWNAME.
@@ -584,7 +597,7 @@ classdef material < handle
             if isempty(newName) == 1.0
                 return
             elseif isempty(regexp(newName, '[/\\*:?"<>|]', 'once')) == 0.0
-                fprintf('The material name cannot contain any of the following characters: / \\ * : ? " < > |\n');
+                fprintf('ERROR: The material name cannot contain any of the following characters: / \\ * : ? " < > |\n');
                 return
             else
                 % Check if the material already exists
@@ -592,7 +605,7 @@ classdef material < handle
                 
                 for i = 1:length(userMaterials)
                     if strcmp([newName, '.mat'], userMaterials(i).name) == 1.0
-                        fprintf('%s already exists in the local database and cannot be overwritten.\n', newName);
+                        fprintf('ERROR: %s already exists in the local database and cannot be overwritten.\n', newName);
                         return
                     end
                 end
@@ -606,18 +619,20 @@ classdef material < handle
                 copyfile(oldPath, newPath)
             catch
                 if exist(oldName, 'file') == 0.0
-                    fprintf('Could not copy %s because it does not exist in the local database.\n', oldName);
+                    fprintf('ERROR: Could not copy %s because it does not exist in the local database.\n', oldName);
                 else
-                    fprintf('Could not copy %s. Make sure the material name does not contain any illegal characters.\n', newName);
+                    fprintf('ERROR: Could not copy %s. Make sure the material name does not contain any illegal characters.\n', newName);
                 end
                 return
             end
+            
+            % List materials in the local database
+            material.list()
         end
         
         %% Query material in the local database
         function [] = query(material)
             %MATERIAL.QUERY    Query material in the local database.
-            %   This function queries a material in the local database.
             %
             %   MATERIAL.QUERY(MATERIAL) queries the material MATERIAL.
             %
@@ -633,14 +648,14 @@ classdef material < handle
             % Get the material properties
             fullpath = ['Data\material\local\', material, '.mat'];
             if exist(fullpath, 'file') == 0.0
-                fprintf('Could not query ''%s'' because the file does not exist in the local database.\n', material);
+                fprintf('ERROR: Could not query ''%s'' because the file does not exist in the local database.\n', material);
                 return
             else
                 load(fullpath)
             end
             
             if exist('material_properties', 'var') == 0.0
-                fprintf('Error whilst reading ''%s''. Properties are inaccessible.\n', material);
+                fprintf('ERROR: ''%s'' contains inaccessible properties.\n', material);
             elseif isempty(material_properties.comment) == 1.0
                 fprintf('No information available for %s.\n', material);
             else
