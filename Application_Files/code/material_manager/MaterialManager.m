@@ -234,7 +234,7 @@ else
     userMaterials = dir('Data/material/local/*.mat');
     
     for i = 1:length(userMaterials)
-        if strcmp([copiedMaterial, '.mat'], userMaterials(i).name) == 1.0
+        if strcmpi([copiedMaterial, '.mat'], userMaterials(i).name) == 1.0
             message = sprintf('%s already exists in the local database and cannot be overwritten.', copiedMaterial);
             if get(handles.rButton_user, 'value') == 1.0
                 errordlg(message, 'Quick Fatigue Tool')
@@ -294,11 +294,11 @@ else
     
     material_properties = saveMaterial(properties); %#ok<NASGU>
     
-    % Save the copy in the /USER_MATERIAL directory
+    % Save the copy in the /LOCAL directory
     try
         save(['Data\material\local\', copiedMaterial, '.mat'], 'material_properties')
     catch
-        message = sprintf('Cannot fetch %s because the local database is not currently on the MATLAB path.', copiedMaterial);
+        message = sprintf('Cannot fetch ''%s'' because the local database is not currently on the MATLAB path.', copiedMaterial);
         errordlg(message, 'Quick Fatigue Tool')
         return
     end
@@ -594,12 +594,12 @@ if isempty(properties.comment)
     material_properties.comment = '';
 end
 
-if properties.default_algorithm < 4
-    material_properties.default_algorithm = properties.default_algorithm + 1;
-elseif properties.default_algorithm < 10
-    material_properties.default_algorithm = properties.default_algorithm + 2;
+if properties.default_algorithm < 4.0
+    material_properties.default_algorithm = properties.default_algorithm + 1.0;
+elseif properties.default_algorithm < 10.0
+    material_properties.default_algorithm = properties.default_algorithm + 2.0;
 else
-    material_properties.default_algorithm = properties.default_algorithm + 3;
+    material_properties.default_algorithm = properties.default_algorithm + 3.0;
 end
 
 
