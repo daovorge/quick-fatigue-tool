@@ -4,9 +4,21 @@ classdef material < handle
 %   
 %   Functions in MATERIAL are used to replicate the behaviour of the 
 %   Material Manager GUI.
+%
+%   MATERIAL contains the following utility functions:
+%   MATERIAL.manage()
+%   MATERIAL.list()
+%   MATERIAL.import(MATERIALNAME)
+%   MATERIAL.fetch()
+%   MATERIAL.edit(MATERIALNAME)
+%   MATERIAL.rename(OLDNAME, NEWNAME)
+%   MATERIAL.remove(MATERIALNAME)
+%   MATERIAL.evaluate(MATERIALNAME)
+%   MATERIAL.copy(OLDNAME, NEWNAME)
+%   MATERIAL.query(MATERIALNAME)
 %   
-%   Quick Fatigue Tool 6.10-08 Copyright Louis Vallance 2017
-%   Last modified 15-May-2017 08:49:00 GMT
+%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
+%   Last modified 22-May-2017 10:29:10 GMT
     
     %%
     
