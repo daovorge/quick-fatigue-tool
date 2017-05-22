@@ -65,7 +65,7 @@ classdef material < handle
             %
             %   MATERIAL.IMPORT(USERMATERIAL) imports material data from a
             %   text file 'USERMATERIAL.*' containing valid material
-            %   definitioins. The file must begin and end with the keywords
+            %   definitions. The file must begin and end with the keywords
             %   *USER MATERIAL and *END MATERIAL, respectively.
             %
             %   Example material text file:
