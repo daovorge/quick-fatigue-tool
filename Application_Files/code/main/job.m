@@ -136,8 +136,11 @@ while feof(fid) == 0.0
         continue
     end
     
+    % Check if the current line is a comment
+    if (length(TLINE) > 1.0) && (strcmp(TLINE(1.0:2.0), '**') == 1.0)
+        continue
     % Check that the current line is a keyword
-    if strcmp(TLINE(1.0), '*') == 1.0
+    elseif strcmp(TLINE(1.0), '*') == 1.0
         % The current line is a keyword definition
         
         % Isolate the keyword
