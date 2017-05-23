@@ -1449,6 +1449,7 @@ classdef messenger < handle
                     case 167.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The stress dataset contains %.0f duplicate analysis items', returnType{i}], getappdata(0, 'message_167_nDuplicateItems'));
                         fprintf(fidType(i), ['-> A list of these items has been written to ''%s\\Project\\output\\%s\\Data Files\\warn_model_duplicate_ids.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
+                        fprintf(fidType(i), ['-> Analysis results may be incorrect', returnType{i}]);
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 168.0

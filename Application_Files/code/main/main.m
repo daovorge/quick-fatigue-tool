@@ -819,6 +819,7 @@ setappdata(0, 'worstNodeTxz', Txz(tensorID, :))
 x1 = find(mainID == worstMainID);
 x2 = find(subID == worstSubID);
 x3 = intersect(x1, x2);
+x3 = x3(1.0);
 s1i = s1(x3, :);
 s2i = s2(x3, :);
 s3i = s3(x3, :);
