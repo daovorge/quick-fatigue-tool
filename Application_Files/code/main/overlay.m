@@ -9,7 +9,7 @@ classdef overlay < handle
 %      4.8 Analysis continuation techniques
 %   
 %   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 04-Apr-2017 13:26:59 GMT
+%   Last modified 24-May-2017 14:36:28 GMT
     
     %%
     
@@ -183,6 +183,41 @@ classdef overlay < handle
             fields = [];
             fieldNames = 'Main ID\tSub ID';
             fieldLabels = '%.0f\t%.0f';
+            units = getappdata(0, 'loadEqUnits');
+            
+            % Field output format string
+            f = getappdata(0, 'fieldFormatString');
+            
+            %% L
+            [isCurrentField, indexCurrent] = ismember(sprintf('L (%s)', units), fieldNamesCurrent);
+            [isPreviousField, indexPrevious] = ismember(sprintf('L (%s)', units), fieldNamesPrevious);
+            
+            if (isCurrentField == 1.0) && (isPreviousField == 0.0)
+                L = fieldDataCurrent(:, indexCurrent);
+            elseif (isCurrentField == 0.0) && (isPreviousField == 1.0)
+                L = fieldDataPrevious(:, indexPrevious);
+            elseif (isCurrentField == 1.0) && (isPreviousField == 1.0)
+                L = 1.0./((1.0./fieldDataPrevious(:, indexPrevious)) + (1.0./fieldDataCurrent(:, indexCurrent)));
+            else
+                L = 'UNDEFINED';
+            end
+            
+            %% LL
+            if ischar(L) == 0.0
+                LL = log10(L);
+                cael = getappdata(0, 'cael');
+                for i = 1:length(LL)
+                    if LL(i) > log10(0.5*cael)
+                        LL(i) = log10(0.5*cael);
+                    elseif LL(i) < 0.0
+                        LL(i) = 0.0;
+                    end
+                end
+                
+                fields = [fields, L, LL];
+                fieldNames = [fieldNames, sprintf('\tL (%s)\tLL (%s)', units, units)];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s\t%%%s', f, f)];
+            end
             
             %% D
             [isCurrentField, indexCurrent] = ismember('D', fieldNamesCurrent);
@@ -198,31 +233,13 @@ classdef overlay < handle
                 D = 'UNDEFINED';
             end
             
+            %% DDL
             if ischar(D) == 0.0
-                % L
-                L = 1.0./D;
-                
-                % LL
-                LL = log10(L);
-                cael = getappdata(0, 'cael');
-                for i = 1:length(LL)
-                    if LL(i) > log10(0.5*cael)
-                        LL(i) = log10(0.5*cael);
-                    elseif LL(i) < 0.0
-                        LL(i) = 0.0;
-                    end
-                end
-                
-                % DDL
                 DDL = D*getappdata(0, 'dLife');
                 
-                fields = [fields, L, LL, D, DDL];
-                fieldNames = [fieldNames, '\tL', sprintf(' (%s)', getappdata(0, 'loadEqUnits')), '\tLL', sprintf(' (%s)', getappdata(0, 'loadEqUnits')), '\tD\tDDL'];
-                fieldLabels = [fieldLabels, '\t%.4e\t%.4f\t%.4g\t%.4g'];
-            else
-                L = 'UNDEFINED'; %#ok<NASGU>
-                LL = 'UNDEFINED'; %#ok<NASGU>
-                DDL = 'UNDEFINED'; %#ok<NASGU>
+                fields = [fields, D, DDL];
+                fieldNames = [fieldNames, '\tD\tDDL'];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s\t%%%s', f, f)];
             end
             
             %% FOS
@@ -245,7 +262,7 @@ classdef overlay < handle
             if ischar(FOS) == 0.0
                 fields = [fields, FOS];
                 fieldNames = [fieldNames, '\tFOS'];
-                fieldLabels = [fieldLabels, '\t%.4f'];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             end
             
             %% SFA
@@ -268,7 +285,7 @@ classdef overlay < handle
             if ischar(SFA) == 0.0
                 fields = [fields, SFA];
                 fieldNames = [fieldNames, '\tSFA'];
-                fieldLabels = [fieldLabels, '\t%.4f'];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             end
             
             %% FRFR
@@ -291,7 +308,7 @@ classdef overlay < handle
             if ischar(FRFR) == 0.0
                 fields = [fields, FRFR];
                 fieldNames = [fieldNames, '\tFRFR'];
-                fieldLabels = [fieldLabels, '\t%.4f'];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             end
             
             %% FRFH
@@ -314,7 +331,7 @@ classdef overlay < handle
             if ischar(FRFH) == 0.0
                 fields = [fields, FRFH];
                 fieldNames = [fieldNames, '\tFRFH'];
-                fieldLabels = [fieldLabels, '\t%.4f'];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             end
             
             %% FRFV
@@ -337,7 +354,7 @@ classdef overlay < handle
             if ischar(FRFV) == 0.0
                 fields = [fields, FRFV];
                 fieldNames = [fieldNames, '\tFRFV'];
-                fieldLabels = [fieldLabels, '\t%.4f'];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             end
             
             %% FRFW
@@ -352,7 +369,7 @@ classdef overlay < handle
             if ischar(FRFW) == 0.0
                 fields = [fields, FRFW];
                 fieldNames = [fieldNames, '\tFRFW'];
-                fieldLabels = [fieldLabels, '\t%.4f'];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             end
             
             %% SMAX
@@ -385,7 +402,7 @@ classdef overlay < handle
             if ischar(SMAX) == 0.0
                 fields = [fields, SMAX];
                 fieldNames = [fieldNames, '\tSMAX (MPa)'];
-                fieldLabels = [fieldLabels, '\t%.4f'];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             end
             
             %% SMXP
@@ -407,7 +424,7 @@ classdef overlay < handle
             if ischar(SMXP) == 0.0
                 fields = [fields, SMXP];
                 fieldNames = [fieldNames, '\tSMXP'];
-                fieldLabels = [fieldLabels, '\t%.4f'];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             end
             
             %% SMXU
@@ -429,7 +446,7 @@ classdef overlay < handle
             if ischar(SMXU) == 0.0
                 fields = [fields, SMXU];
                 fieldNames = [fieldNames, '\tSMXU'];
-                fieldLabels = [fieldLabels, '\t%.4f'];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             end
             
             %% TRF
@@ -451,7 +468,7 @@ classdef overlay < handle
             if ischar(TRF) == 0.0
                 fields = [fields, TRF];
                 fieldNames = [fieldNames, '\tTRF'];
-                fieldLabels = [fieldLabels, '\t%.4f'];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             end
             
             %% WCM
@@ -473,7 +490,7 @@ classdef overlay < handle
             if ischar(WCM) == 0.0
                 fields = [fields, WCM];
                 fieldNames = [fieldNames, '\tWCM (MPa)'];
-                fieldLabels = [fieldLabels, '\t%.4f'];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             end
             
             %% WCA
@@ -495,7 +512,7 @@ classdef overlay < handle
             if ischar(WCA) == 0.0
                 fields = [fields, WCA];
                 fieldNames = [fieldNames, '\tWCA (MPa)'];
-                fieldLabels = [fieldLabels, '\t%.4f'];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             end
             
             %% WCATAN
@@ -508,7 +525,7 @@ classdef overlay < handle
             if ischar(WCATAN) == 0.0
                 fields = [fields, WCATAN];
                 fieldNames = [fieldNames, '\tWCATAN (Deg)'];
-                fieldLabels = [fieldLabels, '\t%.4f'];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             end
             
             %% WCDP
@@ -530,7 +547,7 @@ classdef overlay < handle
             if ischar(WCDP) == 0.0
                 fields = [fields, WCDP];
                 fieldNames = [fieldNames, '\tWCDP (MPa)'];
-                fieldLabels = [fieldLabels, '\t%.4f'];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             end
             
             %% YIELD
@@ -812,6 +829,41 @@ classdef overlay < handle
             fields = [];
             fieldNames = 'Main ID\tSub ID';
             fieldLabels = '%.0f\t%.0f';
+            units = getappdata(0, 'loadEqUnits');
+            
+            % Field output format string
+            f = getappdata(0, 'fieldFormatString');
+            
+            %% L
+            [isAField, indexA] = ismember('L', fieldNamesA);
+            [isBField, indexB] = ismember('L', fieldNamesB);
+            
+            if (isAField == 1.0) && (isBField == 0.0)
+                L = fieldDataA_overlay(:, indexA);
+            elseif (isAField == 0.0) && (isBField == 1.0)
+                L = fieldDataB_overlay(:, indexB);
+            elseif (isAField == 1.0) && (isBField == 1.0)
+                L = 1.0./((1.0./fieldDataB_overlay(:, indexB)) + (1.0./fieldDataA_overlay(:, indexA)));
+            else
+                L = 'UNDEFINED';
+            end
+            
+            %% LL
+            if ischar(L) == 0.0
+                LL = log10(L);
+                cael = getappdata(0, 'cael');
+                for i = 1:length(LL)
+                    if LL(i) > log10(0.5*cael)
+                        LL(i) = log10(0.5*cael);
+                    elseif LL(i) < 0.0
+                        LL(i) = 0.0;
+                    end
+                end
+                
+                fields = [fields, L, LL];
+                fieldNames = [fieldNames, sprintf('\tL (%s)\tLL (%s)', units, units)];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s\t%%%s', f, f)];
+            end
             
             %% D
             [isAField, indexA] = ismember('D', fieldNamesA);
@@ -827,31 +879,13 @@ classdef overlay < handle
                 D = 'UNDEFINED';
             end
             
+            %% DDL
             if ischar(D) == 0.0
-                % L
-                L = 1.0./D;
-                
-                % LL
-                LL = log10(L);
-                cael = getappdata(0, 'cael');
-                for i = 1:length(LL)
-                    if LL(i) > log10(0.5*cael)
-                        LL(i) = log10(0.5*cael);
-                    elseif LL(i) < 0.0
-                        LL(i) = 0.0;
-                    end
-                end
-                
-                % DDL
                 DDL = D*getappdata(0, 'dLife');
                 
-                fields = [fields, L, LL, D, DDL];
-                fieldNames = [fieldNames, '\tL', sprintf(' (%s)', getappdata(0, 'loadEqUnits')), '\tLL', sprintf(' (%s)', getappdata(0, 'loadEqUnits')), '\tD\tDDL'];
-                fieldLabels = [fieldLabels, '\t%.4e\t%.4f\t%.4g\t%.4g'];
-            else
-                L = 'UNDEFINED'; %#ok<NASGU>
-                LL = 'UNDEFINED'; %#ok<NASGU>
-                DDL = 'UNDEFINED'; %#ok<NASGU>
+                fields = [fields, D, DDL];
+                fieldNames = [fieldNames, '\tD\tDDL'];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s\t%%%s', f, f)];
             end
             
             %% FOS
@@ -874,7 +908,7 @@ classdef overlay < handle
             if ischar(FOS) == 0.0
                 fields = [fields, FOS];
                 fieldNames = [fieldNames, '\tFOS'];
-                fieldLabels = [fieldLabels, '\t%.4f'];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             end
             
             %% SFA
@@ -897,7 +931,7 @@ classdef overlay < handle
             if ischar(SFA) == 0.0
                 fields = [fields, SFA];
                 fieldNames = [fieldNames, '\tSFA'];
-                fieldLabels = [fieldLabels, '\t%.4f'];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             end
             
             %% FRFR
@@ -920,7 +954,7 @@ classdef overlay < handle
             if ischar(FRFR) == 0.0
                 fields = [fields, FRFR];
                 fieldNames = [fieldNames, '\tFRFR'];
-                fieldLabels = [fieldLabels, '\t%.4f'];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             end
             
             %% FRFH
@@ -943,7 +977,7 @@ classdef overlay < handle
             if ischar(FRFH) == 0.0
                 fields = [fields, FRFH];
                 fieldNames = [fieldNames, '\tFRFH'];
-                fieldLabels = [fieldLabels, '\t%.4f'];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             end
             
             %% FRFV
@@ -966,7 +1000,7 @@ classdef overlay < handle
             if ischar(FRFV) == 0.0
                 fields = [fields, FRFV];
                 fieldNames = [fieldNames, '\tFRFV'];
-                fieldLabels = [fieldLabels, '\t%.4f'];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             end
             
             %% FRFW
@@ -981,7 +1015,7 @@ classdef overlay < handle
             if ischar(FRFW) == 0.0
                 fields = [fields, FRFW];
                 fieldNames = [fieldNames, '\tFRFW'];
-                fieldLabels = [fieldLabels, '\t%.4f'];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             end
             
             %% SMAX
@@ -1014,7 +1048,7 @@ classdef overlay < handle
             if ischar(SMAX) == 0.0
                 fields = [fields, SMAX];
                 fieldNames = [fieldNames, '\tSMAX (MPa)'];
-                fieldLabels = [fieldLabels, '\t%.4f'];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             end
             
             %% SMXP
@@ -1036,7 +1070,7 @@ classdef overlay < handle
             if ischar(SMXP) == 0.0
                 fields = [fields, SMXP];
                 fieldNames = [fieldNames, '\tSMXP'];
-                fieldLabels = [fieldLabels, '\t%.4f'];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             end
             
             %% SMXU
@@ -1058,7 +1092,7 @@ classdef overlay < handle
             if ischar(SMXU) == 0.0
                 fields = [fields, SMXU];
                 fieldNames = [fieldNames, '\tSMXU'];
-                fieldLabels = [fieldLabels, '\t%.4f'];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             end
             
             %% TRF
@@ -1080,7 +1114,7 @@ classdef overlay < handle
             if ischar(TRF) == 0.0
                 fields = [fields, TRF];
                 fieldNames = [fieldNames, '\tTRF'];
-                fieldLabels = [fieldLabels, '\t%.4f'];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             end
             
             %% WCM
@@ -1102,7 +1136,7 @@ classdef overlay < handle
             if ischar(WCM) == 0.0
                 fields = [fields, WCM];
                 fieldNames = [fieldNames, '\tWCM (MPa)'];
-                fieldLabels = [fieldLabels, '\t%.4f'];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             end
             
             %% WCA
@@ -1124,7 +1158,7 @@ classdef overlay < handle
             if ischar(WCA) == 0.0
                 fields = [fields, WCA];
                 fieldNames = [fieldNames, '\tWCA (MPa)'];
-                fieldLabels = [fieldLabels, '\t%.4f'];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             end
             
             %% WCATAN
@@ -1137,7 +1171,7 @@ classdef overlay < handle
             if ischar(WCATAN) == 0.0
                 fields = [fields, WCATAN];
                 fieldNames = [fieldNames, '\tWCATAN (Deg)'];
-                fieldLabels = [fieldLabels, '\t%.4f'];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             end
             
             %% WCDP
@@ -1159,7 +1193,7 @@ classdef overlay < handle
             if ischar(WCDP) == 0.0
                 fields = [fields, WCDP];
                 fieldNames = [fieldNames, '\tWCDP (MPa)'];
-                fieldLabels = [fieldLabels, '\t%.4f'];
+                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             end
             
             %% YIELD

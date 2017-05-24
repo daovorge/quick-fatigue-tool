@@ -18,7 +18,7 @@ classdef material < handle
 %   MATERIAL.query(MATERIALNAME)
 %   
 %   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 22-May-2017 10:29:10 GMT
+%   Last modified 24-May-2017 10:32:34 GMT
     
     %%
     
@@ -399,7 +399,7 @@ classdef material < handle
             
             for i = 1:length(userMaterials)
                 if strcmpi([materialName, '.mat'], userMaterials(i).name) == 1.0
-                    fprintf(sprintf('ERROR: %s already exists in the local database and cannot be overwritten.\n', materialName));
+                    fprintf(sprintf('ERROR: ''%s'' already exists in the local database and cannot be overwritten.\n', materialName));
                     return
                 end
             end
@@ -432,6 +432,12 @@ classdef material < handle
                 material = material(1.0:end - 4.0);
             end
             
+            % Check that the material exists in the local directory
+            if exist([pwd, '\Data\material\local\', material, '.mat'], 'file') == 0.0
+                fprintf('ERROR: Material ''%s'' does not exist in the local database.\n', material);
+                return
+            end
+            
             setappdata(0, 'editMaterial', 1.0)
             
             setappdata(0, 'materialToEdit', material)
@@ -457,9 +463,9 @@ classdef material < handle
             elseif strcmp(newName, oldName) == 1.0
                 % Material already exists
                 if exist([newName, '.mat'], 'file') == 0.0
-                    fprintf('ERROR: Could not rename %s because it no longer exists in the local database.\n', oldName);
+                    fprintf('ERROR: Material ''%s'' does not exist in the local database.\n', oldName);
                 else
-                    fprintf('ERROR: %s already exists in the local database and cannot be overwritten.\n', newName);
+                    fprintf('ERROR: ''%s'' already exists in the local database and cannot be overwritten.\n', newName);
                 end
                 return
             else
@@ -472,9 +478,9 @@ classdef material < handle
                     movefile(fullpathOld, fullpathNew)
                 catch
                     if exist(fullpathOld, 'file') == 0.0
-                        fprintf('ERROR: Could not rename %s because it does not exist in the local database.\n', newName);
+                        fprintf('ERROR: Could not rename ''%s'' because it does not exist in the local database.\n', newName);
                     else
-                        fprintf('ERROR: Material name %s is invalid.\n', newName);
+                        fprintf('ERROR: Material name ''%s'' is invalid.\n', newName);
                     end
                     return
                 end
@@ -510,7 +516,8 @@ classdef material < handle
                 if exist(fullpath, 'file') ~= 0.0
                     delete(fullpath);
                 else
-                    fprintf('ERROR: Could not delete %s because it does not exist in the local database.\n', materialToRemove);
+                    fprintf('ERROR: Material ''%s'' does not exist in the local database.\n', materialToRemove);
+                    return
                 end
             end
             
@@ -553,7 +560,7 @@ classdef material < handle
             end
             
             % User message
-            message = sprintf('A material report has been written to %s.', fileName);
+            message = sprintf('A material report has been written to ''%s''.', fileName);
             
             if (ispc == 1.0) && (ismac == 0.0)
                 userResponse = questdlg(message, 'Quick Fatigue Tool', 'Open in MATLAB...',...
@@ -605,7 +612,7 @@ classdef material < handle
                 
                 for i = 1:length(userMaterials)
                     if strcmp([newName, '.mat'], userMaterials(i).name) == 1.0
-                        fprintf('ERROR: %s already exists in the local database and cannot be overwritten.\n', newName);
+                        fprintf('ERROR: ''%'' already exists in the local database and cannot be overwritten.\n', newName);
                         return
                     end
                 end
@@ -619,9 +626,9 @@ classdef material < handle
                 copyfile(oldPath, newPath)
             catch
                 if exist(oldName, 'file') == 0.0
-                    fprintf('ERROR: Could not copy %s because it does not exist in the local database.\n', oldName);
+                    fprintf('ERROR: Material ''%s'' does not exist in the local database.\n', oldName);
                 else
-                    fprintf('ERROR: Could not copy %s. Make sure the material name does not contain any illegal characters.\n', newName);
+                    fprintf('ERROR: Could not copy ''%s''. The material name cannot contain any of the following characters: / \\ * : ? " < > |\n', newName);
                 end
                 return
             end
@@ -648,7 +655,7 @@ classdef material < handle
             % Get the material properties
             fullpath = ['Data\material\local\', material, '.mat'];
             if exist(fullpath, 'file') == 0.0
-                fprintf('ERROR: Could not query ''%s'' because the file does not exist in the local database.\n', material);
+                fprintf('ERROR: Material ''%s'' does not exist in the local database.\n', material);
                 return
             else
                 load(fullpath)
@@ -657,7 +664,7 @@ classdef material < handle
             if exist('material_properties', 'var') == 0.0
                 fprintf('ERROR: ''%s'' contains inaccessible properties.\n', material);
             elseif isempty(material_properties.comment) == 1.0
-                fprintf('No information available for %s.\n', material);
+                fprintf('No information available for ''%s''.\n', material);
             else
                 fprintf('Information for material ''%s'': %s\n', material, material_properties.comment);
             end
