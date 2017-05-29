@@ -18,7 +18,7 @@ classdef material < handle
 %   MATERIAL.query(MATERIALNAME)
 %   
 %   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 24-May-2017 10:32:34 GMT
+%   Last modified 29-May-2017 14:33:59 GMT
     
     %%
     
@@ -55,6 +55,17 @@ classdef material < handle
                     fprintf('%s\n', localMaterials(i).name(1.0:end - 4.0))
                 end
             end
+        end
+        
+        %% Createa a new material
+        function [] = create()
+            %MATERIAL.CREATE    Create a new material with the material editor.
+            %
+            %   MATERIAL.CREATE() is called without arguments.
+            %
+            %   Reference section in Quick Fatigue Tool User Guide
+            %      5 Materials
+            UserMaterial
         end
         
         %% Import material into local database from text file
