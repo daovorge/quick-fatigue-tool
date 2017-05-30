@@ -5,7 +5,7 @@ classdef algorithm_user < handle
 %
 %   Variables to be defined:
 %   DPARAMI
-%      Maximum damage parameter for the current analysis item. DPARAMI is a
+%      Maximum damage parameter at the current analysis item. DPARAMI is a
 %      1xL numeric array where L is the number of analysis items. DPARAMI
 %      is defined as follows:
 %
