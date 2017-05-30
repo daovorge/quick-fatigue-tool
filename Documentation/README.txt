@@ -301,4 +301,4 @@ Quick Fatigue Tool User Guide.
 %   louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 29-May-2017 14:33:59 GMT
+%   Last modified 30-May-2017 10:53:46 GMT

@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 22-May-2017 15:50:20 GMT
+%   Last modified 30-May-2017 10:53:46 GMT
 
     %%
 
@@ -21,19 +21,37 @@ classdef preProcess < handle
            setappdata(0, 'getMaterial_currentMaterial', material)
 
            %% Check if the material is specified with its .mat extension
-           [~, ~, ext] = fileparts(material);
-           if isempty(ext) == 1.0
+           [PATHSTR, ~, EXT] = fileparts(material);
+           if isempty(EXT) == 1.0
                material = [material, '.mat'];
            end
 
            %% Open the .mat file for reading:
-           if exist(['data/material/local/', material], 'file') ~= 2.0
-               setappdata(0, 'material', material)
-               error = 1.0;
-               return
+           if isempty(PATHSTR) == 0.0
+               %{
+                   The material was specified with a path, so search this
+                   location first
+               %}
+               if exist(material, 'file') ~= 2.0
+                   setappdata(0, 'material', material)
+                   error = 1.0;
+                   return
+               end
+           else
+               %{
+                   The material was specified without a path. Check the
+                   local material database first
+               %}
+               if exist(['Data/material/local/', material], 'file') == 2.0
+                   material = ['Data/material/local/', material];
+               elseif exist(material, 'file') ~= 2.0
+                   setappdata(0, 'material', material)
+                   error = 1.0;
+                   return
+               end
            end
 
-           try load(['data/material/local/', material])
+           try load(material)
            catch unhandledException
                setappdata(0, 'error_log_003_exceptionMessage', unhandledException.identifier)
                error = 2.0;

@@ -2480,6 +2480,8 @@ classdef messenger < handle
                         end
                     case 9.0
                         fprintf(fid, '    Analysis Algorithm: NASALIFE\r\n');
+                    case 10.0
+                        fprintf(fid, '    Analysis Algorithm: User-defined\r\n');
                 end
                 if algorithm == 6.0
                     fprintf(fid, '    Mean Stress Correction: Built-in\r\n');
@@ -2672,6 +2674,8 @@ classdef messenger < handle
                         end
                     case 9.0
                         fprintf(fid, '    Analysis Algorithm: NASALIFE\r\n');
+                    case 10.0
+                        fprintf(fid, '    Analysis Algorithm: User-defined\r\n');
                 end
                 if algorithm == 6.0
                     fprintf(fid, '    Mean Stress Correction: Built-in\r\n');

@@ -6,7 +6,7 @@ function [] = cleanup(status)
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 29-May-2017 14:33:59 GMT
+%   Last modified 30-May-2017 10:53:46 GMT
     
     %%
     
@@ -72,7 +72,7 @@ if status == 1.0
     % Write file header
     fprintf(fid, 'Quick Fatigue Tool 6.10-09\r\n');
     fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-    fprintf(fid, 'Last modified 29-May-2017 14:33:59 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 30-May-2017 10:53:46 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');
@@ -103,7 +103,6 @@ if status == 1.0
             fprintf(fid, '\r\n\r\nError code: E001');
         else
             fprintf(fid, '\r\n\r\n***ERROR: The material ''%s'' could not be found', getappdata(0, 'material'));
-            fprintf(fid, '\r\n-> Make sure the file exists in Data/material/local and is spelled correctly in the job file');
             fprintf(fid, '\r\n-> For guidance on creating and managing material data, consult Section 5 of the Quick Fatigue Tool User Guide');
             fprintf(fid, '\r\n\r\nError code: E002');
         end
