@@ -727,27 +727,40 @@ classdef messenger < handle
                     case 65.0
                         % Print warning if plasticity was detected in the loading
                         L = getappdata(0, 'L');
-                        if any(L < 1e6)
+                        tLife = getappdata(0, 'transitionLife');
+                        if isempty(tLife) == 0.0 && min(L) < tLife
+                            fprintf(fidType(i), [returnType{i}, '***WARNING: The calculated fatigue life is less than the transition life', returnType{i}]);
+                            fprintf(fidType(i), ['-> Cycles at this life are dominated by plasticity', returnType{i}]);
+                            fprintf(fidType(i), ['-> The S-N methodology is not recommended for this analysis', returnType{i}]);
+                            
+                            if any (L < 1e6) && getappdata(0, 'nlMaterial') == 0.0
+                                fprintf(fidType(i), ['-> Items with lives less than 1e6 %s have been written to ''%s\\Project\\output\\%s\\Data Files\\warn_lcf_items.dat''', returnType{i}], getappdata(0, 'loadEqUnits'), pwd, getappdata(0, 'jobName'));
+                            end
+                            
+                            rmappdata(0, 'transitionLife')
+                            rmappdata(0, 'transitionLifeRatio')
+                            
+                            setappdata(0, 'messageFileWarnings', 1.0)
+                        elseif any(L < 1e6)
                             if getappdata(0, 'nlMaterial') == 0.0
                                 fprintf(fidType(i), [returnType{i}, '***WARNING: %.0f items have lives less than 1e+06 %s', returnType{i}], length(L (L < 1e6)), getappdata(0, 'loadEqUnits'));
                                 fprintf(fidType(i), ['-> The S-N methodology is usually intended for high cycle fatigue problems', returnType{i}]);
                                 fprintf(fidType(i), ['-> Please check the validity of the input data for the analysis application', returnType{i}]);
-                                fprintf(fidType(i), ['-> A list of these items has been written to ''%s\\Project\\output\\%s\\Data Files\\warn_lcf_items.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
+                                fprintf(fidType(i), ['-> These items have been written to ''%s\\Project\\output\\%s\\Data Files\\warn_lcf_items.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
 
                                 setappdata(0, 'messageFileWarnings', 1.0)
                             else
-                                fprintf(fidType(i), [returnType{i}, '***NOTE: After considering plasticity, %.0f items still have lives less than 1e6 cycles', returnType{i}], length(L (L < 1e6)));
+                                fprintf(fidType(i), [returnType{i}, '***NOTE: After considering plasticity, %.0f items have lives less than 1e6 cycles', returnType{i}], length(L (L < 1e6)));
 
                                 setappdata(0, 'messageFileNotes', 1.0)
                             end
-
-                            % Print warning if overflows were detected in the loading
-                            if any(L < 1.0)
-                                fprintf(fidType(i), [returnType{i}, '***WARNING: %.0f items have stresses too large for fatigue analysis', returnType{i}], length(L(L < 1.0)));
-                                fprintf(fidType(i), ['-> A list of these items has been written to ''%s\\Project\\output\\%s\\Data Files\\warn_overflow_items.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
-
-                                setappdata(0, 'messageFileWarnings', 1.0)
-                            end
+                        end
+                        % Print warning if overflows were detected in the loading
+                        if any(L < 1.0)
+                            fprintf(fidType(i), [returnType{i}, '***WARNING: %.0f items have stresses too large for fatigue analysis', returnType{i}], length(L(L < 1.0)));
+                            fprintf(fidType(i), ['-> These items have been written to ''%s\\Project\\output\\%s\\Data Files\\warn_overflow_items.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
+                            
+                            setappdata(0, 'messageFileWarnings', 1.0)
                         end
                     case 66.0
                         numberOfGroups = getappdata(0, 'numberOfGroups');
@@ -1095,7 +1108,7 @@ classdef messenger < handle
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 117.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: A list of duplicate IDs from the groups has been written to ''%s\\Project\\output\\%s\\Data Files\\warn_group_duplicate_ids.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Duplicate IDs from the groups have been written to ''%s\\Project\\output\\%s\\Data Files\\warn_group_duplicate_ids.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 118.0
@@ -1111,7 +1124,7 @@ classdef messenger < handle
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 120.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: A list of yielded items has been written to ''%s\\Project\\output\\%s\\Data Files\\warn_yielding_items.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Yielded items have been written to ''%s\\Project\\output\\%s\\Data Files\\warn_yielding_items.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 121.0
@@ -1228,7 +1241,7 @@ classdef messenger < handle
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 139.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: %.0f hotspots were located for the specified design life (%.3g %s)', returnType{i}],  getappdata(0, 'numberOfHotSpots'), getappdata(0, 'dLife'), getappdata(0, 'loadEqUnits'));
-                        fprintf(fidType(i), ['-> A list of these items has been written to ''%s\\Project\\input\\hotspots_%s.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
+                        fprintf(fidType(i), ['-> These items have been written to ''%s\\Project\\input\\hotspots_%s.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
                         fprintf(fidType(i), ['-> This file can be used as an argument for the ITEMS option in the job file', returnType{i}]);
 
                         setappdata(0, 'messageFileNotes', 1.0)
@@ -1327,14 +1340,14 @@ classdef messenger < handle
                         % At least one group item was removed during nodal elimination
                         fprintf(fidType(i), [returnType{i}, '***NOTE: %.0f analysis items from group %.0f (''%s'') were removed during nodal elimination', returnType{i}], getappdata(0, 'numberOfEliminatedItems'), getappdata(0, 'currentGroupNumber'), getappdata(0, 'currentGroup'));
                         [~, groupNameShort, ~] = fileparts(getappdata(0, 'currentGroup'));
-                        fprintf(fidType(i), ['-> A list of these items has been written to ''%s\\Project\\output\\%s\\Data Files\\%s_eliminated_items.dat''', returnType{i}], pwd, getappdata(0, 'jobName'), groupNameShort);
+                        fprintf(fidType(i), ['-> These items have been written to ''%s\\Project\\output\\%s\\Data Files\\%s_eliminated_items.dat''', returnType{i}], pwd, getappdata(0, 'jobName'), groupNameShort);
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 152.0
                         % All group items were removed during nodal elimination
                         fprintf(fidType(i), [returnType{i}, '***NOTE: All %.0f analysis items were removed from group %.0f (''%s'') during nodal elimination', returnType{i}], getappdata(0, 'numberOfEliminatedItems'), getappdata(0, 'currentGroupNumber'), getappdata(0, 'currentGroup'));
                         [~, groupNameShort, ~] = fileparts(getappdata(0, 'currentGroup'));
-                        fprintf(fidType(i), ['-> A list of these items has been written to ''%s\\Project\\output\\%s\\Data Files\\%s_eliminated_items.dat''', returnType{i}], pwd, getappdata(0, 'jobName'), groupNameShort);
+                        fprintf(fidType(i), ['-> These items have been written to ''%s\\Project\\output\\%s\\Data Files\\%s_eliminated_items.dat''', returnType{i}], pwd, getappdata(0, 'jobName'), groupNameShort);
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 153.0
@@ -1430,7 +1443,7 @@ classdef messenger < handle
                         if getappdata(0, 'multiplePeekItems') == 1.0
                             setappdata(0, 'multiplePeekItems', 0.0)
 
-                            fprintf(fidType(i), ['-> This is the first of %.0f items encountered in the model which have the same stress range. A list of all peek items has been written to', returnType{i}], getappdata(0, 'nPeekItems'));
+                            fprintf(fidType(i), ['-> This is the first of %.0f items encountered in the model which have the same stress range. Peek items have been written to', returnType{i}], getappdata(0, 'nPeekItems'));
                             fprintf(fidType(i), ['   ''%s\\Project\\output\\%s\\Data Files\\peek_items.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
                         end
 
@@ -1448,7 +1461,7 @@ classdef messenger < handle
                         fprintf(fidType(i), ['-> Fatigue results may be reported at incorrect locations', returnType{i}]);
                     case 167.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The stress dataset contains %.0f duplicate analysis items', returnType{i}], getappdata(0, 'message_167_nDuplicateItems'));
-                        fprintf(fidType(i), ['-> A list of these items has been written to ''%s\\Project\\output\\%s\\Data Files\\warn_model_duplicate_ids.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
+                        fprintf(fidType(i), ['-> These items have been written to ''%s\\Project\\output\\%s\\Data Files\\warn_model_duplicate_ids.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
                         fprintf(fidType(i), ['-> Analysis results may be incorrect', returnType{i}]);
 
                         setappdata(0, 'messageFileWarnings', 1.0)
@@ -1501,7 +1514,7 @@ classdef messenger < handle
                         fprintf(fidType(i), [returnType{i}, '***WARNING: ODB Interface WARNING: %.0f elements appear to be collapsed or degenerate (the element nodes are not unique)', returnType{i}], getappdata(0, 'warning_180_numberOfCollapsedElements'));
                         fprintf(fidType(i), ['-> If these elements belong to a crack seam, they should not be used for fatigue analysis', returnType{i}]);
                         fprintf(fidType(i), ['-> If the model does not contain this kind of element, check the field data for errors', returnType{i}]);
-                        fprintf(fidType(i), ['-> A list of these elements has been written to ''%s\\Project\\output\\%s\\Data Files\\warn_degenerate_elements.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
+                        fprintf(fidType(i), ['-> These elements have been written to ''%s\\Project\\output\\%s\\Data Files\\warn_degenerate_elements.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
                     case 181.0
                         if getappdata(0, 'suppress_ID181') == 0.0
                             fprintf(fidType(i), [returnType{i}, '***WARNING: An ambiguity was encountered while determining the element type for one or more regions in the model', returnType{i}]);
@@ -2021,8 +2034,7 @@ classdef messenger < handle
                             setappdata(0, 'messageFileWarnings', 1.0)
                         end
                     case 258.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The transition life is %.0f cycles', returnType{i}], getappdata(0, 'transitionLife'));
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The ratio between the fatigue life and the transition life is %.0f', returnType{i}], getappdata(0, 'transitionLifeRatio'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The transition life is %.0f cycles (ratio = %.0f)', returnType{i}], getappdata(0, 'transitionLife'), getappdata(0, 'transitionLifeRatio'));
                 end
             end
         end
