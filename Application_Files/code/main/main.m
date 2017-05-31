@@ -598,7 +598,7 @@ for groups = 1:G
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%%%%%%%%%%%%%%%%%%%FATIGUE ANALYSIS ALGORITHM%%%%%%%%%%%%%%%%%%%%%%%
-        
+
         switch algorithm
             case 3.0 % UNIAXIAL STRESS-LIFE
                 [nodalAmplitudes, nodalPairs, nodalDamage, nodalDamageParameter, damageParameter]...
@@ -909,6 +909,9 @@ messenger.writeMessage(24.0)
 
 %% GET THE WORST LIFE FOR EACH ANALYSIS GROUP
 group.worstLifePerGroup(1.0./nodalDamage, mainID, subID, groupWorstLife, peekAnalysis)
+
+%% GET THE TRANSITION LIFE
+transitionLife(worstGroup)
 
 %% GET THE NUMBER OF CYCLES IN THE LOADING
 postProcess.getNumberOfCycles()

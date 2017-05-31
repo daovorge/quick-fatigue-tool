@@ -2020,6 +2020,9 @@ classdef messenger < handle
 
                             setappdata(0, 'messageFileWarnings', 1.0)
                         end
+                    case 258.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The transition life is %.0f cycles', returnType{i}], getappdata(0, 'transitionLife'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The ratio between the fatigue life and the transition life is %.0f', returnType{i}], getappdata(0, 'transitionLifeRatio'));
                 end
             end
         end
