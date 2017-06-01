@@ -10,8 +10,8 @@ function [] = main(flags)
 %
 %   Author contact: louisvallance@hotmail.co.uk
 %
-%   Quick Fatigue Tool 6.10-08 Copyright Louis Vallance 2017
-%   Last modified 17-May-2017 14:54:51 GMT
+%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
+%   Last modified 30-May-2017 10:53:46 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all')
@@ -46,9 +46,9 @@ setappdata(0, 'messageFileNotes', 0.0)
 setappdata(0, 'messageFileWarnings', 0.0)
 
 %% PRINT COMMAND WINDOW HEADER
-fprintf('[NOTICE] Quick Fatigue Tool 6.10-08')
+fprintf('[NOTICE] Quick Fatigue Tool 6.10-09')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2017)')
-fprintf('\n[NOTICE] Last modified 17-May-2017 14:54:51 GMT')
+fprintf('\n[NOTICE] Last modified 30-May-2017 10:53:46 GMT')
 
 cleanExit = 0.0;
 
@@ -78,7 +78,7 @@ fileName = sprintf('Project/output/%s/%s.sta', jobName, jobName);
 fid_status = fopen(fileName, 'w+');
 setappdata(0, 'fid_status', fid_status)
 c = clock;
-fprintf(fid_status, '[NOTICE] Quick Fatigue Tool 6.10-08\t%s', datestr(datenum(c(1.0), c(2.0), c(3.0), c(4.0), c(5.0), c(6.0))));
+fprintf(fid_status, '[NOTICE] Quick Fatigue Tool 6.10-09\t%s', datestr(datenum(c(1.0), c(2.0), c(3.0), c(4.0), c(5.0), c(6.0))));
 
 fprintf('\n[NOTICE] The job file "%s.m" has been submitted for analysis', jobName)
 fprintf(fid_status, '\n[NOTICE] The job file "%s.m" has been submitted for analysis', jobName);
@@ -661,6 +661,8 @@ for groups = 1:G
                     = algorithm_nasa.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, signalLength,...
                     totalCounter, nodalDamage, nodalAmplitudes, nodalPairs, nodalDamageParameter,...
                     s1i, s2i, s3i, signConvention, gateTensors, tensorGate, vonMises_i, nasalifeParameter);
+            case 10.0 % USER-DEFINED
+                [nodalDamageParameter, nodalAmplitudes, nodalPairs, nodalDamage] = algorithm_user.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, totalCounter, msCorrection);
             otherwise
         end
 
@@ -817,6 +819,7 @@ setappdata(0, 'worstNodeTxz', Txz(tensorID, :))
 x1 = find(mainID == worstMainID);
 x2 = find(subID == worstSubID);
 x3 = intersect(x1, x2);
+x3 = x3(1.0);
 s1i = s1(x3, :);
 s2i = s2(x3, :);
 s3i = s3(x3, :);
@@ -906,6 +909,9 @@ messenger.writeMessage(24.0)
 
 %% GET THE WORST LIFE FOR EACH ANALYSIS GROUP
 group.worstLifePerGroup(1.0./nodalDamage, mainID, subID, groupWorstLife, peekAnalysis)
+
+%% GET THE TRANSITION LIFE
+transitionLife(worstGroup)
 
 %% GET THE NUMBER OF CYCLES IN THE LOADING
 postProcess.getNumberOfCycles()

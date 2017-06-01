@@ -11,7 +11,7 @@ function varargout = MaterialManager(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials
 %   
-%   Quick Fatigue Tool 6.10-08 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
 %   Last modified 13-Apr-2017 10:01:38 GMT
     
     %%
@@ -199,7 +199,7 @@ UserMaterial
 
 % --- Executes on button press in pButton_edit.
 function pButton_edit_Callback(~, ~, handles)
-setappdata(0, 'editMaterial', 1)
+setappdata(0, 'editMaterial', 1.0)
 materials = get(handles.list_database, 'string');
 setappdata(0, 'materialToEdit', materials(get(handles.list_database, 'value')))
 
@@ -224,7 +224,7 @@ end
 % First check that the material name is valid
 if isempty(copiedMaterial) == 1.0
     return
-elseif ~isempty(regexp(copiedMaterial, '[/\\*:?"<>|]', 'once'))
+elseif isempty(regexp(copiedMaterial, '[/\\*:?"<>|]', 'once')) == 0.0
     message1 = sprintf('The material name cannot contain any of the following characters:\n\n');
     message2 = sprintf('/ \\ * : ? " < > | ');
     errordlg([message1, message2], 'Quick Fatigue Tool')
@@ -234,7 +234,7 @@ else
     userMaterials = dir('Data/material/local/*.mat');
     
     for i = 1:length(userMaterials)
-        if strcmp([copiedMaterial, '.mat'], userMaterials(i).name)
+        if strcmpi([copiedMaterial, '.mat'], userMaterials(i).name) == 1.0
             message = sprintf('%s already exists in the local database and cannot be overwritten.', copiedMaterial);
             if get(handles.rButton_user, 'value') == 1.0
                 errordlg(message, 'Quick Fatigue Tool')
@@ -294,11 +294,11 @@ else
     
     material_properties = saveMaterial(properties); %#ok<NASGU>
     
-    % Save the copy in the /USER_MATERIAL directory
+    % Save the copy in the /LOCAL directory
     try
         save(['Data\material\local\', copiedMaterial, '.mat'], 'material_properties')
     catch
-        message = sprintf('Cannot fetch %s because the local database is not currently on the MATLAB path.', copiedMaterial);
+        message = sprintf('Cannot fetch ''%s'' because the local database is not currently on the MATLAB path.', copiedMaterial);
         errordlg(message, 'Quick Fatigue Tool')
         return
     end
@@ -323,7 +323,7 @@ message = sprintf('Rename %s to:', material);
 newName = char(inputdlg(message, 'Rename Material', 1.0, {material}));
 if isempty(newName) == 1.0
     return
-elseif ~isempty(regexp(newName, '[/\\*:?"<>|]', 'once'))
+elseif isempty(regexp(newName, '[/\\*:?"<>|]', 'once')) == 0.0
     message1 = sprintf('The material name cannot contain any of the following characters:\n\n');
     message2 = sprintf('/ \\ * : ? " < > | ');
     errordlg([message1, message2], 'Quick Fatigue Tool')
@@ -594,12 +594,12 @@ if isempty(properties.comment)
     material_properties.comment = '';
 end
 
-if properties.default_algorithm < 4
-    material_properties.default_algorithm = properties.default_algorithm + 1;
-elseif properties.default_algorithm < 10
-    material_properties.default_algorithm = properties.default_algorithm + 2;
+if properties.default_algorithm < 4.0
+    material_properties.default_algorithm = properties.default_algorithm + 1.0;
+elseif properties.default_algorithm < 10.0
+    material_properties.default_algorithm = properties.default_algorithm + 2.0;
 else
-    material_properties.default_algorithm = properties.default_algorithm + 3;
+    material_properties.default_algorithm = properties.default_algorithm + 3.0;
 end
 
 
@@ -631,10 +631,10 @@ else
         load(fullpath)
     end
     
-    if exist('material_properties', 'var') == 0
+    if exist('material_properties', 'var') == 0.0
         msg = sprintf('Error whilst reading ''%s.mat''. Properties are inaccessible.', material);
         errordlg(msg, 'Quick Fatigue Tool')
-    elseif isempty(material_properties.comment)
+    elseif isempty(material_properties.comment) == 1.0
         msg = sprintf('No information available for %s.', material);
         msgbox(msg, 'Quick Fatigue Tool')
     else
@@ -661,7 +661,7 @@ error = preProcess.getMaterial(material, 0.0, 1.0);
 rmappdata(0, 'evaluateMaterialMessenger')
 
 % Remove '.mat' extension
-material(end-3:end) = [];
+material(end - 3.0:end) = [];
 
 % Create file name
 fileName = sprintf('Project/output/material_reports/%s_report.dat', material);
@@ -841,7 +841,7 @@ function properties = getMaterialFields(value)
 if exist('mat.mat', 'file') == 2.0
     load('mat.mat')
 else
-    errordlg('Missing file ''mat.mat''. Check that the file exists in Data/material/system.', 'Quick Fatigue Tool')
+    errordlg('Missing file ''mat.mat''. Check that the file exists in Data\material\system.', 'Quick Fatigue Tool')
     properties = 0.0;
     return
 end

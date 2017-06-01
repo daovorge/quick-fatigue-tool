@@ -5,8 +5,8 @@ classdef jobFile < handle
 %   JOBFILE is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %   
-%   Quick Fatigue Tool 6.10-08 Copyright Louis Vallance 2017
-%   Last modified 25-Apr-2017 12:13:25 GMT
+%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
+%   Last modified 19-May-2017 16:27:36 GMT
     
     %%
     
@@ -277,10 +277,13 @@ classdef jobFile < handle
                     case 'nasalife'
                         algorithm = 9.0;
                         setappdata(0, 'algorithm', 9.0)
+                    case 'user'
+                        algorithm = 10.0;
+                        setappdata(0, 'algorithm', 10.0)
                     otherwise
                         % No exact string match
-                        algorithms = {'default', 'uniaxial', 'sbbm', 'normal', 'findley', 'invariant', 'weld', 'nasalife'};
-                        algorithmN = [0.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0];
+                        algorithms = {'default', 'uniaxial', 'sbbm', 'normal', 'findley', 'invariant', 'weld', 'nasalife', 'user'};
+                        algorithmN = [0.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0];
                         matchingAlg = find(strncmpi({algorithm}, algorithms, length(algorithm)) == 1.0);
                         
                         if isempty(matchingAlg) == 1.0
@@ -528,7 +531,7 @@ classdef jobFile < handle
                     algorithm = defaultAlgorithm;
                 end
                 % Check if the requested algorithm is available
-            elseif (algorithm ~= 3.0) && (algorithm ~= 4.0) && (algorithm ~= 5.0) && (algorithm ~= 6.0) && (algorithm ~= 7.0) && (algorithm ~= 8.0) && (algorithm ~= 9.0)
+            elseif (algorithm ~= 3.0) && (algorithm ~= 4.0) && (algorithm ~= 5.0) && (algorithm ~= 6.0) && (algorithm ~= 7.0) && (algorithm ~= 8.0) && (algorithm ~= 9.0) && (algorithm ~= 10.0)
                 %{
                     The requested algorithm is not available, so check if
                     the default algorithm is. Do not use BS 7608 or
@@ -1907,7 +1910,10 @@ classdef jobFile < handle
                     end
                 end
             elseif (autoExportODB == 1.0) && ((isempty(partInstance) == 0.0 && strcmpi(partInstance, 'PART-1-1') == 0.0) || isempty(stepName) == 0.0)
-                % A part instance or step name was specified without an ODB file
+                %{
+                    A part instance or step name was specified without an
+                    ODB file
+                %}
                 msg = sprintf('A non-default part instance and/or results step name has been specified without an output database.\n\nResults will not be exported to the output database. OK to continue with job submission?');
                 response = questdlg(msg, 'Quick Fatigue Tool', 'Yes', 'No', 'Yes');
                 
@@ -1915,6 +1921,22 @@ classdef jobFile < handle
                     fprintf('\n[NOTICE] Job %s was aborted by the user\n', jobName);
                     error = 1.0;
                     return
+                end
+            elseif (autoExportODB == 0.0) && (isempty(outputDatabase) == 0.0) && (isempty(partInstance) == 0.0)
+                %{
+                    An output database was specified, but automatic export
+                    is disabled
+                %}
+                msg = sprintf('An output database and part instance have been specified, but automatic export is disabled.');
+                response = questdlg(msg, 'Quick Fatigue Tool', 'Enable automatic export', 'Continue without export', 'Cancel', 'Enable automatic export');
+                
+                if strcmpi('Cancel', response)
+                    fprintf('\n[NOTICE] Job %s was aborted by the user\n', jobName);
+                    error = 1.0;
+                    return
+                elseif strcmpi('Enable automatic export', response)
+                    outputField = 1.0;
+                    setappdata(0, 'autoExport_ODB', 1.0)
                 end
             end
         end

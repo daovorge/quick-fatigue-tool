@@ -16,7 +16,7 @@ function [] = default_job()
 %   Reference section in Quick Fatigue Tool User Settings Reference Guide
 %      1 Job file options
 %   
-%   Quick Fatigue Tool 6.10-08 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
 %   Last modified 12-May-2017 15:25:52 GMT
 
 %% JOB
@@ -88,7 +88,7 @@ REPEATS = 1.0;
 
 %% HIGH FREQUENCY LOADINGS
 
-HF_DATASET = [];
+HF_DATASET = '';
 
 HF_HISTORY = [];
 
@@ -218,7 +218,7 @@ PART_INSTANCE = 'PART-1-1';
 
 EXPLICIT_FEA = 0.0;
 
-STEP_NAME = [];
+STEP_NAME = '';
 
 RESULT_POSITION = 'ELEMENT NODAL';
 

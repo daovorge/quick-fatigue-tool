@@ -9,7 +9,7 @@ function [] = virtualStrainGauge(xx_o, yy_o, xy_o, zz, xz, yz)
 %   Reference section in Quick Fatigue Tool User Guide
 %      4.9 Virtual strain gauges
 %    
-%    Quick Fatigue Tool 6.10-08 Copyright Louis Vallance 2017
+%    Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
 %    Last modified 04-Apr-2017 13:26:59 GMT
     
     %%
@@ -257,7 +257,7 @@ for gaugeNumber = 1:N
         if length(xx_temp) ~= length(xx)
             diff = abs(length(xx_temp) - length(xx));
             if length(xx_temp) > length(xx)
-                xx_temp(1:diff) = [];
+                xx_temp(1.0:diff) = [];
                 xx = xx_temp;
             end
         end
@@ -265,7 +265,7 @@ for gaugeNumber = 1:N
         if length(yy_temp) ~= length(yy)
             diff = abs(length(yy_temp) - length(yy));
             if length(yy_temp) > length(yy)
-                yy_temp(1:diff) = [];
+                yy_temp(1.0:diff) = [];
                 yy = yy_temp;
             end
         end
@@ -273,7 +273,7 @@ for gaugeNumber = 1:N
         if length(xy_temp) ~= length(xy)
             diff = abs(length(xy_temp) - length(xy));
             if length(xy_temp) > length(xy)
-                xy_temp(1:diff) = [];
+                xy_temp(1.0:diff) = [];
                 xy = xy_temp;
             end
         end
