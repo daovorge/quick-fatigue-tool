@@ -229,9 +229,6 @@ for i = 3:signalLength
             allow cycle closures before i > 3.0
         %}
         
-        % Update the rainflow cycle index
-        rfDataIndex = rfDataIndex + 1.0;
-        
         %{
             Since the cycle closure includes the effect of
             material memory, the next reversal may not close a cycle
@@ -279,11 +276,11 @@ for i = 3:signalLength
         if matMemFirstExcursion == 1.0
             ratchetStress = ratchetStress + stressRangeBeyondClosure;
             
-            Nb = (currentStressRange^2)./(E.*trueStrainCurve);
+            Nb = (currentStressRange^2.0)./(E.*trueStrainCurve);
             f = real((Nb./E) + (Nb./kp).^(1.0/np) - trueStrainCurve);
         else
             Nb = (currentStressRange^2)./(E.*trueStrainCurve);
-            f = real((Nb./E) + 2.0.*(Nb./(2*kp)).^(1.0/np) - trueStrainCurve);
+            f = real((Nb./E) + 2.0.*(Nb./(2.0*kp)).^(1.0/np) - trueStrainCurve);
         end
         
         % Solve for the strain range
@@ -298,36 +295,44 @@ for i = 3:signalLength
         % Solve for the stress range
         currentStrainRange = abs(epsilon(i) - epsilon(i - 1.0));
         trueStressCurve = linspace(0.0, currentStrainRange*E, precision);
-        trueStrainCurve = real((trueStressCurve./E) + 2.*(trueStressCurve./(2*kp)).^(1.0/np));
-        stressRange = interp1(trueStrainCurve, trueStressCurve, currentStrainRange, method, 'extrap');
+        trueStrainCurve = real((trueStressCurve./E) + 2.0.*(trueStressCurve./(2.0*kp)).^(1.0/np));
         
-        if matMemFirstExcursion == 1.0
-            if currentDirection == -1.0
-                sigma(i) = sigma(1.0) - stressRange;
-            else
-                sigma(i) = sigma(1.0) + stressRange;
-            end
+        if all(trueStrainCurve == 0.0) == 1.0
+            sigma(i) = sigma(i - 1.0);
         else
-            if currentDirection == -1.0
-                sigma(i) = sigma(i - 3.0) - stressRange;
+            stressRange = interp1(trueStrainCurve, trueStressCurve, currentStrainRange, method, 'extrap');
+            
+            if matMemFirstExcursion == 1.0
+                if currentDirection == -1.0
+                    sigma(i) = sigma(1.0) - stressRange;
+                else
+                    sigma(i) = sigma(1.0) + stressRange;
+                end
             else
-                sigma(i) = sigma(i - 3.0) + stressRange;
+                if currentDirection == -1.0
+                    sigma(i) = sigma(i - 3.0) - stressRange;
+                else
+                    sigma(i) = sigma(i - 3.0) + stressRange;
+                end
             end
+            
+            % Update the rainflow buffer
+            
+            % Update the rainflow cycle index
+            rfDataIndex = rfDataIndex + 1.0;
+            
+            % Count the stress cycle
+            rfData(rfDataIndex, 1.0) = sigma(i - 1.0);
+            rfData(rfDataIndex, 2.0) = sigma(i);
+            
+            % Count the strain cycle
+            rfData(rfDataIndex, 3.0) = epsilon(i - 1.0);
+            rfData(rfDataIndex, 4.0) = epsilon(i);
+            
+            % Position in the history
+            rfData(rfDataIndex, 5.0) = i - 1.0;
+            rfData(rfDataIndex, 6.0) = i;
         end
-        
-        % Update the rainflow buffer
-        
-        % Count the stress cycle
-        rfData(rfDataIndex, 1.0) = sigma(i - 1.0);
-        rfData(rfDataIndex, 2.0) = sigma(i);
-        
-        % Count the strain cycle
-        rfData(rfDataIndex, 3.0) = epsilon(i - 1.0);
-        rfData(rfDataIndex, 4.0) = epsilon(i);
-        
-        % Position in the history
-        rfData(rfDataIndex, 5.0) = i - 1.0;
-        rfData(rfDataIndex, 6.0) = i;
     elseif (currentStressRange == previousStressRange) && (i > 3.0) && (allowClosure == 1.0)
         %%
         %{
@@ -342,9 +347,6 @@ for i = 3:signalLength
             allow cycle closures before i > 3.0
         %}
         
-        % Update the rainflow cycle index
-        rfDataIndex = rfDataIndex + 1.0;
-        
         %{
             Since the cycle closure does not include the effect
             of material memory, the next reversal may close a cycle
@@ -358,8 +360,8 @@ for i = 3:signalLength
         end
         
         % Calculate the stress-strain curve
-        Nb = (currentStressRange^2)./(E.*trueStrainCurve);
-        f = real((Nb./E) + 2.0.*(Nb./(2*kp)).^(1.0/np) - trueStrainCurve);
+        Nb = (currentStressRange^2.0)./(E.*trueStrainCurve);
+        f = real((Nb./E) + 2.0.*(Nb./(2.0*kp)).^(1.0/np) - trueStrainCurve);
         
         % Solve for the stress range
         strainRange = interp1(f, trueStrainCurve, 0.0, method, 'extrap');
@@ -369,28 +371,36 @@ for i = 3:signalLength
         % Solve for the stress range
         trueStressCurve = linspace(0.0, currentStrainRange*E, precision);
         
-        trueStrainCurve = real((trueStressCurve./E) + 2.*(trueStressCurve./(2*kp)).^(1.0/np));
-        stressRange = interp1(trueStrainCurve, trueStressCurve, currentStrainRange, method, 'extrap');
+        trueStrainCurve = real((trueStressCurve./E) + 2.0.*(trueStressCurve./(2*kp)).^(1.0/np));
         
-        if currentDirection == -1.0
-            sigma(i) = sigma(i - 1.0) - stressRange;
+        if all(trueStrainCurve == 0.0) == 1.0
+            sigma(i) = sigma(i - 1.0);
         else
-            sigma(i) = sigma(i - 1.0) + stressRange;
+            stressRange = interp1(trueStrainCurve, trueStressCurve, currentStrainRange, method, 'extrap');
+            
+            if currentDirection == -1.0
+                sigma(i) = sigma(i - 1.0) - stressRange;
+            else
+                sigma(i) = sigma(i - 1.0) + stressRange;
+            end
+            
+            % Update the rainflow buffer
+            
+            % Update the rainflow cycle index
+            rfDataIndex = rfDataIndex + 1.0;
+            
+            % Count the stress cycle
+            rfData(rfDataIndex, 1.0) = sigma(i - 1.0);
+            rfData(rfDataIndex, 2.0) = sigma(i);
+            
+            % Count the strain cycle
+            rfData(rfDataIndex, 3.0) = epsilon(i - 1.0);
+            rfData(rfDataIndex, 4.0) = epsilon(i);
+            
+            % Position in the history
+            rfData(rfDataIndex, 5.0) = i - 1.0;
+            rfData(rfDataIndex, 6.0) = i;
         end
-        
-        % Update the rainflow buffer
-        
-        % Count the stress cycle
-        rfData(rfDataIndex, 1.0) = sigma(i - 1.0);
-        rfData(rfDataIndex, 2.0) = sigma(i);
-        
-        % Count the strain cycle
-        rfData(rfDataIndex, 3.0) = epsilon(i - 1.0);
-        rfData(rfDataIndex, 4.0) = epsilon(i);
-        
-        % Position in the history
-        rfData(rfDataIndex, 5.0) = i - 1.0;
-        rfData(rfDataIndex, 6.0) = i;
     else
         %%
         %{
@@ -414,8 +424,8 @@ for i = 3:signalLength
             trueStrainCurve = linspace(1e-12, 1.5*(currentStressRange/E), precision);
         end
         
-        Nb = (currentStressRange^2)./(E.*trueStrainCurve);
-        f = real((Nb./E) + 2.0.*(Nb./(2*kp)).^(1.0/np) - trueStrainCurve);
+        Nb = (currentStressRange^2.0)./(E.*trueStrainCurve);
+        f = real((Nb./E) + 2.0.*(Nb./(2.0*kp)).^(1.0/np) - trueStrainCurve);
         
         % Solve for the strain range
         strainRange = interp1(f, trueStrainCurve, 0.0, method, 'extrap');
@@ -426,7 +436,13 @@ for i = 3:signalLength
         currentStrainRange = abs(epsilon(i) - epsilon(i - 1.0));
         trueStressCurve = linspace(0.0, currentStrainRange*E, precision);
         
-        trueStrainCurve = real((trueStressCurve./E) + 2.*(trueStressCurve./(2*kp)).^(1.0/np));
+        trueStrainCurve = real((trueStressCurve./E) + 2.0.*(trueStressCurve./(2.0*kp)).^(1.0/np));
+        
+        if all(trueStrainCurve == 0.0) == 1.0
+            sigma(i) = sigma(i - 1.0);
+            continue
+        end
+        
         stressRange = interp1(trueStrainCurve, trueStressCurve, currentStrainRange, method, 'extrap');
         
         if currentDirection == -1.0

@@ -682,7 +682,7 @@ classdef jobFile < handle
                 setappdata(0, 'message_259_msCorrection', -1.0)
                 messenger.writeMessage(259.0)
                 msCorrection = 1.0;
-            elseif algorithm ~= 6.0 && algorithm ~= 8.0 && algorithm ~= 9.0 && algorithm ~= 1.0 && algorithm ~= 2.0 && algorithm ~= 3.0
+            elseif algorithm ~= 6.0 && algorithm ~= 8.0 && algorithm ~= 9.0
                 [error, msCorrection] = mscFileUtils.checkUserData(msCorrection, 0.0, 'MSC');
             elseif algorithm ~= 1.0 && algorithm ~= 2.0 && algorithm ~= 3.0
                 msCorrection = -9999.0;
