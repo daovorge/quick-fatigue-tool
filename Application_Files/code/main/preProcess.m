@@ -3689,7 +3689,7 @@ classdef preProcess < handle
                             end
                         end
 
-                        [~, s1_i, error] = css2(s1_i, E, kp, np);
+                        [~, ~, s1_i, error] = css2(s1_i, E, kp, np);
 
                         % Gate the history
                         gate = preProcess.autoGate(s2_i, historyGate);
@@ -3715,7 +3715,7 @@ classdef preProcess < handle
                                 end
                             end
 
-                            [~, s2_i, error] = css2(s2_i, E, kp, np);
+                            [~, ~, s2_i, error] = css2(s2_i, E, kp, np);
                         end
 
                         % Gate the history
@@ -3742,7 +3742,7 @@ classdef preProcess < handle
                                 end
                             end
 
-                            [~, s3_i, error] = css2(s3_i, E, kp, np);
+                            [~, ~, s3_i, error] = css2(s3_i, E, kp, np);
                         end
                     catch
                         error = 2.0;

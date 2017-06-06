@@ -1,4 +1,4 @@
-function [epsilon, sigma, error] = css2(sigma_e, E, kp, np)
+function [rfData, epsilon, sigma, error] = css2(sigma_e, E, kp, np)
 %CSS2    QFT function to calculate nonlinear elastic stress-strain.
 %   This function calculates the nonlinear elastic stress and strain from
 %   an elastic stress tensor.
@@ -12,6 +12,10 @@ function [epsilon, sigma, error] = css2(sigma_e, E, kp, np)
     %%
     
 error = 0.0;
+%% Initialize RFDATA
+rfData = zeros(1.0, 4.0);
+rfDataIndex = 0.0;
+
 %% Prepare the stress signal
 % If the signal is all zero, return zeros of the same length
 if any(sigma_e) == 0.0
@@ -160,7 +164,6 @@ matMemFirstExcursionIndex = 2.0;
 ratchetStress = 0.0;
 
 for i = 3:signalLength
-    
     %{
         Calculate the current strain range. If the signal did
         not reverse direction, the current strain range must
@@ -218,6 +221,9 @@ for i = 3:signalLength
             allow cycle closures before i > 3.0
         %}
         
+        % Update the rainflow cycle index
+        rfDataIndex = rfDataIndex + 1.0;
+        
         %{
             Since the cycle closure includes the effect of
             material memory, the next reversal may not close a cycle
@@ -226,7 +232,7 @@ for i = 3:signalLength
         
         %{
             The stable loop strain range is taken to be the
-            strain rang eof the previously closed cycle
+            strain range of the previously closed cycle
         %}
         matMemFirstExcursionIndex = i;
         
@@ -300,6 +306,16 @@ for i = 3:signalLength
                 sigma(i) = sigma(i - 3.0) + stressRange;
             end
         end
+        
+        % Update the rainflow buffer
+        
+        % Count the cycle
+        rfData(rfDataIndex, 1.0) = epsilon(i - 1.0);
+        rfData(rfDataIndex, 2.0) = epsilon(i);
+        
+        % Position in the history
+        rfData(rfDataIndex, 3.0) = i - 1.0;
+        rfData(rfDataIndex, 4.0) = i;
     elseif (currentStressRange == previousStressRange) && (i > 3.0) && (allowClosure == 1.0)
         %%
         %{
@@ -313,6 +329,9 @@ for i = 3:signalLength
             earliest on the third reversal. Therefore, do not
             allow cycle closures before i > 3.0
         %}
+        
+        % Update the rainflow cycle index
+        rfDataIndex = rfDataIndex + 1.0;
         
         %{
             Since the cycle closure does not include the effect
@@ -346,6 +365,16 @@ for i = 3:signalLength
         else
             sigma(i) = sigma(i - 1.0) + stressRange;
         end
+        
+        % Update the rainflow buffer
+        
+        % Count the cycle
+        rfData(rfDataIndex, 1.0) = epsilon(i - 1.0);
+        rfData(rfDataIndex, 2.0) = epsilon(i);
+        
+        % Position in the history
+        rfData(rfDataIndex, 3.0) = i - 1.0;
+        rfData(rfDataIndex, 4.0) = i;
     else
         %%
         %{

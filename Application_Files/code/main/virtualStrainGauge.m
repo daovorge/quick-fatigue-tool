@@ -250,9 +250,9 @@ for gaugeNumber = 1:N
         yy = yy./E;
         xy = xy./G;
     else
-        [xx_temp, ~, ~] = css2(xx, E, kp, np);
-        [yy_temp, ~, ~] = css2(yy, E, kp, np);
-        [xy_temp, ~, ~] = css2(xy, E, kp, np);
+        [~, xx_temp, ~, ~] = css2(xx, E, kp, np);
+        [~, yy_temp, ~, ~] = css2(yy, E, kp, np);
+        [~, xy_temp, ~, ~] = css2(xy, E, kp, np);
         
         if length(xx_temp) ~= length(xx)
             diff = abs(length(xx_temp) - length(xx));
