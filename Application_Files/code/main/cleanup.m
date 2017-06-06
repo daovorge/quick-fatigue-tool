@@ -154,7 +154,7 @@ if status == 1.0
     if getappdata(0, 'E047') == 1.0
         fprintf(fid, '\r\n\r\n***ERROR: No load histories were specified');
         
-        if getappdata(0, 'algorithm') == 3.0
+        if getappdata(0, 'algorithm') == 10.0
             fprintf(fid, '\r\n-> The Uniaxial Stress-Life algorithm requires a single load history');
         else
             fprintf(fid, '\r\nIf the loading is a dataset sequence:\r\n-> Specify at least two stress datasets using the DATASET option\r\n-> Set HISTORY = []\r\n');
@@ -201,6 +201,8 @@ if status == 1.0
         
         switch getappdata(0, 'algorithm')
             case 3.0
+                fprintf(fid, '\r\n-> The Uniaxial Strain-Life algorithm requires the following material constants: Sf'', b, Ef'', c, E, kp, np');
+            case 10.0
                 fprintf(fid, '\r\n-> The Uniaxial Stress-Life algorithm requires the following material constants: Sf'', b');
             case 4.0
                 if getappdata(0, 'plasticSN') == 1.0

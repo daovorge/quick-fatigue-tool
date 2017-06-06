@@ -489,7 +489,7 @@ classdef postProcess < handle
                 
                 if getappdata(0, 'figure_HD') == 1.0
                     if outputFigure == 1.0
-                        if algorithm == 3.0
+                        if algorithm == 10.0
                             msg = sprintf('HD, Haigh diagram for item %.0f.%.0f', mainID, subID);
                             figureTitle = 'MATLAB Figures/ANHD + HD, Haigh diagram for all items';
                         else
@@ -717,7 +717,7 @@ classdef postProcess < handle
             Sxx = getappdata(0, 'worstNodeSxx');
         
             if getappdata(0, 'figure_CN') == 1.0 && outputFigure == 1.0
-                if algorithm == 3.0
+                if algorithm == 10.0
                     normalOnCP = 0.5*Sxx;
                     setappdata(0, 'CN', normalOnCP);
                     msg = sprintf('CN, Maximum normal (hydrostatic) stress history for item %.0f.%.0f', mainID, subID);
@@ -753,7 +753,7 @@ classdef postProcess < handle
             %% CS (Shear stress on critical plane)
             
             if getappdata(0, 'figure_CS') == 1.0 && outputFigure == 1.0
-                if algorithm == 3.0
+                if algorithm == 10.0
                     shearOnCP = 0.5*(abs(Sxx));
                     setappdata(0, 'CS', shearOnCP);
                     msg = sprintf('CS, Maximum shear (Tresca) stress history for item %.0f.%.0f', mainID, subID);
@@ -795,7 +795,7 @@ classdef postProcess < handle
                 end
             end
             
-            if (algorithm < 7.0) && (algorithm ~= 3.0)
+            if (algorithm < 7.0) && (algorithm ~= 10.0)
                 thetaOnCP = getappdata(0, 'thetaOnCP');
                 
                 figureFormat = getappdata(0, 'figureFormat');
@@ -1175,7 +1175,7 @@ classdef postProcess < handle
             % Only if the Uniaxial Stress-Life algorithm is used
             % Only if peak-valley detection, noise reduction or high
             % frequency data was used
-            if (outputFigure == 1.0 && algorithm == 3.0 && getappdata(0, 'figure_SIG') == 1.0) &&...
+            if (outputFigure == 1.0 && algorithm == 10.0 && getappdata(0, 'figure_SIG') == 1.0) &&...
                     ((getappdata(0, 'noiseReduction') == 1.0 ||...
                     (getappdata(0, 'gateHistories') == 1.0) || (getappdata(0, 'gateHistories') == 2.0)) ||...
                     getappdata(0, 'gateTensors') == 1.0 || getappdata(0, 'gateTensors') == 2.0)
@@ -1231,7 +1231,7 @@ classdef postProcess < handle
                 if strcmpi(figureFormat, 'fig') == true
                     postProcess.makeVisible([dir, '.fig'])
                 end
-            elseif (outputFigure == 1.0 && algorithm == 3.0 && getappdata(0, 'figure_SIG') == 1.0)
+            elseif (outputFigure == 1.0 && algorithm == 10.0 && getappdata(0, 'figure_SIG') == 1.0)
                 f12 = figure('visible', 'off');
                 oldSignal = getappdata(0, 'SIGOriginalSignal');
                 
@@ -1356,7 +1356,7 @@ classdef postProcess < handle
                 
                 fprintf(fid, 'Units:\tMPa\r\n');
                 
-                fprintf(fid, 'Item #\tMean stress\tStress Amplitude\t\tCycle #\tMean stress\tStress Amplitude\r\n');
+                fprintf(fid, 'Item #\tMean stress\tStress amplitude\t\tCycle #\tMean stress\tStress amplitude\r\n');
                 fprintf(fid, sprintf('%%.0f.%%.0f\t%%%s\t%%%s\t\t%%%s\t%%%s\t%%%s\r\n', h, h, h, h, h), [dataA(1.0:shortLength, :), dataB(1.0:shortLength, :)]');
                 
                 if lengthA > lengthB
@@ -1373,7 +1373,7 @@ classdef postProcess < handle
                 plane orientations
             %}
             
-            if (algorithm < 7.0) && (algorithm ~= 3.0)
+            if (algorithm < 7.0) && (algorithm ~= 10.0)
                 steps = getappdata(0, 'stepSize');
                 step = steps(getappdata(0, 'worstItem'));
                 planes = 0:step:180;

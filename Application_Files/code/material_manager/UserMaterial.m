@@ -961,7 +961,7 @@ end
 
 % Alert the user if the algorithm is not yet available
 algorithm = get(hObject, 'value');
-if (algorithm > 0.0 && algorithm < 5.0) || (algorithm > 10.0 && algorithm < 14.0)
+if (algorithm > 0.0 && algorithm < 5.0) || (algorithm == 11.0)
     set(handles.text_algorithmUnavailable, 'visible', 'on')
 else
     set(handles.text_algorithmUnavailable, 'visible', 'off')

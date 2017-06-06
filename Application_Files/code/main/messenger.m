@@ -314,7 +314,7 @@ classdef messenger < handle
                         end
 
                         algorithm = getappdata(0, 'algorithm');
-                        if algorithm ~= 3.0
+                        if (algorithm ~= 10.0) && (algorithm ~= 3.0)
                             if length(worstItem) > 1.0
                                 if length(worstItem) > 10.0
                                     fprintf(fidType(i), [returnType{i}, '***NOTE: The worst analysis item IDs are:', returnType{i}]);
@@ -363,7 +363,7 @@ classdef messenger < handle
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 21.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: Nodal elimination is not compatible with the Uniaxial Stress-Life analysis algorithm', returnType{i}]);
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Nodal elimination is not compatible with uniaxial analysis methods', returnType{i}]);
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 22.0
@@ -448,7 +448,7 @@ classdef messenger < handle
                     case 31.0
                         % FEA definition
                         dataLabel = getappdata(0, 'dataLabel');
-                        if getappdata(0, 'algorithm') ~= 3.0
+                        if (getappdata(0, 'algorithm') ~= 10.0) && (getappdata(0, 'algorithm') ~= 3.0)
                             if dataLabel(1.0) == 9.0
                                 fprintf(fidType(i), [returnType{i}, '***NOTE: Detected shell section information in the stress dataset', returnType{i}]);
                                 if getappdata(0, 'shellLocation') == 1.0
@@ -473,7 +473,7 @@ classdef messenger < handle
                         end
                     case 32.0
                         % Load proportionality
-                        if (getappdata(0, 'algorithm') == 4.0 || getappdata(0, 'algorithm') == 5.0 || getappdata(0, 'algorithm') == 6.0 || getappdata(0, 'algorithm') == 8.0)
+                        if (getappdata(0, 'algorithm') == 4.0 || getappdata(0, 'algorithm') == 5.0 || getappdata(0, 'algorithm') == 6.0 || getappdata(0, 'algorithm') == 8.0 || getappdata(0, 'algorithm') == 11.0)
                             fprintf(fidType(i), [returnType{i}, '***NOTE: In all or part of the model, the maximum deviation of the principal directions in the loading does not exceed the specified tolerance of %.3g degrees', returnType{i}], getappdata(0, 'proportionalityTolerance'));
                             fprintf(fidType(i), ['-> The critical plane step size has been increased to 90 degrees for these analysis items', returnType{i}]);
                             fprintf(fidType(i), ['-> The tolerance can be changed with the environment variable ''proportionalityTolerance''', returnType{i}]);
@@ -613,7 +613,11 @@ classdef messenger < handle
                     case 49.0
                         % Print warning(s) if there is a problem with the mean stress correction
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The Morrow mean stress correction requires a value for the fatigue strength coefficient', returnType{i}]);
-                        fprintf(fidType(i), ['-> The Goodman mean stress correction will be used instead', returnType{i}]);
+                        if getappdata(0, 'algorithm') == 3.0
+                            fprintf(fidType(i), ['-> Mean stress correction will not be used', returnType{i}]);
+                        else
+                            fprintf(fidType(i), ['-> The Goodman mean stress correction will be used instead', returnType{i}]);
+                        end
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 50.0
@@ -726,35 +730,39 @@ classdef messenger < handle
                         end
                     case 65.0
                         % Print warning if plasticity was detected in the loading
+                        algorithm = getappdata(0, 'algorithm');
                         L = getappdata(0, 'L');
                         tLife = getappdata(0, 'transitionLife');
-                        if isempty(tLife) == 0.0 && min(L) < tLife
-                            fprintf(fidType(i), [returnType{i}, '***WARNING: The calculated fatigue life is less than the transition life', returnType{i}]);
-                            fprintf(fidType(i), ['-> Cycles at this life are dominated by plasticity', returnType{i}]);
-                            fprintf(fidType(i), ['-> The S-N methodology is not recommended for this analysis', returnType{i}]);
-                            
-                            if any (L < 1e6) && getappdata(0, 'nlMaterial') == 0.0
-                                fprintf(fidType(i), ['-> Items with lives less than 1e6 %s have been written to ''%s\\Project\\output\\%s\\Data Files\\warn_lcf_items.dat''', returnType{i}], getappdata(0, 'loadEqUnits'), pwd, getappdata(0, 'jobName'));
-                            end
-                            
-                            rmappdata(0, 'transitionLife')
-                            rmappdata(0, 'transitionLifeRatio')
-                            
-                            setappdata(0, 'messageFileWarnings', 1.0)
-                        elseif any(L < 1e6)
-                            if getappdata(0, 'nlMaterial') == 0.0
-                                fprintf(fidType(i), [returnType{i}, '***WARNING: %.0f items have lives less than 1e+06 %s', returnType{i}], length(L (L < 1e6)), getappdata(0, 'loadEqUnits'));
-                                fprintf(fidType(i), ['-> The S-N methodology is usually intended for high cycle fatigue problems', returnType{i}]);
-                                fprintf(fidType(i), ['-> Please check the validity of the input data for the analysis application', returnType{i}]);
-                                fprintf(fidType(i), ['-> These items have been written to ''%s\\Project\\output\\%s\\Data Files\\warn_lcf_items.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
-
+                        if algorithm ~= 1.0 && algorithm ~= 2.0 && algorithm ~= 3.0
+                            if isempty(tLife) == 0.0 && min(L) < tLife
+                                fprintf(fidType(i), [returnType{i}, '***WARNING: The calculated fatigue life is less than the transition life', returnType{i}]);
+                                fprintf(fidType(i), ['-> Cycles at this life are dominated by plasticity', returnType{i}]);
+                                fprintf(fidType(i), ['-> The S-N methodology is not recommended for this analysis', returnType{i}]);
+                                
+                                if any (L < 1e6) && getappdata(0, 'nlMaterial') == 0.0
+                                    fprintf(fidType(i), ['-> Items with lives less than 1e6 %s have been written to ''%s\\Project\\output\\%s\\Data Files\\warn_lcf_items.dat''', returnType{i}], getappdata(0, 'loadEqUnits'), pwd, getappdata(0, 'jobName'));
+                                end
+                                
+                                rmappdata(0, 'transitionLife')
+                                rmappdata(0, 'transitionLifeRatio')
+                                
                                 setappdata(0, 'messageFileWarnings', 1.0)
-                            else
-                                fprintf(fidType(i), [returnType{i}, '***NOTE: After considering plasticity, %.0f items have lives less than 1e6 cycles', returnType{i}], length(L (L < 1e6)));
-
-                                setappdata(0, 'messageFileNotes', 1.0)
+                            elseif any(L < 1e6)
+                                if getappdata(0, 'nlMaterial') == 0.0
+                                    fprintf(fidType(i), [returnType{i}, '***WARNING: %.0f items have lives less than 1e+06 %s', returnType{i}], length(L (L < 1e6)), getappdata(0, 'loadEqUnits'));
+                                    fprintf(fidType(i), ['-> The S-N methodology is usually intended for high cycle fatigue problems', returnType{i}]);
+                                    fprintf(fidType(i), ['-> Please check the validity of the input data for the analysis application', returnType{i}]);
+                                    fprintf(fidType(i), ['-> These items have been written to ''%s\\Project\\output\\%s\\Data Files\\warn_lcf_items.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
+                                    
+                                    setappdata(0, 'messageFileWarnings', 1.0)
+                                else
+                                    fprintf(fidType(i), [returnType{i}, '***NOTE: After considering plasticity, %.0f items have lives less than 1e6 cycles', returnType{i}], length(L (L < 1e6)));
+                                    
+                                    setappdata(0, 'messageFileNotes', 1.0)
+                                end
                             end
                         end
+                        
                         % Print warning if overflows were detected in the loading
                         if any(L < 1.0)
                             fprintf(fidType(i), [returnType{i}, '***WARNING: %.0f items have stresses too large for fatigue analysis', returnType{i}], length(L(L < 1.0)));
@@ -1362,12 +1370,12 @@ classdef messenger < handle
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 154.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: The Strain-based Brown-Miller algorithm has not yet been implemented', returnType{i}]);
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: The Brown-Miller algorithm has not yet been implemented', returnType{i}]);
                         fprintf(fidType(i), ['-> The Stress-based Brown-Miller algorithm will be used instead', returnType{i}]);
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 155.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: The Principal Strain algorithm has not yet been implemented', returnType{i}]);
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: The Normal Strain algorithm has not yet been implemented', returnType{i}]);
                         fprintf(fidType(i), ['-> The Stress-based Brown-Miller algorithm will be used instead', returnType{i}]);
 
                         setappdata(0, 'messageFileWarnings', 1.0)
@@ -1382,10 +1390,10 @@ classdef messenger < handle
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 158.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: The Uniaxial Strain-Life algorithm has not yet been implemented', returnType{i}]);
-                        fprintf(fidType(i), ['-> The Stress-based Brown-Miller algorithm will be used instead', returnType{i}]);
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Uniaxial Strain-Life algorithm is not compatible with certain features', returnType{i}]);
 
-                        setappdata(0, 'messageFileWarnings', 1.0)
+                        fprintf(fidType(i), ['The following job file options will be ignored:', returnType{i}]);
+                        fprintf(fidType(i), ['-> SN_KNOCK_DOWN, DATASET, PLANE_STRESS, OUTPUT_DATABASE, PART_INSTANCE, FEA_PROCEDURE, STEP_NAME, RESULT_POSITION, GROUP, ITEMS', returnType{i}]);
                     case 159.0
                         if getappdata(0, 'suppress_ID159') == 0.0
                             fprintf(fidType(i), [returnType{i}, '***WARNING: After applying the Morrow mean stress correction, some cycles are negative', returnType{i}]);
@@ -1650,7 +1658,7 @@ classdef messenger < handle
                             fprintf(fidType(i), ['-> The FRF stress amplitude normalization parameter definition will be propagated accross all user-defined FRF envelope definitions using the paramter ''LIMIT''', returnType{i}]);
                         end
                     case 203.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: Field output from Uniaxial Stress-Life analyses is not supported by the ODB interface', returnType{i}]);
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Field output from uniaxial analyses is not supported by the ODB interface', returnType{i}]);
                         fprintf(fidType(i), ['-> Field data will not be written to the output database', returnType{i}]);
                     case 204.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: Automatic export for Abaqus .odb files is enabled, but the field data contains only one analysis item', returnType{i}]);
@@ -1872,7 +1880,7 @@ classdef messenger < handle
                     case 232.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The definition of virtual strain gauge #%.0f appears to reference a single position ID', returnType{i}], getappdata(0, 'vGaugeNumber'));
                         fprintf(fidType(i), ['-> Both the main ID and the sub ID must be specified and separated by a decimal point', returnType{i}]);
-                        if getappdata(0, 'algorithm') == 3.0
+                        if getappdata(0, 'algorithm') == 10.0
                             fprintf(fidType(i), ['-> For Uniaxial Stress-Life analysis, the main and sub IDs are always 1: GAUGE_LOCATION = {''1.1''}', returnType{i}]);
                         else
                             fprintf(fidType(i), ['-> e.g. If the gauge position is integration point or element-nodal, the main ID is the element number and the sub ID is the integration point/node number: GAUGE_LOCATION = {''7.3''}', returnType{i}]);
@@ -2035,6 +2043,24 @@ classdef messenger < handle
                         end
                     case 258.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The transition life is %.0f cycles (ratio = %.0f)', returnType{i}], getappdata(0, 'transitionLife'), getappdata(0, 'transitionLifeRatio'));
+                    case 259.0
+                        msCorrection = getappdata(0, 'message_259_msCorrection');
+                        if msCorrection == -1.0
+                            fprintf(fidType(i), [returnType{i}, '***WARNING: The Uniaxial Strain-Life algorithm is not compatible with user-defined mean stress correction', returnType{i}]);
+                        elseif msCorrection == 2.0
+                            fprintf(fidType(i), [returnType{i}, '***WARNING: The Uniaxial Strain-Life algorithm is not compatible with the Goodman mean stress correction', returnType{i}]);
+                        elseif msCorrection == 3.0
+                            fprintf(fidType(i), [returnType{i}, '***WARNING: The Uniaxial Strain-Life algorithm is not compatible with the Soderberg mean stress correction', returnType{i}]);
+                        elseif msCorrection == 6.0
+                            fprintf(fidType(i), [returnType{i}, '***WARNING: The Uniaxial Strain-Life algorithm is not compatible with the Gerber mean stress correction', returnType{i}]);
+                        else
+                            fprintf(fidType(i), [returnType{i}, '***WARNING: The Uniaxial Strain-Life algorithm is not compatible with the R-ratio S-N curves mean stress correction', returnType{i}]);
+                        end
+                            
+                        fprintf(fidType(i), ['-> The Morrow mean stress correction will be used instead', returnType{i}]);
+
+                        rmappdata(0, 'message_259_msCorrection')
+                        setappdata(0, 'messageFileWarnings', 1.0)
                 end
             end
         end
@@ -2263,7 +2289,7 @@ classdef messenger < handle
 
             % Model data
             fprintf(fid, '\r\n    <MODEL DATA>\r\n');
-            if algorithm == 3.0
+            if algorithm == 10.0 || algorithm == 3.0
                 fprintf(fid, '    Stress Dataset: N/A\r\n');
             elseif ischar(dataset) == 0.0
                 string = cell(1, length(dataset) + 1.0);
@@ -2377,13 +2403,13 @@ classdef messenger < handle
             maxTensorComponents = getappdata(0, 'maxTensorComponents');
             maxTensorComponentsPosition = getappdata(0, 'maxTensorComponentsPosition');
             fprintf(fid, '    Direct Range: %.3g to %.3g\r\n', ranges(1), ranges(2));
-            if algorithm == 3.0
+            if algorithm == 3.0 ||algorithm == 10.0
                 fprintf(fid, '    Shear Range: NONE\r\n');
             else
                 fprintf(fid, '    Shear Range: %.3g to %.3g\r\n', ranges(3), ranges(4));
             end
             fprintf(fid, '    Maximum Stress Components in Loading:\r\n');
-            if algorithm == 3.0
+            if algorithm == 3.0 || algorithm == 10.0
                 fprintf(fid, '    S (Uniaxial)\r\n');
 
                 fprintf(fid, '    %.3g\r\n', maxTensorComponents(1));
@@ -2475,7 +2501,7 @@ classdef messenger < handle
 
                 switch algorithm
                     case 3.0
-                        fprintf(fid, '    Analysis Algorithm: Uniaxial Stress-Life\r\n');
+                        fprintf(fid, '    Analysis Algorithm: Uniaxial Strain-Life\r\n');
                     case 4.0
                         fprintf(fid, '    Analysis Algorithm: Stress-based Brown-Miller (Shear + Direct)\r\n');
                     case 5.0
@@ -2496,6 +2522,8 @@ classdef messenger < handle
                     case 9.0
                         fprintf(fid, '    Analysis Algorithm: NASALIFE\r\n');
                     case 10.0
+                        fprintf(fid, '    Analysis Algorithm: Uniaxial Stress-Life\r\n');
+                    case 11.0
                         fprintf(fid, '    Analysis Algorithm: User-defined\r\n');
                 end
                 if algorithm == 6.0
@@ -2534,7 +2562,7 @@ classdef messenger < handle
                     end
                 end
                 fprintf(fid, '    Design Life: %.3g %s\r\n', getappdata(0, 'dLife'), getappdata(0, 'loadEqUnits'));
-                if algorithm == 3.0
+                if algorithm == 3.0 || algorithm == 10.0
                     fprintf(fid, '    Items: N/A\r\n');
                 elseif isempty(items)
                     fprintf(fid, '    Items: ALL\r\n');
@@ -2547,7 +2575,7 @@ classdef messenger < handle
                 else
                     fprintf(fid, '    Items: %.0f\r\n', items);
                 end
-                if algorithm == 3.0 || algorithm == 8.0
+                if algorithm == 3.0 || algorithm == 8.0 || algorithm == 10.0
                     fprintf(fid, '    Nodal Elimination: N/A\r\n');
                 elseif nodalElimination > 0.0
                     if hotspotWarning == 1.0
@@ -2671,7 +2699,7 @@ classdef messenger < handle
                 fprintf(fid, '\r\n    <ANALYSIS SETTINGS [ALL GROUPS]>\r\n');
                 switch algorithm
                     case 3.0
-                        fprintf(fid, '    Analysis Algorithm: Uniaxial Stress-Life\r\n');
+                        fprintf(fid, '    Analysis Algorithm: Uniaxial Strain-Life\r\n');
                     case 4.0
                         fprintf(fid, '    Analysis Algorithm: Stress-based Brown-Miller (Shear + Direct)\r\n');
                     case 5.0
@@ -2690,6 +2718,8 @@ classdef messenger < handle
                     case 9.0
                         fprintf(fid, '    Analysis Algorithm: NASALIFE\r\n');
                     case 10.0
+                        fprintf(fid, '    Analysis Algorithm: Uniaxial Stress-Life\r\n');
+                    case 11.0
                         fprintf(fid, '    Analysis Algorithm: User-defined\r\n');
                 end
                 if algorithm == 6.0
@@ -2722,7 +2752,7 @@ classdef messenger < handle
 
                 fprintf(fid, '    Design Life: %.3g %s\r\n', getappdata(0, 'dLife'), getappdata(0, 'loadEqUnits'));
 
-                if algorithm == 3.0
+                if algorithm == 3.0 || algorithm == 10.0
                     fprintf(fid, '    Items: N/A\r\n');
                 elseif isempty(items)
                     fprintf(fid, '    Items: ALL\r\n');
@@ -2735,7 +2765,7 @@ classdef messenger < handle
                 else
                     fprintf(fid, '    Items: %.0f\r\n', items);
                 end
-                if algorithm == 3.0 || algorithm == 8.0
+                if algorithm == 3.0 || algorithm == 8.0 || algorithm == 10.0
                     fprintf(fid, '    Nodal Elimination: N/A\r\n');
                 elseif nodalElimination > 0.0
                     if hotspotWarning == 1.0
@@ -3051,6 +3081,65 @@ classdef messenger < handle
                     fprintf('    Worst cycle damage parameter (MPa)    : %.4g\n', getappdata(0, 'WCDP_ABS'))
                     fprintf('    at Item %.0f.%.0f\n\n', getappdata(0, 'WCDP_mainID'), getappdata(0, 'WCDP_subID'))
                     fprintf(fid, '    Worst cycle damage parameter (MPa)    : %.4g\r\n', getappdata(0, 'WCDP_ABS'));
+                    fprintf(fid, '    at Item %.0f.%.0f\r\n\r\n', getappdata(0, 'WCDP_mainID'), getappdata(0, 'WCDP_subID'));
+                end
+            elseif algorithm == 1.0 || algorithm == 2.0 || algorithm == 3.0
+                if outputField == 1.0
+
+                    if getappdata(0, 'enableFOS') == 1.0
+                        % Worst item FOS
+                        fprintf('    Worst FOS                             : %.4f\n', getappdata(0, 'WNFOS'))
+                        fprintf('    at Item %.0f.%.0f\n\n', getappdata(0, 'WNFOS_mainID'), getappdata(0, 'WNFOS_subID'))
+                        fprintf(fid, '    Worst FOS                             : %.4f\r\n', getappdata(0, 'WNFOS'));
+                        fprintf(fid, '    at Item %.0f.%.0f\r\n\r\n', getappdata(0, 'WNFOS_mainID'), getappdata(0, 'WNFOS_subID'));
+                    end
+
+                    if (getappdata(0, 'utsWarn') == 0.0) && (getappdata(0, 'failedFRF') == 0.0)
+                        % Worst item FRFR
+                        fprintf('    Worst FRF                             : %.4f\n', getappdata(0, 'FRFW_ABS'))
+                        fprintf('    at Item %.0f.%.0f\n\n', getappdata(0, 'FRFW_mainID'), getappdata(0, 'FRFW_subID'))
+                        fprintf(fid, '    Worst FRF                             : %.4f\r\n', getappdata(0, 'FRFW_ABS'));
+                        fprintf(fid, '    at Item %.0f.%.0f\r\n\r\n', getappdata(0, 'FRFW_mainID'), getappdata(0, 'FRFW_subID'));
+                    end
+
+                    % Worst item SMAX
+                    fprintf('    Maximum stress (MPa)                  : %.4g\n', getappdata(0, 'SMAX_ABS'))
+                    fprintf('    at Item %.0f.%.0f\n\n', getappdata(0, 'SMAX_mainID'), getappdata(0, 'SMAX_subID'))
+                    fprintf(fid, '    Maximum stress (MPa)                  : %.4g\r\n', getappdata(0, 'SMAX_ABS'));
+                    fprintf(fid, '    at Item %.0f.%.0f\r\n\r\n', getappdata(0, 'SMAX_mainID'), getappdata(0, 'SMAX_subID'));
+
+                    if getappdata(0, 'twopsWarn') == 0.0
+                        % Worst item SMXP
+                        fprintf('    Maximum stress/yield                  : %.4g\n', getappdata(0, 'SMXP_ABS'))
+                        fprintf('    at Item %.0f.%.0f\n\n', getappdata(0, 'SMXP_mainID'), getappdata(0, 'SMXP_subID'))
+                        fprintf(fid, '    Maximum stress/yield                  : %.4g\r\n', getappdata(0, 'SMXP_ABS'));
+                        fprintf(fid, '    at Item %.0f.%.0f\r\n\r\n', getappdata(0, 'SMXP_mainID'), getappdata(0, 'SMXP_subID'));
+                    end
+
+                    if getappdata(0, 'utsWarn') == 0.0
+                        % Worst item SMXU
+                        fprintf('    Maximum stress/UTS                    : %.4g\n', getappdata(0, 'SMXU_ABS'))
+                        fprintf('    at Item %.0f.%.0f\n\n', getappdata(0, 'SMXU_mainID'), getappdata(0, 'SMXU_subID'))
+                        fprintf(fid, '    Maximum stress/UTS                    : %.4g\r\n', getappdata(0, 'SMXU_ABS'));
+                        fprintf(fid, '    at Item %.0f.%.0f\r\n\r\n', getappdata(0, 'SMXU_mainID'), getappdata(0, 'SMXU_subID'));
+                    end
+
+                    % Worst item WCM
+                    fprintf('    Worst cycle mean strain               : %.4g\n', getappdata(0, 'WCM_ABS'))
+                    fprintf('    at Item %.0f.%.0f\n\n', getappdata(0, 'WCM_mainID'), getappdata(0, 'WCM_subID'))
+                    fprintf(fid, '    Worst cycle mean strain               : %.4g\r\n', getappdata(0, 'WCM_ABS'));
+                    fprintf(fid, '    at Item %.0f.%.0f\r\n\r\n', getappdata(0, 'WCM_mainID'), getappdata(0, 'WCM_subID'));
+
+                    % Worst item WCA
+                    fprintf('    Worst cycle strain amplitude          : %.4g\n', getappdata(0, 'WCA_ABS'))
+                    fprintf('    at Item %.0f.%.0f\n\n', getappdata(0, 'WCA_mainID'), getappdata(0, 'WCA_subID'))
+                    fprintf(fid, '    Worst cycle strain amplitude          : %.4g\r\n', getappdata(0, 'WCA_ABS'));
+                    fprintf(fid, '    at Item %.0f.%.0f\r\n\r\n', getappdata(0, 'WCA_mainID'), getappdata(0, 'WCA_subID'));
+
+                    % Worst item WCDP
+                    fprintf('    Worst cycle damage parameter          : %.4g\n', getappdata(0, 'WCDP_ABS'))
+                    fprintf('    at Item %.0f.%.0f\n\n', getappdata(0, 'WCDP_mainID'), getappdata(0, 'WCDP_subID'))
+                    fprintf(fid, '    Worst cycle damage parameter          : %.4g\r\n', getappdata(0, 'WCDP_ABS'));
                     fprintf(fid, '    at Item %.0f.%.0f\r\n\r\n', getappdata(0, 'WCDP_mainID'), getappdata(0, 'WCDP_subID'));
                 end
             else

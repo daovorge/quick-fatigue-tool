@@ -67,7 +67,7 @@ classdef algorithm_sip < handle
             %% Get current damage parameter
             nodalDamageParameter(node) = max(cycles);
             
-            %% Perform a mean stress correection on the nodal damage parameter if necessary
+            %% Perform a mean stress correction on the nodal damage parameter if necessary
             if msCorrection < 7.0
                 x = nodalPairs{node};
                 largestPair = find(cycles == max(cycles));

@@ -292,7 +292,7 @@ end
 nodalElimination = getappdata(0, 'nodalElimination');
 
 % Only if Uniaxial Stress-Life or BS 7608 are not being used for analysis
-if (algorithm ~= 3.0) && (algorithm ~= 8.0)
+if (algorithm ~= 10.0) && (algorithm ~= 8.0) && (algorithm ~= 3.0)
     if (nodalElimination > 0.0) && (N > 1.0)
         fprintf('\n[PRE] Optimizing datasets')
         fprintf(fid_status, '\n[PRE] Optimizing datasets');
@@ -321,7 +321,7 @@ else
         messenger.writeMessage(20.0)
     end
 
-    if nodalElimination > 0.0 && algorithm == 3.0
+    if nodalElimination > 0.0 && (algorithm == 10.0 || algorithm == 3.0)
         messenger.writeMessage(21.0)
     end
 
@@ -352,7 +352,7 @@ step = getappdata(0, 'stepSize');
 % Check that total number of required steps is an integer
 if mod(180.0, step) ~= 0.0 || step < 1.0 || step > 180.0
     step = 15.0;
-    if (algorithm ~= 8.0) && (algorithm ~= 3.0)
+    if (algorithm ~= 8.0) && (algorithm ~= 10.0) && (algorithm ~= 3.0)
         messenger.writeMessage(61.0)
     end
 end
@@ -364,7 +364,7 @@ planePrecision = floor(180.0./step) + 1.0;
 setappdata(0, 'planePrecision', planePrecision)
 
 %% CHECK THE LOAD PROPORTIONALITY
-if getappdata(0, 'checkLoadProportionality') == 1.0 && (algorithm ~= 3.0 && algorithm ~= 7.0 && algorithm ~= 9.0 && algorithm ~= 6.0)
+if getappdata(0, 'checkLoadProportionality') == 1.0 && (algorithm ~= 10.0 && algorithm ~= 3.0 && algorithm ~= 7.0 && algorithm ~= 9.0 && algorithm ~= 6.0)
     fprintf('\n[PRE] Performing load proportionality checks')
     fprintf(fid_status, '\n[PRE] Performing load proportionality checks');
 
@@ -600,11 +600,11 @@ for groups = 1:G
         %%%%%%%%%%%%%%%%%%%%%%FATIGUE ANALYSIS ALGORITHM%%%%%%%%%%%%%%%%%%%%%%%
 
         switch algorithm
-            case 3.0 % UNIAXIAL STRESS-LIFE
-                [nodalAmplitudes, nodalPairs, nodalDamage, nodalDamageParameter, damageParameter]...
-                    = algorithm_usl.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, signalLength,...
-                    totalCounter, nodalDamage, msCorrection, nodalAmplitudes, nodalPairs,...
-                    nodalDamageParameter, gateTensors, tensorGate);
+            case 3.0 % UNIAXIAL STRAIN-LIFE
+                [nodalAmplitudes, nodalAmplitudes_strain, nodalPairs, nodalPairs_strain, nodalDamage, nodalDamageParameter, damageParameter, ~]...
+                    = algorithm_uel.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, signalLength,...
+                    totalCounter, nodalDamage, msCorrection, nodalDamageParameter,...
+                    gateTensors, tensorGate, s1i, s2i, s3i);
             case 4.0 % STRESS-BASED BROWN-MILLER
                 [nodalDamageParameter, nodalAmplitudes, nodalPairs,...
                     nodalPhiC, nodalThetaC, nodalDamage, maxPhiCurve] =...
@@ -661,7 +661,12 @@ for groups = 1:G
                     = algorithm_nasa.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, signalLength,...
                     totalCounter, nodalDamage, nodalAmplitudes, nodalPairs, nodalDamageParameter,...
                     s1i, s2i, s3i, signConvention, gateTensors, tensorGate, vonMises_i, nasalifeParameter);
-            case 10.0 % USER-DEFINED
+            case 10.0 % UNIAXIAL STRESS-LIFE
+                [nodalAmplitudes, nodalPairs, nodalDamage, nodalDamageParameter, damageParameter]...
+                    = algorithm_usl.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, signalLength,...
+                    totalCounter, nodalDamage, msCorrection, nodalAmplitudes, nodalPairs,...
+                    nodalDamageParameter, gateTensors, tensorGate);
+            case 11.0 % USER-DEFINED
                 [nodalDamageParameter, nodalAmplitudes, nodalPairs, nodalDamage] = algorithm_user.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, totalCounter, msCorrection);
             otherwise
         end
@@ -841,9 +846,8 @@ if (outputHistory == 1.0) || (outputField == 1.0) || (outputFigure == 1.0)
     fprintf(fid_status, '\n[POST] Calculating worst item output');
 
     switch algorithm
-        case 3.0 % UNIAXIAL STRESS-LIFE
-            algorithm_usl.worstItemAnalysis(signalLength, msCorrection,...
-                nodalAmplitudes, nodalPairs)
+        case 3.0 % UNIAXIAL STRAIN-LIFE
+            algorithm_uel.worstItemAnalysis(signalLength, nodalAmplitudes, nodalAmplitudes_strain, nodalPairs, nodalPairs_strain)
         case 4.0
             % STRESS-BASED BROWN-MILLER
             algorithm_sbbm.worstItemAnalysis(worstNodeTensor, phiOnCP,...
@@ -877,6 +881,9 @@ if (outputHistory == 1.0) || (outputField == 1.0) || (outputFigure == 1.0)
             algorithm_nasa.worstItemAnalysis(worstAnalysisItem, G,...
                 worstNodeTensor, signalLength, s1i, s2i, s3i,...
                 signConvention, gateTensors, tensorGate, nasalifeParameter)
+        case 10.0 % UNIAXIAL STRESS-LIFE
+            algorithm_usl.worstItemAnalysis(signalLength, msCorrection,...
+                nodalAmplitudes, nodalPairs)
         otherwise
     end
 end
@@ -918,7 +925,15 @@ postProcess.getNumberOfCycles()
 
 %% GET WCM AND WCA FOR FIELD OR HISTORY OUTPUT
 if outputField == 1.0 || outputHistory == 1.0
-    postProcess.getWorstCycleMeanAmp()
+    if algorithm == 1.0 || algorithm == 2.0 || algorithm == 3.0
+        % Worst cycle for each item
+        setappdata(0, 'nodalAmplitudes_strain', nodalAmplitudes_strain)
+        setappdata(0, 'nodalPairs_strain', nodalPairs_strain)
+        
+        postProcess_e.getWorstCycleMeanAmp()
+    else
+        postProcess.getWorstCycleMeanAmp()
+    end
 end
 
 if outputField == 1.0
@@ -928,6 +943,8 @@ if outputField == 1.0
 
     if algorithm == 8.0
         algorithm_bs7608.getFields()
+    elseif algorithm == 1.0 || algorithm == 2.0 || algorithm == 3.0
+        postProcess_e.getFields(algorithm, msCorrection, gateTensors, tensorGate, coldItems, fid_status)
     else
         postProcess.getFields(algorithm, msCorrection, gateTensors, tensorGate, coldItems, fid_status)
     end
@@ -935,6 +952,8 @@ if outputField == 1.0
     %% EXPORT FIELDS
     if algorithm == 8.0
         algorithm_bs7608.exportFields(loadEqUnits)
+    elseif algorithm == 1.0 || algorithm == 2.0 || algorithm == 3.0
+        postProcess_e.exportFields(loadEqUnits, coldItems)
     else
         postProcess.exportFields(loadEqUnits, coldItems)
     end
@@ -949,6 +968,8 @@ if (outputHistory == 1.0) || (outputFigure == 1.0)
 
     if algorithm == 8.0
         algorithm_bs7608.getHistories(loadEqUnits, outputField, outputFigure)
+    elseif algorithm == 1.0 || algorithm == 2.0 || algorithm == 3.0
+        postProcess_e.getHistories(algorithm, loadEqUnits, outputField, outputFigure, damageParameter)
     else
         postProcess.getHistories(algorithm, loadEqUnits, outputField, outputFigure, damageParameter, G)
     end
@@ -957,6 +978,8 @@ if (outputHistory == 1.0) || (outputFigure == 1.0)
         %% EXPORT HISTORIES
         if algorithm == 8.0
             algorithm_bs7608.exportHistories(loadEqUnits)
+        elseif algorithm == 1.0 || algorithm == 2.0 || algorithm == 3.0
+            postProcess_e.exportHistories(algorithm, loadEqUnits)
         else
             postProcess.exportHistories(algorithm, loadEqUnits)
         end

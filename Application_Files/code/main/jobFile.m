@@ -256,7 +256,7 @@ classdef jobFile < handle
                     case 'default'
                         algorithm = 0.0;
                         setappdata(0, 'algorithm', 0.0)
-                    case 'uniaxial'
+                    case 'uniaxial strain'
                         algorithm = 3.0;
                         setappdata(0, 'algorithm', 3.0)
                     case 'sbbm'
@@ -277,13 +277,16 @@ classdef jobFile < handle
                     case 'nasalife'
                         algorithm = 9.0;
                         setappdata(0, 'algorithm', 9.0)
-                    case 'user'
+                    case 'uniaxial stress'
                         algorithm = 10.0;
                         setappdata(0, 'algorithm', 10.0)
+                    case 'user'
+                        algorithm = 11.0;
+                        setappdata(0, 'algorithm', 11.0)
                     otherwise
                         % No exact string match
-                        algorithms = {'default', 'uniaxial', 'sbbm', 'normal', 'findley', 'invariant', 'weld', 'nasalife', 'user'};
-                        algorithmN = [0.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0];
+                        algorithms = {'default', 'uniaxial strain', 'sbbm', 'normal', 'findley', 'invariant', 'weld', 'nasalife', 'uniaxial stress', 'user'};
+                        algorithmN = [0.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0];
                         matchingAlg = find(strncmpi({algorithm}, algorithms, length(algorithm)) == 1.0);
                         
                         if isempty(matchingAlg) == 1.0
@@ -501,14 +504,9 @@ classdef jobFile < handle
             %% DETERMINE THE ANALYSIS ALGORITHM TO BE USED FOR THE ANALYSIS
             defaultAlgorithm = getappdata(0, 'defaultAlgorithm');
             
-            % If the algorithm is Uniaxial Stress-Life, change defaultAlgorithm value
-            if defaultAlgorithm == 11.0
-                defaultAlgorithm = 3.0;
-            end
-            
             % If the default algorithm is requested, check if it is available
             if algorithm == 0.0
-                if ((defaultAlgorithm ~= 3.0) && (defaultAlgorithm ~= 4.0) && (defaultAlgorithm ~= 5.0) && (defaultAlgorithm ~= 6.0) && (defaultAlgorithm ~= 7.0)) && (algorithm ~= 8.0)
+                if ((defaultAlgorithm == 1.0) || (defaultAlgorithm == 2.0) || (defaultAlgorithm == 3.0) || (defaultAlgorithm == 9.0)) && (algorithm ~= 8.0)
                     % The default algorithm is not available and the user did not
                     % request BS 7608, so use Stress-based Brown-Miller
                     algorithm = 4.0;
@@ -523,22 +521,34 @@ classdef jobFile < handle
                             messenger.writeMessage(156.0)
                         case 9.0
                             messenger.writeMessage(157.0)
-                        case 10.0
-                            messenger.writeMessage(158.0)
                     end
                 else
                     % The default algorithm is available
-                    algorithm = defaultAlgorithm;
+                    if defaultAlgorithm == 11.0
+                        algorithm = 10.0;
+                    elseif defaultAlgorithm == 10.0
+                        algorithm = 3.0;
+                    else
+                        algorithm = defaultAlgorithm;
+                    end
                 end
                 % Check if the requested algorithm is available
-            elseif (algorithm ~= 3.0) && (algorithm ~= 4.0) && (algorithm ~= 5.0) && (algorithm ~= 6.0) && (algorithm ~= 7.0) && (algorithm ~= 8.0) && (algorithm ~= 9.0) && (algorithm ~= 10.0)
+            elseif (algorithm ~= 3.0) && (algorithm ~= 4.0) && (algorithm ~= 5.0) && (algorithm ~= 6.0) && (algorithm ~= 7.0) && (algorithm ~= 8.0) && (algorithm ~= 9.0) && (algorithm ~= 10.0) && (algorithm ~= 11.0)
                 %{
                     The requested algorithm is not available, so check if
                     the default algorithm is. Do not use BS 7608 or
                     Uniaxial Stress-Life
                 %}
-                if (defaultAlgorithm == 3.0) || (defaultAlgorithm == 4.0) || (defaultAlgorithm == 5.0) || (defaultAlgorithm == 6.0) || (defaultAlgorithm == 7.0) || (defaultAlgorithm == 9.0)
-                    algorithm = defaultAlgorithm;
+                if (defaultAlgorithm ~= 1.0) && (defaultAlgorithm ~= 2.0) && (defaultAlgorithm ~= 3.0) && (defaultAlgorithm ~= 9.0)
+                    % The default algorithm is available
+                    if defaultAlgorithm == 11.0
+                        algorithm = 10.0;
+                    elseif defaultAlgorithm == 10.0
+                        algorithm = 3.0;
+                    else
+                        algorithm = defaultAlgorithm;
+                    end
+                    
                     messenger.writeMessage(187.0)
                 else
                     %{
@@ -668,9 +678,13 @@ classdef jobFile < handle
                 If the mean stress correction is user-defined, check that
                 it exists and verify the contents
             %}
-            if algorithm ~= 6.0 && algorithm ~= 8.0 && algorithm ~= 9.0
+            if (ischar(msCorrection) == 1.0) && (algorithm == 1.0 || algorithm == 2.0 || algorithm == 3.0)
+                setappdata(0, 'message_259_msCorrection', -1.0)
+                messenger.writeMessage(259.0)
+                msCorrection = 1.0;
+            elseif algorithm ~= 6.0 && algorithm ~= 8.0 && algorithm ~= 9.0 && algorithm ~= 1.0 && algorithm ~= 2.0 && algorithm ~= 3.0
                 [error, msCorrection] = mscFileUtils.checkUserData(msCorrection, 0.0, 'MSC');
-            else
+            elseif algorithm ~= 1.0 && algorithm ~= 2.0 && algorithm ~= 3.0
                 msCorrection = -9999.0;
             end
             
@@ -707,8 +721,12 @@ classdef jobFile < handle
             end
             
             % Morrow requires a value for the fatigue strength coefficient
-            if msCorrection == 1.0 && SfWarn == 1.0 && (algorithm ~= 6.0 && algorithm ~= 8.0)
-                msCorrection = 2.0;
+            if msCorrection == 1.0 && SfWarn == 1.0 && (algorithm == 3.0 || algorithm == 4.0 || algorithm == 5.0)
+                if algorithm == 3.0
+                    msCorrection = 8.0;
+                else
+                    msCorrection = 2.0;
+                end
                 messenger.writeMessage(49.0)
             end
             
@@ -725,15 +743,24 @@ classdef jobFile < handle
             end
             
             % Uniaxial Stress-Life is not compatible with Morrow MSC
-            if msCorrection == 1.0 && algorithm == 3.0
+            if msCorrection == 1.0 && algorithm == 10.0
                 msCorrection = 2.0;
                 messenger.writeMessage(54.0)
             end
             
             % Uniaxial Stress-Life is not compatible with Smith-Watson-Topper MSC
-            if msCorrection == 5.0 && algorithm == 3.0
+            if msCorrection == 5.0 && algorithm == 10.0
                 msCorrection = 2.0;
                 messenger.writeMessage(55.0)
+            end
+            
+            % Uniaxial Strain-Life is not compatible with some MSCs
+            if algorithm == 3.0
+                if (msCorrection == -1.0) || (msCorrection == 2.0) || (msCorrection == 3.0) || (msCorrection == 6.0) || (msCorrection == 7.0)
+                    setappdata(0, 'message_259_msCorrection', msCorrection)
+                    messenger.writeMessage(259.0)
+                    msCorrection = 1.0;
+                end
             end
             
             % Notify user about the danger of using Stress Invariant Parameter
@@ -795,19 +822,21 @@ classdef jobFile < handle
             end
             
             % If S-N data was requested, check that it exists
-            if (useSN == 1.0) && (snWarn == 1.0) && (algorithm ~= 8.0) || (useSN == 0.0)
+            if ((useSN == 1.0) && (snWarn == 1.0) && (algorithm ~= 8.0)) || (useSN == 0.0) || ((algorithm == 1.0) || (algorithm == 2.0) || (algorithm == 3.0))
                 %{
                     Either S-N data was requested but none was available,
-                    or S-N data was not requested. In either case, check
-                    that there are sufficient material properties to
-                    continue the analysis
+                    S-N data was not requested or a strain-life algorithm
+                    is selected. In either case, check that there are
+                    sufficient material properties to continue the analysis
                 %}
                 
                 % S-N data was requested but none was available
-                if useSN == 1.0
-                    useSN = 0.0;
-                    setappdata(0, 'useSN', 0.0)
-                    messenger.writeMessage(37.0)
+                if algorithm ~= 1.0 && algorithm ~= 2.0 && algorithm ~= 3.0
+                    if useSN == 1.0
+                        useSN = 0.0;
+                        setappdata(0, 'useSN', 0.0)
+                        messenger.writeMessage(37.0)
+                    end
                 end
                 
                 %{
@@ -815,9 +844,16 @@ classdef jobFile < handle
                     sufficient material data either. Check the material
                     properties
                 %}
-                
                 switch algorithm
+                    case 1.0
+                    case 2.0
                     case 3.0
+                        if SfWarn == 1.0 || bWarn == 1.0 || EfWarn == 1.0 || cWarn == 1.0 || EWarn == 1.0 || kpWarn == 1.0 || npWarn == 1.0
+                            error = 1.0;
+                            setappdata(0, 'E005', 1.0)
+                            return
+                        end
+                    case 10.0
                         if SfWarn == 1.0 || bWarn == 1.0
                             error = 1.0;
                             setappdata(0, 'E005', 1.0)
@@ -936,7 +972,7 @@ classdef jobFile < handle
                     % Warn that R-ratio S-N curves are not compatible when S-N data is
                     % not requested
                     switch algorithm
-                        case 3.0 % Uniaxial Stress-Life
+                        case 10.0 % Uniaxial Stress-Life
                             % Use Goodman instead
                             msCorrection = 2.0;
                             
@@ -961,11 +997,15 @@ classdef jobFile < handle
                 end
             end
             
+            if algorithm == 3.0
+                messenger.writeMessage(158.0)
+            end
+            
             if algorithm == 8.0
                 messenger.writeMessage(23.0)
             end
             
-            if algorithm == 3.0
+            if algorithm == 10.0
                 messenger.writeMessage(7.0)
             end
         end
@@ -1625,7 +1665,7 @@ classdef jobFile < handle
             setappdata(0, 'incorrectItemList', 0.0)
             
             % If using Uniaxial Stress-Life, no scale & combine is necessary
-            if algorithm == 3.0
+            if algorithm == 10.0 || algorithm == 3.0
                 [Sxx, Syy, Szz, Txy, Tyz, Txz, mainID, subID, error, oldSignal] = preProcess.uniaxialRead(history, gateHistories, historyGate, scale, offset);
             else
                 [Sxx, Syy, Szz, Txy, Tyz, Txz, mainID, subID, error] = preProcess.scalecombine(dataset, history, items, gateHistories, historyGate, scale, offset, elementType);
@@ -1637,7 +1677,7 @@ classdef jobFile < handle
             
             % If high frequency data is provided, superimpose it onto the low frequency
             % block
-            if (isempty(hfDataset) == 0.0) || (algorithm == 3.0 && isempty(hfHistory) == 0.0)
+            if (isempty(hfDataset) == 0.0) || ((algorithm == 10.0 || algorithm == 3.0) && isempty(hfHistory) == 0.0)
                 [Sxx, Syy, Szz, Txy, Tyz, Txz, error] = highFrequency.main(Sxx, Syy, Szz, Txy, Tyz, Txz, hfDataset, hfHistory, hfTime, algorithm, items, hfScales);
                 
                 %{
@@ -1645,7 +1685,7 @@ classdef jobFile < handle
                     Stress-Life algorithm, update the OLDSIGNAL variable to
                     reflect the newly superinposed data
                 %}
-                if algorithm == 3.0
+                if algorithm == 10.0 || algorithm == 3.0
                     oldSignal = Sxx;
                 end
             end
@@ -1682,7 +1722,7 @@ classdef jobFile < handle
             Txy = Txy*conversionFactor;    Tyz = Tyz*conversionFactor;    Txz = Txz*conversionFactor;
             
             % Apply unit conversion factor to the old signal for Uniaxial Stress-Life
-            if algorithm == 3.0
+            if algorithm == 10.0 || algorithm == 3.0
                 setappdata(0, 'SIGOriginalSignal', oldSignal*conversionFactor)
             end
             
@@ -1739,14 +1779,14 @@ classdef jobFile < handle
             odbResultPosition = getappdata(0, 'odbResultPosition');
             algorithm = getappdata(0, 'algorithm');
             
-            if algorithm == 3.0
+            if algorithm == 3.0 || algorithm == 10.0
                 setappdata(0, 'autoExport_uniaxial', 1.0)
             end
             
             if autoExportODB == 1.0 && isempty(outputDatabase) == 0.0
                 % The ODB interface does not support Uniaxial Stress-Life
-                if algorithm == 3.0
-                    msg = sprintf('Uniaxial Stress-Life is not supported by the ODB interface.\n\nResults will not be exported to the output database. OK to continue with job submission?');
+                if algorithm == 3.0 || algorithm == 1.0
+                    msg = sprintf('Uniaxial analysis methods are not supported by the ODB interface.\n\nResults will not be exported to the output database. OK to continue with job submission?');
                     response = questdlg(msg, 'Quick Fatigue Tool', 'Yes', 'No', 'Yes');
                     if strcmpi('No', response) == 1.0
                         fprintf('\n[NOTICE] Job %s was aborted by the user\n', jobName);

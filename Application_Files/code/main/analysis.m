@@ -1,7 +1,5 @@
 classdef analysis < handle
 %ANALYSIS    QFT class for general analysis tasks.
-%   This class contains methods for general analysis tasks.
-%   
 %   ANALYSIS is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %   

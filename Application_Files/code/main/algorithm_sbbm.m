@@ -413,10 +413,10 @@ classdef algorithm_sbbm < handle
                                 BM = E*((((1.65*morrowSf(index))/E)*(Nf).^b) + (1.75*Ef)*((Nf).^c));
                             else
                                 % No mean stress correction was requested
-                                BM = E*((((1.65*Sf)/E)*(Nf).^b) + (Ef*1.75)*((Nf).^c));
+                                BM = E*((((1.65*Sf)/E)*(Nf).^b) + (1.75*Ef)*((Nf).^c));
                             end
                             
-                            life = 10^(interp1(log10((1.0./ktn).*BM), log10(Nf), log10(cycles(index) + residualStress), 'linear', 'extrap'));
+                            life = 0.5*10^(interp1(log10((1.0./ktn).*BM), log10(Nf), log10(cycles(index) + residualStress), 'linear', 'extrap'));
                             
                             % If the life was above the knee-point,
                             % re-calculate the life using B2
@@ -429,15 +429,16 @@ classdef algorithm_sbbm < handle
                                     BM = E*((((1.65*Sf)/E)*(Nf).^b2) + (Ef*1.75)*((Nf).^c));
                                 end
                                 
-                                life = 10^(interp1(log10((1./ktn).*BM), log10(Nf), log10(cycles(index) + residualStress), 'linear', 'extrap'));
+                                life = 0.5*10^(interp1(log10((1.0./ktn).*BM), log10(Nf), log10(cycles(index) + residualStress), 'linear', 'extrap'));
                             end
                             
                             if life < 0.0
                                 life = 0.0;
                             end
+                            
+                            % Invert the life value to get the damage
+                            cumulativeDamage(index) = (1.0/life);
                         end
-                        % Invert the life value to get the damage
-                        cumulativeDamage(index) = (1.0/life);
                     end
                 end
             end

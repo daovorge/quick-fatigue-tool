@@ -3614,9 +3614,6 @@ classdef preProcess < handle
                 % Store the current group number
                 setappdata(0, 'message_groupNumber', groups)
 
-                % Get the current algorithm
-                algorithm = getappdata(0, 'algorithm');
-
                 % Check that the proof stress is defined
                 if algorithm == 8.0
                     proof = getappdata(0, 'bs7608Twops');

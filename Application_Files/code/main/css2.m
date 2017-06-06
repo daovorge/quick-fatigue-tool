@@ -13,7 +13,15 @@ function [rfData, epsilon, sigma, error] = css2(sigma_e, E, kp, np)
     
 error = 0.0;
 %% Initialize RFDATA
-rfData = zeros(1.0, 4.0);
+%{
+    1: Min. stress
+    2: Max. stress
+    3: Min. strain
+    4: Max. strain
+    5: Min. index
+    6: Max. index
+%}
+rfData = zeros(1.0, 6.0);
 rfDataIndex = 0.0;
 
 %% Prepare the stress signal
@@ -309,13 +317,17 @@ for i = 3:signalLength
         
         % Update the rainflow buffer
         
-        % Count the cycle
-        rfData(rfDataIndex, 1.0) = epsilon(i - 1.0);
-        rfData(rfDataIndex, 2.0) = epsilon(i);
+        % Count the stress cycle
+        rfData(rfDataIndex, 1.0) = sigma(i - 1.0);
+        rfData(rfDataIndex, 2.0) = sigma(i);
+        
+        % Count the strain cycle
+        rfData(rfDataIndex, 3.0) = epsilon(i - 1.0);
+        rfData(rfDataIndex, 4.0) = epsilon(i);
         
         % Position in the history
-        rfData(rfDataIndex, 3.0) = i - 1.0;
-        rfData(rfDataIndex, 4.0) = i;
+        rfData(rfDataIndex, 5.0) = i - 1.0;
+        rfData(rfDataIndex, 6.0) = i;
     elseif (currentStressRange == previousStressRange) && (i > 3.0) && (allowClosure == 1.0)
         %%
         %{
@@ -368,13 +380,17 @@ for i = 3:signalLength
         
         % Update the rainflow buffer
         
-        % Count the cycle
-        rfData(rfDataIndex, 1.0) = epsilon(i - 1.0);
-        rfData(rfDataIndex, 2.0) = epsilon(i);
+        % Count the stress cycle
+        rfData(rfDataIndex, 1.0) = sigma(i - 1.0);
+        rfData(rfDataIndex, 2.0) = sigma(i);
+        
+        % Count the strain cycle
+        rfData(rfDataIndex, 3.0) = epsilon(i - 1.0);
+        rfData(rfDataIndex, 4.0) = epsilon(i);
         
         % Position in the history
-        rfData(rfDataIndex, 3.0) = i - 1.0;
-        rfData(rfDataIndex, 4.0) = i;
+        rfData(rfDataIndex, 5.0) = i - 1.0;
+        rfData(rfDataIndex, 6.0) = i;
     else
         %%
         %{
