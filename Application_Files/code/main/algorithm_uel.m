@@ -81,7 +81,7 @@ classdef algorithm_uel < handle
             if msCorrection < 7.0
                 x = nodalPairs_stress{node};
                 largestPair = find(cycles_stress == max(cycles_stress));
-                [nodalDamageParameter(node), ~, ~] = analysis_e.msc(max(cycles_strain), x(largestPair(1.0), :), msCorrection, S1, residual);
+                [nodalDamageParameter(node), ~, ~, ~, ~] = analysis_e.msc(max(cycles_strain), x(largestPair(1.0), :), msCorrection, S1, residual);
             end
             
             %% Perform a damage calculation on the current analysis item
@@ -114,7 +114,7 @@ classdef algorithm_uel < handle
             
             % Perform mean stress correction if necessary
             if msCorrection < 7.0
-                [cycles_strain, mscWarning, overflowCycles] = analysis_e.msc(cycles_strain, pairs_stress, msCorrection, S1, residual);
+                [cycles_strain, gamma, R, mscWarning, overflowCycles] = analysis_e.msc(cycles_strain, pairs_stress, msCorrection, S1, residual);
             else
                 mscWarning = 0.0;
             end
@@ -172,15 +172,15 @@ classdef algorithm_uel < handle
                     cumulativeDamage(index) = 0.0;
                 else
                     % Define the E-N curve
-                    if msCorrection == 1.0
-                        % Apply Morrow mean stress correction
-                        BM = (morrowSf(index)/E).*((Nf).^b) + Ef.*((Nf).^c);
-                    elseif msCorrection == 5.0
-                        % Apply SWT mean stress correction
-                        BM = (Sf^2.0/E).*((Nf).^(2.0*b)) + Ef.*((Nf).^(b + c));
-                    else
-                        % No mean stress correction was requested
-                        BM = (Sf/E).*(Nf).^b + Ef.*(Nf).^c;
+                    switch msCorrection
+                        case 1.0 % Morrow
+                            BM = (morrowSf(index)/E).*((Nf).^b) + Ef.*((Nf).^c);
+                        case 4.0 % Walker
+                            BM = (Sf/E).*(Nf.*((0.5.*(1.0 - R(index))).^((1.0 - gamma)/b))).^b + Ef.*(Nf.*((0.5.*(1.0 - R(index))).^((1.0 - gamma)/b))).^c;
+                        case 5.0 % Smith-Watson-Topper
+                            BM = (Sf^2.0/E).*((Nf).^(2.0*b)) + Ef.*((Nf).^(b + c));
+                        otherwise % No mean stress correction
+                            BM = (Sf/E).*(Nf).^b + Ef.*(Nf).^c;
                     end
                     
                     life = 0.5*interp1((1.0./ktn).*BM, Nf, cycles_strain(index), 'linear', 'extrap');
@@ -190,15 +190,18 @@ classdef algorithm_uel < handle
                         the life using B2
                     %}
                     if life > b2Nf
-                        if msCorrection == 1.0
-                            % Apply Morrow mean stress correction
-                            BM = E*((((morrowSf(index))/E)*(Nf).^b2) + (Ef)*((Nf).^c));
-                        else
-                            % No mean stress correction was requested
-                            BM = E*((((Sf)/E)*(Nf).^b2) + (Ef)*((Nf).^c));
+                        switch msCorrection
+                            case 1.0 % Morrow
+                                BM = (morrowSf(index)/E).*((Nf).^b2) + Ef.*((Nf).^c);
+                            case 4.0 % Walker
+                                BM = (Sf/E).*(Nf.*((0.5.*(1.0 - R(index))).^((1.0 - gamma)/b2))).^b2 + Ef.*(Nf.*((0.5.*(1.0 - R(index))).^((1.0 - gamma)/b2))).^c;
+                            case 5.0 % Smith-Watson-Topper
+                                BM = (Sf^2.0/E).*((Nf).^(2.0*b2)) + Ef.*((Nf).^(b2 + c));
+                            otherwise % No mean stress correction
+                                BM = (Sf/E).*(Nf).^b2 + Ef.*(Nf).^c;
                         end
                         
-                        life = 0.5*10^(interp1(log10((1.0./ktn).*BM), log10(Nf), log10(cycles(index)), 'linear', 'extrap'));
+                        life = 0.5*interp1((1.0./ktn).*BM, Nf, cycles(index), 'linear', 'extrap');
                     end
                     
                     if life < 0.0
