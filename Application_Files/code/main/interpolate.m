@@ -92,7 +92,7 @@ if (sets == 1.0) || (sets > 1.0 && msCorrection ~= 7.0)
             cumulativeDamage(index) = 0.0;
         else
             % Interpolate directly to get the damage
-            cumulativeDamage(index) = (10^(interp1(log10(S), log10(N), log10(cycles(index) + residualStress), 'linear', 'extrap')))^-1.0;
+            cumulativeDamage(index) = (10^(interp1(log10(S), log10(N), log10(cycles(index)), 'linear', 'extrap')))^-1.0;
             
             if cumulativeDamage < 0.0
                 cumulativeDamage(index) = 1.0;
@@ -109,6 +109,9 @@ elseif msCorrection == 7.0
     
     % Get the S-values at R=-1.0 if required later
     s_Rminus1 = getappdata(0, 's_values_reduced');
+    
+    % Add the residual stress to the cycle
+    pairs = pairs + residualStress;
     
     for index = 1:numberOfCycles
         %{
@@ -136,7 +139,7 @@ elseif msCorrection == 7.0
                     Otherwise, the cycle may still be damaging, but the
                     R-ratios mean stress correction will not be applied
                 %}
-                cumulativeDamage(index) = (10^(interp1(log10(s_Rminus1), log10(N), log10(cycles(index) + residualStress), 'linear', 'extrap')))^-1.0;
+                cumulativeDamage(index) = (10^(interp1(log10(s_Rminus1), log10(N), log10(cycles(index)), 'linear', 'extrap')))^-1.0;
             end
             continue
         end
@@ -353,7 +356,7 @@ elseif msCorrection == 7.0
             end
             
             % Interpolate directly to get the damage
-            cumulativeDamage(index) = (10^(interp1(log10(Si), log10(N), log10(cycles(index) + residualStress), 'linear', 'extrap')))^-1.0;
+            cumulativeDamage(index) = (10^(interp1(log10(Si), log10(N), log10(cycles(index)), 'linear', 'extrap')))^-1.0;
             
             if cumulativeDamage(index) < 0.0 || isinf(cumulativeDamage(index))
                 cumulativeDamage(index) = 1.0;

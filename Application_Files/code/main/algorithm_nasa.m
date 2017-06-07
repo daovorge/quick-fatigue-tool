@@ -29,6 +29,9 @@ classdef algorithm_nasa < handle
             Sf = getappdata(0, 'Sf');
             b = getappdata(0, 'b');
             
+            % Get the residual stress
+            residualStress = getappdata(0, 'residualStress');
+            
             %% Arrange stress history into a sequence of stress tensors
             tensor = zeros(3.0, 3.0, signalLength);
             
@@ -170,6 +173,9 @@ classdef algorithm_nasa < handle
                         % Get the equivalent stress amplitude of the cycle
                         Sa = 0.5*sqrt(2.0)*sqrt((Sxa - Sya)^2 + (Sya - Sza)^2 + (Sza - Sxa)^2 + 6*(Txya^2 + Tyza^2 + Txza^2));
                 end
+                
+                % Add the residual stress to the mean stres
+                Sm = Sm + residualStress;
                 
                 % Get the A-ratio and R-ratio
                 A = Sa/Sm;
@@ -500,7 +506,7 @@ classdef algorithm_nasa < handle
             % Get the Walker-corrected stress amplitude
             for i = 1:numberOfCycles
                 % Get the A-ratio and R-ratio
-                A = Sa(i)/(0.5.*(max(pairs(i, :)) + min(pairs(i, :))));
+                A = Sa(i)/(residualStress + (0.5.*(max(pairs(i, :)) + min(pairs(i, :)))));
                 if (isinf(A) == 1.0) || (A == -1.0)
                     R = -1.0;
                 else
@@ -574,7 +580,7 @@ classdef algorithm_nasa < handle
                         cumulativeDamage(index) = 0.0;
                     else
                         % Divide the LHS by Sf' so that LHS == Nf^b
-                        quotient = (Sa(index) + residualStress)/Sf;
+                        quotient = (Sa(index))/Sf;
                         
                         % Raise the LHS to the power of 1/b so that LHS == Nf
                         life = 0.5*(quotient^(1/b));
@@ -593,7 +599,7 @@ classdef algorithm_nasa < handle
                             
                             ktn = analysis.getKtn(life, constant, radius);
    
-                            quotient = (ktn*Sa(index) + residualStress)/Sf;
+                            quotient = (ktn*Sa(index))/Sf;
 
                             if life > b2Nf
                                 life = 0.5*quotient^(1/b2);
@@ -633,6 +639,7 @@ classdef algorithm_nasa < handle
             
             Sf = group_materialProps(i).Sf;
             b = group_materialProps(i).b;
+            residualStress = getappdata(0, 'residualStress');
             
             %% Arrange stress history into a sequence of stress tensors
             tensor = zeros(3.0, 3.0, signalLength);
@@ -771,6 +778,9 @@ classdef algorithm_nasa < handle
                         % Get the equivalent stress amplitude of the cycle
                         Sa = 0.5*sqrt(2.0)*sqrt((Sxa - Sya)^2 + (Sya - Sza)^2 + (Sza - Sxa)^2 + 6*(Txya^2 + Tyza^2 + Txza^2));
                 end
+                
+                % Add the residual stress to the mean stres
+                Sm = Sm + residualStress;
                 
                 % Get the A-ratio and R-ratio
                 A = Sa/Sm;

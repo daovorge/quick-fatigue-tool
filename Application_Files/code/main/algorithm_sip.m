@@ -67,11 +67,14 @@ classdef algorithm_sip < handle
             %% Get current damage parameter
             nodalDamageParameter(node) = max(cycles);
             
+            % Residual stress
+            residualStress = getappdata(0, 'residualStress');
+            
             %% Perform a mean stress correction on the nodal damage parameter if necessary
             if msCorrection < 7.0
                 x = nodalPairs{node};
                 largestPair = find(cycles == max(cycles));
-                [nodalDamageParameter(node), ~, ~] = analysis.msc(max(cycles), x(largestPair(1.0), :), msCorrection);
+                [nodalDamageParameter(node), ~, ~] = analysis.msc(max(cycles), x(largestPair(1.0), :), msCorrection, residualStress);
             end
             
             %% Perform a damage calculation on the current analysis item
@@ -105,7 +108,7 @@ classdef algorithm_sip < handle
             
             % Perform mean stress correction if necessary
             if msCorrection < 7.0
-                [cycles, mscWarning, overflowCycles] = analysis.msc(cycles, pairs, msCorrection);
+                [cycles, mscWarning, overflowCycles] = analysis.msc(cycles, pairs, msCorrection, residualStress);
             else
                 mscWarning = 0.0;
             end
@@ -178,7 +181,7 @@ classdef algorithm_sip < handle
                         cumulativeDamage(index) = 0.0;
                     else
                         % Divide the LHS by Sf' so that LHS == Nf^b
-                        quotient = (cycles(index) + residualStress)/Sf;
+                        quotient = (cycles(index))/Sf;
                         
                         % Raise the LHS to the power of 1/b so that LHS == Nf
                         life = 0.5*quotient^(1.0/b);
@@ -197,7 +200,7 @@ classdef algorithm_sip < handle
                             
                             ktn = analysis.getKtn(life, constant, radius);
    
-                            quotient = (ktn*cycles(index) + residualStress)/Sf;
+                            quotient = (ktn*cycles(index))/Sf;
 
                             if life > b2Nf
                                 life = 0.5*quotient^(1/b2);

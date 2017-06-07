@@ -497,11 +497,6 @@ classdef algorithm_bs7608 < handle
         function damage = damageCalculation(cycles, pairs, repeats)
             
             %% CALCULATE DAMAGE FOR EACH CYCLE
-            
-            % Get the residual stress
-            residualStress = getappdata(0, 'residualStress_original');
-            residualStress = residualStress(getappdata(0, 'getMaterial_currentGroup'));
-            
             numberOfCycles = length(cycles);
             
             cumulativeDamage = zeros(1.0, numberOfCycles);
@@ -565,7 +560,7 @@ classdef algorithm_bs7608 < handle
                     
                     % Calculate the life
                     if weldClassInt == 12.0
-                        life = 10^(interp1(log10(userS), log10(userN), log10(2.0*cycles(index) + residualStress), 'linear', 'extrap'));
+                        life = 10^(interp1(log10(userS), log10(userN), log10(2.0*cycles(index)), 'linear', 'extrap'));
                     elseif weldClassInt == 11.0
                         if getappdata(0, 'devsBelowMean') == 0.0
                             life = 800.0/((2.0*cycles(index)/getappdata(0, 'bs7608UTS'))^3.0);
@@ -573,7 +568,7 @@ classdef algorithm_bs7608 < handle
                             life = 400.0/((2.0*cycles(index)/getappdata(0, 'bs7608UTS'))^3.0);
                         end
                     else
-                        life = 10.0^(getappdata(0, 'bs7608Factor') - getappdata(0, 'bs7608_m')*log10(2.0*cycles(index) + residualStress));
+                        life = 10.0^(getappdata(0, 'bs7608Factor') - getappdata(0, 'bs7608_m')*log10(2.0*cycles(index)));
                     end
                     
                     if weldClassInt < 11.0
@@ -582,7 +577,7 @@ classdef algorithm_bs7608 < handle
                             re-calculate with modified slope
                         %}
                         if life > 1e7 && getappdata(0, 'seaWater') == 0.0
-                            life = 10.0^(getappdata(0, 'bs7608Factor') - (getappdata(0, 'bs7608_m') + 2.0)*log10(2.0*cycles(index) + residualStress));
+                            life = 10.0^(getappdata(0, 'bs7608Factor') - (getappdata(0, 'bs7608_m') + 2.0)*log10(2.0*cycles(index)));
                         end
                     else
                         %{

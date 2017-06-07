@@ -49,10 +49,13 @@ classdef algorithm_sbbm < handle
             nodalPhiC(node) = phiC;
             nodalThetaC(node) = thetaC;
             
+            % Residual stress
+            residualStress = getappdata(0, 'residualStress');
+            
             % Perform a mean stress correction on the nodal damage parameter if necessary
             if msCorrection < 7.0
                 x = nodalPairs{node};
-                [nodalDamageParameter(node), ~, ~] = analysis.msc(max(damageParameter), x(damageParameter == max(damageParameter), :), msCorrection);
+                [nodalDamageParameter(node), ~, ~] = analysis.msc(max(damageParameter), x(damageParameter == max(damageParameter), :), msCorrection, residualStress);
             end
             
             % Perform a damage calculation on the current analysis item
@@ -217,7 +220,7 @@ classdef algorithm_sbbm < handle
             
             % Perform mean stress correction if necessary
             if msCorrection < 7.0
-                [cycles, mscWarning, overflowCycles] = analysis.msc(cycles, pairs, msCorrection);
+                [cycles, mscWarning, overflowCycles] = analysis.msc(cycles, pairs, msCorrection, residualStress);
             else
                 mscWarning = 0.0;
             end
@@ -325,10 +328,10 @@ classdef algorithm_sbbm < handle
                             % Use only the HCF stress zone of the SN curve
                             if msCorrection == 1.0
                                 % Apply Morrow mean stress correction
-                                quotient = (cycles(index) + residualStress)/(1.65*morrowSf(index));
+                                quotient = (cycles(index))/(1.65*morrowSf(index));
                             else
                                 % No mean stress correction was requested
-                                quotient = (cycles(index) + residualStress)/(1.65*Sf);
+                                quotient = (cycles(index))/(1.65*Sf);
                             end
                             
                             % Raise the LHS to the power of 1/b so that LHS == Nf
@@ -355,10 +358,10 @@ classdef algorithm_sbbm < handle
                                 % Use only the HCF stress zone of the SN curve
                                 if msCorrection == 1.0
                                     % Apply Morrow mean stress correction
-                                    quotient = (ktn*cycles(index) + residualStress)/(1.65*morrowSf(index));
+                                    quotient = (ktn*cycles(index))/(1.65*morrowSf(index));
                                 else
                                     % No mean stress correction was requested
-                                    quotient = (ktn*cycles(index) + residualStress)/(1.65*Sf);
+                                    quotient = (ktn*cycles(index))/(1.65*Sf);
                                 end
                                 
                                 if life > b2Nf
@@ -416,7 +419,7 @@ classdef algorithm_sbbm < handle
                                 BM = E*((((1.65*Sf)/E)*(Nf).^b) + (1.75*Ef)*((Nf).^c));
                             end
                             
-                            life = 0.5*10^(interp1(log10((1.0./ktn).*BM), log10(Nf), log10(cycles(index) + residualStress), 'linear', 'extrap'));
+                            life = 0.5*10^(interp1(log10((1.0./ktn).*BM), log10(Nf), log10(cycles(index)), 'linear', 'extrap'));
                             
                             % If the life was above the knee-point,
                             % re-calculate the life using B2
@@ -429,7 +432,7 @@ classdef algorithm_sbbm < handle
                                     BM = E*((((1.65*Sf)/E)*(Nf).^b2) + (Ef*1.75)*((Nf).^c));
                                 end
                                 
-                                life = 0.5*10^(interp1(log10((1.0./ktn).*BM), log10(Nf), log10(cycles(index) + residualStress), 'linear', 'extrap'));
+                                life = 0.5*10^(interp1(log10((1.0./ktn).*BM), log10(Nf), log10(cycles(index)), 'linear', 'extrap'));
                             end
                             
                             if life < 0.0

@@ -386,7 +386,7 @@ classdef messenger < handle
                         end
 
                         fprintf(fidType(i), ['The following job file options will be ignored:', returnType{i}]);
-                        fprintf(fidType(i), ['-> MATERIAL, USE_SN, SN_SCALE, SN_KNOCK_DOWN, MS_CORRECTION, FACTOR_OF_STRENGTH, FATIGUE_RESERVE_FACTOR, KT_DEF, KT_CURVE, NOTCH_CONSTANT, NOTCH_RADIUS', returnType{i}]);
+                        fprintf(fidType(i), ['-> MATERIAL, USE_SN, SN_SCALE, SN_KNOCK_DOWN, MS_CORRECTION, FACTOR_OF_STRENGTH, FATIGUE_RESERVE_FACTOR, KT_DEF, KT_CURVE, NOTCH_CONSTANT, NOTCH_RADIUS, RESIDUAL', returnType{i}]);
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 24.0

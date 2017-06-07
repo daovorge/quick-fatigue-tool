@@ -701,7 +701,7 @@ classdef analysis < handle
         end
         
         %% Mean stress correction
-        function [mscCycles, warning, overflowCycles] = msc(cycles, pairs, msCorrection)
+        function [mscCycles, warning, overflowCycles] = msc(cycles, pairs, msCorrection, residual)
             % Initialize output
             warning = 0.0;
             k = 1.0;
@@ -726,6 +726,9 @@ classdef analysis < handle
             
             % Get the mean stress from each cycle
             Sm = 0.5*(pairs(:, 1.0) + pairs(:, 2.0));
+            
+            % Add the residual stress to the mean stress
+            Sm = Sm + residual;
             
             % Get the corrected stress amplitudes
             switch msCorrection
