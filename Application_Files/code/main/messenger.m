@@ -166,7 +166,7 @@ classdef messenger < handle
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The Uniaxial Stress-Life algorithm is not compatible with certain features', returnType{i}]);
 
                         fprintf(fidType(i), ['The following job file options will be ignored:', returnType{i}]);
-                        fprintf(fidType(i), ['-> DATASET, PLANE_STRESS, OUTPUT_DATABASE, PART_INSTANCE, FEA_PROCEDURE, STEP_NAME, RESULT_POSITION, GROUP, ITEMS', returnType{i}]);
+                        fprintf(fidType(i), ['-> DATASET, PLANE_STRESS, GROUP, ITEMS, OUTPUT_DATABASE, PART_INSTANCE, EXPLICIT_FEA, STEP_NAME, RESULT_POSITION, WELD_CLASS, YIELD_STRENGTH, UTS, DEVIATIONS_BELOW_MEAN, FAILURE_MODE, CHARACTERISTIC_LENGTH, SEA_WATER', returnType{i}]);
                     case 8.0
                         % Proof stress
                         if getappdata(0, 'twops_status') == 1.0
@@ -1249,7 +1249,7 @@ classdef messenger < handle
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 139.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: %.0f hotspots were located for the specified design life (%.3g %s)', returnType{i}],  getappdata(0, 'numberOfHotSpots'), getappdata(0, 'dLife'), getappdata(0, 'loadEqUnits'));
-                        fprintf(fidType(i), ['-> These items have been written to ''%s\\Project\\input\\hotspots_%s.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
+                        fprintf(fidType(i), ['-> These items have been written to ''%s\\Project\\output\\%s\\Data Files\\hotspots.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
                         fprintf(fidType(i), ['-> This file can be used as an argument for the ITEMS option in the job file', returnType{i}]);
 
                         setappdata(0, 'messageFileNotes', 1.0)
@@ -1393,7 +1393,7 @@ classdef messenger < handle
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The Uniaxial Strain-Life algorithm is not compatible with certain features', returnType{i}]);
 
                         fprintf(fidType(i), ['The following job file options will be ignored:', returnType{i}]);
-                        fprintf(fidType(i), ['-> SN_KNOCK_DOWN, DATASET, PLANE_STRESS, OUTPUT_DATABASE, PART_INSTANCE, FEA_PROCEDURE, STEP_NAME, RESULT_POSITION, GROUP, ITEMS', returnType{i}]);
+                        fprintf(fidType(i), ['-> USE_SN, SN_SCALE, SN_KNOCK_DOWN, DATASET, PLANE_STRESS, GROUP, ITEMS, OUTPUT_DATABASE, PART_INSTANCE, EXPLICIT_FEA, STEP_NAME, RESULT_POSITION, WELD_CLASS, UTS, DEVIATIONS_BELOW_MEAN, FAILURE_MODE, CHARACTERISTIC_LENGTH, SEA_WATER', returnType{i}]);
                     case 159.0
                         if getappdata(0, 'suppress_ID159') == 0.0
                             fprintf(fidType(i), [returnType{i}, '***WARNING: After applying the Morrow mean stress correction, some cycles are negative', returnType{i}]);

@@ -10,7 +10,7 @@ classdef analysis_e < handle
     
     methods(Static = true)
         %% Mean stress correction
-        function [mscCycles, warning, overflowCycles] = msc(cycles, pairs, msCorrection)
+        function [mscCycles, warning, overflowCycles] = msc(cycles_e, pairs_s, msCorrection, S1, residual)
             % Initialize output
             warning = 0.0;
             overflowCycles = 0.0;
@@ -19,7 +19,7 @@ classdef analysis_e < handle
             % Check if the UTS is available
             uts = getappdata(0, 'uts');
             if isempty(uts) && (msCorrection == 5.0 || msCorrection == 7.0)
-                mscCycles = cycles;
+                mscCycles = cycles_e;
                 return
             end
             
@@ -30,13 +30,18 @@ classdef analysis_e < handle
             end
             
             % Get the mean stress from each cycle
-            Sm = 0.5*(pairs(:, 1.0) + pairs(:, 2.0));
+            Sm = 0.5*(pairs_s(:, 1.0) + pairs_s(:, 2.0));
+            
+            % Add the residual stress to the mean stress
+            Sm = Sm + residual;
             
             % Get the corrected stress amplitudes
             switch msCorrection
                 case 1.0 % Morrow
+                    % Get the unmodified fatigue strength coefficient
                     Sf = getappdata(0, 'Sf');
                     
+                    % Correct Sf' using Sm
                     morrowSf = Sf - Sm;
                     
                     % Check for negative values
@@ -49,17 +54,17 @@ classdef analysis_e < handle
                         end
                     end
                     setappdata(0, 'morrowSf', morrowSf)
-                    mscCycles = cycles;
+                    mscCycles = cycles_e;
                 case 4.0 % Walker
                     gamma = getappdata(0, 'walkerGamma');
                     
                     % Get the maximum cycle and load ratio
-                    [numberOfPairs, ~] = size(pairs);
+                    [numberOfPairs, ~] = size(pairs_s);
                     maxCycle = zeros(1.0, numberOfPairs);
                     minCycle = maxCycle;
                     for i = 1:numberOfPairs
-                        maxCycle(i) = max(pairs(i, :));
-                        minCycle(i) = min(pairs(i, :));
+                        maxCycle(i) = max(pairs_s(i, :));
+                        minCycle(i) = min(pairs_s(i, :));
                     end
                     R = minCycle./maxCycle;
                     
@@ -78,32 +83,19 @@ classdef analysis_e < handle
                     mscCycles = maxCycle.*((1.0-R)./2.0).^gamma;
                     for i = 1:numberOfPairs
                         if isreal(mscCycles(i)) == 0.0 || isinf(mscCycles(i)) || isnan(mscCycles(i))
-                            mscCycles(i) = cycles(i);
+                            mscCycles(i) = cycles_e(i);
                         end
                     end
                 case 5.0 % Smith-Watson-Topper
-                        % SWT correction is applied indirectly
-                        [numberOfPairs, ~] = size(pairs);
-                        maxCycle = zeros(1.0, numberOfPairs);
-                        minCycle = maxCycle;
-                        for i = 1:numberOfPairs
-                            maxCycle(i) = max(pairs(i, :));
-                            minCycle(i) = min(pairs(i, :));
-                        end
-                        R = minCycle./maxCycle;
-                        mscCycles = maxCycle.*((1.0-R)./2.0).^0.5;
-                        for i = 1:numberOfPairs
-                            if isreal(mscCycles(i)) == 0.0 || isinf(mscCycles(i)) || isnan(mscCycles(i))
-                                mscCycles(i) = cycles(i);
-                            end
-                        end
+                        % SWT correction is applied to the life equation
+                        mscCycles = max(S1).*cycles_e;
                 case -1.0 % User-defined
                     % Get the user-defined mean stress correction data
                     mscData = getappdata(0, 'userMSCData');
                     mscData_m = mscData(:, 1.0);
                     mscData_a = mscData(:, 2.0);
                     
-                    % Initialise the MSC cycles buffer
+                    % Initialise the MSC cycles_e buffer
                     mscCycles = zeros(1.0, length(Sm));
                     
                     % Normalize the mean stress of the cycle with the UTS
@@ -128,7 +120,7 @@ classdef analysis_e < handle
                             
                             % Scale the current cycle to its equivalent
                             % value
-                            mscCycles(i) = cycles(i)*MSC;
+                            mscCycles(i) = cycles_e(i)*MSC;
                             
                             messenger.writeMessage(58.0)
                         elseif Sm(i) > mscData_m(1.0)
@@ -144,7 +136,7 @@ classdef analysis_e < handle
                             
                             % Scale the current cycle to its equivalent
                             % value
-                            mscCycles(i) = cycles(i)*MSC;
+                            mscCycles(i) = cycles_e(i)*MSC;
                             
                             messenger.writeMessage(58.0)
                         elseif isempty(find(mscData_m == Sm(i), 1.0)) == 0.0
@@ -163,7 +155,7 @@ classdef analysis_e < handle
                             
                             % Scale the current cycle to its equivalent
                             % value
-                            mscCycles(i) = cycles(i)*MSC;
+                            mscCycles(i) = cycles_e(i)*MSC;
                         else
                             % Find which two mean stress points the cycle lies
                             % between
@@ -199,7 +191,7 @@ classdef analysis_e < handle
                             
                             % Scale the current cycle to its equivalent
                             % value
-                            mscCycles(i) = cycles(i)*MSC;
+                            mscCycles(i) = cycles_e(i)*MSC;
                         end
                     end
                 otherwise
@@ -209,9 +201,9 @@ classdef analysis_e < handle
         %% Get the principal strain history for the loading (if applicable)
         function [] = getPrincipalStrain(S1, S2, S3, E, kp, np)
             % Calculate the principal strains
-            [~, E1, ~, ~] = css2(S1, E, kp, np);
-            [~, E2, ~, ~] = css2(S2, E, kp, np);
-            [~, E3, ~, ~] = css2(S3, E, kp, np);
+            [~, E1, ~, ~] = css2b(S1, E, kp, np);
+            [~, E2, ~, ~] = css2b(S2, E, kp, np);
+            [~, E3, ~, ~] = css2b(S3, E, kp, np);
             
             % Save the principal strains
             setappdata(0, 'E1', E1)

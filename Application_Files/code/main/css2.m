@@ -73,6 +73,7 @@ end
 
 %% Initialize analysis variables
 precision = 1e3;
+overshoot = 1.5;
 method = 'linear';
 
 % Get the signal length
@@ -94,10 +95,10 @@ sigma = zeros(1.0, signalLength);
     strain. This is a safe guess since the strain stress is
     larger than the true strain
 %}
-trueStrainCurve = linspace(1e-12, (1.5*sigma_e(2.0))/E, precision);
+trueStrainCurve = linspace(1e-12, (overshoot*sigma_e(2.0))/E, precision);
 
 %{
-    The true strain curve is found by substituting the true
+    The true stress curve is found by substituting the true
     strain curve into the monotonic R-O equation
 %}
 % Neuber substitution from sigma_e*eps_e == sigma_t*eps_t
@@ -262,9 +263,9 @@ for i = 3:signalLength
         end
         
         if currentDirection == -1.0
-            trueStrainCurve = linspace(1e-12, -1.5*(stressRange/E), precision);
+            trueStrainCurve = linspace(1e-12, -overshoot*(stressRange/E), precision);
         else
-            trueStrainCurve = linspace(1e-12, 1.5*(stressRange/E), precision);
+            trueStrainCurve = linspace(1e-12, overshoot*(stressRange/E), precision);
         end
         
         % Calculate the stress-strain curve
@@ -354,9 +355,9 @@ for i = 3:signalLength
         allowClosure = 1.0;
         
         if currentDirection == -1.0
-            trueStrainCurve = linspace(1e-12, -1.5*(currentStressRange/E), precision);
+            trueStrainCurve = linspace(1e-12, -overshoot*(currentStressRange/E), precision);
         else
-            trueStrainCurve = linspace(1e-12, 1.5*(currentStressRange/E), precision);
+            trueStrainCurve = linspace(1e-12, overshoot*(currentStressRange/E), precision);
         end
         
         % Calculate the stress-strain curve
@@ -401,6 +402,32 @@ for i = 3:signalLength
             rfData(rfDataIndex, 5.0) = i - 1.0;
             rfData(rfDataIndex, 6.0) = i;
         end
+    elseif (currentStressRange == 2.0*previousStressRange) && (i == 3.0)
+        %%
+        %{
+            On the first cyclic excursion, the stress range is exacty
+            double the range of the monotonic excursion, creating a
+            symmetrical hysteresis loop
+        %}
+        epsilon(i) = -epsilon(i - 1.0);
+        sigma(i) = -sigma(i - 1.0);
+        
+        % Update the rainflow buffer
+        
+        % Update the rainflow cycle index
+        rfDataIndex = rfDataIndex + 1.0;
+        
+        % Count the stress cycle
+        rfData(rfDataIndex, 1.0) = sigma(i - 1.0);
+        rfData(rfDataIndex, 2.0) = sigma(i);
+        
+        % Count the strain cycle
+        rfData(rfDataIndex, 3.0) = epsilon(i - 1.0);
+        rfData(rfDataIndex, 4.0) = epsilon(i);
+        
+        % Position in the history
+        rfData(rfDataIndex, 5.0) = i - 1.0;
+        rfData(rfDataIndex, 6.0) = i;
     else
         %%
         %{
@@ -419,12 +446,12 @@ for i = 3:signalLength
         allowClosure = 1.0;
         
         if currentDirection == -1.0
-            trueStrainCurve = linspace(1e-12, -1.5*(currentStressRange/E), precision);
+            trueStrainCurve = linspace(1e-12, -overshoot*(currentStressRange/E), precision);
         else
-            trueStrainCurve = linspace(1e-12, 1.5*(currentStressRange/E), precision);
+            trueStrainCurve = linspace(1e-12, overshoot*(currentStressRange/E), precision);
         end
         
-        Nb = (currentStressRange^2.0)./(E.*trueStrainCurve);
+        Nb = (currentStressRange.^2.0)./(E.*trueStrainCurve);
         f = real((Nb./E) + 2.0.*(Nb./(2.0*kp)).^(1.0/np) - trueStrainCurve);
         
         % Solve for the strain range

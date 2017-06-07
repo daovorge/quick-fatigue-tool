@@ -428,7 +428,7 @@ classdef postProcess_e < handle
         end
         
         %% Get history output from analysis:
-        function [] = getHistories(algorithm, loadEqUnits, outputField, outputFigure, damageParameter)
+        function [] = getHistories(algorithm, loadEqUnits, outputField, outputFigure, damageParameter, damageParameter_strain)
             figureFormat = getappdata(0, 'figureFormat');
             
             root = getappdata(0, 'outputDirectory');
@@ -469,29 +469,29 @@ classdef postProcess_e < handle
                     hold on
                     if min(WCM) == max(WCM)
                         if max(WCA) == 0.0
-                            plot(linspace(-max(WCM), 0, 2), linspace(max(WCM), 0, 2), '-.k', 'lineWidth', 1.0);
-                            plot(linspace(0, max(WCM), 2), linspace(0, max(WCM), 2), '-.k', 'lineWidth', 1.0);
+                            plot(linspace(-max(WCM), 0.0, 2.0), linspace(max(WCM), 0.0, 2.0), '-.k', 'lineWidth', 1.0);
+                            plot(linspace(0.0, max(WCM), 2.0), linspace(0.0, max(WCM), 2.0), '-.k', 'lineWidth', 1.0);
                         else
-                            plot(linspace(-max(WCA), 0, 2), linspace(max(WCA), 0, 2), '-.k', 'lineWidth', 1.0);
-                            plot(linspace(0, max(WCA), 2), linspace(0, max(WCA), 2), '-.k', 'lineWidth', 1.0);
+                            plot(linspace(-max(WCA), 0.0, 2.0), linspace(max(WCA), 0.0, 2.0), '-.k', 'lineWidth', 1.0);
+                            plot(linspace(0.0, max(WCA), 2.0), linspace(0.0, max(WCA), 2.0), '-.k', 'lineWidth', 1.0);
                         end
                     else
                         if max(WCM) < 0.0
-                            plot(linspace(min(WCM), 0, 2), linspace(-min(WCM), 0, 2), '-.k', 'lineWidth', 1.0);
-                            plot(linspace(0, -min(WCM), 2), linspace(0, -min(WCM), 2), '-.k', 'lineWidth', 1.0);
+                            plot(linspace(min(WCM), 0.0, 2.0), linspace(-min(WCM), 0.0, 2.0), '-.k', 'lineWidth', 1.0);
+                            plot(linspace(0.0, -min(WCM), 2.0), linspace(0.0, -min(WCM), 2.0), '-.k', 'lineWidth', 1.0);
                         elseif max(WCM) == 0.0
-                            plot(linspace(min(WCM), 0, 2), linspace(-min(WCM), 0, 2), '-.k', 'lineWidth', 1.0);
-                            plot(linspace(0, -min(WCM), 2), linspace(0, -min(WCM), 2), '-.k', 'lineWidth', 1.0);
+                            plot(linspace(min(WCM), 0.0, 2.0), linspace(-min(WCM), 0.0, 2.0), '-.k', 'lineWidth', 1.0);
+                            plot(linspace(0.0, -min(WCM), 2.0), linspace(0.0, -min(WCM), 2.0), '-.k', 'lineWidth', 1.0);
                         else
-                            plot(linspace(-max(WCM), 0, 2), linspace(max(WCM), 0, 2), '-.k', 'lineWidth', 1.0);
-                            plot(linspace(0, max(WCM), 2), linspace(0, max(WCM), 2), '-.k', 'lineWidth', 1.0);
+                            plot(linspace(-max(WCM), 0.0, 2.0), linspace(max(WCM), 0.0, 2.0), '-.k', 'lineWidth', 1.0);
+                            plot(linspace(0.0, max(WCM), 2.0), linspace(0.0, max(WCM), 2.0), '-.k', 'lineWidth', 1.0);
                         end
                     end
                     
                     if max(WCA) == 0.0
-                        p2 = line([0, 0], [0, abs(max(WCM))], 'lineWidth', 1.0);
+                        p2 = line([0.0, 0.0], [0.0, abs(max(WCM))], 'lineWidth', 1.0);
                     else
-                        p2 = line([0, 0], [0, max(WCA)], 'lineWidth', 1.0);
+                        p2 = line([0.0, 0.0], [0.0, max(WCA)], 'lineWidth', 1.0);
                     end
                     
                     set(p2, 'Color', 'k', 'lineStyle', '-.')
@@ -530,7 +530,7 @@ classdef postProcess_e < handle
                             figureTitle = 'MATLAB Figures/ANHD + HD, Haigh diagram for all items and critical plane';
                         end
                         
-                        subplot(1, 2, 2)
+                        subplot(1.0, 2.0, 2.0)
                         scatter(Sm, amplitudes, 40, 'MarkerEdgeColor', [0.5 0 0.5],...
                             'MarkerFaceColor', [0.7 0 0.7], 'LineWidth', 1.5)
                         
@@ -594,7 +594,7 @@ classdef postProcess_e < handle
                 end
             end
             
-            %% PS1 (Maximum Principal stress at worst item)
+            %% PS1 (Maximum elastic principal stress at worst item)
             worstItem = getappdata(0, 'worstItem');
             s1 = getappdata(0, 'S1');
             s1 = s1(worstItem, :);
@@ -612,7 +612,7 @@ classdef postProcess_e < handle
                 subplot(3.0, 1.0, 1.0)
                 plot(s1, '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
 
-                msg = sprintf('PS1, Maximum principal stress for item %.0f.%.0f', mainID, subID);
+                msg = sprintf('PS1, Maximum elastic principal stress for item %.0f.%.0f', mainID, subID);
                 ylabel('Stress [MPa]', 'FontSize', fontY)
                 title(msg, 'FontSize', fontTitle)
                 set(gca, 'FontSize', fontTicks)
@@ -629,12 +629,12 @@ classdef postProcess_e < handle
                     grid on
                 end
 
-                %% PS2 (Middle Principal stress at worst item)
+                %% PS2 (Middle elastic principal stress at worst item)
                 
                 subplot(3, 1, 2)
                 plot(s2, '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
                 
-                msg = sprintf('PS2, Middle principal stress for item %.0f.%.0f', mainID, subID);
+                msg = sprintf('PS2, Middle elastic principal stress for item %.0f.%.0f', mainID, subID);
                 ylabel('Stress [MPa]', 'FontSize', fontY)
                 title(msg, 'FontSize', fontTitle)
                 set(gca, 'FontSize', fontTicks)
@@ -651,12 +651,12 @@ classdef postProcess_e < handle
                     grid on
                 end
                 
-                %% PS3 (Minimum Principal stress at worst item)
+                %% PS3 (Minimum elastic principal stress at worst item)
                 
                 subplot(3.0, 1.0, 3.0)
                 plot(s3, '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
                 
-                msg = sprintf('PS3, Minimum principal stress for item %.0f.%.0f', mainID, subID);
+                msg = sprintf('PS3, Minimum elastic principal stress for item %.0f.%.0f', mainID, subID);
                 xlabel('Sample', 'FontSize', fontX)
                 ylabel('Stress [MPa]', 'FontSize', fontY)
                 title(msg, 'FontSize', fontTitle)
@@ -674,14 +674,14 @@ classdef postProcess_e < handle
                     grid on
                 end
                 
-                dir = [root, 'MATLAB Figures/PS, Principal stresses at worst item'];
+                dir = [root, 'MATLAB Figures/PS, Elastic principal stresses at worst item'];
                 saveas(f4, dir, figureFormat)
                 if strcmpi(figureFormat, 'fig') == true
                     postProcess.makeVisible([dir, '.fig'])
                 end
             end
             
-            %% PE1 (Maximum Principal strain at worst item)
+            %% PE1 (Maximum inelastic principal strain at worst item)
             e1 = getappdata(0, 'E1');
             e1 = e1(worstItem, :);
             e2 = getappdata(0, 'E2');
@@ -696,9 +696,9 @@ classdef postProcess_e < handle
             if getappdata(0, 'figure_PE') == 1.0 && outputFigure == 1.0
                 f5 = figure('visible', 'off');
                 subplot(3.0, 1.0, 1.0)
-                plot(s1, '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
+                plot(e1, '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
 
-                msg = sprintf('PE1, Maximum principal strain for item %.0f.%.0f', mainID, subID);
+                msg = sprintf('PE1, Maximum inelastic principal strain for item %.0f.%.0f', mainID, subID);
                 ylabel('Strain', 'FontSize', fontY)
                 title(msg, 'FontSize', fontTitle)
                 set(gca, 'FontSize', fontTicks)
@@ -715,12 +715,12 @@ classdef postProcess_e < handle
                     grid on
                 end
 
-                %% PE2 (Middle Principal strain at worst item)
+                %% PE2 (Middle inelastic principal strain at worst item)
                 
                 subplot(3, 1, 2)
-                plot(s2, '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
+                plot(e2, '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
                 
-                msg = sprintf('PE2, Middle principal strain for item %.0f.%.0f', mainID, subID);
+                msg = sprintf('PE2, Middle inelastic principal strain for item %.0f.%.0f', mainID, subID);
                 ylabel('Strain', 'FontSize', fontY)
                 title(msg, 'FontSize', fontTitle)
                 set(gca, 'FontSize', fontTicks)
@@ -737,12 +737,12 @@ classdef postProcess_e < handle
                     grid on
                 end
                 
-                %% PE3 (Minimum Principal strain at worst item)
+                %% PE3 (Minimum inelastic principal strain at worst item)
                 
                 subplot(3.0, 1.0, 3.0)
-                plot(s3, '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
+                plot(e3, '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
                 
-                msg = sprintf('PE3, Minimum principal strain for item %.0f.%.0f', mainID, subID);
+                msg = sprintf('PE3, Minimum inelastic principal strain for item %.0f.%.0f', mainID, subID);
                 xlabel('Sample', 'FontSize', fontX)
                 ylabel('Strain', 'FontSize', fontY)
                 title(msg, 'FontSize', fontTitle)
@@ -760,14 +760,14 @@ classdef postProcess_e < handle
                     grid on
                 end
                 
-                dir = [root, 'MATLAB Figures/PE, Principal strains at worst item'];
+                dir = [root, 'MATLAB Figures/PE, Inelastic principal strains at worst item'];
                 saveas(f5, dir, figureFormat)
                 if strcmpi(figureFormat, 'fig') == true
                     postProcess.makeVisible([dir, '.fig'])
                 end
             end
             
-            %% CN (Normal stress on critical plane)
+            %% CN (Elastic normal stress on critical plane)
             
             Sxx = getappdata(0, 'worstNodeSxx');
         
@@ -775,13 +775,13 @@ classdef postProcess_e < handle
                 if algorithm == 3.0
                     normalOnCP = 0.5*Sxx;
                     setappdata(0, 'CN', normalOnCP);
-                    msg = sprintf('CN, Maximum normal (hydrostatic) stress history for item %.0f.%.0f', mainID, subID);
+                    msg = sprintf('CN, Maximum elastic normal (hydrostatic) stress history for item %.0f.%.0f', mainID, subID);
                 elseif algorithm == 7.0
                     normalOnCP = getappdata(0, 'CN');
-                    msg = sprintf('CN, Maximum normal (hydrostatic) stress history for item %.0f.%.0f', mainID, subID);
+                    msg = sprintf('CN, Maximum elastic normal (hydrostatic) stress history for item %.0f.%.0f', mainID, subID);
                 else
                     normalOnCP = getappdata(0, 'CN');
-                    msg = sprintf('CN, Maximum normal stress history on critical plane for item %.0f.%.0f', mainID, subID);
+                    msg = sprintf('CN, Maximum elastic normal stress history on critical plane for item %.0f.%.0f', mainID, subID);
                 end
                     
                 f6 = figure('visible', 'off');
@@ -805,22 +805,22 @@ classdef postProcess_e < handle
                 end
             end
             
-            %% CS (Shear stress on critical plane)
+            %% CS (Elastic shear stress on critical plane)
             
             if getappdata(0, 'figure_CS') == 1.0 && outputFigure == 1.0
                 if algorithm == 3.0
                     shearOnCP = 0.5*(abs(Sxx));
                     setappdata(0, 'CS', shearOnCP);
-                    msg = sprintf('CS, Maximum shear (Tresca) stress history for item %.0f.%.0f', mainID, subID);
-                    figureTitle = 'MATLAB Figures/CN + CS, Normal and shear stress at worst item';
+                    msg = sprintf('CS, Maximum elastic shear (Tresca) stress history for item %.0f.%.0f', mainID, subID);
+                    figureTitle = 'MATLAB Figures/CN + CS, Elastic normal and shear stress at worst item';
                 elseif algorithm == 7.0
                     shearOnCP = getappdata(0, 'CS');
-                    msg = sprintf('CS, Maximum shear (Tresca) stress history for item %.0f.%.0f', mainID, subID);
-                    figureTitle = 'MATLAB Figures/CN + CS, Normal and shear stress at worst item';
+                    msg = sprintf('CS, Maximum elastic shear (Tresca) stress history for item %.0f.%.0f', mainID, subID);
+                    figureTitle = 'MATLAB Figures/CN + CS, Elastic normal and shear stress at worst item';
                 else
                     shearOnCP = getappdata(0, 'CS');
-                    msg = sprintf('CS, Maximum shear stress history on critical plane for item %.0f.%.0f', mainID, subID);
-                    figureTitle = 'MATLAB Figures/CN + CS, Normal and shear stress on critical plane at worst item';
+                    msg = sprintf('CS, Maximum elastic shear stress history on critical plane for item %.0f.%.0f', mainID, subID);
+                    figureTitle = 'MATLAB Figures/CN + CS, Elastic normal and shear stress on critical plane at worst item';
                 end
                 
                 subplot(2.0, 1.0, 2.0)
@@ -1224,7 +1224,7 @@ classdef postProcess_e < handle
                 end
             end
             
-            %% SIG UNIAXIAL STRESS HISTORY (BEFORE AND AFTER FILTERING *)
+            %% SIGS UNIAXIAL ELASTIC STRESS HISTORY (BEFORE AND AFTER FILTERING *)
             
             % *If applicable
             % Only if the Uniaxial Strain-Life algorithm is used
@@ -1241,7 +1241,7 @@ classdef postProcess_e < handle
                 subplot(2, 1, 1)
                 plot(oldSignal, '-', 'LineWidth', lineWidth, 'Color', midnightBlue);
                 
-                msg = sprintf('SIG1, Uniaxial load history before gating');
+                msg = sprintf('SIGS1, Uniaxial elastic stress history before gating');
                 title(msg, 'FontSize', fontTitle)
                 xlabel('Sample', 'FontSize', fontX)
                 ylabel('Stress (MPa)', 'FontSize', fontY)
@@ -1263,7 +1263,7 @@ classdef postProcess_e < handle
                 subplot(2, 1, 2)
                 plot(damageParameter, '-', 'LineWidth', lineWidth, 'Color', forestGreen);
                 
-                msg = sprintf('SIG2, Uniaxial load history after gating');
+                msg = sprintf('SIGS2, Uniaxial elastic stress history after gating');
                 title(msg, 'FontSize', fontTitle)
                 xlabel('Sample', 'FontSize', fontX)
                 ylabel('Stress (MPa)', 'FontSize', fontY)
@@ -1281,7 +1281,7 @@ classdef postProcess_e < handle
                     grid on
                 end
                 
-                dir = [root, 'MATLAB Figures/SIG, Uniaxial load history before and after gating'];
+                dir = [root, 'MATLAB Figures/SIGS, Uniaxial elastic stress history before and after gating'];
                 saveas(f14, dir, figureFormat)
                 if strcmpi(figureFormat, 'fig') == true
                     postProcess.makeVisible([dir, '.fig'])
@@ -1292,7 +1292,7 @@ classdef postProcess_e < handle
                 
                 plot(oldSignal, '-', 'LineWidth', lineWidth, 'Color', midnightBlue);   hold on
                 
-                msg = sprintf('SIG, Uniaxial load history');
+                msg = sprintf('SIGS, Uniaxial stress history');
                 xlabel('Sample', 'FontSize', fontX)
                 ylabel('Stress (MPa)', 'FontSize', fontY)
                 title(msg, 'FontSize', fontTitle)
@@ -1310,8 +1310,39 @@ classdef postProcess_e < handle
                     grid on
                 end
                 
-                dir = [root, 'MATLAB Figures/SIG, Uniaxial load history'];
+                dir = [root, 'MATLAB Figures/SIGS, Uniaxial elastic stress history'];
                 saveas(f12, dir, figureFormat)
+                if strcmpi(figureFormat, 'fig') == true
+                    postProcess.makeVisible([dir, '.fig'])
+                end
+            end
+            
+            %% SIGE UNIAXIAL INELASTIC STRAIN HISTORY
+            if (outputFigure == 1.0 && algorithm == 3.0 && getappdata(0, 'figure_SIG') == 1.0)
+                f13 = figure('visible', 'off');
+                
+                plot(damageParameter_strain, '-', 'LineWidth', lineWidth, 'Color', midnightBlue);   hold on
+                
+                msg = sprintf('SIGE, Uniaxial inelastic strain history');
+                xlabel('Sample', 'FontSize', fontX)
+                ylabel('Strain', 'FontSize', fontY)
+                title(msg, 'FontSize', fontTitle)
+                set(gca, 'FontSize', fontTicks)
+                set(gca, 'XTick', linspace(1.0, L, XTickPartition + 1.0))
+                set(gca, 'XTickLabel', round(linspace(1.0, L, XTickPartition + 1.0)));
+                
+                try
+                    axis tight
+                catch
+                    % Don't tighten the axis
+                end
+                
+                if strcmpi(gridLines, 'on') == 1.0 || str2double(gridLines) == 1.0
+                    grid on
+                end
+                
+                dir = [root, 'MATLAB Figures/SIGE, Uniaxial inelastic strain history'];
+                saveas(f13, dir, figureFormat)
                 if strcmpi(figureFormat, 'fig') == true
                     postProcess.makeVisible([dir, '.fig'])
                 end

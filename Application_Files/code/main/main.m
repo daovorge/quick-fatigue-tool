@@ -601,7 +601,7 @@ for groups = 1:G
 
         switch algorithm
             case 3.0 % UNIAXIAL STRAIN-LIFE
-                [nodalAmplitudes, nodalAmplitudes_strain, nodalPairs, nodalPairs_strain, nodalDamage, nodalDamageParameter, damageParameter, ~]...
+                [nodalAmplitudes, nodalAmplitudes_strain, nodalPairs, nodalPairs_strain, nodalDamage, nodalDamageParameter, damageParameter, damageParameter_strain]...
                     = algorithm_uel.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, signalLength,...
                     totalCounter, nodalDamage, msCorrection, nodalDamageParameter,...
                     gateTensors, tensorGate, s1i, s2i, s3i);
@@ -969,7 +969,7 @@ if (outputHistory == 1.0) || (outputFigure == 1.0)
     if algorithm == 8.0
         algorithm_bs7608.getHistories(loadEqUnits, outputField, outputFigure)
     elseif algorithm == 1.0 || algorithm == 2.0 || algorithm == 3.0
-        postProcess_e.getHistories(algorithm, loadEqUnits, outputField, outputFigure, damageParameter)
+        postProcess_e.getHistories(algorithm, loadEqUnits, outputField, outputFigure, damageParameter, damageParameter_strain)
     else
         postProcess.getHistories(algorithm, loadEqUnits, outputField, outputFigure, damageParameter, G)
     end

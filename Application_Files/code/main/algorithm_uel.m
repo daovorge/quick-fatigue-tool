@@ -35,6 +35,9 @@ classdef algorithm_uel < handle
             kp = getappdata(0, 'kp');
             np = getappdata(0, 'np');
             
+            % Get the residual stress
+            residual = getappdata(0, 'residualStress');
+            
             %% Get the principal strain history at this item
             analysis_e.getPrincipalStrain(S1, S2, S3, E, kp, np);
             
@@ -44,7 +47,7 @@ classdef algorithm_uel < handle
                 damageParameter_stress = analysis.gateTensors(damageParameter_stress, gateTensors, tensorGate);
             end
             
-            [rfData, damageParameter_strain, damageParameter_stress, ~] = css2(damageParameter_stress, E, kp, np);
+            [rfData, damageParameter_strain, damageParameter_stress, ~] = css2b(damageParameter_stress, E, kp, np);
             
             %% Rainflow count the stress
             if signalLength < 3.0
@@ -78,20 +81,17 @@ classdef algorithm_uel < handle
             if msCorrection < 7.0
                 x = nodalPairs_stress{node};
                 largestPair = find(cycles_stress == max(cycles_stress));
-                [nodalDamageParameter(node), ~, ~] = analysis_e.msc(max(cycles_strain), x(largestPair(1.0), :), msCorrection);
+                [nodalDamageParameter(node), ~, ~] = analysis_e.msc(max(cycles_strain), x(largestPair(1.0), :), msCorrection, S1, residual);
             end
             
             %% Perform a damage calculation on the current analysis item
-            nodalDamage(node) = algorithm_uel.damageCalculation(cycles_stress, cycles_strain, msCorrection, pairs_stress, pairs_strain);
+            nodalDamage(node) = algorithm_uel.damageCalculation(cycles_stress, cycles_strain, msCorrection, pairs_stress, pairs_strain, S1, residual);
         end
         
         %% DAMAGE CALCULATION
-        function damage = damageCalculation(cycles_stress, cycles_strain, msCorrection, pairs_stress, pairs_strain)
+        function damage = damageCalculation(cycles_stress, cycles_strain, msCorrection, pairs_stress, pairs_strain, S1, residual)
             
             %% CALCULATE DAMAGE FOR EACH STRESS CYCLE
-            
-            % Get the residual stress
-            residualStress = getappdata(0, 'residualStress');
             
             % Get number of repeats of loading
             repeats = getappdata(0, 'repeats');
@@ -114,7 +114,7 @@ classdef algorithm_uel < handle
             
             % Perform mean stress correction if necessary
             if msCorrection < 7.0
-                [cycles_strain, mscWarning, overflowCycles] = analysis_e.msc(cycles_strain, pairs_stress, msCorrection);
+                [cycles_strain, mscWarning, overflowCycles] = analysis_e.msc(cycles_strain, pairs_stress, msCorrection, S1, residual);
             else
                 mscWarning = 0.0;
             end
@@ -158,7 +158,7 @@ classdef algorithm_uel < handle
                 end
                 
                 % Modify the endurance limit if applicable
-                [fatigueLimit, zeroDamage] = analysis.modifyEnduranceLimit(modifyEnduranceLimit, ndEndurance, fatigueLimit, fatigueLimit_original, cycles_stress(index), cyclesToRecover, residualStress, enduranceScale);
+                [fatigueLimit, zeroDamage] = analysis.modifyEnduranceLimit(modifyEnduranceLimit, ndEndurance, fatigueLimit, fatigueLimit_original, cycles_stress(index), cyclesToRecover, residual, enduranceScale);
                 if (zeroDamage == 1.0) && (kt == 1.0)
                     cumulativeDamage(index) = 0.0;
                     continue
@@ -175,12 +175,15 @@ classdef algorithm_uel < handle
                     if msCorrection == 1.0
                         % Apply Morrow mean stress correction
                         BM = (morrowSf(index)/E).*((Nf).^b) + Ef.*((Nf).^c);
+                    elseif msCorrection == 5.0
+                        % Apply SWT mean stress correction
+                        BM = (Sf^2.0/E).*((Nf).^(2.0*b)) + Ef.*((Nf).^(b + c));
                     else
                         % No mean stress correction was requested
                         BM = (Sf/E).*(Nf).^b + Ef.*(Nf).^c;
                     end
                     
-                    life = 0.5*interp1((1.0./ktn).*BM, Nf, cycles_strain(index) + residualStress, 'linear', 'extrap');
+                    life = 0.5*interp1((1.0./ktn).*BM, Nf, cycles_strain(index), 'linear', 'extrap');
                     
                     %{
                         If the life was above the knee-point, re-calculate
@@ -195,7 +198,7 @@ classdef algorithm_uel < handle
                             BM = E*((((Sf)/E)*(Nf).^b2) + (Ef)*((Nf).^c));
                         end
                         
-                        life = 0.5*10^(interp1(log10((1.0./ktn).*BM), log10(Nf), log10(cycles(index) + residualStress), 'linear', 'extrap'));
+                        life = 0.5*10^(interp1(log10((1.0./ktn).*BM), log10(Nf), log10(cycles(index)), 'linear', 'extrap'));
                     end
                     
                     if life < 0.0
