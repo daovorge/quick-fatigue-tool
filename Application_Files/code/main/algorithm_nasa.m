@@ -7,10 +7,11 @@ classdef algorithm_nasa < handle
 %   not required to run this file.
 %   
 %   See also algorithm_bs7608, algorithm_findley, algorithm_ns,
-%   algorithm_sbbm, algorithm_sip, algorithm_usl.
+%   algorithm_sbbm, algorithm_sip, algorithm_uel, algorithm_usl,
+%   algorithm_user.
 %   
 %   Reference section in Quick Fatigue Tool User Guide
-%      6.8 NASALIFE
+%      6.7 NASALIFE
 %   
 %   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
 %   Last modified 12-May-2017 15:25:52 GMT

@@ -7,7 +7,8 @@ classdef algorithm_sip < handle
 %   required to run this file.
 %   
 %   See also algorithm_bs7608, algorithm_findley, algorithm_nasa,
-%   algorithm_ns, algorithm_sbbm, algorithm_usl.
+%   algorithm_ns, algorithm_sbbm, algorithm_uel, algorithm_usl,
+%   algorithm_user.
 %   
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.5 Stress Invariant Parameter

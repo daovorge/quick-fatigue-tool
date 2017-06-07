@@ -7,7 +7,8 @@ classdef algorithm_sbbm < handle
 %   not required to run this file.
 %   
 %   See also algorithm_bs7608, algorithm_findley, algorithm_nasa,
-%   algorithm_ns, algorithm_sip, algorithm_usl.
+%   algorithm_ns, algorithm_sip, algorithm_uel, algorithm_usl,
+%   algorithm_user.
 %   
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.2 Stress-based Brown-Miller

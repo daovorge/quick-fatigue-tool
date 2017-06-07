@@ -7,10 +7,11 @@ classdef algorithm_usl < handle
 %   required to run this file.
 %   
 %   See also algorithm_bs7608, algorithm_findley, algorithm_nasa,
-%   algorithm_ns, algorithm_sbbm, algorithm_sip.
+%   algorithm_ns, algorithm_sbbm, algorithm_sip, algorith_uel,
+%   algorithm_user.
 %   
 %   Reference section in Quick Fatigue Tool User Guide
-%      6.7 Uniaxial Stress-Life
+%      6.8 Uniaxial Stress-Life
 %   
 %   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
 %   Last modified 12-May-2017 15:25:52 GMT

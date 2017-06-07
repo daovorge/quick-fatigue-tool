@@ -7,7 +7,8 @@ classdef algorithm_ns < handle
 %   required to run this file.
 %   
 %   See also algorithm_bs7608, algorithm_findley, algorithm_nasa,
-%   algorithm_sbbm, algorithm_sip, algorithm_usl.
+%   algorithm_sbbm, algorithm_sip, algorithm_uel, algorithm_usl,
+%   algorithm_user.
 %   
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.3 Normal Stress
