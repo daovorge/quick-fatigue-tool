@@ -1,17 +1,21 @@
-function [rfData, epsilon, sigma, error] = css2b(sigma_e, E, kp, np)
-%CSS2B    QFT function to calculate nonlinear elastic stress-strain.
+function [rfData, epsilon, sigma, error] = css2c(sigma_e, E, kp, np)
+%CSS2C    QFT function to calculate nonlinear elastic stress-strain.
 %   This function calculates the nonlinear elastic stress and strain from
 %   an elastic stress tensor.
 %   
-%   CSS2B is used internally by Quick Fatigue Tool. The user
+%   CSS2C is used internally by Quick Fatigue Tool. The user
 %   is not required to run this file.
 %
-%	CSS2B is a variation of CSS2. The original function calculates the
+%	CSS2C is a variation of CSS2. The original function calculates the
 %	hysteresis loop by interpolation even if the current stress range is
 %   identical to the previous stress range. In this function, if the
 %   current and previous stress ranges are identical, the current
 %   hysteresis point is assumed to be equal to the previous point. The rest
-%   of CSS2B is the same as CSS2.
+%   of CSS2C is the same as CSS2.
+%
+%   CSS2C is the same as CSS2B, except that the rainlow cycle counting is
+%   performed by RAINFLOW_(FT) instead of from the hysteresis loops
+%   directly inside CSS2C. This is found to be more reliable.
 %   
 %   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
 %   Last modified 08-Jun-2017 11:15:47 GMT
@@ -19,17 +23,6 @@ function [rfData, epsilon, sigma, error] = css2b(sigma_e, E, kp, np)
     %%
     
 error = 0.0;
-%% Initialize RFDATA
-%{
-    1: Min. stress
-    2: Max. stress
-    3: Min. strain
-    4: Max. strain
-    5: Min. index
-    6: Max. index
-%}
-rfData = zeros(1.0, 6.0);
-rfDataIndex = 0.0;
 
 %% Prepare the stress signal
 % If the signal is all zero, return zeros of the same length
@@ -328,23 +321,6 @@ for i = 3:signalLength
                     sigma(i) = sigma(i - 3.0) + stressRange;
                 end
             end
-            
-            % Update the rainflow buffer
-            
-            % Update the rainflow cycle index
-            rfDataIndex = rfDataIndex + 1.0;
-            
-            % Count the stress cycle
-            rfData(rfDataIndex, 1.0) = sigma(i - 2.0);
-            rfData(rfDataIndex, 2.0) = sigma(i - 1.0);
-            
-            % Count the strain cycle
-            rfData(rfDataIndex, 3.0) = epsilon(i - 2.0);
-            rfData(rfDataIndex, 4.0) = epsilon(i - 1.0);
-            
-            % Position in the history
-            rfData(rfDataIndex, 5.0) = i - 1.0;
-            rfData(rfDataIndex, 6.0) = i;
         end
     elseif ((currentStressRange == 2.0*previousStressRange) && (i == 3.0)) || ((currentStressRange == previousStressRange) && (i > 3.0) && (allowClosure == 1.0))
         %%
@@ -368,23 +344,6 @@ for i = 3:signalLength
             % i > 3.0
             epsilon(i) = epsilon(i - 2.0);
             sigma(i) = sigma(i - 2.0);
-            
-            % Update the rainflow buffer
-        
-            % Update the rainflow cycle index
-            rfDataIndex = rfDataIndex + 1.0;
-            
-            % Count the stress cycle
-            rfData(rfDataIndex, 1.0) = sigma(i - 1.0);
-            rfData(rfDataIndex, 2.0) = sigma(i);
-            
-            % Count the strain cycle
-            rfData(rfDataIndex, 3.0) = epsilon(i - 1.0);
-            rfData(rfDataIndex, 4.0) = epsilon(i);
-            
-            % Position in the history
-            rfData(rfDataIndex, 5.0) = i - 1.0;
-            rfData(rfDataIndex, 6.0) = i;
         end
     else
         %%
@@ -441,5 +400,23 @@ end
 % Remove the leading zero if applicable
 if removeZero == 1.0
     sigma(1.0) = [];
+    epsilon(1.0) = [];
 end
+
+%% Rainflow cycle count the inelastic histories
+
+% Rainflow cycle count the inelastic stress/strain signals
+rfData_e = analysis.rainFlow_2(epsilon);
+rfData_s = analysis.rainFlow_2(sigma);
+
+% Concatenate cycles into single buffer
+%{
+    1: Min. stress
+    2: Max. stress
+    3: Min. strain
+    4: Max. strain
+    5: Min. index
+    6: Max. index
+%}
+rfData = [rfData_s(:, 1:2), rfData_e(:, 1:2), rfData_s(:, 3:4)];
 end

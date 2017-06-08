@@ -48,7 +48,7 @@ classdef algorithm_uel < handle
                 damageParameter_stress = analysis.gateTensors(damageParameter_stress, gateTensors, tensorGate);
             end
             
-            [rfData, damageParameter_strain, damageParameter_stress, ~] = css2b(damageParameter_stress, E, kp, np);
+            [rfData, damageParameter_strain, damageParameter_stress, ~] = css2c(damageParameter_stress, E, kp, np);
             
             %% Rainflow count the stress
             if signalLength < 3.0

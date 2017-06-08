@@ -7,7 +7,7 @@ function [rfData, epsilon, sigma, error] = css2(sigma_e, E, kp, np)
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 04-Apr-2017 13:26:59 GMT
+%   Last modified 08-Jun-2017 11:15:47 GMT
     
     %%
     
@@ -277,10 +277,10 @@ for i = 3:signalLength
         if matMemFirstExcursion == 1.0
             ratchetStress = ratchetStress + stressRangeBeyondClosure;
             
-            Nb = (currentStressRange^2.0)./(E.*trueStrainCurve);
+            Nb = (stressRange^2.0)./(E.*trueStrainCurve);
             f = real((Nb./E) + (Nb./kp).^(1.0/np) - trueStrainCurve);
         else
-            Nb = (currentStressRange^2)./(E.*trueStrainCurve);
+            Nb = (stressRange^2)./(E.*trueStrainCurve);
             f = real((Nb./E) + 2.0.*(Nb./(2.0*kp)).^(1.0/np) - trueStrainCurve);
         end
         
@@ -296,7 +296,12 @@ for i = 3:signalLength
         % Solve for the stress range
         currentStrainRange = abs(epsilon(i) - epsilon(i - 1.0));
         trueStressCurve = linspace(0.0, currentStrainRange*E, precision);
-        trueStrainCurve = real((trueStressCurve./E) + 2.0.*(trueStressCurve./(2.0*kp)).^(1.0/np));
+        
+        if matMemFirstExcursion == 1.0
+            trueStrainCurve = real((trueStressCurve./E) + (trueStressCurve./(kp)).^(1.0/np));
+        else
+            trueStrainCurve = real((trueStressCurve./E) + 2.0.*(trueStressCurve./(2.0*kp)).^(1.0/np));
+        end
         
         if all(trueStrainCurve == 0.0) == 1.0
             sigma(i) = sigma(i - 1.0);

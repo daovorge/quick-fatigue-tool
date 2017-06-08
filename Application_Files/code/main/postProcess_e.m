@@ -10,7 +10,7 @@ classdef postProcess_e < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 06-Jun-2017 14:47:35 GMT
+%   Last modified 08-Jun-2017 12:47:26 GMT
     
     %%
     
@@ -557,7 +557,7 @@ classdef postProcess_e < handle
                 end
             end
             
-            %% VM (von Mises stress at worst item)
+            %% VM (von Mises elastic stress at worst item)
             
             vonMises = getappdata(0, 'VM');
             vonMises = vonMises(worstItem, :);
@@ -569,7 +569,7 @@ classdef postProcess_e < handle
                 
                 plot(vonMises, '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
                 
-                msg = sprintf('VM, von Mises stress for item %.0f.%.0f', mainID, subID);
+                msg = sprintf('VM, von Mises elastic stress for item %.0f.%.0f', mainID, subID);
                 xlabel('Sample', 'FontSize', fontX)
                 ylabel('von Mises Stress [MPa]', 'FontSize', fontY)
                 title(msg, 'FontSize', fontTitle)
@@ -587,7 +587,7 @@ classdef postProcess_e < handle
                     grid on
                 end
                 
-                dir = [root, 'MATLAB Figures/VM, von Mises stress at worst item'];
+                dir = [root, 'MATLAB Figures/VM, von Mises elastic stress at worst item'];
                 saveas(f3, dir, figureFormat)
                 if strcmpi(figureFormat, 'fig') == true
                     postProcess.makeVisible([dir, '.fig'])
@@ -1224,7 +1224,7 @@ classdef postProcess_e < handle
                 end
             end
             
-            %% SIGS UNIAXIAL ELASTIC STRESS HISTORY (BEFORE AND AFTER FILTERING *)
+            %% SIGS UNIAXIAL STRESS HISTORY (BEFORE AND AFTER FILTERING *)
             
             % *If applicable
             % Only if the Uniaxial Strain-Life algorithm is used
@@ -1263,7 +1263,7 @@ classdef postProcess_e < handle
                 subplot(2, 1, 2)
                 plot(damageParameter, '-', 'LineWidth', lineWidth, 'Color', forestGreen);
                 
-                msg = sprintf('SIGS2, Uniaxial elastic stress history after gating');
+                msg = sprintf('SIGS2, Uniaxial inelastic stress history after gating');
                 title(msg, 'FontSize', fontTitle)
                 xlabel('Sample', 'FontSize', fontX)
                 ylabel('Stress (MPa)', 'FontSize', fontY)
@@ -1281,7 +1281,7 @@ classdef postProcess_e < handle
                     grid on
                 end
                 
-                dir = [root, 'MATLAB Figures/SIGS, Uniaxial elastic stress history before and after gating'];
+                dir = [root, 'MATLAB Figures/SIGS, Uniaxial stress history before and after gating'];
                 saveas(f14, dir, figureFormat)
                 if strcmpi(figureFormat, 'fig') == true
                     postProcess.makeVisible([dir, '.fig'])
