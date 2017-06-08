@@ -22,7 +22,7 @@ function varargout = UniaxialStrainLife(varargin)%#ok<*DEFNU>
 
 % Edit the above text to modify the response to help UniaxialStrainLife
 
-% Last Modified by GUIDE v2.5 08-Jun-2017 10:35:51
+% Last Modified by GUIDE v2.5 08-Jun-2017 16:58:59
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -53,6 +53,9 @@ function UniaxialStrainLife_OpeningFcn(hObject, eventdata, handles, varargin)
 % varargin   command line arguments to UniaxialStrainLife (see VARARGIN)
 movegui(hObject, 'center')
 
+% Clear the command window
+clc
+
 % Choose default command line output for UniaxialStrainLife
 handles.output = hObject;
 
@@ -61,6 +64,47 @@ guidata(hObject, handles);
 
 % UIWAIT makes UniaxialStrainLife wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
+
+% Load the panel state
+if isappdata(0, 'panel_uniaxialStrainLife_edit_inputFile') == 1.0
+    %{
+        figure1_CloseRequestFcn has been called on a previous occasion.
+        Recall the panel state
+    %}
+    
+    % Input definition
+    set(handles.edit_inputFile, 'string', getappdata(0, 'panel_uniaxialStrainLife_edit_inputFile'))
+    
+    set(handles.rButton_stress, 'value', getappdata(0, 'panel_uniaxialStrainLife_rButton_stress'))
+    set(handles.rButton_strain, 'value', getappdata(0, 'panel_uniaxialStrainLife_rButton_strain'))
+    
+    set(handles.rButon_strainUnitsStrain, 'value', getappdata(0, 'panel_uniaxialStrainLife_rButon_strainUnitsStrain'))
+    set(handles.rButton_strainUnitsMicro, 'value', getappdata(0, 'panel_uniaxialStrainLife_rButton_strainUnitsMicro'))
+    
+    set(handles.rButton_typeElastic, 'value', getappdata(0, 'panel_uniaxialStrainLife_rButton_typeElastic'))
+    set(handles.rButton_typePlastic, 'value', getappdata(0, 'panel_uniaxialStrainLife_rButton_typePlastic'))
+    
+    if getappdata(0, 'panel_uniaxialStrainLife_rButton_stress') == 0.0
+        set(handles.rButon_strainUnitsStrain, 'enable', 'on')
+        set(handles.rButton_strainUnitsMicro, 'enable', 'on')
+        set(handles.rButton_typePlastic, 'enable', 'on')
+    end
+    
+    % Material definition
+    set(handles.edit_material, 'string', getappdata(0, 'panel_uniaxialStrainLife_edit_material'))
+    
+    % Analysis definition
+    set(handles.edit_scf, 'string', getappdata(0, 'panel_uniaxialStrainLife_edit_scf'))
+    set(handles.pMenu_msc, 'value', getappdata(0, 'panel_uniaxialStrainLife_pMenu_msc'))
+    
+    % Output definition
+    set(handles.check_resultsLocation, 'value', getappdata(0, 'panel_uniaxialStrainLife_check_resultsLocation'))
+    set(handles.edit_resultsLocation, 'string', getappdata(0, 'panel_uniaxialStrainLife_edit_resultsLocation'))
+    
+    if getappdata(0, 'panel_uniaxialStrainLife_check_resultsLocation') == 1.0
+        set(handles.edit_resultsLocation, 'enable', 'on', 'backgroundColor', 'white')
+    end
+end
 
 
 % --- Outputs from this function are returned to the command line.
@@ -109,6 +153,10 @@ set(handles.edit_material, 'string', '')
 set(handles.edit_scf, 'string', '1')
 set(handles.pMenu_msc, 'value', 2.0)
 
+% Output definition
+set(handles.check_resultsLocation, 'value', 0.0)
+set(handles.edit_resultsLocation, 'enable', 'inactive', 'string', 'Default project output directory', 'backgroundColor', [177.0/255, 206.0/255, 237.0/255])
+
 
 
 function edit_inputFile_Callback(hObject, eventdata, handles)
@@ -138,6 +186,8 @@ function pButton_browseInput_Callback(~, ~, handles)
 %{
     Get the input file containing a stress or strain history
 %}
+% Blank the GUI
+blank(handles)
 
 % Define the start path
 if isappdata(0, 'panel_uniaxialStrainLife_input_path') == 1.0
@@ -167,6 +217,9 @@ else
     % Save the file path
     setappdata(0, 'panel_uniaxialStrainLife_input_path', path)
 end
+
+% Enable the GUI
+enable(handles)
 
 
 
@@ -198,6 +251,9 @@ function pButton_browseMaterial_Callback(hObject, eventdata, handles)
     Get the material file for the fatigue analysis
 %}
 
+% Blank the GUI
+blank(handles)
+
 % Define the start path
 if isappdata(0, 'panel_uniaxialStrainLife_material_path') == 1.0
     startPath_material = getappdata(0, 'panel_uniaxialStrainLife_material_path');
@@ -220,12 +276,18 @@ else
     setappdata(0, 'panel_uniaxialStrainLife_edit_material', materialName)
 end
 
+% Enable the GUI
+enable(handles)
+
 
 % --- Executes on button press in pButton_createMaterial.
 function pButton_createMaterial_Callback(hObject, eventdata, handles)
 %{
     Open the material editor GUI
 %}
+% Blank the GUI
+blank(handles)
+
 setappdata(0, 'uniaxial_strain_life_skip_material_manager', 1.0)
 UserMaterial
 uiwait
@@ -241,14 +303,24 @@ if isappdata(0, 'material_for_uniaxial_strain_life') == 1.0
     rmappdata(0, 'material_for_uniaxial_strain_life')
 end
 
+% Enable the GUI
+enable(handles)
+
 
 % --- Executes on button press in pButton_manageMaterial.
 function pButton_manageMaterial_Callback(hObject, eventdata, handles)
 %{
     Start the Material Manager application
 %}
+
+% Blank the GUI
+blank(handles)
+
 MaterialManager
 uiwait
+
+% Enable the GUI
+enable(handles)
 
 
 
@@ -338,12 +410,18 @@ function uipanel_unitsType_SelectionChangeFcn(hObject, eventdata, handles)
 
 % --- Executes on button press in check_resultsLocation.
 function check_resultsLocation_Callback(hObject, eventdata, handles)
-% hObject    handle to check_resultsLocation (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of check_resultsLocation
-
+switch get(hObject, 'value')
+    case 0.0
+        set(handles.edit_resultsLocation, 'enable', 'inactive', 'string', 'Default project output directory', 'backgroundColor', [177.0/255, 206.0/255, 237.0/255])
+    case 1.0
+        if exist([pwd, '/Project/output'], 'dir') == 7.0
+            set(handles.edit_resultsLocation, 'string', [pwd, '/Project/output'])
+        else
+            set(handles.edit_resultsLocation, 'string', pwd)
+        end
+        
+        set(handles.edit_resultsLocation, 'enable', 'on', 'backgroundColor', 'white')
+end
 
 
 function edit_resultsLocation_Callback(hObject, eventdata, handles)
@@ -373,3 +451,53 @@ function pButton_resultsLocation_Callback(hObject, eventdata, handles)
 % hObject    handle to pButton_resultsLocation (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes when user attempts to close figure1.
+function figure1_CloseRequestFcn(hObject, ~, handles)
+% Save the panel state
+
+% Input definition
+setappdata(0, 'panel_uniaxialStrainLife_edit_inputFile', get(handles.edit_inputFile, 'string'))
+
+setappdata(0, 'panel_uniaxialStrainLife_rButton_stress', get(handles.rButton_stress, 'value'))
+setappdata(0, 'panel_uniaxialStrainLife_rButton_strain', get(handles.rButton_strain, 'value'))
+
+setappdata(0, 'panel_uniaxialStrainLife_rButon_strainUnitsStrain', get(handles.rButon_strainUnitsStrain, 'value'))
+setappdata(0, 'panel_uniaxialStrainLife_rButton_strainUnitsMicro', get(handles.rButton_strainUnitsMicro, 'value'))
+
+setappdata(0, 'panel_uniaxialStrainLife_rButton_typeElastic', get(handles.rButton_typeElastic, 'value'))
+setappdata(0, 'panel_uniaxialStrainLife_rButton_typePlastic', get(handles.rButton_typePlastic, 'value'))
+
+% Material definition
+setappdata(0, 'panel_uniaxialStrainLife_edit_material', get(handles.edit_material, 'string'))
+
+% Analysis definition
+setappdata(0, 'panel_uniaxialStrainLife_edit_scf', get(handles.edit_scf, 'string'))
+setappdata(0, 'panel_uniaxialStrainLife_pMenu_msc', get(handles.pMenu_msc, 'value'))
+
+% Output definition
+setappdata(0, 'panel_uniaxialStrainLife_check_resultsLocation', get(handles.check_resultsLocation, 'value'))
+setappdata(0, 'panel_uniaxialStrainLife_edit_resultsLocation', get(handles.edit_resultsLocation, 'string'))
+
+delete(hObject);
+
+function blank(handles)
+set(findall(handles.figure1, '-property', 'Enable'), 'Enable', 'off')
+
+
+function enable(handles)
+set(findall(handles.figure1, '-property', 'Enable'), 'Enable', 'on')
+
+% Input definition
+if get(handles.rButton_stress, 'value') == 1.0
+    set(handles.rButon_strainUnitsStrain, 'enable', 'off')
+    set(handles.rButton_strainUnitsMicro, 'enable', 'off')
+    set(handles.rButton_typeElastic, 'enable', 'inactive')
+    set(handles.rButton_typePlastic, 'enable', 'off')
+end
+
+% Output definition
+if get(handles.check_resultsLocation, 'value') == 0.0
+    set(handles.edit_resultsLocation, 'enable', 'inactive')
+end

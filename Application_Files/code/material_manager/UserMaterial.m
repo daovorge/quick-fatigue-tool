@@ -213,6 +213,11 @@ set(handles.pMenu_msc, 'string', string)
 % Set the default material save location
 set(handles.edit_location, 'string', [pwd, '\Data\material\local'])
 
+% Disable return button if applicable
+if (isappdata(0, 'multiaxial_gauge_fatigue_skip_material_manager') == 1.0) || (isappdata(0, 'uniaxial_strain_life_skip_material_manager') == 1.0)
+    set(handles.pButton_manager, 'enable', 'off')
+end
+
 % UIWAIT makes UserMaterial wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
