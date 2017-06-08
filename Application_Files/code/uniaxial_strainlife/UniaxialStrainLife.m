@@ -22,7 +22,7 @@ function varargout = UniaxialStrainLife(varargin)%#ok<*DEFNU>
 
 % Edit the above text to modify the response to help UniaxialStrainLife
 
-% Last Modified by GUIDE v2.5 07-Jun-2017 15:49:53
+% Last Modified by GUIDE v2.5 08-Jun-2017 10:35:51
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -88,9 +88,26 @@ close UniaxialStrainLife
 
 % --- Executes on button press in pButton_reset.
 function pButton_reset_Callback(hObject, eventdata, handles)
-% hObject    handle to pButton_reset (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+%{
+    This putton resets the GUI to its original state, without any user
+    modifications
+%}
+% Input definition
+set(handles.edit_inputFile, 'string', '')
+
+set(handles.rButton_stress, 'value', 1.0)
+set(handles.rButton_strain, 'value', 0.0)
+set(handles.rButon_strainUnitsStrain, 'value', 1.0, 'enable', 'off')
+set(handles.rButton_strainUnitsMicro, 'value', 0.0, 'enable', 'off')
+set(handles.rButton_typeElastic, 'value', 1.0, 'enable', 'inactive')
+set(handles.rButton_typePlastic, 'value', 0.0, 'enable', 'off')
+
+% Material definition
+set(handles.edit_material, 'string', '')
+
+% Analysis definition
+set(handles.edit_scf, 'string', '1')
+set(handles.pMenu_msc, 'value', 2.0)
 
 
 
@@ -117,10 +134,39 @@ end
 
 
 % --- Executes on button press in pButton_browseInput.
-function pButton_browseInput_Callback(hObject, eventdata, handles)
-% hObject    handle to pButton_browseInput (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+function pButton_browseInput_Callback(~, ~, handles)
+%{
+    Get the input file containing a stress or strain history
+%}
+
+% Define the start path
+if isappdata(0, 'panel_uniaxialStrainLife_input_path') == 1.0
+    startPath_input = getappdata(0, 'panel_uniaxialStrainLife_input_path');
+else
+    startPath_input = pwd;
+end
+
+% Define the GETFILE dialogue name
+if get(handles.rButton_stress, 'value') == 1.0
+    uigetFileTitle = 'Stress history file';
+else
+    uigetFileTitle = 'Strain history file';
+end
+
+% Get the file
+[file, path, ~] = uigetfile({'*.txt','Text File (*.txt)';...
+        '*.dat','Data File (*.dat)';...
+        '*.*',  'All Files (*.*)'}, uigetFileTitle,...
+        startPath_input);
+    
+if isequal(file, 0.0) == 1.0 || isequal(path, 0.0) == 1.0
+    % User cancelled operation
+else
+    set(handles.edit_inputFile, 'string', [path, file])
+    
+    % Save the file path
+    setappdata(0, 'panel_uniaxialStrainLife_input_path', path)
+end
 
 
 
@@ -148,23 +194,61 @@ end
 
 % --- Executes on button press in pButton_browseMaterial.
 function pButton_browseMaterial_Callback(hObject, eventdata, handles)
-% hObject    handle to pButton_browseMaterial (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+%{
+    Get the material file for the fatigue analysis
+%}
+
+% Define the start path
+if isappdata(0, 'panel_uniaxialStrainLife_material_path') == 1.0
+    startPath_material = getappdata(0, 'panel_uniaxialStrainLife_material_path');
+else
+    startPath_material = [pwd, '/Data/material/local'];
+end
+
+[materialName, path, ~] = uigetfile({'*.mat','MAT-Files (*.mat)'},...
+    'Material File', startPath_material);
+
+if isequal(materialName, 0.0) == 1.0 || isequal(path, 0.0) == 1.0
+else
+    setappdata(0, 'uniaxialStrainLife_material', [path, materialName])
+    
+    materialName(end-3: end) = [];
+    set(handles.edit_material, 'string', materialName)
+    
+    % Save the file path
+    setappdata(0, 'panel_uniaxialStrainLife_material_path', path)
+    setappdata(0, 'panel_uniaxialStrainLife_edit_material', materialName)
+end
 
 
 % --- Executes on button press in pButton_createMaterial.
 function pButton_createMaterial_Callback(hObject, eventdata, handles)
-% hObject    handle to pButton_createMaterial (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+%{
+    Open the material editor GUI
+%}
+setappdata(0, 'uniaxial_strain_life_skip_material_manager', 1.0)
+UserMaterial
+uiwait
+
+rmappdata(0, 'uniaxial_strain_life_skip_material_manager')
+material = getappdata(0, 'material_for_uniaxial_strain_life');
+
+if isempty(material) == 0.0
+    set(handles.edit_material, 'string', getappdata(0, 'material_for_uniaxial_strain_life'))
+end
+
+if isappdata(0, 'material_for_uniaxial_strain_life') == 1.0
+    rmappdata(0, 'material_for_uniaxial_strain_life')
+end
 
 
 % --- Executes on button press in pButton_manageMaterial.
 function pButton_manageMaterial_Callback(hObject, eventdata, handles)
-% hObject    handle to pButton_manageMaterial (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+%{
+    Start the Material Manager application
+%}
+MaterialManager
+uiwait
 
 
 
@@ -220,7 +304,7 @@ switch get(eventdata.NewValue, 'tag')
         set(handles.rButon_strainUnitsStrain, 'enable', 'off')
         set(handles.rButton_strainUnitsMicro, 'enable', 'off')
         
-        set(handles.rButton_typeElastic, 'enable', 'off', 'value', 1.0)
+        set(handles.rButton_typeElastic, 'enable', 'inactive', 'value', 1.0)
         set(handles.rButton_typePlastic, 'enable', 'off', 'value', 0.0)
     case 'rButton_strain'
         set(handles.rButon_strainUnitsStrain, 'enable', 'on')
@@ -249,4 +333,43 @@ function uipanel_unitsType_SelectionChangeFcn(hObject, eventdata, handles)
 %	EventName: string 'SelectionChanged' (read only)
 %	OldValue: handle of the previously selected object or empty if none was selected
 %	NewValue: handle of the currently selected object
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in check_resultsLocation.
+function check_resultsLocation_Callback(hObject, eventdata, handles)
+% hObject    handle to check_resultsLocation (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of check_resultsLocation
+
+
+
+function edit_resultsLocation_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_resultsLocation (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_resultsLocation as text
+%        str2double(get(hObject,'String')) returns contents of edit_resultsLocation as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_resultsLocation_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_resultsLocation (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in pButton_resultsLocation.
+function pButton_resultsLocation_Callback(hObject, eventdata, handles)
+% hObject    handle to pButton_resultsLocation (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)

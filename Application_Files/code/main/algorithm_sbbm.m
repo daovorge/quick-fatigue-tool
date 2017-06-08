@@ -14,7 +14,7 @@ classdef algorithm_sbbm < handle
 %      6.2 Stress-based Brown-Miller
 %   
 %   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 12-May-2017 15:25:52 GMT
+%   Last modified 08-Jun-2017 10:07:12 GMT
     
     %%
     
@@ -282,13 +282,10 @@ classdef algorithm_sbbm < handle
                 
                 % Calculate Kt factors for each value of Nf if applicable
                 if plasticSN == 1.0 && kt ~= 1.0
-                    ktn = zeros(1.0, length(Nf));
                     radius = getappdata(0, 'notchRootRadius');
                     constant = getappdata(0, 'notchSensitivityConstant');
                     
-                    for ktIndex = 1:length(Nf)
-                        ktn(ktIndex) = analysis.getKtn(Nf(ktIndex), constant, radius);
-                    end
+                    ktn = analysis.getKtn(Nf, constant, radius);
                 else
                     ktn = ones(1.0, length(Nf));
                 end

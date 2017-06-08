@@ -733,11 +733,14 @@ close UserMaterial
     material editor was accessed via the multiaxial gauge fatigue dialogue,
     or if the user pressed cancel, skip the material manager
 %}
-
-if isempty(getappdata(0, 'multiaxial_gauge_fatigue_skip_material_manager')) == 1.0 && isempty(getappdata(0, 'pressed_cancel_skip_material_manager')) == 1.0
+if isempty(getappdata(0, 'multiaxial_gauge_fatigue_skip_material_manager')) == 1.0 &&...
+        isempty(getappdata(0, 'uniaxial_strain_life_skip_material_manager')) == 1.0 &&...
+        isempty(getappdata(0, 'pressed_cancel_skip_material_manager')) == 1.0
     MaterialManager
-else
+elseif isappdata(0, 'multiaxial_gauge_fatigue_skip_material_manager') == 1.0
     setappdata(0, 'material_for_multiaxial_gauge_fatigue', shortFilename)
+elseif isappdata(0, 'uniaxial_strain_life_skip_material_manager') == 1.0
+    setappdata(0, 'material_for_uniaxial_strain_life', shortFilename)
 end
 
 

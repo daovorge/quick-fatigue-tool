@@ -12,7 +12,7 @@ function [cumulativeDamage] = interpolate(cumulativeDamage, pairs, msCorrection,
 %      5.4 Using custom stress-life data
 %   
 %   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 12-May-2017 15:25:52 GMT
+%   Last modified 08-Jun-2017 10:05:25 GMT
     
     %%
     
@@ -27,6 +27,8 @@ ndEndurance = getappdata(0, 'ndEndurance');
 enduranceScale = getappdata(0, 'enduranceScaleFactor');
 cyclesToRecover = abs(round(getappdata(0, 'cyclesToRecover')));
 kt = getappdata(0, 'kt');
+radius = getappdata(0, 'notchRootRadius');
+constant = getappdata(0, 'notchSensitivityConstant');
 
 if (sets == 1.0) || (sets > 1.0 && msCorrection ~= 7.0)
     %{
@@ -343,15 +345,11 @@ elseif msCorrection == 7.0
             cumulativeDamage(index) = 0.0;
         else
             %{
-                Find the value of Kt for the SN curve and scale the S
+                Find the value of Kt for the S-N curve and scale the S
                 datapoints if applicable
             %}
             if kt ~= 1.0
-                ktn = zeros(1.0, length(Si));
-                for ktIndex = 1:length(Si)
-                    ktn(ktIndex) = analysis.getKtn(N(ktIndex));
-                end
-                
+                ktn = analysis.getKtn(N, constant, radius);
                 Si = Si.*(1.0./ktn);
             end
             

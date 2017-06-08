@@ -643,7 +643,7 @@ classdef analysis < handle
             % Get value of Kt at the given life (Kt_f)
             switch method
                 case 1.0 % Peterson (default)
-                    ktn = 1.0 + ((kt - 1.0)/(0.915 + ((200.0)/((log10(N))^4.0))));
+                    ktn = 1.0 + ((kt - 1.0)./(0.915 + ((200.0)./((log10(N)).^4.0))));
                 case 2.0 % Peterson B
                     ktn = 1.0 + ((kt - 1.0)/(1.0 + (constant/radius)));
                 case 3.0 % Neuber
@@ -655,7 +655,7 @@ classdef analysis < handle
                 case 6.0 % Notch sensitivity
                     ktn = 1.0 + constant*(kt - 1.0);
                 otherwise % Peterson (default)
-                    ktn = 1.0 + ((kt - 1.0)/(0.915 + ((200.0)/((log10(N))^4.0))));
+                    ktn = 1.0 + ((kt - 1.0)./(0.915 + ((200.0)./((log10(N)).^4.0))));
             end
         end
         

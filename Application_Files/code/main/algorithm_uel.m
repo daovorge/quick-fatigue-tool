@@ -122,13 +122,10 @@ classdef algorithm_uel < handle
             
             % Calculate Kt factors for each value of Nf if applicable
             if kt ~= 1.0
-                ktn = zeros(1.0, length(Nf));
                 radius = getappdata(0, 'notchRootRadius');
                 constant = getappdata(0, 'notchSensitivityConstant');
-                
-                for ktIndex = 1:length(Nf)
-                    ktn(ktIndex) = analysis.getKtn(Nf(ktIndex), constant, radius);
-                end
+
+                ktn = analysis.getKtn(Nf, constant, radius);
             else
                 ktn = ones(1.0, length(Nf));
             end
