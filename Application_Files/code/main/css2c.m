@@ -18,7 +18,7 @@ function [rfData, epsilon, sigma, error] = css2c(sigma_e, E, kp, np)
 %   directly inside CSS2C. This is found to be more reliable.
 %   
 %   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 08-Jun-2017 11:15:47 GMT
+%   Last modified 08-Jun-2017 14:19:34 GMT
     
     %%
     
@@ -294,7 +294,12 @@ for i = 3:signalLength
         end
         
         % Solve for the stress range
-        currentStrainRange = abs(epsilon(i) - epsilon(i - 1.0));
+        if matMemFirstExcursion == 1.0
+            currentStrainRange = epsilon(i);
+        else
+            currentStrainRange = abs(epsilon(i) - epsilon(i - 1.0));
+        end
+        
         trueStressCurve = linspace(0.0, currentStrainRange*E, precision);
         
         if matMemFirstExcursion == 1.0

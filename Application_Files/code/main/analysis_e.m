@@ -86,11 +86,26 @@ classdef analysis_e < handle
                 case 5.0 % Smith-Watson-Topper
                     %{
                         The SWT mean stress correction is applied to the
-                        strain-life equation directly and to the strain
-                        cycle
+                        strain-life equation directly. This function only
+                        returns the value of gamma only
+                        
+                        The SWT correction is the Walker correction with
+                        gamma = 0.5
                     %}
                     
-                    mscCycles = max(S1).*cycles_e;
+                    % Get the maximum cycle and load ratio
+                    [numberOfPairs, ~] = size(pairs_s);
+                    maxCycle = zeros(1.0, numberOfPairs);
+                    minCycle = maxCycle;
+                    for i = 1:numberOfPairs
+                        maxCycle(i) = max(pairs_s(i, :));
+                        minCycle(i) = min(pairs_s(i, :));
+                    end
+                    R = minCycle./maxCycle;
+                    
+                    gamma = 0.5;
+                    
+                    mscCycles = cycles_e;
                 otherwise
             end
         end
