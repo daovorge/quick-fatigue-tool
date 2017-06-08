@@ -644,10 +644,7 @@ end
 
 %% Calculate Kt factors for each value of Nf if applicable
 if getappdata(0, 'kt') ~= 1.0
-    ktn = zeros(1.0, length(Nf));
-    for ktIndex = 1:length(Nf)
-        ktn(ktIndex) = analysis.getKtn(Nf(ktIndex));
-    end
+    ktn = analysis.getKtn(Nf);
 else
     ktn = ones(1.0, length(Nf));
 end
