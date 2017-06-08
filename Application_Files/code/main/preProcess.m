@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 30-May-2017 10:53:46 GMT
+%   Last modified 08-Jun-2017 12:59:03 GMT
 
     %%
 
@@ -3686,7 +3686,7 @@ classdef preProcess < handle
                             end
                         end
 
-                        [~, ~, s1_i, error] = css2(s1_i, E, kp, np);
+                        [~, ~, s1_i, error] = css2b(s1_i, E, kp, np);
 
                         % Gate the history
                         gate = preProcess.autoGate(s2_i, historyGate);
@@ -3712,7 +3712,7 @@ classdef preProcess < handle
                                 end
                             end
 
-                            [~, ~, s2_i, error] = css2(s2_i, E, kp, np);
+                            [~, ~, s2_i, error] = css2b(s2_i, E, kp, np);
                         end
 
                         % Gate the history
@@ -3739,7 +3739,7 @@ classdef preProcess < handle
                                 end
                             end
 
-                            [~, ~, s3_i, error] = css2(s3_i, E, kp, np);
+                            [~, ~, s3_i, error] = css2b(s3_i, E, kp, np);
                         end
                     catch
                         error = 2.0;
