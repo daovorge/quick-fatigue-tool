@@ -183,7 +183,7 @@ classdef multiaxialPreProcess < handle
             pathGauge90 = get(handles.edit_gauge_90, 'string');
             
             if (isempty(pathGauge0) == 1.0) || (isempty(pathGauge45) == 1.0) || (isempty(pathGauge90) == 1.0)
-                errordlg('All three gauge signals must be defined.', 'Quick Fatigue Tool')
+                errordlg('All three gauge signals must be specified.', 'Quick Fatigue Tool')
                 uiwait
                 error = 1.0;
                 return

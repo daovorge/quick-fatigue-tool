@@ -22,7 +22,7 @@ function varargout = UniaxialStrainLife(varargin)%#ok<*DEFNU>
 
 % Edit the above text to modify the response to help UniaxialStrainLife
 
-% Last Modified by GUIDE v2.5 08-Jun-2017 16:58:59
+% Last Modified by GUIDE v2.5 09-Jun-2017 10:48:48
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -90,12 +90,14 @@ if isappdata(0, 'panel_uniaxialStrainLife_edit_inputFile') == 1.0
         set(handles.rButton_typePlastic, 'enable', 'on')
     end
     
-    % Material definition
-    set(handles.edit_material, 'string', getappdata(0, 'panel_uniaxialStrainLife_edit_material'))
-    
     % Analysis definition
     set(handles.edit_scf, 'string', getappdata(0, 'panel_uniaxialStrainLife_edit_scf'))
     set(handles.pMenu_msc, 'value', getappdata(0, 'panel_uniaxialStrainLife_pMenu_msc'))
+    set(handles.edit_walkerGamma, 'string', getappdata(0, 'panel_uniaxialStrainLife_edit_walkerGamma'))
+    if get(handles.pMenu_msc, 'value') == 6.0
+        set(handles.text_walkerGamma, 'enable', 'on')
+        set(handles.edit_walkerGamma, 'enable', 'on')
+    end
     
     % Output definition
     set(handles.check_resultsLocation, 'value', getappdata(0, 'panel_uniaxialStrainLife_check_resultsLocation'))
@@ -105,6 +107,9 @@ if isappdata(0, 'panel_uniaxialStrainLife_edit_inputFile') == 1.0
         set(handles.edit_resultsLocation, 'enable', 'on', 'backgroundColor', 'white')
     end
 end
+
+% Material definition
+setMaterialName(handles)
 
 
 % --- Outputs from this function are returned to the command line.
@@ -120,9 +125,67 @@ varargout{1} = handles.output;
 
 % --- Executes on button press in pButton_analyse.
 function pButton_analyse_Callback(hObject, eventdata, handles)
-% hObject    handle to pButton_analyse (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+
+%% Clear the command window
+clc; warning('off', 'all')
+
+%% Start the timer
+tic
+
+%% Blank the GUI
+blank(handles)
+pause(1e-6)
+
+%% Prescan the load history file
+[loadHistoryData, error] = uniaxialPreProcess.preScanFile(handles);
+
+if error == 1.0
+    % Enable the GUI
+    enable(handles)
+    warning('on', 'all')
+    return
+end
+
+%% Get the stress concentration factor
+error = uniaxialPreProcess.checkSCF(handles);
+
+if error == 1.0
+    % Enable the GUI
+    set(handles.edit_scf, 'string', '1')
+    enable(handles)
+    warning('on', 'all')
+    return
+end
+
+%% Get the mean stress correction
+msCorrection = get(handles.pMenu_msc, 'value');
+
+% Check the validity of the Walker gamma value
+error = uniaxialPreProcess.checkWalkerGamma(handles, msCorrection);
+
+if error == 1.0
+    % Enable the GUI
+    set(handles.edit_walkerGamma, 'string', '')
+    enable(handles)
+    warning('on', 'all')
+    return
+end
+
+%% Read the material file
+error = uniaxialPreProcess.preScanMaterial(handles, msCorrection);
+
+if error == 1.0
+    % Enable the GUI
+    enable(handles)
+    warning('on', 'all')
+    return
+end
+
+%% Stop the timer
+analysisTime = toc;
+
+%% Enable the GUI
+enable(handles)
 
 
 % --- Executes on button press in pButton_cancel.
@@ -147,11 +210,13 @@ set(handles.rButton_typeElastic, 'value', 1.0, 'enable', 'inactive')
 set(handles.rButton_typePlastic, 'value', 0.0, 'enable', 'off')
 
 % Material definition
-set(handles.edit_material, 'string', '')
+setMaterialName(handles)
 
 % Analysis definition
 set(handles.edit_scf, 'string', '1')
 set(handles.pMenu_msc, 'value', 2.0)
+set(handles.text_walkerGamma, 'enable', 'off')
+set(handles.edit_walkerGamma, 'enable', 'off', 'string', '')
 
 % Output definition
 set(handles.check_resultsLocation, 'value', 0.0)
@@ -347,13 +412,15 @@ end
 
 
 % --- Executes on selection change in pMenu_msc.
-function pMenu_msc_Callback(hObject, eventdata, handles)
-% hObject    handle to pMenu_msc (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns pMenu_msc contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from pMenu_msc
+function pMenu_msc_Callback(hObject, ~, handles)
+switch get(hObject, 'value')
+    case 6.0 % User selected Walker (gamma)
+        set(handles.text_walkerGamma, 'enable', 'on')
+        set(handles.edit_walkerGamma, 'enable', 'on')
+    otherwise
+        set(handles.text_walkerGamma, 'enable', 'off')
+        set(handles.edit_walkerGamma, 'enable', 'off')
+end
 
 
 % --- Executes during object creation, after setting all properties.
@@ -413,6 +480,7 @@ function check_resultsLocation_Callback(hObject, eventdata, handles)
 switch get(hObject, 'value')
     case 0.0
         set(handles.edit_resultsLocation, 'enable', 'inactive', 'string', 'Default project output directory', 'backgroundColor', [177.0/255, 206.0/255, 237.0/255])
+        set(handles.pButton_resultsLocation, 'enable', 'off')
     case 1.0
         if exist([pwd, '/Project/output'], 'dir') == 7.0
             set(handles.edit_resultsLocation, 'string', [pwd, '/Project/output'])
@@ -421,6 +489,7 @@ switch get(hObject, 'value')
         end
         
         set(handles.edit_resultsLocation, 'enable', 'on', 'backgroundColor', 'white')
+        set(handles.pButton_resultsLocation, 'enable', 'on')
 end
 
 
@@ -448,9 +517,33 @@ end
 
 % --- Executes on button press in pButton_resultsLocation.
 function pButton_resultsLocation_Callback(hObject, eventdata, handles)
-% hObject    handle to pButton_resultsLocation (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Blank the GUI
+blank(handles)
+
+% Define the start path
+if isappdata(0, 'panel_uniaxialStrainLife_output_path') == 1.0
+    startPath_output = getappdata(0, 'panel_uniaxialStrainLife_output_path');
+else
+    if exist([pwd, '/Project/output'], 'dir') == 7.0
+        startPath_output = [pwd, '/Project/output'];
+    else
+        startPath_output = pwd;
+    end
+end
+
+outputDirectory = uigetdir(startPath_output, 'Output Directory');
+
+if isequal(outputDirectory, 0.0)
+    % User cancelled operation
+else
+    set(handles.edit_resultsLocation, 'string', outputDirectory)
+    
+    % Save the directory
+    setappdata(0, 'panel_uniaxialStrainLife_output_path', outputDirectory)
+end
+
+% Enable the GUI
+enable(handles)
 
 
 % --- Executes when user attempts to close figure1.
@@ -475,6 +568,7 @@ setappdata(0, 'panel_uniaxialStrainLife_edit_material', get(handles.edit_materia
 % Analysis definition
 setappdata(0, 'panel_uniaxialStrainLife_edit_scf', get(handles.edit_scf, 'string'))
 setappdata(0, 'panel_uniaxialStrainLife_pMenu_msc', get(handles.pMenu_msc, 'value'))
+setappdata(0, 'panel_uniaxialStrainLife_edit_walkerGamma', get(handles.edit_walkerGamma, 'string'))
 
 % Output definition
 setappdata(0, 'panel_uniaxialStrainLife_check_resultsLocation', get(handles.check_resultsLocation, 'value'))
@@ -497,7 +591,65 @@ if get(handles.rButton_stress, 'value') == 1.0
     set(handles.rButton_typePlastic, 'enable', 'off')
 end
 
+% Analysis definition
+if get(handles.pMenu_msc, 'value') ~= 6.0
+    set(handles.text_walkerGamma, 'enable', 'off')
+    set(handles.edit_walkerGamma, 'enable', 'off')
+end
+
 % Output definition
 if get(handles.check_resultsLocation, 'value') == 0.0
     set(handles.edit_resultsLocation, 'enable', 'inactive')
+    set(handles.pButton_resultsLocation, 'enable', 'off')
+end
+
+function setMaterialName(handles)
+material = getappdata(0, 'panel_uniaxialStrainLife_edit_material');
+if isempty(material) == 0.0
+    [~, material, ~] = fileparts(material);
+    if exist(['Data/material/local/', material, '.mat'], 'file') == 2.0
+        % Use a previously selected material
+        set(handles.edit_material, 'string', material)
+    else
+        % Use the first material in the /local directory if it exists
+        userMaterial = dir('Data/material/local/*.mat');
+        
+        if isempty(userMaterial) == 0.0
+            userMaterial(1.0).name(end-3:end) = [];
+            set(handles.edit_material, 'string', userMaterial(1.0).name)
+        else
+            set(handles.edit_material, 'string', [])
+        end
+    end
+else
+    userMaterial = dir('Data/material/local/*.mat');
+    
+    if isempty(userMaterial) == 0.0
+        userMaterial(1.0).name(end-3:end) = [];
+        set(handles.edit_material, 'string', userMaterial(1.0).name)
+    else
+        set(handles.edit_material, 'string', [])
+    end
+end
+
+
+function edit_walkerGamma_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_walkerGamma (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_walkerGamma as text
+%        str2double(get(hObject,'String')) returns contents of edit_walkerGamma as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_walkerGamma_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_walkerGamma (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
 end

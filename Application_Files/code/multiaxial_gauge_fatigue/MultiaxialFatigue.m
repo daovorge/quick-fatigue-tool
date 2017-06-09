@@ -101,16 +101,6 @@ if isappdata(0, 'panel_multiaxialFatigue_edit_gauge_0') == 1.0
                 set(handles.edit_material, 'string', [])
             end
         end
-    else
-        % Use the first material in the /local directory if it exists
-        userMaterial = dir('Data/material/local/*.mat');
-        
-        if isempty(userMaterial) == 0.0
-            userMaterial(1.0).name(end-3:end) = [];
-            set(handles.edit_material, 'string', userMaterial(1.0).name)
-        else
-            set(handles.edit_material, 'string', [])
-        end
     end
     
     % Algorithm/MSC
@@ -251,6 +241,16 @@ if isappdata(0, 'panel_multiaxialFatigue_edit_gauge_0') == 1.0
         set(handles.edit_location, 'backgroundColor', [177/255, 206/255, 237/255])
         
         set(handles.edit_location, 'string', 'Default project output directory')
+    end
+else
+    % Use the first material in the /local directory if it exists
+    userMaterial = dir('Data/material/local/*.mat');
+    
+    if isempty(userMaterial) == 0.0
+        userMaterial(1.0).name(end-3:end) = [];
+        set(handles.edit_material, 'string', userMaterial(1.0).name)
+    else
+        set(handles.edit_material, 'string', [])
     end
 end
 

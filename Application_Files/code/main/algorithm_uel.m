@@ -82,15 +82,15 @@ classdef algorithm_uel < handle
             if msCorrection < 7.0
                 x = nodalPairs_stress{node};
                 largestPair = find(cycles_stress == max(cycles_stress));
-                [nodalDamageParameter(node), ~, ~, ~, ~] = analysis_e.msc(max(cycles_strain), x(largestPair(1.0), :), msCorrection, S1, residual);
+                [nodalDamageParameter(node), ~, ~, ~, ~] = analysis_e.msc(max(cycles_strain), x(largestPair(1.0), :), msCorrection, residual);
             end
             
             %% Perform a damage calculation on the current analysis item
-            nodalDamage(node) = algorithm_uel.damageCalculation(cycles_stress, cycles_strain, msCorrection, pairs_stress, pairs_strain, S1, residual);
+            nodalDamage(node) = algorithm_uel.damageCalculation(cycles_stress, cycles_strain, msCorrection, pairs_stress, pairs_strain, residual);
         end
         
         %% DAMAGE CALCULATION
-        function damage = damageCalculation(cycles_stress, cycles_strain, msCorrection, pairs_stress, pairs_strain, S1, residual)
+        function damage = damageCalculation(cycles_stress, cycles_strain, msCorrection, pairs_stress, pairs_strain, residual)
             
             %% CALCULATE DAMAGE FOR EACH STRESS CYCLE
             
@@ -115,7 +115,7 @@ classdef algorithm_uel < handle
             
             % Perform mean stress correction if necessary
              if msCorrection < 7.0
-                [cycles_strain, gamma, R, mscWarning, overflowCycles] = analysis_e.msc(cycles_strain, pairs_stress, msCorrection, S1, residual);
+                [cycles_strain, gamma, R, mscWarning, overflowCycles] = analysis_e.msc(cycles_strain, pairs_stress, msCorrection, residual);
             else
                 mscWarning = 0.0;
             end

@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 08-Jun-2017 12:59:03 GMT
+%   Last modified 09-Jun-2017 10:43:29 GMT
 
     %%
 
@@ -4176,7 +4176,7 @@ classdef preProcess < handle
 
                 % Verify the values of gamma
                 for groups = 1:G
-                    if walkerGamma(groups) < 0.0
+                    if (walkerGamma(groups) < 0.0) || (walkerGamma(groups) > 1.0)
                         setappdata(0, 'E142', 1.0)
                         setappdata(0, 'error_log_142_group', groups)
                         setappdata(0, 'error_log_142_gamma', walkerGamma(groups))

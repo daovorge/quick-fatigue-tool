@@ -1327,7 +1327,7 @@ if status == 1.0
     end
     if getappdata(0, 'E142') == 1.0
         fprintf(fid, '\r\n\r\n***ERROR: The Walker gamma definition in group %.0f is %.3g', getappdata(0, 'error_log_142_group'), getappdata(0, 'error_log_142_gamma'));
-        fprintf(fid, '\r\n-> Negative values of the Walker gamma parameter are not permitted');
+        fprintf(fid, '\r\n-> The Walker gamma parameter must be in the range (0 <= Gamma <= 1)');
         fprintf(fid, '\r\n\r\nError code: E142');
         rmappdata(0, 'E142')
     end

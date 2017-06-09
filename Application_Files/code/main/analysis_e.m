@@ -10,7 +10,7 @@ classdef analysis_e < handle
     
     methods(Static = true)
         %% Mean stress correction
-        function [mscCycles, gamma, R, warning, overflowCycles] = msc(cycles_e, pairs_s, msCorrection, S1, residual)
+        function [mscCycles, gamma, R, warning, overflowCycles] = msc(cycles_e, pairs_s, msCorrection, residual)
             % Initialize output
             warning = 0.0;
             overflowCycles = 0.0;
