@@ -149,131 +149,106 @@ classdef uniaxialPreProcess < handle
         end
         
         %% Read the material file
-        function [returnError] = preScanMaterial(handles, msCorrection)
+        function [error] = preScanMaterial(handles, msCorrection)
             %% Initialise output
-            returnError = 0.0;
+            error = 0.0;
+            
+            % Suppress output to the message file
+            setappdata(0, 'uniaxialStrainLifeMessenger', 1.0)
             
             %% Get the material properties
             material = get(handles.edit_material, 'string');
             [~, material, ~] = fileparts(material);
-            error = preProcess.getMaterial(material, 0.0, 1.0);
+            materialError = preProcess.getMaterial(material, 0.0, 1.0);
             
             %% Check for errors
-            switch error
+            switch materialError
                 case 1.0
                     if strcmpi(material, 'Undefined.mat') == 1.0
-                        errorMessage = sprintf('A meterial must be selected for analysis.');
+                        errorMessage = sprintf('A material must be selected for analysis.');
                     elseif isempty(material) == 1.0
-                        errorMessage = sprintf('A meterial must be selected for analysis.');
+                        errorMessage = sprintf('A material must be selected for analysis.');
                     else
-                        errorMessage = sprintf('Error while processing material ''%s''. The file could not be located.\r\n\r\nThe material must be located in ''Data/material/local'' to be used for analysis.', material);
+                        errorMessage = sprintf('Error while processing material ''%s''. The file could not be located.', material);
                     end
                     errordlg(errorMessage, 'Quick Fatigue Tool')
                     uiwait
-                    returnError = 1.0;
+                    error = 1.0;
                     return
                 case 2.0
                     errorMessage = sprintf('Error while processing material ''%s''. The file could not be opened.', material);
                     errordlg(errorMessage, 'Quick Fatigue Tool')
                     uiwait
-                    returnError = 1.0;
+                    error = 1.0;
                     return
                 case 3.0
                     errorMessage = sprintf('Error while processing material ''%s''. The file contains one or more syntax errors.', material);
                     errordlg(errorMessage, 'Quick Fatigue Tool')
                     uiwait
-                    returnError = 1.0;
+                    error = 1.0;
                     return
                 otherwise
             end
             
             %% Check that the required material properties are available
-            if isempty(getappdata(0, 'poisson')) == 1.0
-                missingProperties{1} = 'UNDEFINED';
-            else
-                missingProperties{1} = 'OK';
+            %{
+                All of the following properties must be defined in order to
+                perform the uniaxial strain-life fatigue analysis:
+            
+                E
+                Sf'
+                b
+                Ef'
+                c
+                kp'
+                np'
+            
+                If the Walker (regression) mean stress correction is
+                selected, the material UTS is also required.
+            %}
+            % Cell containing missing material properties
+            missingProperties = cell([], []);
+            
+            if isempty(getappdata(0, 'E')) == 1.0
+                missingProperties = [missingProperties, 'E'];
             end
             
             if isempty(getappdata(0, 'Sf')) == 1.0
-                missingProperties{2} = 'UNDEFINED';
-                missingProperties{5} = 'NOT EVALUATED';
-                missingProperties{6} = 'NOT EVALUATED';
-            else
-                missingProperties{2} = 'OK';
-                
-                if isempty(getappdata(0, 'Ef')) == 1.0
-                    missingProperties{5} = 'UNDEFINED';
-                else
-                    missingProperties{5} = 'OK';
-                end
-                
-                if isempty(getappdata(0, 'c')) == 1.0
-                    missingProperties{6} = 'UNDEFINED';
-                else
-                    missingProperties{6} = 'OK';
-                end
-            end
-            
-            if isempty(getappdata(0, 'E')) == 1.0
-                missingProperties{3} = 'UNDEFINED';
-            else
-                missingProperties{3} = 'OK';
+                missingProperties = [missingProperties, 'Sf'];
             end
             
             if isempty(getappdata(0, 'b')) == 1.0
-                missingProperties{4} = 'UNDEFINED';
-            else
-                missingProperties{4} = 'OK';
+                missingProperties = [missingProperties, 'b'];
             end
             
-            if msCorrection > 0.0
-                if isempty(getappdata(0, 'kp')) == 1.0
-                    missingProperties{7} = 'UNDEFINED';
-                else
-                    missingProperties{7} = 'OK';
-                end
-                
-                if isempty(getappdata(0, 'np')) == 1.0
-                    missingProperties{8} = 'UNDEFINED';
-                else
-                    missingProperties{8} = 'OK';
-                end
-                
-                if isempty(getappdata(0, 'uts')) == 1.0 && msCorrection == 2.0
-                    errordlg('The ultimate tensile strength of the material is required for user-defined mean stress correction', 'Quick Fatigue Tool')
-                    uiwait
-                    returnError = 1.0;
-                    return
-                elseif isempty(getappdata(0, 'kp')) == 1.0 ||...
-                        isempty(getappdata(0, 'np')) == 1.0 ||...
-                        isempty(getappdata(0, 'E')) == 1.0
-                    errorMessage1 = 'Cyclic properties are required for mean stress correction. The following properties are required for analysis:';
-                    errorMessage2 = sprintf('\n\nYoung''s Modulus (%s)\nCyclic strain hardening coefficient (%s)\nCyclic strain hardening exponent (%s)',...
-                        missingProperties{3}, missingProperties{7}, missingProperties{8});
-                    errordlg([errorMessage1, errorMessage2], 'Quick Fatigue Tool')
-                    uiwait
-                    returnError = 1.0;
-                    return
-                end
-            elseif msCorrection == 2.0 && isempty(getappdata(0, 'uts')) == 1.0
-                errordlg('The ultimate tensile strength of the material is required for user-defined mean stress correction', 'Quick Fatigue Tool')
+            if isempty(getappdata(0, 'Ef')) == 1.0
+                missingProperties = [missingProperties, 'Ef'];
+            end
+            
+            if isempty(getappdata(0, 'c')) == 1.0
+                missingProperties = [missingProperties, 'c'];
+            end
+            
+            if isempty(getappdata(0, 'kp')) == 1.0
+                missingProperties = [missingProperties, 'kp'];
+            end
+            
+            if isempty(getappdata(0, 'np')) == 1.0
+                missingProperties = [missingProperties, 'np'];
+            end
+            
+            % If there are any missing properties, exit with an error
+            if isempty(missingProperties) == 0.0
+                errorMessage1 = sprintf('The material definition is insufficient for strain-life fatigue analysis. The following properties are missing:\r\n\r\n');
+                errorMessage2 = sprintf('%s\r\n', missingProperties);
+                errordlg([errorMessage1, errorMessage2], 'Quick Fatigue Tool')
                 uiwait
-                returnError = 1.0;
+                error = 1.0;
                 return
             end
             
-            if any(strcmpi(missingProperties, 'UNDEFINED') == 1.0)
-                errorMessage1 = sprintf('Error while processing the material definition. The following properties are required for analysis:\n\n');
-                errorMessage2 = sprintf('Poisson''s ratio (%s)\nYoung''s Modulus (%s)\nFatigue strength coefficient (%s)\n',...
-                    missingProperties{1}, missingProperties{3}, missingProperties{2});
-                errorMessage3 = sprintf('Fatigue strength exponent (%s)\nFatigue ductility coefficient (%s)\nFatigue ductility exponent (%s)',...
-                    missingProperties{4}, missingProperties{5}, missingProperties{6});
-                errorMessage = [errorMessage1, errorMessage2, errorMessage3];
-                errordlg(errorMessage, 'Quick Fatigue Tool')
-                uiwait
-                returnError = 1.0;
-                return
-            end
+            % Remove message file flag
+            rmappdata(0, 'uniaxialStrainLifeMessenger')
         end
         
         %% Check if the output directory exists

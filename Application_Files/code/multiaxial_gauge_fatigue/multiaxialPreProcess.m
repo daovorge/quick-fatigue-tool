@@ -13,7 +13,7 @@ classdef multiaxialPreProcess < handle
 %      A3.2 Multiaxial Gauge Fatigue
 %   
 %   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 17-May-2017 14:54:51 GMT
+%   Last modified 09-Jun-2017 11:59:15 GMT
     
     %%
     
@@ -682,6 +682,9 @@ classdef multiaxialPreProcess < handle
             %% Initialise output
             returnError = 0.0;
             
+            %% Suppress output to the message file
+            setappdata(0, 'multiaxialGaugeFatigueMessenger', 1.0)
+            
             %% Get the material properties
             material = get(handles.edit_material, 'string');
             [~, material, ~] = fileparts(material);
@@ -691,11 +694,11 @@ classdef multiaxialPreProcess < handle
             switch error
                 case 1.0
                     if strcmpi(material, 'Undefined.mat') == 1.0
-                        errorMessage = sprintf('A meterial must be selected for analysis.');
+                        errorMessage = sprintf('A material must be selected for analysis.');
                     elseif isempty(material) == 1.0
-                        errorMessage = sprintf('A meterial must be selected for analysis.');
+                        errorMessage = sprintf('A material must be selected for analysis.');
                     else
-                        errorMessage = sprintf('Error while processing material ''%s''. The file could not be located.\r\n\r\nThe material must be located in ''Data/material/local'' to be used for analysis.', material);
+                        errorMessage = sprintf('Error while processing material ''%s''. The file could not be located.', material);
                     end
                     errordlg(errorMessage, 'Quick Fatigue Tool')
                     uiwait
@@ -803,6 +806,9 @@ classdef multiaxialPreProcess < handle
                 returnError = 1.0;
                 return
             end
+            
+            % Remove message file flag
+            rmappdata(0, 'multiaxialGaugeFatigueMessenger')
         end
         
         %% Read the surface finish definition

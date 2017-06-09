@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 22-May-2017 15:50:20 GMT
+%   Last modified 09-Jun-2017 12:28:19 GMT
 
     %%
 
@@ -31,12 +31,18 @@ classdef messenger < handle
 
             %{
                 If this function is being called from the material
-                evaluation feature in Material Manager, exit now since
-                there is no message file
+                evaluation feature in Material Manager, the Multiaxial
+                Gauge Fatigue app or the Uniaxial Strain-Life app, exit now
+                since there is no message file
             %}
             if isappdata(0, 'evaluateMaterialMessenger') == 1.0
                 return
+            elseif isappdata(0, 'uniaxialStrainLifeMessenger') == 1.0
+                return
+            elseif isappdata(0, 'multiaxialGaugeFatigueMessenger') == 1.0
+                return
             end
+            
 
             % If the message file already exists, get the file ID
             if messageID ~= 0.0
