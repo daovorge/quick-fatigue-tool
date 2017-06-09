@@ -97,7 +97,7 @@ classdef uniaxialPreProcess < handle
         end
         
         %% Check the stress concentration factor
-        function [error] = checkSCF(handles)
+        function [error, scf] = checkSCF(handles)
             % Initialize error variable
             error = 0.0;
             

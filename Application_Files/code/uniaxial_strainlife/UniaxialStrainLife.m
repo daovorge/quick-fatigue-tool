@@ -144,7 +144,7 @@ if error == 1.0
 end
 
 %% Get the stress concentration factor
-error = uniaxialPreProcess.checkSCF(handles);
+[error, scf] = uniaxialPreProcess.checkSCF(handles);
 
 if error == 1.0
     % Enable the GUI
@@ -231,7 +231,7 @@ if (get(handles.rButton_stress, 'value') == 1.0) || ((get(handles.rButton_strain
         history. The damage parameter is the elastic stress. Convert the
         elastic stress into the nonlinear elastic stress and strain.
     %}
-    damage = uniaxialAnalysis.main(loadHistoryData, cael, E, Sf, b, Ef, c, kp, np, gamma, msCorrection, L, ndEndurance, fatigueLimitSress);
+    damage = uniaxialAnalysis.main(loadHistoryData, cael, E, Sf, b, Ef, c, kp, np, gamma, msCorrection, L, ndEndurance, fatigueLimitSress, scf);
 else
     %{
         The user supplied an inelastic strain history. The damage parameter

@@ -1,4 +1,4 @@
-function [rfData, epsilon, sigma, error] = css2c(sigma_e, E, kp, np)
+function [rfData, epsilon, sigma, error] = css2c(sigma_e, E, kp, np, scf)
 %CSS2C    QFT function to calculate nonlinear elastic stress-strain.
 %   This function calculates the nonlinear elastic stress and strain from
 %   an elastic stress tensor.
@@ -83,6 +83,9 @@ signalLength = length(sigma_e);
 epsilon = zeros(1.0, signalLength);
 sigma = zeros(1.0, signalLength);
 
+% Square the elastic stress concentration factor
+scf = scf*scf;
+
 %% Calcualte the monotonic stage
 %{
     The first excursion is assumed to be monotonic, therefore
@@ -102,7 +105,7 @@ trueStrainCurve = linspace(1e-12, (overshoot*sigma_e(2.0))/E, precision);
     strain curve into the monotonic R-O equation
 %}
 % Neuber substitution from sigma_e*eps_e == sigma_t*eps_t
-Nb = (sigma_e(2.0)^2)./(E.*trueStrainCurve);
+Nb = (scf*(sigma_e(2.0)^2))./(E.*trueStrainCurve);
 
 % Newton's method. Solution is where f=0
 f = real((Nb./E) + (Nb./kp).^(1.0/np) - trueStrainCurve);
@@ -277,10 +280,10 @@ for i = 3:signalLength
         if matMemFirstExcursion == 1.0
             ratchetStress = ratchetStress + stressRangeBeyondClosure;
             
-            Nb = (stressRange^2.0)./(E.*trueStrainCurve);
+            Nb = (scf.*(stressRange^2.0))./(E.*trueStrainCurve);
             f = real((Nb./E) + (Nb./kp).^(1.0/np) - trueStrainCurve);
         else
-            Nb = (stressRange^2)./(E.*trueStrainCurve);
+            Nb = (scf.*(stressRange^2))./(E.*trueStrainCurve);
             f = real((Nb./E) + 2.0.*(Nb./(2.0*kp)).^(1.0/np) - trueStrainCurve);
         end
         
@@ -373,7 +376,7 @@ for i = 3:signalLength
             trueStrainCurve = linspace(1e-12, overshoot*(currentStressRange/E), precision);
         end
         
-        Nb = (currentStressRange.^2.0)./(E.*trueStrainCurve);
+        Nb = (scf.*(currentStressRange.^2.0))./(E.*trueStrainCurve);
         f = real((Nb./E) + 2.0.*(Nb./(2.0*kp)).^(1.0/np) - trueStrainCurve);
         
         % Solve for the strain range

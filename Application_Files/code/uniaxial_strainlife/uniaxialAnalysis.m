@@ -18,13 +18,13 @@ classdef uniaxialAnalysis < handle
     
     methods (Static = true)
         %% Entry function for Uniaxial Strain-Life
-        function [damage] = main(damageParameter_stress, cael, E, Sf, b, Ef, c, kp, np, gamma, msCorrection, L, ndEndurance, fatigueLimitSress)
+        function [damage] = main(damageParameter_stress, cael, E, Sf, b, Ef, c, kp, np, gamma, msCorrection, L, ndEndurance, fatigueLimitSress, scf)
             %% Convert the uniaxial stress into uniaxial strain
             % Gate the tensors
             damageParameter_stress = analysis.gateTensors(damageParameter_stress, 2.0, 5.0);
             
             % Convert the elastic stress into inelastic strain
-            [rfData, damageParameter_strain, damageParameter_stress, ~] = css2c(damageParameter_stress, E, kp, np);
+            [rfData, damageParameter_strain, damageParameter_stress, ~] = css2c(damageParameter_stress, E, kp, np, scf);
             
             %% Rainflow count the stress
             if L < 3.0
