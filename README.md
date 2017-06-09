@@ -13,3 +13,9 @@ Preparing Quick Fatigue Tool requires minimal intervention from the user, althou
 If the MATLAB working directory is not configured exactly as described above (e.g. the user enters the job directory before running a job file), the application will not run.
 
 ![Alt text](/../resource/figure/directory.png?raw=true "Figure 1: Directory structure")
+
+## Download
+The latest release of Quick Fatigue Tool can be downloaded by selecting Releases and downloading the latest version.
+
+## Checking out pre-release code
+The latest development version of Quick Fatigue Tool can be accessed in the devel branch.
