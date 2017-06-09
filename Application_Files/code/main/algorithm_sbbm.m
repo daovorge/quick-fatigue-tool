@@ -296,7 +296,7 @@ classdef algorithm_sbbm < handle
                 end
                 
                 % Check if strain-based materials data is available
-                if (isempty(Ef) || isempty(c)) || plasticSN == 0.0
+                if (isempty(Ef) == 1.0 || isempty(c) == 1.0) || plasticSN == 0.0
                     for index = 1:numberOfCycles
                         % If the cycle is purely compressive, assume no damage
                         if (min(pairs(index, :)) < 0.0 && max(pairs(index, :)) <= 0.0) && (getappdata(0, 'ndCompression') == 1.0)

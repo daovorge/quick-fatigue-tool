@@ -12,7 +12,7 @@ classdef uniaxialPreProcess < handle
 %      A3.2 Multiaxial Gauge Fatigue
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 17-May-2017 14:54:51 GMT
+%   Last modified 09-Jun-2017 17:02:26 GMT
     
     %%
     
@@ -122,29 +122,57 @@ classdef uniaxialPreProcess < handle
         end
         
         %% Check the user-defined value of the Walker gamma parameter
-        function [error] = checkWalkerGamma(handles, msCorrection)
+        function [error, gamma] = checkWalkerGamma(handles, msCorrection, uts, behaviour)
             % Initialize error variable
             error = 0.0;
+            gamma = [];
             
-            if msCorrection == 6.0
-                gamma = str2double(get(handles.edit_walkerGamma, 'string'));
-                
-                if isempty(get(handles.edit_walkerGamma, 'string')) == 1.0
-                    errorMessage = sprintf('The Walker gamma parameter must be specified.');
-                    errordlg(errorMessage, 'Quick Fatigue Tool')
-                    uiwait
-                    error = 1.0;
-                elseif (isinf(gamma) == 1.0) || (isnan(gamma) == 1.0) || (isreal(gamma) == 0.0)
-                    errorMessage = sprintf('The specified Walker gamma parameter is invalid.');
-                    errordlg(errorMessage, 'Quick Fatigue Tool')
-                    uiwait
-                    error = 1.0;
-                elseif (gamma < 0.0) || (gamma > 1.0)
-                    errorMessage = sprintf('The Walker gamma parameter must be in the range (0 <= Gamma <= 1).');
-                    errordlg(errorMessage, 'Quick Fatigue Tool')
-                    uiwait
-                    error = 1.0;
-                end
+            switch msCorrection
+                case 4.0 % Walker (standard)
+                    switch behaviour
+                        case 1.0 % Calculate gamma based on Dowling for steel
+                            gamma = 0.65;
+                        case 2.0 % Calculate gamma based on Dowling for aluminium
+                            gamma = 0.45;
+                        otherwise % Calculate gamma based on load ratio
+                            gamma = -9999.0;
+                    end
+                case 5.0 % Walker (regression)
+                    switch behaviour
+                        case 1.0 % Steel
+                            gamma = (-0.0002*uts) + 0.8818;
+                        case 2.0 % Aluminium
+                            if uts < 365.0
+                                gamma = 0.651;
+                            elseif uts > 475.0
+                                gamma = 0.473;
+                            else
+                                gamma = 0.651 + (-0.001618181*(uts - 365.0));
+                            end
+                        case 3.0 % Other
+                            gamma = (-0.0002*uts) + 0.8818;
+                        otherwise
+                    end
+                case 6.0 % Walker (gamma)
+                    gamma = str2double(get(handles.edit_walkerGamma, 'string'));
+                    
+                    if isempty(get(handles.edit_walkerGamma, 'string')) == 1.0
+                        errorMessage = sprintf('The Walker gamma parameter must be specified.');
+                        errordlg(errorMessage, 'Quick Fatigue Tool')
+                        uiwait
+                        error = 1.0;
+                    elseif (isinf(gamma) == 1.0) || (isnan(gamma) == 1.0) || (isreal(gamma) == 0.0)
+                        errorMessage = sprintf('The specified Walker gamma parameter is invalid.');
+                        errordlg(errorMessage, 'Quick Fatigue Tool')
+                        uiwait
+                        error = 1.0;
+                    elseif (gamma < 0.0) || (gamma > 1.0)
+                        errorMessage = sprintf('The Walker gamma parameter must be in the range (0 <= Gamma <= 1).');
+                        errordlg(errorMessage, 'Quick Fatigue Tool')
+                        uiwait
+                        error = 1.0;
+                    end
+                otherwise
             end
         end
         
@@ -210,38 +238,47 @@ classdef uniaxialPreProcess < handle
             missingProperties = cell([], []);
             
             if isempty(getappdata(0, 'E')) == 1.0
-                missingProperties = [missingProperties, 'E'];
+                missingProperties = [missingProperties, 'Young''s Modulus: E'];
             end
             
             if isempty(getappdata(0, 'Sf')) == 1.0
-                missingProperties = [missingProperties, 'Sf'];
+                missingProperties = [missingProperties, 'Fatigue strength coefficient: Sf'];
             end
             
             if isempty(getappdata(0, 'b')) == 1.0
-                missingProperties = [missingProperties, 'b'];
+                missingProperties = [missingProperties, 'Fatigue strength exponent: b'];
             end
             
             if isempty(getappdata(0, 'Ef')) == 1.0
-                missingProperties = [missingProperties, 'Ef'];
+                missingProperties = [missingProperties, 'Fatigue ductility coefficient: Ef'];
             end
             
             if isempty(getappdata(0, 'c')) == 1.0
-                missingProperties = [missingProperties, 'c'];
+                missingProperties = [missingProperties, 'Fatigue ductility exponent: c'];
             end
             
             if isempty(getappdata(0, 'kp')) == 1.0
-                missingProperties = [missingProperties, 'kp'];
+                missingProperties = [missingProperties, 'Cyclic strain-hardening coefficient: kp'];
             end
             
             if isempty(getappdata(0, 'np')) == 1.0
-                missingProperties = [missingProperties, 'np'];
+                missingProperties = [missingProperties, 'Cyclic strain-hardening exponent: np'];
             end
             
             % If there are any missing properties, exit with an error
             if isempty(missingProperties) == 0.0
                 errorMessage1 = sprintf('The material definition is insufficient for strain-life fatigue analysis. The following properties are missing:\r\n\r\n');
-                errorMessage2 = sprintf('%s\r\n', missingProperties);
+                errorMessage2 = sprintf('%s\r\n', missingProperties{:});
                 errordlg([errorMessage1, errorMessage2], 'Quick Fatigue Tool')
+                uiwait
+                error = 1.0;
+                return
+            end
+            
+            % Check for the ultimate tensile stress if applicable
+            if (msCorrection == 5.0) && (isempty(getappdata(0, 'uts')) == 1.0)
+                errorMessage = sprintf('The Walker (regression) mean stress correction requires a value of the ultimate tensile strength. Check the material definition.');
+                errordlg(errorMessage, 'Quick Fatigue Tool')
                 uiwait
                 error = 1.0;
                 return
@@ -269,7 +306,7 @@ classdef uniaxialPreProcess < handle
                     end
                 end
                 
-                path = [pwd, sprintf('/Project/output/gauge_fatigue_results_%s', dateString)];
+                path = [pwd, sprintf('\\Project\\output\\uniaxial_strain_life_results_%s', dateString)];
                 
                 % If the output directory  does not exist, create it
                 if exist(path, 'dir') == 0.0
@@ -287,14 +324,23 @@ classdef uniaxialPreProcess < handle
                     directory exists
                 %}
                 if isempty(path) == 1.0
+                    errorMessage = sprintf('The results location cannot be empty.');
+                    errordlg(errorMessage, 'Quick Fatigue Tool')
+                    uiwait
                     error = 1.0;
-                    return
                 elseif exist(path, 'dir') == 0.0
                     try
                         mkdir(path)
                     catch
-                        error = 2.0;
-                        return
+                        try
+                            rmdir(path)
+                        catch
+                        end
+                        
+                        errorMessage = sprintf('The specified output file path could not be created. Check that the drive location exists and has read/write access.');
+                        errordlg(errorMessage, 'Quick Fatigue Tool')
+                        uiwait
+                        error = 1.0;
                     end
                 end
             end
@@ -304,9 +350,50 @@ classdef uniaxialPreProcess < handle
             setappdata(0, 'dateString', dateString)
         end
         
-        %% Get principal stress history from principal strain history (NEW)
+        %% Get the elastic principal stress
+        function [S1, S2] = getElasticPrincipalStressFromElasticStress(Sxx, Syy, Szz, Txy, Txz, Tyz, L)
+            %{
+                This function is required if the input load history is
+                elastic stress
+            %}
+            
+            %{
+            	Construct a 3x3xL multidimensional array of the
+                stress tensor history, where L is the history
+                length
+            %}
+            % Direct stress components
+            normals = [Sxx; Syy; Szz]';
+            
+            % Shear stress components
+            shears = [Txy; Txz; Tyz]';
+            
+            % Assign normal stress component histories to diagonal terms
+            diagonals = repmat(eye([3.0, 3.0]), 1.0, 1.0, L);
+            diagonals(diagonals > 0.0) = normals';
+            
+            % Assign shear stress component histories to non-diagonal terms
+            nonDiagonals = repmat(tril(ones(3.0), -1.0), 1.0, 1.0, L);
+            nonDiagonals(nonDiagonals > 0.0) = shears';
+            
+            % Combine diagonal and non-diagonal terms
+            multidimensionalStressTensor = diagonals + nonDiagonals + permute(nonDiagonals, [2.0, 1.0, 3.0]);
+            
+            % Get the Eigenvalues for each frame of the tensor data
+            eigenvalues = eig3(multidimensionalStressTensor);
+            
+            %{
+            	The principal stresses are the maximum, median
+                and minimum values of the Eigenvector at each
+                tensor frame
+            %}
+            S1 = max(real(eigenvalues));
+            S2 = min(real(eigenvalues));
+        end
+        
+        %% Get inelastic stress history from inelastic strain history (NEW)
         function [sigma, trueStressCurveBuffer, trueStrainCurveBuffer] =...
-                getPrincipalStress(epsilon, E, kp, np)
+                getInelasticStressFromInelasticStrain(epsilon, E, kp, np)
             
             %{
                 If out-of-plane strains are being ignored, EPSILON will be
@@ -671,25 +758,15 @@ classdef uniaxialPreProcess < handle
         end
         
         %% Get the fatigue limit stress
-        function [] = getFatigueLimit(algorithm)
-            %% Calculate the endurance limit
-            
-            % Recall the material properties
-            cael = getappdata(0, 'cael');
-            Sf = getappdata(0, 'Sf');
-            b = getappdata(0, 'b');
-            E = getappdata(0, 'E');
-            Ef = getappdata(0, 'Ef');
-            c = getappdata(0, 'c');
+        function [fatigueLimitSress, fatigueLimitSrain] = getFatigueLimit(cael, E, Sf, b, Ef, c)
+            %{
+                Calculate the fatigue limit of the material based on the
+                strain-life relationship.
+            %}
 
-            if algorithm == 2.0 %SBBM
-                conditionalStrain = ((1.65*Sf)/(E))*(cael)^b + (1.75*Ef)*(cael)^c;
-            else % PS
-                conditionalStrain = (Sf/E)*(cael)^b + Ef*(cael)^c;
-            end
+            fatigueLimitSrain = (Sf/E)*(cael)^b + Ef*(cael)^c;
             
-            setappdata(0, 'fatigueLimit_strain', conditionalStrain)
-            setappdata(0, 'fatigueLimit_stress', conditionalStrain*E)
+            fatigueLimitSress = E*fatigueLimitSrain;
         end
     end
 end

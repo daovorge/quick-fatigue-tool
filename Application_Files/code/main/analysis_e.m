@@ -4,7 +4,7 @@ classdef analysis_e < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 25-Apr-2017 12:13:25 GMT
+%   Last modified 09-Jun-2017 17:02:26 GMT
     
     %%
     
@@ -54,8 +54,8 @@ classdef analysis_e < handle
                 case 4.0 % Walker
                     %{
                         The Walker mean stress correction is applied to the
-                        strain-life equation directly. This function only
-                        returns the value of gamma only
+                        strain-life equation directly. This function
+                        returns the value of gamma only.
                     %}
                     
                     gamma = getappdata(0, 'walkerGamma');
@@ -86,11 +86,11 @@ classdef analysis_e < handle
                 case 5.0 % Smith-Watson-Topper
                     %{
                         The SWT mean stress correction is applied to the
-                        strain-life equation directly. This function only
-                        returns the value of gamma only
+                        strain-life equation directly. This function
+                        returns the value of gamma only.
                         
                         The SWT correction is the Walker correction with
-                        gamma = 0.5
+                        gamma = 0.5.
                     %}
                     
                     % Get the maximum cycle and load ratio
@@ -102,8 +102,6 @@ classdef analysis_e < handle
                         minCycle(i) = min(pairs_s(i, :));
                     end
                     R = minCycle./maxCycle;
-                    
-                    gamma = 0.5;
                     
                     mscCycles = cycles_e;
                 otherwise

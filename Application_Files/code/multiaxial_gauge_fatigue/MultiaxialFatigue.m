@@ -635,7 +635,7 @@ elseif error == 2.0
         rmdir(path)
     catch
     end
-    errordlg('The specified output file path could not be created. Check that the drive location exists.', 'Quick Fatigue Tool')
+    errordlg('The specified output file path could not be created. Check that the drive location exists and has read/write access.', 'Quick Fatigue Tool')
     uiwait
     multiaxialPreProcess.enable(handles)
     warning('on', 'all')

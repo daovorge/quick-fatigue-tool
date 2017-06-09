@@ -1,28 +1,19 @@
 function varargout = UniaxialStrainLife(varargin)%#ok<*DEFNU>
-% UNIAXIALSTRAINLIFE MATLAB code for UniaxialStrainLife.fig
-%      UNIAXIALSTRAINLIFE, by itself, creates a new UNIAXIALSTRAINLIFE or raises the existing
-%      singleton*.
+%UNIAXIALSTRAINLIFE    QFT functions for Uniaxial Strain-Life
+%   These functions are used to call and operate the Uniaxial Strain-Life
+%   application.
+%   
+%   UNIAXIALSTRAINLIFE is used internally by Quick Fatigue Tool. The user is
+%   not required to run this file.
 %
-%      H = UNIAXIALSTRAINLIFE returns the handle to a new UNIAXIALSTRAINLIFE or the handle to
-%      the existing singleton*.
+%   See also multiaxialAnalysis, multiaxialPostProcess,
+%   multiaxialPreProcess, gaugeOrientation, materialOptions.
 %
-%      UNIAXIALSTRAINLIFE('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in UNIAXIALSTRAINLIFE.M with the given input arguments.
-%
-%      UNIAXIALSTRAINLIFE('Property','Value',...) creates a new UNIAXIALSTRAINLIFE or raises the
-%      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before UniaxialStrainLife_OpeningFcn gets called.  An
-%      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to UniaxialStrainLife_OpeningFcn via varargin.
-%
-%      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
-%      instance to run (singleton)".
-%
-% See also: GUIDE, GUIDATA, GUIHANDLES
-
-% Edit the above text to modify the response to help UniaxialStrainLife
-
-% Last Modified by GUIDE v2.5 09-Jun-2017 10:48:48
+%   Reference section in Quick Fatigue Tool User Guide
+%      A3.2 Multiaxial Gauge Fatigue
+%   
+%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
+%   Last modified 09-Jun-2017 17:02:26 GMT
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -99,12 +90,18 @@ if isappdata(0, 'panel_uniaxialStrainLife_edit_inputFile') == 1.0
         set(handles.edit_walkerGamma, 'enable', 'on')
     end
     
+    if get(handles.rButton_typePlastic, 'value') == 1.0
+        set(handles.text_scf, 'enable', 'off')
+        set(handles.edit_scf, 'enable', 'off')
+    end
+    
     % Output definition
     set(handles.check_resultsLocation, 'value', getappdata(0, 'panel_uniaxialStrainLife_check_resultsLocation'))
     set(handles.edit_resultsLocation, 'string', getappdata(0, 'panel_uniaxialStrainLife_edit_resultsLocation'))
     
     if getappdata(0, 'panel_uniaxialStrainLife_check_resultsLocation') == 1.0
         set(handles.edit_resultsLocation, 'enable', 'on', 'backgroundColor', 'white')
+        set(handles.pButton_resultsLocation, 'enable', 'on')
     end
 end
 
@@ -160,17 +157,6 @@ end
 %% Get the mean stress correction
 msCorrection = get(handles.pMenu_msc, 'value');
 
-% Check the validity of the Walker gamma value
-error = uniaxialPreProcess.checkWalkerGamma(handles, msCorrection);
-
-if error == 1.0
-    % Enable the GUI
-    set(handles.edit_walkerGamma, 'string', '')
-    enable(handles)
-    warning('on', 'all')
-    return
-end
-
 %% Read the material file
 error = uniaxialPreProcess.preScanMaterial(handles, msCorrection);
 
@@ -180,6 +166,85 @@ if error == 1.0
     warning('on', 'all')
     return
 end
+
+%% Check the validity of the Walker gamma value
+uts = getappdata(0, 'uts');
+behaviour = getappdata(0, 'materialBehavior');
+
+[error, gamma] = uniaxialPreProcess.checkWalkerGamma(handles, msCorrection, uts, behaviour);
+
+if error == 1.0
+    % Enable the GUI
+    set(handles.edit_walkerGamma, 'string', '')
+    enable(handles)
+    warning('on', 'all')
+    return
+end
+
+%% Check the output definition
+[error, outputPath] = uniaxialPreProcess.checkOutput(get(handles.check_resultsLocation, 'value'), get(handles.edit_resultsLocation, 'string'));
+
+if error == 1.0
+    % Enable the GUI
+    enable(handles)
+    warning('on', 'all')
+    return
+end
+
+%% Get material properties
+cael = getappdata(0, 'cael');
+E = getappdata(0, 'E');
+Sf = getappdata(0, 'Sf');
+b = getappdata(0, 'b');
+Ef = getappdata(0, 'Ef');
+c = getappdata(0, 'c');
+kp = getappdata(0, 'kp');
+np = getappdata(0, 'np');
+
+%% Apply strain history unit conversion (if applicable)
+if (get(handles.rButton_strain, 'value') == 1.0) && (get(handles.rButton_strainUnitsMicro, 'value') == 1.0)
+    loadHistoryData = loadHistoryData./1e6;
+end
+
+%% If the input is elastic strain, convert to elastic stress
+if (get(handles.rButton_strain, 'value') == 1.0) && (get(handles.rButton_typeElastic, 'value') == 1.0)
+    loadHistoryData = loadHistoryData.*E;
+end
+
+%% Get the fatigue limit of the material
+[fatigueLimitSress, ~] = uniaxialPreProcess.getFatigueLimit(cael, E, Sf, b, Ef, c);
+
+%% Get the history length
+L = length(loadHistoryData);
+
+%% Set endurance limit parameters
+if behaviour == 2.0
+    ndEndurance = 0.0;
+else
+    ndEndurance = 1.0;
+end
+
+%% Get the damage parameter
+if (get(handles.rButton_stress, 'value') == 1.0) || ((get(handles.rButton_strain, 'value') == 1.0 && get(handles.rButton_typeElastic, 'value') == 1.0))
+    %{
+        The user supplied an elastic stress history or an elastic strain
+        history. The damage parameter is the elastic stress. Convert the
+        elastic stress into the nonlinear elastic stress and strain.
+    %}
+    damage = uniaxialAnalysis.main(loadHistoryData, cael, E, Sf, b, Ef, c, kp, np, gamma, msCorrection, L, ndEndurance, fatigueLimitSress);
+else
+    %{
+        The user supplied an inelastic strain history. The damage parameter
+        is the inelastic strain. Convert the inelastic strain into the
+        nonlinear elastic stress and strain.
+    %}
+end
+
+%% Get the life
+life = 1.0/damage;
+
+msgbox(sprintf('Life (cycles): %f', life), 'Quick Fatigue Tool')
+uiwait
 
 %% Stop the timer
 analysisTime = toc;
@@ -202,18 +267,19 @@ function pButton_reset_Callback(hObject, eventdata, handles)
 % Input definition
 set(handles.edit_inputFile, 'string', '')
 
-set(handles.rButton_stress, 'value', 1.0)
-set(handles.rButton_strain, 'value', 0.0)
-set(handles.rButon_strainUnitsStrain, 'value', 1.0, 'enable', 'off')
-set(handles.rButton_strainUnitsMicro, 'value', 0.0, 'enable', 'off')
-set(handles.rButton_typeElastic, 'value', 1.0, 'enable', 'inactive')
-set(handles.rButton_typePlastic, 'value', 0.0, 'enable', 'off')
+set(handles.rButton_stress, 'value', 0.0)
+set(handles.rButton_strain, 'value', 1.0)
+set(handles.rButon_strainUnitsStrain, 'value', 0.0, 'enable', 'on')
+set(handles.rButton_strainUnitsMicro, 'value', 1.0, 'enable', 'on')
+set(handles.rButton_typeElastic, 'value', 1.0, 'enable', 'on')
+set(handles.rButton_typePlastic, 'value', 0.0, 'enable', 'on')
 
 % Material definition
 setMaterialName(handles)
 
 % Analysis definition
-set(handles.edit_scf, 'string', '1')
+set(handles.text_scf, 'enable', 'on')
+set(handles.edit_scf, 'string', '1', 'enable', 'on')
 set(handles.pMenu_msc, 'value', 2.0)
 set(handles.text_walkerGamma, 'enable', 'off')
 set(handles.edit_walkerGamma, 'enable', 'off', 'string', '')
@@ -384,6 +450,18 @@ blank(handles)
 MaterialManager
 uiwait
 
+% Check if the material still exists
+if exist([get(handles.edit_material, 'string'), '.mat'], 'file') ~= 2.0
+    userMaterial = dir('Data/material/local/*.mat');
+    
+    if isempty(userMaterial) == 0.0
+        userMaterial(1.0).name(end-3:end) = [];
+        set(handles.edit_material, 'string', userMaterial(1.0).name)
+    else
+        set(handles.edit_material, 'string', '')
+    end
+end
+
 % Enable the GUI
 enable(handles)
 
@@ -467,12 +545,15 @@ function uipanel_units_SelectionChangeFcn(hObject, eventdata, handles)
 
 % --- Executes when selected object is changed in uipanel_unitsType.
 function uipanel_unitsType_SelectionChangeFcn(hObject, eventdata, handles)
-% hObject    handle to the selected object in uipanel_unitsType 
-% eventdata  structure with the following fields (see UIBUTTONGROUP)
-%	EventName: string 'SelectionChanged' (read only)
-%	OldValue: handle of the previously selected object or empty if none was selected
-%	NewValue: handle of the currently selected object
-% handles    structure with handles and user data (see GUIDATA)
+switch get(eventdata.NewValue, 'tag')
+    case 'rButton_typeElastic'
+        set(handles.text_scf, 'enable', 'on')
+        set(handles.edit_scf, 'enable', 'on')
+    case 'rButton_typePlastic'
+        set(handles.text_scf, 'enable', 'off')
+        set(handles.edit_scf, 'enable', 'off')
+    otherwise
+end
 
 
 % --- Executes on button press in check_resultsLocation.
@@ -628,7 +709,7 @@ else
         userMaterial(1.0).name(end-3:end) = [];
         set(handles.edit_material, 'string', userMaterial(1.0).name)
     else
-        set(handles.edit_material, 'string', [])
+        set(handles.edit_material, 'string', '')
     end
 end
 

@@ -114,7 +114,7 @@ classdef algorithm_uel < handle
             Nf = linspace(1.0, cael, 1e6);
             
             % Perform mean stress correction if necessary
-             if msCorrection < 7.0
+            if msCorrection < 7.0
                 [cycles_strain, gamma, R, mscWarning, overflowCycles] = analysis_e.msc(cycles_strain, pairs_stress, msCorrection, residual);
             else
                 mscWarning = 0.0;
@@ -176,7 +176,7 @@ classdef algorithm_uel < handle
                         case 4.0 % Walker
                             BM = (Sf/E).*(Nf.*((0.5.*(1.0 - R(index))).^((1.0 - gamma)/b))).^b + Ef.*(Nf.*((0.5.*(1.0 - R(index))).^((1.0 - gamma)/b))).^c;
                         case 5.0 % Smith-Watson-Topper
-                            BM = (Sf/E).*(Nf.*((0.5.*(1.0 - R(index))).^((1.0 - gamma)/b))).^b + Ef.*(Nf.*((0.5.*(1.0 - R(index))).^((1.0 - gamma)/b))).^c;
+                            BM = (Sf/E).*(Nf.*((0.5.*(1.0 - R(index))).^((1.0 - 0.5)/b))).^b + Ef.*(Nf.*((0.5.*(1.0 - R(index))).^((1.0 - 0.5)/b))).^c;
                         otherwise % No mean stress correction
                             BM = (Sf/E).*(Nf).^b + Ef.*(Nf).^c;
                     end

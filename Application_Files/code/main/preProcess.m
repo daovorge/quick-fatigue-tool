@@ -4069,7 +4069,7 @@ classdef preProcess < handle
                     Ef = getappdata(0, 'Ef');
                     c = getappdata(0, 'c');
 
-                    if plasticSN == 1.0 && (~isempty(Ef) && ~isempty(c))
+                    if plasticSN == 1.0 && (isempty(Ef) == 0.0 && isempty(c) == 0.0)
                         conditionalStress = E*(((1.65*Sf)/(E))*(cael)^b + (1.75*Ef)*(cael)^c);
                     else
                         conditionalStress = (1.65*Sf)*(cael)^b;
@@ -4188,12 +4188,13 @@ classdef preProcess < handle
                 for groups = 1:G
                     group.recallMaterial(groups)
                     uts = group_materialProps(groups).uts;
+                    behaviour = getappdata(0, 'materialBehavior');
 
                     if (walkerGammaSource == 2.0) || (isempty(uts) == 1.0) % STANDARD VALUES
-                        if getappdata(0, 'materialBehavior') == 1.0
+                        if behaviour == 1.0
                             % Calculate gamma based on Dowling for steel
                             walkerGamma(groups) = 0.65;
-                        elseif getappdata(0, 'materialBehavior') == 2.0
+                        elseif behaviour == 2.0
                             % Calculate gamma based on Dowling for aluminium
                             walkerGamma(groups) = 0.45;
                         else
@@ -4201,7 +4202,17 @@ classdef preProcess < handle
                             walkerGamma(groups) = -9999.0;
                         end
                     else % REGRESSION FIT
-                        walkerGamma(groups) = (-0.0002*uts) + 0.8818;
+                        if (behaviour == 1.0) || (behaviour == 3.0)
+                            walkerGamma(groups) = (-0.0002*uts) + 0.8818;
+                        elseif behaviour == 2.0
+                            if uts < 365.0
+                                walkerGamma(groups) = 0.651;
+                            elseif uts > 475.0
+                                walkerGamma(groups) = 0.473;
+                            else
+                                walkerGamma(groups) = 0.651 + (-0.001618181*(uts - 365.0));
+                            end
+                        end
                     end
                 end
             end

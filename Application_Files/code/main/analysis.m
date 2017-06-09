@@ -710,7 +710,7 @@ classdef analysis < handle
             
             % Check if the UTS is available
             uts = getappdata(0, 'uts');
-            if isempty(uts) && (msCorrection == 5.0 || msCorrection == 7.0)
+            if (isempty(uts) == 1.0) && (msCorrection == 5.0 || msCorrection == 7.0)
                 mscCycles = cycles;
                 return
             end
