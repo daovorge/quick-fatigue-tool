@@ -1,4 +1,4 @@
-function [rfData, epsilon, sigma, error] = css2c(sigma_e, E, kp, np, scf)
+function [rfData, epsilon, sigma, error, warning] = css2c(sigma_e, E, kp, np, scf)
 %CSS2C    QFT function to calculate nonlinear elastic stress-strain.
 %   This function calculates the nonlinear elastic stress and strain from
 %   an elastic stress tensor.
@@ -18,11 +18,12 @@ function [rfData, epsilon, sigma, error] = css2c(sigma_e, E, kp, np, scf)
 %   directly inside CSS2C. This is found to be more reliable.
 %   
 %   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 08-Jun-2017 14:19:34 GMT
+%   Last modified 10-Jun-2017 11:51:26 GMT
     
     %%
     
 error = 0.0;
+warning = 0.0;
 
 %% Prepare the stress signal
 % If the signal is all zero, return zeros of the same length
@@ -83,8 +84,8 @@ signalLength = length(sigma_e);
 epsilon = zeros(1.0, signalLength);
 sigma = zeros(1.0, signalLength);
 
-% Square the elastic stress concentration factor
-scf = scf*scf;
+% Scale the elastic stress by the SCF
+sigma_e = sigma_e.*scf;
 
 %% Calcualte the monotonic stage
 %{
@@ -105,7 +106,7 @@ trueStrainCurve = linspace(1e-12, (overshoot*sigma_e(2.0))/E, precision);
     strain curve into the monotonic R-O equation
 %}
 % Neuber substitution from sigma_e*eps_e == sigma_t*eps_t
-Nb = (scf*(sigma_e(2.0)^2))./(E.*trueStrainCurve);
+Nb = (sigma_e(2.0)^2)./(E.*trueStrainCurve);
 
 % Newton's method. Solution is where f=0
 f = real((Nb./E) + (Nb./kp).^(1.0/np) - trueStrainCurve);
@@ -155,6 +156,7 @@ if abs(epsilon(2.0)) < abs(trueStrainCurve(2.0))
     setappdata(0, 'message_205_epsilon', epsilon(2.0))
     setappdata(0, 'message_205_strain', trueStrainCurve(2.0))
     messenger.writeMessage(205.0)
+    warning = 1.0;
 end
 
 %% Calculate the cyclic stage
@@ -280,10 +282,10 @@ for i = 3:signalLength
         if matMemFirstExcursion == 1.0
             ratchetStress = ratchetStress + stressRangeBeyondClosure;
             
-            Nb = (scf.*(stressRange^2.0))./(E.*trueStrainCurve);
+            Nb = (stressRange^2.0)./(E.*trueStrainCurve);
             f = real((Nb./E) + (Nb./kp).^(1.0/np) - trueStrainCurve);
         else
-            Nb = (scf.*(stressRange^2))./(E.*trueStrainCurve);
+            Nb = (stressRange^2)./(E.*trueStrainCurve);
             f = real((Nb./E) + 2.0.*(Nb./(2.0*kp)).^(1.0/np) - trueStrainCurve);
         end
         
@@ -376,7 +378,7 @@ for i = 3:signalLength
             trueStrainCurve = linspace(1e-12, overshoot*(currentStressRange/E), precision);
         end
         
-        Nb = (scf.*(currentStressRange.^2.0))./(E.*trueStrainCurve);
+        Nb = (currentStressRange.^2.0)./(E.*trueStrainCurve);
         f = real((Nb./E) + 2.0.*(Nb./(2.0*kp)).^(1.0/np) - trueStrainCurve);
         
         % Solve for the strain range

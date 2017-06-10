@@ -13,7 +13,7 @@ function varargout = UniaxialStrainLife(varargin)%#ok<*DEFNU>
 %      A3.2 Multiaxial Gauge Fatigue
 %   
 %   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 09-Jun-2017 17:02:26 GMT
+%   Last modified 10-Jun-2017 11:51:26 GMT
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -133,6 +133,9 @@ tic
 blank(handles)
 pause(1e-6)
 
+%% Suppress output to the message file
+setappdata(0, 'uniaxialStrainLifeMessenger', 1.0)
+
 %% Prescan the load history file
 [loadHistoryData, error] = uniaxialPreProcess.preScanFile(handles);
 
@@ -231,13 +234,30 @@ if (get(handles.rButton_stress, 'value') == 1.0) || ((get(handles.rButton_strain
         history. The damage parameter is the elastic stress. Convert the
         elastic stress into the nonlinear elastic stress and strain.
     %}
-    damage = uniaxialAnalysis.main(loadHistoryData, cael, E, Sf, b, Ef, c, kp, np, gamma, msCorrection, L, ndEndurance, fatigueLimitSress, scf);
+    [damage, error] = uniaxialAnalysis.main(loadHistoryData, cael, E, Sf, b, Ef, c, kp, np, gamma, msCorrection, L, ndEndurance, fatigueLimitSress, scf);
 else
     %{
         The user supplied an inelastic strain history. The damage parameter
         is the inelastic strain. Convert the inelastic strain into the
         nonlinear elastic stress and strain.
     %}
+end
+
+%% Check for errors
+if error == 1.0
+    errordlg('The Neuber correction failed. Check the material definition for errors.', 'Quick Fatigue Tool')
+    uiwait
+    % Enable the GUI
+    enable(handles)
+    warning('on', 'all')
+    return
+elseif error == 2.0
+    errordlg('The monotonic stress excursion exceeds the precision of the solver. Fatigue damage cannot be calculated.', 'Quick Fatigue Tool')
+    uiwait
+    % Enable the GUI
+    enable(handles)
+    warning('on', 'all')
+    return
 end
 
 %% Get the life
@@ -433,6 +453,9 @@ end
 if isappdata(0, 'material_for_uniaxial_strain_life') == 1.0
     rmappdata(0, 'material_for_uniaxial_strain_life')
 end
+
+% Remove message file flag
+rmappdata(0, 'uniaxialStrainLifeMessenger')
 
 % Enable the GUI
 enable(handles)

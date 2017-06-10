@@ -12,7 +12,7 @@ classdef uniaxialPreProcess < handle
 %      A3.2 Multiaxial Gauge Fatigue
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 09-Jun-2017 17:02:26 GMT
+%   Last modified 10-Jun-2017 11:51:26 GMT
     
     %%
     
@@ -23,9 +23,21 @@ classdef uniaxialPreProcess < handle
             error = 0.0;
             loadHistoryData = [];
             
-            %% Check if the file exists
+            %% Get the string of the input file dialogue
             loadHistoryPath = get(handles.edit_inputFile, 'string');
             
+            %% Check if the input is a numeric array
+            %{
+                The user can supply the load history directly as a numeric
+                array. Before trying to search for the file, see if the
+                input can be evaluated as an array
+            %}
+            if (strcmpi(loadHistoryPath(1.0), '[') == 1.0) && (isnumeric(str2num(loadHistoryPath)) == 1.0) %#ok<ST2NM>
+                loadHistoryData = str2num(loadHistoryPath); %#ok<ST2NM>
+                return
+            end
+            
+            %% Check if the file exists
             if isempty(loadHistoryPath) == 1.0
                 errordlg('A load history file must be specified.', 'Quick Fatigue Tool')
                 uiwait
@@ -181,9 +193,6 @@ classdef uniaxialPreProcess < handle
             %% Initialise output
             error = 0.0;
             
-            % Suppress output to the message file
-            setappdata(0, 'uniaxialStrainLifeMessenger', 1.0)
-            
             %% Get the material properties
             material = get(handles.edit_material, 'string');
             [~, material, ~] = fileparts(material);
@@ -283,9 +292,6 @@ classdef uniaxialPreProcess < handle
                 error = 1.0;
                 return
             end
-            
-            % Remove message file flag
-            rmappdata(0, 'uniaxialStrainLifeMessenger')
         end
         
         %% Check if the output directory exists

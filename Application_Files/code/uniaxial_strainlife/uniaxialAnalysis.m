@@ -12,19 +12,32 @@ classdef uniaxialAnalysis < handle
 %      A3.2 Multiaxial Gauge Fatigue
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 09-Jun-2017 17:02:26 GMT
+%   Last modified 10-Jun-2017 11:51:26 GMT
     
     %%
     
     methods (Static = true)
         %% Entry function for Uniaxial Strain-Life
-        function [damage] = main(damageParameter_stress, cael, E, Sf, b, Ef, c, kp, np, gamma, msCorrection, L, ndEndurance, fatigueLimitSress, scf)
+        function [damage, error] = main(damageParameter_stress, cael, E, Sf, b, Ef, c, kp, np, gamma, msCorrection, L, ndEndurance, fatigueLimitSress, scf)
             %% Convert the uniaxial stress into uniaxial strain
             % Gate the tensors
             damageParameter_stress = analysis.gateTensors(damageParameter_stress, 2.0, 5.0);
             
             % Convert the elastic stress into inelastic strain
-            [rfData, damageParameter_strain, damageParameter_stress, ~] = css2c(damageParameter_stress, E, kp, np, scf);
+            [rfData, damageParameter_strain, damageParameter_stress, errorA, errorB] = css2c(damageParameter_stress, E, kp, np, scf);
+            
+            % Initiliaze output
+            damage = 0.0;
+            error = 0.0;
+            
+            % Check for errors
+            if errorA == 1.0
+                error = 1.0;
+                return
+            elseif errorB == 1.0
+                error  = 2.0;
+                return
+            end
             
             %% Rainflow count the stress
             if L < 3.0
