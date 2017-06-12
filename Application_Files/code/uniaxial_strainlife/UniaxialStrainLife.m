@@ -185,7 +185,7 @@ if error == 1.0
 end
 
 %% Check the output definition
-[error, outputPath] = uniaxialPreProcess.checkOutput(get(handles.check_resultsLocation, 'value'), get(handles.edit_resultsLocation, 'string'));
+[error, outputPath, dateString] = uniaxialPreProcess.checkOutput(get(handles.check_resultsLocation, 'value'), get(handles.edit_resultsLocation, 'string'));
 
 if error == 1.0
     % Enable the GUI
@@ -227,21 +227,25 @@ else
     ndEndurance = 1.0;
 end
 
-%% Get the damage parameter
+%% Get the input quantity type
 if (get(handles.rButton_stress, 'value') == 1.0) || ((get(handles.rButton_strain, 'value') == 1.0 && get(handles.rButton_typeElastic, 'value') == 1.0))
     %{
         The user supplied an elastic stress history or an elastic strain
         history. The damage parameter is the elastic stress. Convert the
         elastic stress into the nonlinear elastic stress and strain.
     %}
-    [damage, error] = uniaxialAnalysis.main(loadHistoryData, cael, E, Sf, b, Ef, c, kp, np, gamma, msCorrection, L, ndEndurance, fatigueLimitSress, scf);
+    type = 1.0;
 else
     %{
         The user supplied an inelastic strain history. The damage parameter
         is the inelastic strain. Convert the inelastic strain into the
         nonlinear elastic stress and strain.
     %}
+    type = 2.0;
 end
+
+%% Get the fatigue damage
+[damage, nCycles, error] = uniaxialAnalysis.main(loadHistoryData, cael, E, Sf, b, Ef, c, kp, np, gamma, msCorrection, L, ndEndurance, fatigueLimitSress, scf, type);
 
 %% Check for errors
 if error == 1.0
@@ -263,14 +267,18 @@ end
 %% Get the life
 life = 1.0/damage;
 
-msgbox(sprintf('Life (cycles): %f', life), 'Quick Fatigue Tool')
-uiwait
-
 %% Stop the timer
 analysisTime = toc;
 
-%% Enable the GUI
-enable(handles)
+%% Write results to output file
+uniaxialPostProcess.outputLog(handles, nCycles, life, cael, analysisTime, gamma, outputPath, dateString)
+
+%% Report the life in a message box
+uniaxialPostProcess.outputMsgBox(nCycles, life, cael, outputPath)
+
+%% Close the GUI
+warning('on', 'all')
+close UniaxialStrainLife
 
 
 % --- Executes on button press in pButton_cancel.
@@ -546,6 +554,9 @@ switch get(eventdata.NewValue, 'tag')
         
         set(handles.rButton_typeElastic, 'enable', 'inactive', 'value', 1.0)
         set(handles.rButton_typePlastic, 'enable', 'off', 'value', 0.0)
+        
+        set(handles.text_scf, 'enable', 'on')
+        set(handles.edit_scf, 'enable', 'on')
     case 'rButton_strain'
         set(handles.rButon_strainUnitsStrain, 'enable', 'on')
         set(handles.rButton_strainUnitsMicro, 'enable', 'on')

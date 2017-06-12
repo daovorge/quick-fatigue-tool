@@ -2,8 +2,8 @@ classdef uniaxialAnalysis < handle
 %UNIAXIALANALYSIS    QFT class for Uniaxial Strain-Life.
 %   This class contains methods for the Uniaxial Strain-Life application.
 %   
-%   UNIAXIALANALYSIS is used internally by Quick Fatigue Tool. The
-%   user is not required to run this file.
+%   UNIAXIALANALYSIS is used internally by Quick Fatigue Tool. The user is
+%   not required to run this file.
 %   
 %   See also multiaxialAnalysis, multiaxialPostProcess, gaugeOrientation,
 %   materialOptions, MultiaxialFatigue.
@@ -18,13 +18,30 @@ classdef uniaxialAnalysis < handle
     
     methods (Static = true)
         %% Entry function for Uniaxial Strain-Life
-        function [damage, error] = main(damageParameter_stress, cael, E, Sf, b, Ef, c, kp, np, gamma, msCorrection, L, ndEndurance, fatigueLimitSress, scf)
+        function [damage, nCycles, error] = main(damageParameter, cael, E, Sf, b, Ef, c, kp, np, gamma, msCorrection, L, ndEndurance, fatigueLimitSress, scf, type)
+            %% Initialize variables
+            errorA = 0.0;
+            errorB = 0.0;
+            
             %% Convert the uniaxial stress into uniaxial strain
             % Gate the tensors
-            damageParameter_stress = analysis.gateTensors(damageParameter_stress, 2.0, 5.0);
+            damageParameter = analysis.gateTensors(damageParameter, 2.0, 5.0);
             
             % Convert the elastic stress into inelastic strain
-            [rfData, damageParameter_strain, damageParameter_stress, errorA, errorB] = css2c(damageParameter_stress, E, kp, np, scf);
+            if type == 1.0
+                %{
+                    Get the nonlinear elastic stress and strain history
+                    from the elastic stress or strain history
+                %}
+                [rfData, damageParameter_strain, damageParameter_stress, errorA, errorB] = css2c(damageParameter, E, kp, np, scf);
+            else
+                %{
+                    Get the nonlinear elastic stress history from the
+                    nonlinear elastic strain history
+                %}
+                [rfData, damageParameter_stress, ~, ~] = uniaxialPreProcess.getInelasticStressFromInelasticStrain(damageParameter, E, kp, np);
+                damageParameter_strain = damageParameter;
+            end
             
             % Initiliaze output
             damage = 0.0;
@@ -66,6 +83,9 @@ classdef uniaxialAnalysis < handle
             
             %% Get current damage parameter
             damageParameter = max(cycles_strain);
+            
+            %% Get the number of cycles
+            nCycles = length(amplitudes_stress);
             
             %% Perform a mean stress correction on the nodal damage parameter if necessary
             if msCorrection > 1.0

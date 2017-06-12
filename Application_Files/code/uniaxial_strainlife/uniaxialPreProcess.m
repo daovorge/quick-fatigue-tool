@@ -26,6 +26,14 @@ classdef uniaxialPreProcess < handle
             %% Get the string of the input file dialogue
             loadHistoryPath = get(handles.edit_inputFile, 'string');
             
+            %% Check if the file exists
+            if isempty(loadHistoryPath) == 1.0
+                errordlg('A load history file must be specified.', 'Quick Fatigue Tool')
+                uiwait
+                error = 1.0;
+                return
+            end
+            
             %% Check if the input is a numeric array
             %{
                 The user can supply the load history directly as a numeric
@@ -37,14 +45,7 @@ classdef uniaxialPreProcess < handle
                 return
             end
             
-            %% Check if the file exists
-            if isempty(loadHistoryPath) == 1.0
-                errordlg('A load history file must be specified.', 'Quick Fatigue Tool')
-                uiwait
-                error = 1.0;
-                return
-            end
-            
+            %% Check if the input is a file
             if exist(loadHistoryPath, 'file') == 0.0
                 errorMessage = sprintf('Error while processing ''%s''. The file could not be located.', loadHistoryPath);
                 errordlg(errorMessage, 'Quick Fatigue Tool')
@@ -295,7 +296,7 @@ classdef uniaxialPreProcess < handle
         end
         
         %% Check if the output directory exists
-        function [error, path] = checkOutput(checkLocation, path)
+        function [error, path, dateString] = checkOutput(checkLocation, path)
             error = 0.0;
             
             c = clock;
@@ -350,10 +351,6 @@ classdef uniaxialPreProcess < handle
                     end
                 end
             end
-            
-            % Save the file name and date
-            setappdata(0, 'outputPath', path)
-            setappdata(0, 'dateString', dateString)
         end
         
         %% Get the elastic principal stress
@@ -398,7 +395,7 @@ classdef uniaxialPreProcess < handle
         end
         
         %% Get inelastic stress history from inelastic strain history (NEW)
-        function [sigma, trueStressCurveBuffer, trueStrainCurveBuffer] =...
+        function [rfData, sigma, trueStressCurveBuffer, trueStrainCurveBuffer] =...
                 getInelasticStressFromInelasticStrain(epsilon, E, kp, np)
             
             %{
@@ -761,6 +758,23 @@ classdef uniaxialPreProcess < handle
             if removeZero == 1.0
                 sigma(1.0) = [];
             end
+            
+            %% Rainflow cycle count the inelastic histories
+            
+            % Rainflow cycle count the inelastic stress/strain signals
+            rfData_e = analysis.rainFlow_2(epsilon);
+            rfData_s = analysis.rainFlow_2(sigma);
+            
+            % Concatenate cycles into single buffer
+            %{
+                1: Min. stress
+                2: Max. stress
+                3: Min. strain
+                4: Max. strain
+                5: Min. index
+                6: Max. index
+            %}
+            rfData = [rfData_s(:, 1:2), rfData_e(:, 1:2), rfData_s(:, 3:4)];
         end
         
         %% Get the fatigue limit stress

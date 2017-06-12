@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 09-Jun-2017 12:28:19 GMT
+%   Last modified 12-Jun-2017 09:23:37 GMT
 
     %%
 
@@ -2541,29 +2541,36 @@ classdef messenger < handle
                         case -1.0
                             fprintf(fid, '    Mean Stress Correction: User-defined\r\n');
                             fprintf(fid, '    Mean Stress Correction File: ''%s''\r\n', getappdata(0, 'userMSCFile'));
-                        case 1
+                        case 1.0
                             fprintf(fid, '    Mean Stress Correction: Morrow\r\n');
-                        case 2
+                        case 2.0
                             fprintf(fid, '    Mean Stress Correction: Goodman\r\n');
-                        case 3
+                        case 3.0
                             fprintf(fid, '    Mean Stress Correction: Soderberg\r\n');
-                        case 4
+                        case 4.0
                             gamma = getappdata(0, 'walkerGamma');
                             walkerGammaSource = getappdata(0, 'walkerGammaSource');
                             materialBehavior = getappdata(0, 'materialBehavior');
-                            fprintf(fid, '    Mean Stress Correction: Walker\r\n');
+                            switch walkerGammaSource
+                                case 1.0
+                                    fprintf(fid, '    Mean Stress Correction: Walker (regression fit)\r\n');
+                                case 2.0
+                                    fprintf(fid, '    Mean Stress Correction: Walker (standard values)\r\n');
+                                case 3.0
+                                    fprintf(fid, '    Mean Stress Correction: Walker (gamma value)\r\n');
+                            end
                             if (materialBehavior == 3.0 && walkerGammaSource == 2.0) || (isempty(getappdata(0, 'uts')) == 1.0) && (materialBehavior == 3.0) && (walkerGammaSource ~= 3.0)
-                                fprintf(fid, '    Gamma (Walker): From Load Ratios\r\n');
+                                fprintf(fid, '    Gamma (Walker): [FROM LOAD RATIOS]\r\n');
                             else
                                 fprintf(fid, '    Gamma (Walker): %f\r\n', gamma);
                             end
-                        case 5
+                        case 5.0
                             fprintf(fid, '    Mean Stress Correction: Smith-Watson-Topper\r\n');
-                        case 6
+                        case 6.0
                             fprintf(fid, '    Mean Stress Correction: Gerber\r\n');
-                        case 7
+                        case 7.0
                             fprintf(fid, '    Mean Stress Correction: R-Ratio S-N curves\r\n');
-                        case 8
+                        case 8.0
                             fprintf(fid, '    Mean Stress Correction: NONE\r\n');
                     end
                 end
@@ -2737,21 +2744,28 @@ classdef messenger < handle
                         case -1.0
                             fprintf(fid, '    Mean Stress Correction: User-defined\r\n');
                             fprintf(fid, '    Mean Stress Correction File: ''%s''\r\n', getappdata(0, 'userMSCFile'));
-                        case 1
+                        case 1.0
                             fprintf(fid, '    Mean Stress Correction: Morrow\r\n');
-                        case 2
+                        case 2.0
                             fprintf(fid, '    Mean Stress Correction: Goodman\r\n');
-                        case 3
+                        case 3.0
                             fprintf(fid, '    Mean Stress Correction: Soderberg\r\n');
-                        case 4
-                            fprintf(fid, '    Mean Stress Correction: Walker\r\n');
-                        case 5
+                        case 4.0
+                            switch walkerGammaSource
+                                case 1.0
+                                    fprintf(fid, '    Mean Stress Correction: Walker (regression fit)\r\n');
+                                case 2.0
+                                    fprintf(fid, '    Mean Stress Correction: Walker (standard values)\r\n');
+                                case 3.0
+                                    fprintf(fid, '    Mean Stress Correction: Walker (gamma value)\r\n');
+                            end
+                        case 5.0
                             fprintf(fid, '    Mean Stress Correction: Smith-Watson-Topper\r\n');
-                        case 6
+                        case 6.0
                             fprintf(fid, '    Mean Stress Correction: Gerber\r\n');
-                        case 7
+                        case 7.0
                             fprintf(fid, '    Mean Stress Correction: R-Ratio S-N curves\r\n');
-                        case 8
+                        case 8.0
                             fprintf(fid, '    Mean Stress Correction: NONE\r\n');
                     end
                 end
@@ -2913,7 +2927,7 @@ classdef messenger < handle
                         gamma = group_materialProps(groups).walkerGamma;
                         materialBehavior = group_materialProps(groups).materialBehavior;
                         if (materialBehavior == 3.0 && walkerGammaSource == 2.0) || (isempty(uts) == 1.0) && (materialBehavior == 3.0) && (walkerGammaSource ~= 3.0)
-                            fprintf(fid, '    Gamma (Walker): From Load Ratios\r\n');
+                            fprintf(fid, '    Gamma (Walker): [FROM LOAD RATIOS]\r\n');
                         else
                             fprintf(fid, '    Gamma (Walker): %f\r\n', gamma);
                         end
