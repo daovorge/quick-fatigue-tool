@@ -10,7 +10,7 @@ function [] = main(flags)
 %
 %   Author contact: louisvallance@hotmail.co.uk
 %
-%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
 %   Last modified 08-Jun-2017 12:47:26 GMT
 
 % Begin main code - DO NOT EDIT
@@ -46,7 +46,7 @@ setappdata(0, 'messageFileNotes', 0.0)
 setappdata(0, 'messageFileWarnings', 0.0)
 
 %% PRINT COMMAND WINDOW HEADER
-fprintf('[NOTICE] Quick Fatigue Tool 6.10-09')
+fprintf('[NOTICE] Quick Fatigue Tool 6.11-00')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2017)')
 fprintf('\n[NOTICE] Last modified 08-Jun-2017 12:47:26 GMT')
 
@@ -78,7 +78,7 @@ fileName = sprintf('Project/output/%s/%s.sta', jobName, jobName);
 fid_status = fopen(fileName, 'w+');
 setappdata(0, 'fid_status', fid_status)
 c = clock;
-fprintf(fid_status, '[NOTICE] Quick Fatigue Tool 6.10-09\t%s', datestr(datenum(c(1.0), c(2.0), c(3.0), c(4.0), c(5.0), c(6.0))));
+fprintf(fid_status, '[NOTICE] Quick Fatigue Tool 6.11-00\t%s', datestr(datenum(c(1.0), c(2.0), c(3.0), c(4.0), c(5.0), c(6.0))));
 
 fprintf('\n[NOTICE] The job file "%s.m" has been submitted for analysis', jobName)
 fprintf(fid_status, '\n[NOTICE] The job file "%s.m" has been submitted for analysis', jobName);

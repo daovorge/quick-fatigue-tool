@@ -42,12 +42,19 @@ classdef uniaxialPreProcess < handle
             %}
             if (strcmpi(loadHistoryPath(1.0), '[') == 1.0) && (isnumeric(str2num(loadHistoryPath)) == 1.0) %#ok<ST2NM>
                 loadHistoryData = str2num(loadHistoryPath); %#ok<ST2NM>
+                
+                if isempty(loadHistoryData) == 1.0
+                    errorMessage = sprintf('Error while processing input: ''%s''.\n\nThe expression could not be evaluated.', loadHistoryPath);
+                    errordlg(errorMessage, 'Quick Fatigue Tool')
+                    uiwait
+                    error = 1.0;
+                end
                 return
             end
             
             %% Check if the input is a file
             if exist(loadHistoryPath, 'file') == 0.0
-                errorMessage = sprintf('Error while processing ''%s''. The file could not be located.', loadHistoryPath);
+                errorMessage = sprintf('Error while processing input: ''%s''.\n\nThe expression is not a valid file path or a numerical array.', loadHistoryPath);
                 errordlg(errorMessage, 'Quick Fatigue Tool')
                 uiwait
                 error = 1.0;
@@ -58,7 +65,7 @@ classdef uniaxialPreProcess < handle
             try
                 loadHistoryData = dlmread(loadHistoryPath);
             catch
-                errorMessage = sprintf('Error while processing ''%s''. The file could not be read.', loadHistoryPath);
+                errorMessage = sprintf('Error while processing input: ''%s''.\n\nThe file could not be read.', loadHistoryPath);
                 errordlg(errorMessage, 'Quick Fatigue Tool')
                 uiwait
                 error = 1.0;
@@ -67,7 +74,7 @@ classdef uniaxialPreProcess < handle
             
             %% Check for non-numeric data in each file
             if (any(any(isinf(loadHistoryData))) == 1.0) || (any(any(isnan(loadHistoryData))) == 1.0) || (any(any(isreal(loadHistoryData))) == 0.0)
-                errorMessage = sprintf('Error while processing ''%s''. Some of the data has inf, NaN or complex values.', loadHistoryPath);
+                errorMessage = sprintf('Error while processing input: ''%s''.\n\nSome of the data has inf, NaN or complex values.', loadHistoryPath);
                 errordlg(errorMessage, 'Quick Fatigue Tool')
                 uiwait
                 error = 1.0;
@@ -78,7 +85,7 @@ classdef uniaxialPreProcess < handle
             %{
                 The load history data must be either a 1xN or an Nx1 vector
             %}
-            errorMessage1 = sprintf('Error while processing ''%s''.', loadHistoryPath);
+            errorMessage1 = sprintf('Error while processing input: ''%s''.\n\n', loadHistoryPath);
             
             [R, C] = size(loadHistoryData);
             if (R == 1.0) && (C == 1.0)
@@ -86,7 +93,7 @@ classdef uniaxialPreProcess < handle
                     The user supplied a single load history point. Fatigue
                     analysis is not possible
                 %}
-                errorMessage2 = sprintf('\n\nThe load history data contains a single point. At least two points are required for fatigue analysis.');
+                errorMessage2 = sprintf('The load history data contains a single point. At least two points are required for fatigue analysis.');
                 errordlg([errorMessage1, errorMessage2], 'Quick Fatigue Tool')
                 uiwait
                 error = 1.0;
@@ -96,7 +103,7 @@ classdef uniaxialPreProcess < handle
                     The user suppled a an NxM load history. Only 1xN and
                     Nx1 is supported
                 %}
-                errorMessage2 = sprintf('\n\nThe load history data is %.0fx%.0f. Only 1xN and Nx1 vectors are supported.', R, C);
+                errorMessage2 = sprintf('The load history data is %.0fx%.0f. Only 1xN and Nx1 vectors are supported.', R, C);
                 errordlg([errorMessage1, errorMessage2], 'Quick Fatigue Tool')
                 uiwait
                 error = 1.0;

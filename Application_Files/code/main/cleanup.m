@@ -5,7 +5,7 @@ function [] = cleanup(status)
 %   CLEANUP is used internally by Quick Fatigue Tool. The user
 %   is not required to run this file.
 %   
-%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
 %   Last modified 08-Jun-2017 12:47:26 GMT
     
     %%
@@ -70,7 +70,7 @@ if status == 1.0
     fid = fopen(errLogFile, 'w');
     
     % Write file header
-    fprintf(fid, 'Quick Fatigue Tool 6.10-09\r\n');
+    fprintf(fid, 'Quick Fatigue Tool 6.11-00\r\n');
     fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
     fprintf(fid, 'Last modified 08-Jun-2017 12:47:26 GMT\r\n\r\n');
     

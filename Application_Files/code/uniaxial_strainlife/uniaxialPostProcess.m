@@ -48,13 +48,6 @@ classdef uniaxialPostProcess < handle
             %% Gauge definition
             fprintf(fid, '\r\n<INPUT DEFINITION>\r\n');
             fprintf(fid, 'Load history: %s\r\n', get(handles.edit_inputFile, 'string'));
-            
-            %% Material definition
-            fprintf(fid, '\r\n<MATERIAL DEFINITION>\r\n');
-            fprintf(fid, 'Analysis material: %s\r\n', get(handles.edit_material, 'string'));
-            
-            %% Analysis definition
-            fprintf(fid, '\r\n<ANALYSIS DEFINITION>\r\n');
             if get(handles.rButton_stress, 'value') == 1.0
                 fprintf(fid, 'Input quantity: Stress (elastic)\r\n');
                 fprintf(fid, 'Input units: MPa\r\n');
@@ -72,6 +65,12 @@ classdef uniaxialPostProcess < handle
                 end
             end
             
+            %% Material definition
+            fprintf(fid, '\r\n<MATERIAL DEFINITION>\r\n');
+            fprintf(fid, 'Analysis material: %s\r\n', get(handles.edit_material, 'string'));
+            
+            %% Analysis definition
+            fprintf(fid, '\r\n<ANALYSIS DEFINITION>\r\n');
             fprintf(fid, 'Analysis algorithm: Uniaixal Strain-Life\r\n');
             
             if get(handles.rButton_typeElastic, 'value') == 1.0

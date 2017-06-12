@@ -6,7 +6,7 @@ classdef messenger < handle
 %   MESSENGER is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %
-%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
 %   Last modified 12-Jun-2017 09:23:37 GMT
 
     %%
@@ -2112,9 +2112,9 @@ classdef messenger < handle
 
             % Write file header
             try
-                fprintf(fid, 'Quick Fatigue Tool 6.10-09 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
+                fprintf(fid, 'Quick Fatigue Tool 6.11-00 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
             catch
-                fprintf(fid, 'Quick Fatigue Tool 6.10-09\r\n');
+                fprintf(fid, 'Quick Fatigue Tool 6.11-00\r\n');
             end
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
             fprintf(fid, 'Last modified 15-Apr-2017 19:34:54 GMT\r\n\r\n');

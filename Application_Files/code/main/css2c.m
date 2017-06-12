@@ -17,7 +17,7 @@ function [rfData, epsilon, sigma, error, warning] = css2c(sigma_e, E, kp, np, sc
 %   performed by RAINFLOW_(FT) instead of from the hysteresis loops
 %   directly inside CSS2C. This is found to be more reliable.
 %   
-%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
 %   Last modified 10-Jun-2017 11:51:26 GMT
     
     %%

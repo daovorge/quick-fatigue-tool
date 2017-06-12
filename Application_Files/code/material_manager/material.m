@@ -17,7 +17,7 @@ classdef material < handle
 %   MATERIAL.copy(OLDNAME, NEWNAME)
 %   MATERIAL.query(MATERIALNAME)
 %   
-%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
 %   Last modified 29-May-2017 14:33:59 GMT
     
     %%
