@@ -14,11 +14,11 @@ function [rfData, epsilon, sigma, error, warning] = css2c(sigma_e, E, kp, np, sc
 %   of CSS2C is the same as CSS2.
 %
 %   CSS2C is the same as CSS2B, except that the rainlow cycle counting is
-%   performed by RAINFLOW_(FT) instead of from the hysteresis loops
+%   performed by RAINFLOW_2(FT) instead of from the hysteresis loops
 %   directly inside CSS2C. This is found to be more reliable.
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 10-Jun-2017 11:51:26 GMT
+%   Last modified 13-Jun-2017 15:59:08 GMT
     
     %%
     
@@ -429,4 +429,7 @@ rfData_s = analysis.rainFlow_2(sigma);
     6: Max. index
 %}
 rfData = [rfData_s(:, 1:2), rfData_e(:, 1:2), rfData_s(:, 3:4)];
+
+%% Save the last state of the ALLOWCLOSURE flag
+setappdata(0, 'css_allowClosure', allowClosure)
 end

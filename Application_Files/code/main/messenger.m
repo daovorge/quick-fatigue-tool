@@ -2067,6 +2067,16 @@ classdef messenger < handle
 
                         rmappdata(0, 'message_259_msCorrection')
                         setappdata(0, 'messageFileWarnings', 1.0)
+                    case 260.0
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: The Uniaxial Strain-Life algorithm has been used in a continuation analysis, but the material state file from the previous job could not be found', returnType{i}]);
+                        fprintf(fidType(i), ['-> Any accumulated plasticity from the prvious analysis will be reset to zero, and the current elastic stress history will be treated as a new loading event', returnType{i}]);
+
+                        setappdata(0, 'messageFileWarnings', 1.0)
+                    case 261.0
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: The material state file contains invalid data', returnType{i}]);
+                        fprintf(fidType(i), ['-> Any accumulated plasticity from the prvious analysis will be reset to zero, and the current elastic stress history will be treated as a new loading event', returnType{i}]);
+
+                        setappdata(0, 'messageFileWarnings', 1.0)
                 end
             end
         end

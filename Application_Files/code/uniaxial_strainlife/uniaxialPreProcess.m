@@ -28,7 +28,7 @@ classdef uniaxialPreProcess < handle
             
             %% Check if the file exists
             if isempty(loadHistoryPath) == 1.0
-                errordlg('A load history file must be specified.', 'Quick Fatigue Tool')
+                errordlg('A load history must be specified.', 'Quick Fatigue Tool')
                 uiwait
                 error = 1.0;
                 return

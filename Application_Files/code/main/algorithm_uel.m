@@ -14,7 +14,7 @@ classdef algorithm_uel < handle
 %      6.9 Uniaxial Strain-Life
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 06-Jun-2017 11:07:58 GMT
+%   Last modified 13-Jun-2017 15:59:08 GMT
     
     %%
     
@@ -48,7 +48,36 @@ classdef algorithm_uel < handle
                 damageParameter_stress = analysis.gateTensors(damageParameter_stress, gateTensors, tensorGate);
             end
             
-            [rfData, damageParameter_strain, damageParameter_stress, ~, ~] = css2c(damageParameter_stress, E, kp, np, 1.0);
+            if getappdata(0, 'continueAnalysis') == 1.0
+                %{
+                    The job is a continuation of a previous analysis. Begin
+                    the plasticity correction from the last point of the
+                    previous load history.
+                %}
+                
+                % Check if there is a meterial state file
+                [epsilon_pp, sigma_pp, sigma_pe, allowClosure, error] = algorithm_uel.readMaterialState();
+                
+                % Convert elastic stress into inelastic stress-strain
+                if error == 1.0
+                    [rfData, damageParameter_strain, damageParameter_stress, ~, ~] = css2c(damageParameter_stress, E, kp, np, 1.0);
+                else
+                    [rfData, damageParameter_strain, damageParameter_stress, ~, ~] = css2d(damageParameter_stress, epsilon_pp, sigma_pp, sigma_pe, allowClosure, E, kp, np, 1.0);
+                end
+            else
+                % Convert elastic stress into inelastic stress-strain
+                [rfData, damageParameter_strain, damageParameter_stress, ~, ~] = css2c(damageParameter_stress, E, kp, np, 1.0);
+            end
+            
+            %% Write the last stress-strain point to file
+            %{
+                The purpose of this step is to record the material state at
+                the end of the load history. If the user specifies the
+                current job with CONTINUE_FROM, the Uniaxial Strain-Life
+                algorithm should begin the plasticity correction from this
+                point.
+            %}
+            algorithm_uel.writeMaterialState(damageParameter_strain, damageParameter_stress, Sxx(end))
             
             %% Rainflow count the stress
             if signalLength < 3.0
@@ -241,6 +270,68 @@ classdef algorithm_uel < handle
                 accumulation plot
             %}
             setappdata(0, 'worstNodeCumulativeDamage', getappdata(0, 'cumulativeDamage'))
+        end
+        
+        %% WRITE MATERIAL STATE
+        function [] = writeMaterialState(epsilon, sigma, sigma_e)
+            % Get the output directory
+            root = getappdata(0, 'outputDirectory');
+            
+            % If the directory does not exist, create it
+            if exist(sprintf('%s/Data Files', root), 'dir') == 0.0
+                mkdir(sprintf('%s/Data Files', root))
+            end
+            
+            % Open the file
+            dir = [root, 'Data Files/material.state'];
+            fid = fopen(dir, 'w+');
+            
+            % Write the material state to file
+            fprintf(fid, '%f\t%f\t%f\t%f\t%f\t%.0f', epsilon(end-1.0:end), sigma(end-1.0:end), sigma_e, getappdata(0, 'css_allowClosure'));
+            
+            % Close the file
+            fclose(fid);
+        end
+        
+        %% READ MATERIAL STATE
+        function [epsilon_pp, sigma_pp, sigma_pe, allowClosure, error] = readMaterialState()
+            % Initialize output
+            epsilon_pp = 0.0;
+            sigma_pp = 0.0;
+            sigma_pe = 0.0;
+            allowClosure = 0.0;
+            error = 0.0;
+            
+            % Get the path to the material state file
+            stateFile = sprintf('%s\\Project\\output\\%s\\Data Files\\material.state', pwd, getappdata(0, 'continueFrom'));
+            
+            % Check if the file exists
+            if exist(stateFile, 'file') == 0.0
+                messenger.writeMessage(260.0)
+                error = 1.0;
+            else
+                % Open the file
+                data = dlmread(stateFile);
+                
+                [r, c] = size(data);
+                if (r ~= 1.0) || (c ~= 6.0)
+                    messenger.writeMessage(261.0)
+                    error = 1.0;
+                    return
+                end
+                
+                % Get the last inelastic strain point
+                epsilon_pp = data(1.0:2.0);
+                
+                % Get the inelastic stress point
+                sigma_pp = data(3.0:4.0);
+                
+                % Get the elastic stress point
+                sigma_pe = data(5.0);
+                
+                % ALLOWCLOSURE flag
+                allowClosure = data(6.0);
+            end
         end
     end
 end
