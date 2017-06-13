@@ -75,10 +75,11 @@ if isappdata(0, 'panel_uniaxialStrainLife_edit_inputFile') == 1.0
     set(handles.rButton_typeElastic, 'value', getappdata(0, 'panel_uniaxialStrainLife_rButton_typeElastic'))
     set(handles.rButton_typePlastic, 'value', getappdata(0, 'panel_uniaxialStrainLife_rButton_typePlastic'))
     
-    if getappdata(0, 'panel_uniaxialStrainLife_rButton_stress') == 0.0
-        set(handles.rButon_strainUnitsStrain, 'enable', 'on')
-        set(handles.rButton_strainUnitsMicro, 'enable', 'on')
-        set(handles.rButton_typePlastic, 'enable', 'on')
+    if getappdata(0, 'panel_uniaxialStrainLife_rButton_stress') == 1.0
+        set(handles.rButon_strainUnitsStrain, 'enable', 'off')
+        set(handles.rButton_strainUnitsMicro, 'enable', 'off')
+        set(handles.rButton_typePlastic, 'enable', 'off')
+        set(handles.rButton_typeElastic, 'enable', 'inactive')
     end
     
     % Analysis definition
