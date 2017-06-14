@@ -1346,7 +1346,7 @@ classdef postProcess_e < handle
             end
             
             %% LH LOAD HISTORIES
-            if getappdata(0, 'figure_LH') == 1.0 && outputFigure == 1.0
+            if getappdata(0, 'figure_LH') == 1.0 && outputFigure == 1.0 && algorithm ~= 3.0
                 Sxx = getappdata(0, 'worstNodeSxx');
                 Syy = getappdata(0, 'worstNodeSyy');
                 Szz = getappdata(0, 'worstNodeSzz');

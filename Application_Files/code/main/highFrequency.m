@@ -29,7 +29,7 @@ classdef highFrequency < handle
             end
             
             % Scale and combine the high frequency data
-            if algorithm == 3.0
+            if (algorithm == 3.0) || (algorithm == 10.0)
                 [Sxx_hf, Syy_hf, Szz_hf, Txy_hf, Tyz_hf, Txz_hf, error] = highFrequency.uniaxialReadHF(hfHistory, hfScales);
             else
                 [Sxx_hf, Syy_hf, Szz_hf, Txy_hf, Tyz_hf, Txz_hf, error] = highFrequency.scalecombineHF(hfDataset, hfHistory, items, hfScales);
