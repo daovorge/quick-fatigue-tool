@@ -419,6 +419,19 @@ end
 rfData_e = analysis.rainFlow_2(epsilon);
 rfData_s = analysis.rainFlow_2(sigma);
 
+% Get the number of cycle
+[nCycles_e, ~] = size(rfData_e);
+[nCycles_s, ~] = size(rfData_s);
+
+% Make sure matrices are same size
+if nCycles_e > nCycles_s
+    diff = nCycles_e - nCycles_s;
+    rfData_s(end + 1.0: end + diff, 1:4) = zeros(diff, 4.0);
+elseif nCycles_e < nCycles_s
+    diff = nCycles_s - nCycles_e;
+    rfData_e(end + 1.0: end + diff, 1:4) = zeros(diff, 4.0);
+end
+
 % Concatenate cycles into single buffer
 %{
     1: Min. stress
