@@ -13,7 +13,7 @@
 %      2 Environment variables
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 12-May-2017 15:25:52 GMT
+%   Last modified 14-Jun-2017 14:41:28 GMT
 
 %% GATE TENSORS
 %{
@@ -349,8 +349,7 @@ setappdata(0, 'figure_KDSN', 1.0)
 setappdata(0, 'figure_VM', 1.0)
 setappdata(0, 'figure_PS', 1.0)
 setappdata(0, 'figure_PE', 1.0)
-setappdata(0, 'figure_CN', 1.0)
-setappdata(0, 'figure_CS', 1.0)
+setappdata(0, 'figure_CNS', 0.0)
 setappdata(0, 'figure_DPP', 1.0)
 setappdata(0, 'figure_DP', 1.0)
 setappdata(0, 'figure_LP', 1.0)
@@ -360,6 +359,7 @@ setappdata(0, 'figure_DAC', 1.0)
 setappdata(0, 'figure_RHIST', 1.0)
 setappdata(0, 'figure_RC', 1.0)
 setappdata(0, 'figure_SIG', 1.0)
+setappdata(0, 'figure_LH', 1.0)
 
 % FIGURE FILE FORMAT
 %{

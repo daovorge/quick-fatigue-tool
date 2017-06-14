@@ -14,7 +14,7 @@ classdef algorithm_bs7608 < handle
 %      6.6 BS 7608 Fatigue of Welded Steel Joints
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 12-May-2017 15:25:52 GMT
+%   Last modified 14-Jun-2017 14:41:28 GMT
     
     %%
     
@@ -1173,7 +1173,7 @@ classdef algorithm_bs7608 < handle
             
             %% CN (Normal stress on critical plane)
         
-            if getappdata(0, 'figure_CN') == 1.0 && outputFigure == 1.0
+            if getappdata(0, 'figure_CNS') == 1.0 && outputFigure == 1.0
                 normalOnCP = getappdata(0, 'CN');
                 
                 f7 = figure('visible', 'off');
@@ -1196,11 +1196,8 @@ classdef algorithm_bs7608 < handle
                 if strcmpi(gridLines, 'on') == 1.0 || str2double(gridLines) == 1.0
                     grid on
                 end
-            end
-            
-            %% CS (Shear stress on critical plane)
-            
-            if getappdata(0, 'figure_CS') == 1.0 && outputFigure == 1.0
+                
+                %% CS (Shear stress on critical plane)
                 shearOnCP = getappdata(0, 'CS');
                 
                 subplot(2, 1, 2)
@@ -1512,7 +1509,7 @@ classdef algorithm_bs7608 < handle
                             legend(l1, 'Infinite Life Envelope')
                         end
 
-                        msg = sprintf('DAC, Cumulative damage at item %.0f.%.0f', mainID, subID);
+                        msg = sprintf('DAC, Cumulative damage for item %.0f.%.0f', mainID, subID);
                         xlabel('Cycle', 'FontSize', fontX)
                         ylabel('Normalised Damage', 'FontSize', fontY)
                         title(msg, 'FontSize', fontTitle)
@@ -1553,7 +1550,7 @@ classdef algorithm_bs7608 < handle
                 set(get(gca, 'child'), 'FaceColor', 'interp', 'CDataMode', 'auto');
                 colorbar
                 
-                msg = sprintf('RHIST, Rainflow cycle histogram at item %.0f.%.0f', mainID, subID);
+                msg = sprintf('RHIST, Rainflow cycle histogram for item %.0f.%.0f', mainID, subID);
                 xlabel('Mean Stress (MPa)', 'FontSize', fontX)
                 ylabel('Stress Range (MPa)', 'FontSize', fontY)
                 title(msg, 'FontSize', fontTitle)
@@ -1579,7 +1576,7 @@ classdef algorithm_bs7608 < handle
                 
                 plot(bins{2}, sum(h), '-', 'LineWidth', lineWidth, 'Color', midnightBlue);
 
-                msg = sprintf('RC, Stress range distribution at item %.0f.%.0f', mainID, subID);
+                msg = sprintf('RC, Stress range distribution for item %.0f.%.0f', mainID, subID);
                 xlabel('Stress Range (MPa)', 'FontSize', fontX)
                 ylabel('Cycles', 'FontSize', fontY)
                 title(msg, 'FontSize', fontTitle)
@@ -1598,6 +1595,108 @@ classdef algorithm_bs7608 < handle
                 dir = [root, 'MATLAB Figures/RC, Stress range distribution at worst item'];
                 saveas(f13, dir, 'fig')
                 postProcess.makeVisible([dir, '.fig'])
+            end
+            
+            %% LH LOAD HISTORIES
+            if getappdata(0, 'figure_LH') == 1.0 && outputFigure == 1.0
+                Sxx = getappdata(0, 'worstNodeSxx');
+                Syy = getappdata(0, 'worstNodeSyy');
+                Szz = getappdata(0, 'worstNodeSzz');
+                Txy = getappdata(0, 'worstNodeTxy');
+                Tyz = getappdata(0, 'worstNodeTyz');
+                Txz = getappdata(0, 'worstNodeTxz');
+                
+                f12 = figure('visible', 'off');
+                
+                subplot(3, 2, 1)
+                plot(Sxx, '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
+                xlabel('Sample', 'FontSize', fontX)
+                ylabel('Stress (MPa)', 'FontSize', fontY)
+                title(sprintf('S11 for item %.0f.%.0f', mainID, subID'), 'FontSize', fontTitle)
+                try
+                    axis tight
+                catch
+                    % Don't tighten the axis
+                end
+                if strcmpi(gridLines, 'on') == 1.0 || gridLines == 1.0
+                    grid on
+                end
+                
+                subplot(3, 2, 2)
+                plot(Syy, '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
+                xlabel('Sample', 'FontSize', fontX)
+                ylabel('Stress (MPa)', 'FontSize', fontY)
+                title(sprintf('S22 for item %.0f.%.0f', mainID, subID'), 'FontSize', fontTitle)
+                try
+                    axis tight
+                catch
+                    % Don't tighten the axis
+                end
+                if strcmpi(gridLines, 'on') == 1.0 || gridLines == 1.0
+                    grid on
+                end
+                
+                subplot(3, 2, 3)
+                plot(Szz, '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
+                xlabel('Sample', 'FontSize', fontX)
+                ylabel('Stress (MPa)', 'FontSize', fontY)
+                title(sprintf('S33 for item %.0f.%.0f', mainID, subID'), 'FontSize', fontTitle)
+                try
+                    axis tight
+                catch
+                    % Don't tighten the axis
+                end
+                if strcmpi(gridLines, 'on') == 1.0 || gridLines == 1.0
+                    grid on
+                end
+                
+                subplot(3, 2, 4)
+                plot(Txy, '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
+                xlabel('Sample', 'FontSize', fontX)
+                ylabel('Stress (MPa)', 'FontSize', fontY)
+                title(sprintf('S12 for item %.0f.%.0f', mainID, subID'), 'FontSize', fontTitle)
+                try
+                    axis tight
+                catch
+                    % Don't tighten the axis
+                end
+                if strcmpi(gridLines, 'on') == 1.0 || gridLines == 1.0
+                    grid on
+                end
+                
+                subplot(3, 2, 5)
+                plot(Tyz, '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
+                xlabel('Sample', 'FontSize', fontX)
+                ylabel('Stress (MPa)', 'FontSize', fontY)
+                title(sprintf('S23 for item %.0f.%.0f', mainID, subID'), 'FontSize', fontTitle)
+                try
+                    axis tight
+                catch
+                    % Don't tighten the axis
+                end
+                if strcmpi(gridLines, 'on') == 1.0 || gridLines == 1.0
+                    grid on
+                end
+                
+                subplot(3, 2, 6)
+                plot(Txz, '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
+                xlabel('Sample', 'FontSize', fontX)
+                ylabel('Stress (MPa)', 'FontSize', fontY)
+                title(sprintf('S13 for item %.0f.%.0f', mainID, subID'), 'FontSize', fontTitle)
+                try
+                    axis tight
+                catch
+                    % Don't tighten the axis
+                end
+                if strcmpi(gridLines, 'on') == 1.0 || gridLines == 1.0
+                    grid on
+                end
+                
+                dir = [root, 'MATLAB Figures/LH, Load history'];
+                saveas(f12, dir, figureFormat)
+                if strcmpi(figureFormat, 'fig') == true
+                    postProcess.makeVisible([dir, '.fig'])
+                end
             end
         end
         

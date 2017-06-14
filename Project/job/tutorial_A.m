@@ -33,7 +33,7 @@ DATA_CHECK = 0.0;
 
 %% MATERIAL
 
-MATERIAL = [];
+MATERIAL = '';
 
 % STRESS-LIFE CURVE
 %{
