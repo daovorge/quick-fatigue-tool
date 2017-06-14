@@ -268,6 +268,9 @@ end
 %% Get the life
 life = 1.0/damage;
 
+% Remove message file flag
+rmappdata(0, 'uniaxialStrainLifeMessenger')
+
 %% Stop the timer
 analysisTime = toc;
 
@@ -462,9 +465,6 @@ end
 if isappdata(0, 'material_for_uniaxial_strain_life') == 1.0
     rmappdata(0, 'material_for_uniaxial_strain_life')
 end
-
-% Remove message file flag
-rmappdata(0, 'uniaxialStrainLifeMessenger')
 
 % Enable the GUI
 enable(handles)

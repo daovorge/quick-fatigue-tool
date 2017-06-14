@@ -7,7 +7,7 @@ classdef highFrequency < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 04-Apr-2017 13:26:59 GMT
+%   Last modified 14-Jun-2017 13:21:30 GMT
     
     %%
     
@@ -1096,32 +1096,51 @@ classdef highFrequency < handle
             if lengthLowF < 3.0
                 % LF signal must have length of at least 3.0
                 lowF(end + 1.0) = 0.0;
-                
-                lengthLowF = lengthLowF + 1.0;
+                %lengthLowF = lengthLowF + 1.0;
                 
                 messenger.writeMessage(123.0)
             end
 
             %% Re-sample the thermal signal
-            
             if sampleRate < 1.0
-                % The LF data contains more samples than necessary by
-                % interpolation. Downsample the LF data.
-                lowF_interp = downsample(lowF, floor(1/sampleRate));
+                %{
+                    The LF data contains more samples than necessary by
+                    interpolation. Downsample the LF data.
+                %}
+                lowF_interp = downsample(lowF, floor(1.0/sampleRate));
             elseif sampleRate > 1.0
-                % The LF data has less samples than required to superimpose
-                % the HF data. Interpolate the LF data.
-                if mod(lengthLowF, 2.0) == 1.0
-                    L = (lengthLowF - 1.0)/2.0;
+                %{
+                    The LF data has less samples than required to
+                    superimpose the HF data. Interpolate the LF data.
+                %}
+                
+                % Get the half-number parameter L
+                if lengthLowF < 9.0
+                    L = floor((lengthLowF - 1.0)/2.0);
                 else
-                    L = (lengthLowF - 2.0)/2.0;
-                    
-                    if L == 0.0
-                        L = 1.0;
-                    end
+                    L = 4.0;
                 end
                 
-                lowF_interp = interp(lowF, ceil(sampleRate), L, 0.5);
+                % Set the normalized cut-off frequency
+                R = 0.5;
+                
+                % Interpolate the low frequency block
+                lowF_interp = interp(lowF, ceil(sampleRate), L, R);
+                
+                %{
+                    After inteprolation, the last value of the signal is
+                    often too large. Adjust the last point so that it is
+                    the average of all previous points
+                
+                    1. Get the mean of the last two points
+                    2. Adjust the last point to the penultimate point
+                    3. Adjust the penultimate point to the mean
+                %}
+                if abs(lowF_interp(end)) > max(abs(lowF_interp(1.0:end - 1.0)))
+                    ave = mean([lowF_interp(end - 2.0), lowF_interp(end - 1.0)]);
+                    lowF_interp(end) = lowF_interp(end - 1.0);
+                    lowF_interp(end - 1.0) = ave;
+                end
             end
             
             lengthLowF_interp = length(lowF_interp);
@@ -1193,24 +1212,28 @@ classdef highFrequency < handle
             
             downSample = 0.0;
             if sampleRate < 1.0
-                % The LF data contains more samples than necessary by
-                % interpolation. Downsample the LF data.
+                %{
+                    The LF data contains more samples than necessary by
+                    interpolation. Downsample the LF data.
+                %}
                 sampleRate = floor(1.0/sampleRate);
                 downSample = 1.0;
             elseif sampleRate > 1.0
-                % The LF data has less samples than required to superimpose
-                % the HF data. Interpolate the LF data.
+                %{
+                    The LF data has less samples than required to superimpose
+                    the HF data. Interpolate the LF data.
+                %}
                 sampleRate = ceil(sampleRate);
                 
-                if mod(lengthLowF, 2.0) == 1.0
-                    L = (lengthLowF - 1.0)/2.0;
+                % Get the half-number parameter L
+                if lengthLowF < 9.0
+                    L = floor((lengthLowF - 1.0)/2.0);
                 else
-                    L = (lengthLowF - 2.0)/2.0;
-                    
-                    if L == 0.0
-                        L = 1.0;
-                    end
+                    L = 4.0;
                 end
+                
+                % Set the normalized cut-off frequency
+                R = 0.5;
             end
             
             % Create containers for new datasets
@@ -1221,8 +1244,10 @@ classdef highFrequency < handle
             final_yz = final_xx;
             final_xz = final_xx;
             
-            % Superimpose the high frequency dataset onto the loading block
-            % for each analysis item
+            %{
+                Superimpose the high frequency dataset onto the loading
+                block for each analysis item
+            %}
             for i = 1:N
                 % Get the low frequency block at the current item
                 lowF_xx = Sxx(i, :);
@@ -1242,14 +1267,55 @@ classdef highFrequency < handle
                     lowF_interp_xz = downsample(lowF_xz, sampleRate);
                 else
                     % Interpolate the low frequency block
-                    lowF_interp_xx = interp(lowF_xx, sampleRate, L, 0.5);
-                    lowF_interp_yy = interp(lowF_yy, sampleRate, L, 0.5);
-                    lowF_interp_zz = interp(lowF_zz, sampleRate, L, 0.5);
-                    lowF_interp_xy = interp(lowF_xy, sampleRate, L, 0.5);
-                    lowF_interp_yz = interp(lowF_yz, sampleRate, L, 0.5);
-                    lowF_interp_xz = interp(lowF_xz, sampleRate, L, 0.5);
+                    lowF_interp_xx = interp(lowF_xx, sampleRate, L, R);
+                    lowF_interp_yy = interp(lowF_yy, sampleRate, L, R);
+                    lowF_interp_zz = interp(lowF_zz, sampleRate, L, R);
+                    lowF_interp_xy = interp(lowF_xy, sampleRate, L, R);
+                    lowF_interp_yz = interp(lowF_yz, sampleRate, L, R);
+                    lowF_interp_xz = interp(lowF_xz, sampleRate, L, R);
                 end
                 
+                %{
+                    After inteprolation, the last value of the signal is
+                    often too large. Adjust the last point so that it is
+                    the average of all previous points
+                
+                    1. Get the mean of the last two points
+                    2. Adjust the last point to the penultimate point
+                    3. Adjust the penultimate point to the mean
+                %}
+                if abs(lowF_interp_xx(end)) > max(abs(lowF_interp_xx(1.0:end - 1.0)))
+                    ave = mean([lowF_interp_xx(end - 2.0), lowF_interp_xx(end - 1.0)]);
+                    lowF_interp_xx(end) = lowF_interp_xx(end - 1.0);                    
+                    lowF_interp_xx(end - 1.0) = ave;
+                end
+                if abs(lowF_interp_yy(end)) > max(abs(lowF_interp_yy(1.0:end - 1.0)))
+                    ave = mean([lowF_interp_yy(end - 2.0), lowF_interp_yy(end - 1.0)]);
+                    lowF_interp_yy(end) = lowF_interp_yy(end - 1.0);
+                    lowF_interp_yy(end - 1.0) = ave;
+                end
+                if abs(lowF_interp_zz(end)) > max(abs(lowF_interp_zz(1.0:end - 1.0)))
+                    ave = mean([lowF_interp_zz(end - 2.0), lowF_interp_zz(end - 1.0)]);
+                    lowF_interp_zz(end) = lowF_interp_zz(end - 1.0);
+                    lowF_interp_zz(end - 1.0) = ave;
+                end
+                if abs(lowF_interp_xy(end)) > max(abs(lowF_interp_xy(1.0:end - 1.0)))
+                    ave = mean([lowF_interp_xy(end - 2.0), lowF_interp_xy(end - 1.0)]);
+                    lowF_interp_xy(end) = lowF_interp_xy(end - 1.0);
+                    lowF_interp_xy(end - 1.0) = ave;
+                end
+                if abs(lowF_interp_yz(end)) > max(abs(lowF_interp_yz(1.0:end - 1.0)))
+                    ave = mean([lowF_interp_yz(end - 2.0), lowF_interp_yz(end - 1.0)]);
+                    lowF_interp_yz(end) = lowF_interp_yz(end - 1.0);
+                    lowF_interp_yz(end - 1.0) = ave;
+                end
+                if abs(lowF_interp_xz(end)) > max(abs(lowF_interp_xz(1.0:end - 1.0)))
+                    ave = mean([lowF_interp_xz(end - 2.0), lowF_interp_xz(end - 1.0)]);
+                    lowF_interp_xz(end) = lowF_interp_xz(end - 1.0);
+                    lowF_interp_xz(end - 1.0) = ave;
+                end
+                
+                % Get the length of the interpolated signal
                 lengthLowF_interp = length(lowF_interp_xx);
                 
                 % Remove extraneous data points introduced by the re-sampling process

@@ -1374,6 +1374,7 @@ classdef preProcess < handle
                 end
 
                 hotspotWarning = 0.0;
+                residual = getappdata(0, 'residualStress');
 
                 if nodalElimination == 2.0 && isempty(designLife) == 0.0
                     % Calculate the fatigue limit stress (conditional stress)
@@ -1479,7 +1480,7 @@ classdef preProcess < handle
                             conditionalStress = real(conditionalStress);
                         end
                     elseif (msCorrection < 7.0) && (algorithm ~= 6.0 && algorithm ~= 8.0 && algorithm ~= 9.0)
-                        [range_item(totalCounter), ~, ~] = analysis.msc(range_item(totalCounter), [min(s3_i), max(s1_i)], msCorrection);
+                        [range_item(totalCounter), ~, ~] = analysis.msc(range_item(totalCounter), [min(s3_i), max(s1_i)], msCorrection, residual);
                     end
 
                     % Check if the maximum stress is lower than the fatigue limit
