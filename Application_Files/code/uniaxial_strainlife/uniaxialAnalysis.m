@@ -5,23 +5,26 @@ classdef uniaxialAnalysis < handle
 %   UNIAXIALANALYSIS is used internally by Quick Fatigue Tool. The user is
 %   not required to run this file.
 %   
-%   See also multiaxialAnalysis, multiaxialPostProcess, gaugeOrientation,
-%   materialOptions, MultiaxialFatigue.
+%   See also uniaxialPostProcess, uniaxialPreProcess, UniaxialStrainLife
 %   
 %   Reference section in Quick Fatigue Tool User Guide
 %      A3.2 Multiaxial Gauge Fatigue
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 10-Jun-2017 11:51:26 GMT
+%   Last modified 19-Jun-2017 13:56:11 GMT
     
     %%
     
     methods (Static = true)
         %% Entry function for Uniaxial Strain-Life
-        function [damage, nCycles, error] = main(damageParameter, cael, E, Sf, b, Ef, c, kp, np, gamma, msCorrection, L, ndEndurance, fatigueLimitSress, scf, type)
+        function [damage, nCycles, error, amplitudes_strain, pairs_strain, damageParameter_stress, damageParameter_strain, damageParameter] = main(damageParameter, cael, E, Sf, b, Ef, c, kp, np, gamma, msCorrection, L, ndEndurance, fatigueLimitSress, scf, type)
             %% Initialize variables
+            damage = 0.0;
+            error = 0.0;
             errorA = 0.0;
             errorB = 0.0;
+            amplitudes_strain = [];
+            pairs_strain = [];
             
             %% Convert the uniaxial stress into uniaxial strain
             % Gate the tensors
@@ -42,10 +45,6 @@ classdef uniaxialAnalysis < handle
                 [rfData, damageParameter_stress, ~, ~] = uniaxialPreProcess.getInelasticStressFromInelasticStrain(damageParameter, E, kp, np);
                 damageParameter_strain = damageParameter;
             end
-            
-            % Initiliaze output
-            damage = 0.0;
-            error = 0.0;
             
             % Check for errors
             if errorA == 1.0
@@ -75,26 +74,19 @@ classdef uniaxialAnalysis < handle
             end
             
             %% Store worst cycles for current item
-            amplitudes_stress = cycles_stress;
             amplitudes_strain = cycles_strain;
             
-            pairs_stress = pairs_stress;
-            pairs_strain = pairs_strain;
-            
-            %% Get current damage parameter
-            damageParameter = max(cycles_strain);
-            
             %% Get the number of cycles
-            nCycles = length(amplitudes_stress);
+            nCycles = length(amplitudes_strain);
             
             %% Perform a mean stress correction on the nodal damage parameter if necessary
             if msCorrection > 1.0
                 largestPair = find(cycles_stress == max(cycles_stress));
-                [damageParameter, ~, ~, ~, ~, ~] = uniaxialAnalysis.msc(max(cycles_strain), pairs_stress(largestPair(1.0), :), msCorrection, gamma, Sf);
+                [~, ~, ~, ~, ~, ~] = uniaxialAnalysis.msc(max(cycles_strain), pairs_stress(largestPair(1.0), :), msCorrection, gamma, Sf);
             end
             
             %% Perform a damage calculation on the current analysis item
-            [damage, cumulativeDamage] = uniaxialAnalysis.damageCalculation(cycles_stress, cycles_strain, msCorrection, pairs_stress,...
+            [damage, ~] = uniaxialAnalysis.damageCalculation(cycles_stress, cycles_strain, msCorrection, pairs_stress,...
                 cael, E, Sf, b, Ef, c, gamma, ndEndurance, fatigueLimitSress);
         end
         

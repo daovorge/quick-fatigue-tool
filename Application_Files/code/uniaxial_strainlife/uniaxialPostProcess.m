@@ -6,14 +6,13 @@ classdef uniaxialPostProcess < handle
 %   UNIAXIALPOSTPROCESS is used internally by Quick Fatigue Tool. The
 %   user is not required to run this file.
 %   
-%   See also multiaxialAnalysis, multiaxialPreProcess, gaugeOrientation,
-%   materialOptions, MultiaxialFatigue.
+%   See also uniaxialAnalysis, uniaxialPreProcess, UniaxialStrainLife
 %   
 %   Reference section in Quick Fatigue Tool User Guide
 %      A3.2 Multiaxial Gauge Fatigue
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 10-Jun-2017 11:51:26 GMT
+%   Last modified 19-Jun-2017 13:56:11 GMT
     
     %%
     
@@ -653,104 +652,57 @@ classdef uniaxialPostProcess < handle
         end
         
         %% Export tables
-        function [] = outputTables(step, phiC, E11, E22, E33, S11, S22,...
-                S33, signalLength, msCorrection)
-            outputPath = getappdata(0, 'outputPath');
-            
-            dir = [outputPath, '/Data Files'];
-            if exist(dir, 'dir') == 0.0
-                mkdir(dir)
-            end
-            
-            INC = 1:signalLength;
-            
+        function [] = outputTables(WCAE, pairE, outputPath, type, dParamS, dParamE, dParamOriginal, dParamGated)
             %%
             %{
-                ANGLE HISTORIES -> Multiple values over all plane
-                orientations
+                LOAD HISTORIES -> Load history before and after gating
             %}
-            planes = 0:step:180;
-            
-            ST = getappdata(0, 'shear_cp');
-            NT = getappdata(0, 'normal_cp');
-            
-            PT = getappdata(0, 'worstNodeDamageParamCube');
-            DT = getappdata(0, 'worstNodeDamageCube');
-            LT = 1.0./DT;
+            LO = length(dParamOriginal);
+            LG = length(dParamGated);
             
             %% Open file for writing:
+            fid = fopen([outputPath, '/h-output-load.dat'], 'w+');
             
-            fid = fopen([dir, '/h-output-angle.dat'], 'w+');
+            fprintf(fid, 'LH, INPUT LOAD HISTORY\r\n');
+            if type == 1.0
+                fprintf(fid, 'Units\tMPa\r\n');
+                fprintf(fid, 'Elastic stress (before gating)\tElastic stress (after gating)\r\n');
+            else
+                fprintf(fid, 'Units\tE\r\n');
+                fprintf(fid, 'Inelastic strain (before gating)\tInelastic strain (after gating)\r\n');
+            end
             
-            data = [planes; ST; NT; PT; DT; LT]';
-            
-            fprintf(fid, 'ST, NT, DPP, DP, LP, ANGLE HISTORIES\r\n\r\n');
-            
-            fprintf(fid, 'PHI = %.0f degrees\r\n', phiC);
-            
-            fprintf(fid, 'Plane orientation (THETA-degrees)\tMaximum shear strain\tMaximum normal strain\tDamage parameter\tDamage\tLife\n');
-            fprintf(fid, '%.0f\t%.4f\t%.4f\t%.4f\t%.4e\t%.4e\r\n', data');
+            if LO > LG
+                for i = 1:LG
+                    fprintf(fid, '%f\t%f\r\n', dParamOriginal(i), dParamGated(i));
+                end
+                for i = (LG + 1.0):LO
+                    fprintf(fid, '%f\t\r\n', dParamOriginal(i));
+                end
+            else
+                for i = 1:LO
+                    fprintf(fid, '%f\t%f\r\n', dParamOriginal(i), dParamGated(i));
+                end
+                for i = (LO + 1.0):LG
+                    fprintf(fid, '\t%f\r\n', dParamGated(i));
+                end
+            end
             
             fclose(fid);
             
             %%
             %{
-                TENSOR HISTORIES -> Multiple values on the
-                critical plane
+                CYCLIC HISTORIES -> Inelastic stress and strain histories
             %}
-            outOfPlane = getappdata(0, 'multiaxialFatigue_outOfPlane');
+            data = [dParamE; dParamS]';
             
-            if msCorrection == 0.0
-                if outOfPlane == 1.0
-                    data = [INC; E11; E22; E33]';
-                    
-                    %% Open file for writing:
-                    
-                    fid = fopen([dir, '/h-output-tensor.dat'], 'w+');
-                    
-                    fprintf(fid, 'EST, PRINCIPAL TENSOR HISTORY\r\n\r\n');
-                    
-                    fprintf(fid, 'Load Increment\tPE1\tPE2\tPE3\r\n');
-                    
-                    fprintf(fid, '%.0f\t%.4f\t%.4f\t%.4f\r\n', data');
-                else
-                    data = [INC; E11; E22]';
-                    
-                    %% Open file for writing:
-                    
-                    fid = fopen([dir, '/h-output-tensor.dat'], 'w+');
-                    
-                    fprintf(fid, 'EST, PRINCIPAL TENSOR HISTORY\r\n\r\n');
-                    
-                    fprintf(fid, 'Load Increment\tPE1\tPE2\r\n');
-                    
-                    fprintf(fid, '%.0f\t%.4f\t%.4f\r\n', data');
-                end
-            else
-                if outOfPlane == 1.0
-                    data = [INC; E11; E22; E33; S11; S22; S33]';
-                    
-                    %% Open file for writing:
-                    
-                    fid = fopen([dir, '/h-output-tensor.dat'], 'w+');
-                    
-                    fprintf(fid, 'EST, PRINCIPAL TENSOR HISTORY\r\n\r\n');
-                    
-                    fprintf(fid, 'Load Increment\tPE1\tPE2\tPE3\tPS1 (MPa)\tPS2 (MPa)\tPS3 (MPa)\r\n');
-                    fprintf(fid, '%.0f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\r\n', data');
-                else
-                    data = [INC; E11; E22; S11; S22]';
-                    
-                    %% Open file for writing:
-                    
-                    fid = fopen([dir, '/h-output-tensor.dat'], 'w+');
-                    
-                    fprintf(fid, 'EST, PRINCIPAL TENSOR HISTORY\r\n\r\n');
-                    
-                    fprintf(fid, 'Load Increment\tPE1\tPE2\tPS1 (MPa)\tPS2 (MPa)\r\n');
-                    fprintf(fid, '%.0f\t%.4f\t%.4f\t%.4f\t%.4f\r\n', data');
-                end
-            end
+            %% Open file for writing:
+            fid = fopen([outputPath, '/h-output-css.dat'], 'w+');
+            
+            fprintf(fid, 'CSS, INELASTIC LOAD HISTORIES\r\n');
+            fprintf(fid, 'Strain (E)\tStress (MPa)\r\n');
+            
+            fprintf(fid, '%f\t%f\r\n', data');
             
             fclose(fid);
             
@@ -759,41 +711,18 @@ classdef uniaxialPostProcess < handle
                 CYCLE HISTORIES -> Worst cycle per item and all cycles at worst
                 item
             %}
+            WCME = 0.5*(pairE(:, 1.0)' + pairE(:, 2.0)');
             
-            pairs = getappdata(0, 'cyclesOnCP');
-            WCA = getappdata(0, 'amplitudesOnCP');
-            WCM = 0.5*(pairs(:, 1.0)' + pairs(:, 2.0)');
+            C = 1:length(WCME);
             
-            C = 1:length(WCM);
-            
-            data = [C; WCM; WCA]';
+            data = [C; WCME; WCAE]';
             
             %% Open file for writing:
-            fid = fopen([dir, '/h-output-cycle.dat'], 'w+');
+            fid = fopen([outputPath, '/h-output-cycle.dat'], 'w+');
             
             fprintf(fid, 'HD, ALL CYCLE HISTORIES\r\n');
-            fprintf(fid, 'Cycle #\tMean strain\tStrain amplitude\r\n');
+            fprintf(fid, 'Cycle #\tMean strain (E)\tStrain amplitude (E)\r\n');
             
-            fprintf(fid, '%.0f\t%.4f\t%.4f\r\n', data');
-            
-            fclose(fid);
-            
-            %%
-            %{
-                LOAD HISTORIES -> Multiple values at over all signal
-                increments
-            %}
-            CN = getappdata(0, 'CN');
-            CS = getappdata(0, 'CS');
-            
-            data = [INC; CN; CS]';
-            
-            %% Open file for writing:
-            fid = fopen([dir, '/h-output-load.dat'], 'w+');
-            
-            fprintf(fid, 'CN, CS, NORMAL AND SHEAR STRAIN HISTORY ON CRITICAL PLANE\r\n');
-            
-            fprintf(fid, 'Load Increment\tNormal strain\tResultant Shear strain\r\n');
             fprintf(fid, '%.0f\t%.4f\t%.4f\r\n', data');
             
             fclose(fid);

@@ -5,14 +5,13 @@ classdef uniaxialPreProcess < handle
 %   UNIAXIALPREPROCESS is used internally by Quick Fatigue Tool. The
 %   user is not required to run this file.
 %   
-%   See also multiaxialAnalysis, multiaxialPostProcess, gaugeOrientation,
-%   materialOptions, MultiaxialFatigue.
+%   See also uniaxialAnalysis, uniaxialPostProcess, UniaxialStrainLife
 %   
 %   Reference section in Quick Fatigue Tool User Guide
 %      A3.2 Multiaxial Gauge Fatigue
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 10-Jun-2017 11:51:26 GMT
+%   Last modified 19-Jun-2017 13:56:11 GMT
     
     %%
     

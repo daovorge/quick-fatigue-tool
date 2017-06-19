@@ -6,14 +6,13 @@ function varargout = UniaxialStrainLife(varargin)%#ok<*DEFNU>
 %   UNIAXIALSTRAINLIFE is used internally by Quick Fatigue Tool. The user is
 %   not required to run this file.
 %
-%   See also multiaxialAnalysis, multiaxialPostProcess,
-%   multiaxialPreProcess, gaugeOrientation, materialOptions.
+%   See also uniaxialAnalysis, uniaxialPostProcess, uniaxialPreProcess
 %
 %   Reference section in Quick Fatigue Tool User Guide
 %      A3.2 Multiaxial Gauge Fatigue
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 10-Jun-2017 11:51:26 GMT
+%   Last modified 19-Jun-2017 13:56:11 GMT
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -36,7 +35,7 @@ end
 
 
 % --- Executes just before UniaxialStrainLife is made visible.
-function UniaxialStrainLife_OpeningFcn(hObject, eventdata, handles, varargin)
+function UniaxialStrainLife_OpeningFcn(hObject, ~, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -111,7 +110,7 @@ setMaterialName(handles)
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = UniaxialStrainLife_OutputFcn(hObject, eventdata, handles) 
+function varargout = UniaxialStrainLife_OutputFcn(~, ~, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -122,7 +121,7 @@ varargout{1} = handles.output;
 
 
 % --- Executes on button press in pButton_analyse.
-function pButton_analyse_Callback(hObject, eventdata, handles)
+function pButton_analyse_Callback(~, ~, handles)
 
 %% Clear the command window
 clc; warning('off', 'all')
@@ -246,7 +245,7 @@ else
 end
 
 %% Get the fatigue damage
-[damage, nCycles, error] = uniaxialAnalysis.main(loadHistoryData, cael, E, Sf, b, Ef, c, kp, np, gamma, msCorrection, L, ndEndurance, fatigueLimitSress, scf, type);
+[damage, nCycles, error, WCAE, pairE, dParamS, dParamE, dParamGated] = uniaxialAnalysis.main(loadHistoryData, cael, E, Sf, b, Ef, c, kp, np, gamma, msCorrection, L, ndEndurance, fatigueLimitSress, scf, type);
 
 %% Check for errors
 if error == 1.0
@@ -274,6 +273,9 @@ rmappdata(0, 'uniaxialStrainLifeMessenger')
 %% Stop the timer
 analysisTime = toc;
 
+%% Export tables
+uniaxialPostProcess.outputTables(WCAE, pairE, outputPath, type, dParamS, dParamE, loadHistoryData, dParamGated)
+
 %% Write results to output file
 uniaxialPostProcess.outputLog(handles, nCycles, life, cael, analysisTime, gamma, outputPath, dateString)
 
@@ -291,7 +293,7 @@ close UniaxialStrainLife
 
 
 % --- Executes on button press in pButton_reset.
-function pButton_reset_Callback(hObject, eventdata, handles)
+function pButton_reset_Callback(~, ~, handles)
 %{
     This putton resets the GUI to its original state, without any user
     modifications
@@ -322,7 +324,7 @@ set(handles.edit_resultsLocation, 'enable', 'inactive', 'string', 'Default proje
 
 
 
-function edit_inputFile_Callback(hObject, eventdata, handles)
+function edit_inputFile_Callback(~, ~, ~)
 % hObject    handle to edit_inputFile (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -332,7 +334,7 @@ function edit_inputFile_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function edit_inputFile_CreateFcn(hObject, eventdata, handles)
+function edit_inputFile_CreateFcn(hObject, ~, ~)
 % hObject    handle to edit_inputFile (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -386,7 +388,7 @@ enable(handles)
 
 
 
-function edit_material_Callback(hObject, eventdata, handles)
+function edit_material_Callback(~, ~, ~)
 % hObject    handle to edit_material (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -396,7 +398,7 @@ function edit_material_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function edit_material_CreateFcn(hObject, eventdata, handles)
+function edit_material_CreateFcn(hObject, ~, ~)
 % hObject    handle to edit_material (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -409,7 +411,7 @@ end
 
 
 % --- Executes on button press in pButton_browseMaterial.
-function pButton_browseMaterial_Callback(hObject, eventdata, handles)
+function pButton_browseMaterial_Callback(~, ~, handles)
 %{
     Get the material file for the fatigue analysis
 %}
@@ -444,7 +446,7 @@ enable(handles)
 
 
 % --- Executes on button press in pButton_createMaterial.
-function pButton_createMaterial_Callback(hObject, eventdata, handles)
+function pButton_createMaterial_Callback(~, ~, handles)
 %{
     Open the material editor GUI
 %}
@@ -471,7 +473,7 @@ enable(handles)
 
 
 % --- Executes on button press in pButton_manageMaterial.
-function pButton_manageMaterial_Callback(hObject, eventdata, handles)
+function pButton_manageMaterial_Callback(~, ~, handles)
 %{
     Start the Material Manager application
 %}
@@ -499,7 +501,7 @@ enable(handles)
 
 
 
-function edit_scf_Callback(hObject, eventdata, handles)
+function edit_scf_Callback(~, ~, ~)
 % hObject    handle to edit_scf (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -509,7 +511,7 @@ function edit_scf_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function edit_scf_CreateFcn(hObject, eventdata, handles)
+function edit_scf_CreateFcn(hObject, ~, ~)
 % hObject    handle to edit_scf (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -534,7 +536,7 @@ end
 
 
 % --- Executes during object creation, after setting all properties.
-function pMenu_msc_CreateFcn(hObject, eventdata, handles)
+function pMenu_msc_CreateFcn(hObject, ~, ~)
 % hObject    handle to pMenu_msc (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -569,7 +571,7 @@ end
 
 
 % --- Executes when selected object is changed in uipanel_units.
-function uipanel_units_SelectionChangeFcn(hObject, eventdata, handles)
+function uipanel_units_SelectionChangeFcn(~, ~, ~)
 % hObject    handle to the selected object in uipanel_units 
 % eventdata  structure with the following fields (see UIBUTTONGROUP)
 %	EventName: string 'SelectionChanged' (read only)
@@ -579,7 +581,7 @@ function uipanel_units_SelectionChangeFcn(hObject, eventdata, handles)
 
 
 % --- Executes when selected object is changed in uipanel_unitsType.
-function uipanel_unitsType_SelectionChangeFcn(hObject, eventdata, handles)
+function uipanel_unitsType_SelectionChangeFcn(~, eventdata, handles)
 switch get(eventdata.NewValue, 'tag')
     case 'rButton_typeElastic'
         set(handles.text_scf, 'enable', 'on')
@@ -592,7 +594,7 @@ end
 
 
 % --- Executes on button press in check_resultsLocation.
-function check_resultsLocation_Callback(hObject, eventdata, handles)
+function check_resultsLocation_Callback(hObject, ~, handles)
 switch get(hObject, 'value')
     case 0.0
         set(handles.edit_resultsLocation, 'enable', 'inactive', 'string', 'Default project output directory', 'backgroundColor', [177.0/255, 206.0/255, 237.0/255])
@@ -609,7 +611,7 @@ switch get(hObject, 'value')
 end
 
 
-function edit_resultsLocation_Callback(hObject, eventdata, handles)
+function edit_resultsLocation_Callback(~, ~, ~)
 % hObject    handle to edit_resultsLocation (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -619,7 +621,7 @@ function edit_resultsLocation_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function edit_resultsLocation_CreateFcn(hObject, eventdata, handles)
+function edit_resultsLocation_CreateFcn(hObject, ~, ~)
 % hObject    handle to edit_resultsLocation (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -632,7 +634,7 @@ end
 
 
 % --- Executes on button press in pButton_resultsLocation.
-function pButton_resultsLocation_Callback(hObject, eventdata, handles)
+function pButton_resultsLocation_Callback(~, ~, handles)
 % Blank the GUI
 blank(handles)
 
@@ -749,7 +751,7 @@ else
 end
 
 
-function edit_walkerGamma_Callback(hObject, eventdata, handles)
+function edit_walkerGamma_Callback(~, ~, ~)
 % hObject    handle to edit_walkerGamma (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -759,7 +761,7 @@ function edit_walkerGamma_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function edit_walkerGamma_CreateFcn(hObject, eventdata, handles)
+function edit_walkerGamma_CreateFcn(hObject, ~, ~)
 % hObject    handle to edit_walkerGamma (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
