@@ -7,7 +7,7 @@ classdef highFrequency < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 14-Jun-2017 13:21:30 GMT
+%   Last modified 19-Jun-2017 16:18:57 GMT
     
     %%
     
@@ -1096,7 +1096,7 @@ classdef highFrequency < handle
             if lengthLowF < 3.0
                 % LF signal must have length of at least 3.0
                 lowF(end + 1.0) = 0.0;
-                %lengthLowF = lengthLowF + 1.0;
+                lengthLowF = lengthLowF + 1.0;
                 
                 messenger.writeMessage(123.0)
             end
@@ -1130,17 +1130,13 @@ classdef highFrequency < handle
                 %{
                     After inteprolation, the last value of the signal is
                     often too large. Adjust the last point so that it is
-                    the average of all previous points
+                    the average of all previous points:
                 
                     1. Get the mean of the last two points
                     2. Adjust the last point to the penultimate point
                     3. Adjust the penultimate point to the mean
                 %}
-                if abs(lowF_interp(end)) > max(abs(lowF_interp(1.0:end - 1.0)))
-                    ave = mean([lowF_interp(end - 2.0), lowF_interp(end - 1.0)]);
-                    lowF_interp(end) = lowF_interp(end - 1.0);
-                    lowF_interp(end - 1.0) = ave;
-                end
+                lowF_interp = highFrequency.adjustEndpoint(lowF, lowF_interp);
             end
             
             lengthLowF_interp = length(lowF_interp);
@@ -1278,42 +1274,18 @@ classdef highFrequency < handle
                 %{
                     After inteprolation, the last value of the signal is
                     often too large. Adjust the last point so that it is
-                    the average of all previous points
+                    the average of all previous points:
                 
                     1. Get the mean of the last two points
                     2. Adjust the last point to the penultimate point
                     3. Adjust the penultimate point to the mean
                 %}
-                if abs(lowF_interp_xx(end)) > max(abs(lowF_interp_xx(1.0:end - 1.0)))
-                    ave = mean([lowF_interp_xx(end - 2.0), lowF_interp_xx(end - 1.0)]);
-                    lowF_interp_xx(end) = lowF_interp_xx(end - 1.0);                    
-                    lowF_interp_xx(end - 1.0) = ave;
-                end
-                if abs(lowF_interp_yy(end)) > max(abs(lowF_interp_yy(1.0:end - 1.0)))
-                    ave = mean([lowF_interp_yy(end - 2.0), lowF_interp_yy(end - 1.0)]);
-                    lowF_interp_yy(end) = lowF_interp_yy(end - 1.0);
-                    lowF_interp_yy(end - 1.0) = ave;
-                end
-                if abs(lowF_interp_zz(end)) > max(abs(lowF_interp_zz(1.0:end - 1.0)))
-                    ave = mean([lowF_interp_zz(end - 2.0), lowF_interp_zz(end - 1.0)]);
-                    lowF_interp_zz(end) = lowF_interp_zz(end - 1.0);
-                    lowF_interp_zz(end - 1.0) = ave;
-                end
-                if abs(lowF_interp_xy(end)) > max(abs(lowF_interp_xy(1.0:end - 1.0)))
-                    ave = mean([lowF_interp_xy(end - 2.0), lowF_interp_xy(end - 1.0)]);
-                    lowF_interp_xy(end) = lowF_interp_xy(end - 1.0);
-                    lowF_interp_xy(end - 1.0) = ave;
-                end
-                if abs(lowF_interp_yz(end)) > max(abs(lowF_interp_yz(1.0:end - 1.0)))
-                    ave = mean([lowF_interp_yz(end - 2.0), lowF_interp_yz(end - 1.0)]);
-                    lowF_interp_yz(end) = lowF_interp_yz(end - 1.0);
-                    lowF_interp_yz(end - 1.0) = ave;
-                end
-                if abs(lowF_interp_xz(end)) > max(abs(lowF_interp_xz(1.0:end - 1.0)))
-                    ave = mean([lowF_interp_xz(end - 2.0), lowF_interp_xz(end - 1.0)]);
-                    lowF_interp_xz(end) = lowF_interp_xz(end - 1.0);
-                    lowF_interp_xz(end - 1.0) = ave;
-                end
+                lowF_interp_xx = highFrequency.adjustEndpoint(lowF_xx, lowF_interp_xx);
+                lowF_interp_yy = highFrequency.adjustEndpoint(lowF_yy, lowF_interp_yy);
+                lowF_interp_zz = highFrequency.adjustEndpoint(lowF_zz, lowF_interp_zz);
+                lowF_interp_xy = highFrequency.adjustEndpoint(lowF_xy, lowF_interp_xy);
+                lowF_interp_yz = highFrequency.adjustEndpoint(lowF_yz, lowF_interp_yz);
+                lowF_interp_xz = highFrequency.adjustEndpoint(lowF_xz, lowF_interp_xz);
                 
                 % Get the length of the interpolated signal
                 lengthLowF_interp = length(lowF_interp_xx);
@@ -1367,6 +1339,54 @@ classdef highFrequency < handle
             Txy = final_xy;
             Tyz = final_yz;
             Txz = final_xz;
+        end
+        
+        %% Correct the end point of the interpolated signal
+        function [lowF_interp] = adjustEndpoint(lowF, lowF_interp)
+            %{
+                Get the ratio between the last point of the interpolated
+                and the original history
+            %}
+            if abs(lowF_interp(end)) > abs(lowF(end))
+                ratio = lowF_interp(end)/lowF(end);
+            else
+                ratio = lowF(end)/lowF_interp(end);
+            end
+            
+            %{
+                If the difference is greater than 5%, adjust the tail of
+                the interpolated data
+            %}
+            if ratio > 1.05
+                L = length(lowF_interp);
+                
+                % Get the sign of the gradient of the tail
+                signG = sign(lowF_interp(end) - lowF_interp(end - 1.0));
+                signGi = signG;
+                
+                % Find the number of points making up the tail
+                index = L + 1.0;
+                while signGi == signG
+                    index = index - 1.0;
+                    signGi = sign(lowF_interp(index) - lowF_interp(index - 1.0));
+                end
+                
+                % Get the adjustment increment
+                delta = (lowF_interp(index) - lowF(end))/(L - index);
+                
+                % If the tail is pointing downward, flip the sign of DELTA
+                if signGi == 1.0
+                    delta = -delta;
+                end
+                
+                %{
+                    Adjust the tail so that the last point of the
+                    interpolated and the uninterpolated history are equal
+                %}
+                for i = index:(L - 1.0)
+                    lowF_interp(i + 1.0) = lowF_interp(i) + delta;
+                end
+            end
         end
     end
 end

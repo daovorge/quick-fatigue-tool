@@ -17,7 +17,7 @@ function [rfData, epsilon, sigma, error, warning] = css2d(sigma_e, epsilon_pp, s
 %   from a previous analysis defined by CONTINUE_FROM.
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 13-Jun-2017 15:59:08 GMT
+%   Last modified 19-Jun-2017 16:12:44 GMT
     
     %%
     
@@ -98,10 +98,6 @@ currentStressRange = abs(sigma_e(3.0) - sigma_e(2.0));
 
 stressRangeBuffer = currentStressRange;
 
-matMemFirstExcursion = 1.0;
-matMemFirstExcursionIndex = 2.0;
-ratchetStress = 0.0;
-
 for i = 3:signalLength
     %{
         Calculate the current strain range. If the signal did not reverse
@@ -119,16 +115,6 @@ for i = 3:signalLength
     else
         % The current excursion is moving backwards
         currentDirection = -1.0;
-    end
-    
-    %{
-        The current strain range is smaller than the first
-        cyclic excusrion since the previous cycle closure.
-        Successive cycle closures cannot assume the path of the
-        monotonic excursion
-    %}
-    if currentStressRange < stressRangeBuffer(matMemFirstExcursionIndex)
-        matMemFirstExcursion = 0.0;
     end
     
     %{
@@ -166,12 +152,6 @@ for i = 3:signalLength
         allowClosure = 0.0;
         
         %{
-            The stable loop strain range is taken to be the
-            strain range of the previously closed cycle
-        %}
-        matMemFirstExcursionIndex = i;
-        
-        %{
             Calculate the portion of the strain range which
             accounts only for the distance beyond the cycle
             closure point
@@ -185,11 +165,7 @@ for i = 3:signalLength
             additional strain range beyond the current cycle
             closure point
         %}
-        if matMemFirstExcursion == 1.0
-            stressRange = stressRangeBuffer(1.0) + stressRangeBeyondClosure + ratchetStress;
-        else
-            stressRange = stressRangeBuffer(i - 3.0) + stressRangeBeyondClosure;
-        end
+        stressRange = stressRangeBuffer(i - 3.0) + stressRangeBeyondClosure;
         
         if currentDirection == -1.0
             trueStrainCurve = linspace(1e-12, -overshoot*(stressRange/E), precision);
@@ -203,57 +179,28 @@ for i = 3:signalLength
             the first excursion in the loading, the monotonic
             stress-strain curve must be used instead
         %}
-        if matMemFirstExcursion == 1.0
-            ratchetStress = ratchetStress + stressRangeBeyondClosure;
-            
-            Nb = (stressRange^2.0)./(E.*trueStrainCurve);
-            f = real((Nb./E) + (Nb./kp).^(1.0/np) - trueStrainCurve);
-        else
-            Nb = (stressRange^2)./(E.*trueStrainCurve);
-            f = real((Nb./E) + 2.0.*(Nb./(2.0*kp)).^(1.0/np) - trueStrainCurve);
-        end
+        Nb = (stressRange^2)./(E.*trueStrainCurve);
+        f = real((Nb./E) + 2.0.*(Nb./(2.0*kp)).^(1.0/np) - trueStrainCurve);
         
         % Solve for the strain range
         strainRange = interp1(f, trueStrainCurve, 0.0, method, 'extrap');
-        
-        if matMemFirstExcursion == 1.0
-            epsilon(i) = epsilon(1.0) + strainRange;
-        else
-            epsilon(i) = epsilon(i - 3.0) + strainRange;
-        end
+        epsilon(i) = epsilon(i - 3.0) + strainRange;
         
         % Solve for the stress range
-        if matMemFirstExcursion == 1.0
-            currentStrainRange = epsilon(i);
-        else
-            currentStrainRange = abs(epsilon(i) - epsilon(i - 1.0));
-        end
+        currentStrainRange = abs(epsilon(i) - epsilon(i - 1.0));
         
         trueStressCurve = linspace(0.0, currentStrainRange*E, precision);
-        
-        if matMemFirstExcursion == 1.0
-            trueStrainCurve = real((trueStressCurve./E) + (trueStressCurve./(kp)).^(1.0/np));
-        else
-            trueStrainCurve = real((trueStressCurve./E) + 2.0.*(trueStressCurve./(2.0*kp)).^(1.0/np));
-        end
+        trueStrainCurve = real((trueStressCurve./E) + 2.0.*(trueStressCurve./(2.0*kp)).^(1.0/np));
         
         if all(trueStrainCurve == 0.0) == 1.0
             sigma(i) = sigma(i - 1.0);
         else
             stressRange = interp1(trueStrainCurve, trueStressCurve, currentStrainRange, method, 'extrap');
             
-            if matMemFirstExcursion == 1.0
-                if currentDirection == -1.0
-                    sigma(i) = sigma(1.0) - stressRange;
-                else
-                    sigma(i) = sigma(1.0) + stressRange;
-                end
+            if currentDirection == -1.0
+                sigma(i) = sigma(i - 3.0) - stressRange;
             else
-                if currentDirection == -1.0
-                    sigma(i) = sigma(i - 3.0) - stressRange;
-                else
-                    sigma(i) = sigma(i - 3.0) + stressRange;
-                end
+                sigma(i) = sigma(i - 3.0) + stressRange;
             end
         end
     elseif ((currentStressRange == 2.0*previousStressRange) && (i == 3.0)) || ((currentStressRange == previousStressRange) && (allowClosure == 1.0))

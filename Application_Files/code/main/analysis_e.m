@@ -106,6 +106,9 @@ classdef analysis_e < handle
                     mscCycles = cycles_e;
                 otherwise
             end
+            
+            % Adjust bad R-values
+            R(R > 1.0) = -1e9;
         end
         
         %% Get the principal strain history for the loading (if applicable)
