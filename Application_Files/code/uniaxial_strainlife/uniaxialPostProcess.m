@@ -8,8 +8,8 @@ classdef uniaxialPostProcess < handle
 %   
 %   See also uniaxialAnalysis, uniaxialPreProcess, UniaxialStrainLife
 %   
-%   Reference section in Quick Fatigue Tool User Guide
-%      A3.2 Multiaxial Gauge Fatigue
+%   Reference section in Quick Fatigue Tool Appendices
+%      A3.6 Uniaxial Strain-Life
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
 %   Last modified 19-Jun-2017 13:56:11 GMT

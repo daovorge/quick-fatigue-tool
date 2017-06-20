@@ -7,7 +7,7 @@ classdef python < handle
 %   
 %   See also ExportTool.
 %   
-%   Reference section in Quick Fatigue Tool User Guide
+%   Reference section in Quick Fatigue Tool Appendices
 %      10.4 The ODB Interface
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017

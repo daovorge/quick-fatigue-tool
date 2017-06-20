@@ -6,7 +6,7 @@ function [] = cleanup(status)
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 19-Jun-2017 16:18:57 GMT
+%   Last modified 20-Jun-2017 15:28:26 GMT
     
     %%
     
@@ -72,7 +72,7 @@ if status == 1.0
     % Write file header
     fprintf(fid, 'Quick Fatigue Tool 6.11-00\r\n');
     fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-    fprintf(fid, 'Last modified 19-Jun-2017 16:18:57 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 20-Jun-2017 15:28:26 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');
@@ -606,6 +606,7 @@ if status == 1.0
     end
     if getappdata(0, 'E044') == 1.0
         fprintf(fid, '\r\n\r\n***ERROR: The exposure time for the low or high frequency data is undefined');
+        fprintf(fid, '\r\n-> The exposure time is set by the HF_TIME option');
         fprintf(fid, '\r\n\r\nError code: E044');
         rmappdata(0, 'E044')
     end

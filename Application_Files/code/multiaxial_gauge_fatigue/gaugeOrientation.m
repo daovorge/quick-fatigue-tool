@@ -9,7 +9,7 @@ function varargout = gaugeOrientation(varargin)
 %   See also multiaxialAnalysis, multiaxialPostProcess,
 %   multiaxialPreProcess, materialOptions, MultiaxialFatigue.
 %   
-%   Reference section in Quick Fatigue Tool User Guide
+%   Reference section in Quick Fatigue Tool Appendices
 %      A3.2 Multiaxial Gauge Fatigue
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017

@@ -8,13 +8,13 @@ classdef importMaterial < handle
 %   See also keywords, fetchMaterial, job.
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 04-Apr-2017 13:26:59 GMT
+%   Last modified 20-Jun-2017 14:41:51 GMT
     
     %%
     
     methods(Static = true)
         %% INITIALIZE DEFAULT KEYWORDS
-        function [material_properties, kwStr, kwStrSp] = initialize()
+        function [material_properties, kwStr, kwStrSp, algStr, mscStr, regStr, fatStr, nssStr, classStr] = initialize()
             % DEFAULT MATERIAL STRUCTURE
             material_properties = struct(...
                 'default_algorithm', 6.0,...
@@ -61,6 +61,24 @@ classdef importMaterial < handle
                 'DEFAULT MSC', 'CAEL', 'REGRESSION', 'MECHANICAL',...
                 'FATIGUE', 'CYCLIC', 'NORMAL STRESS SENSITIVITY', 'CLASS',...
                 'END MATERIAL'};
+            
+            % ALGORITHM STRINGS
+            algStr = {'UNIAXIALSTRESS', 'UNIAXIALSTRAIN', 'SBBM', 'NORMAL', 'FINDLEY', 'INVARIANT', 'NASALIFE'};
+            
+            % MSC STRINGS
+            mscStr = {'MORROW', 'GOODMAN', 'SODERBERG', 'WALKER', 'SWT', 'GERBER', 'RATIO', 'NONE'};
+            
+            % REGRESSION STRINGS
+            regStr = {'UNIFORM', 'UNIVERSAL', 'MODIFIED', '9050', 'NONE'};
+            
+            % FATIGUE STRINGS
+            fatStr = {'CONSTANTS', 'TESTDATA'};
+            
+            % NSSC STRINGS
+            nssStr = {'USER', 'SOCIE', 'GENERAL', 'DANGVAN', 'SINES', 'CROSSLAND'};
+            
+            % CLASS STRINGS
+            classStr = {'WROUGHTSTEEL', 'DUCTILEIRON', 'MALLEABLEIRON', 'WROUGHTIRON', 'CASTIRON', 'ALUMINIUM', 'OTHER'};
         end
         
         %% PROCESS THE MATERIAL FILE
@@ -73,7 +91,7 @@ classdef importMaterial < handle
             error = 0.0;
             
             % Initialize the material properties
-            [material_properties, kwStr, kwStrSp] = importMaterial.initialize();
+            [material_properties, kwStr, kwStrSp, algStr, mscStr, regStr, fatStr, nssStr, classStr] = importMaterial.initialize();
             
             % Initialize the material name
             materialName = 'Material-1 (empty)';
@@ -119,10 +137,16 @@ classdef importMaterial < handle
                 TLINE = lower(fgetl(fid));  nTLINE_total = nTLINE_total + 1.0;
                 
                 TLINEi = TLINE;
-                TLINEi(ismember(TLINEi, ' ')) = [];
+                TLINEi(ismember(TLINEi,' *')) = [];
+                
+                % Isolate the keyword
+                TLINEi = strtok(lower(TLINEi), ',');
+                
+                % Check if the keyword matches the library
+                matchingKw = find(strncmpi({TLINEi}, kwStr, length(TLINEi)) == 1.0);
                 
                 % If the current line is emtpy, skip to the next line
-                if strfind(TLINEi, '*usermaterial') == 1.0
+                if matchingKw == 1.0
                     % A material definition has been found
                     foundMaterial = 1.0;
                     break
@@ -168,8 +192,14 @@ classdef importMaterial < handle
                     continue
                 end
                 
+                % Check if the current line is a comment
+                if (length(TLINE) > 1.0) && (strcmp(TLINE(1.0:2.0), '**') == 1.0)
+                    % Get the next line in the file
+                    TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
+                    
+                    continue
                 % Check that the current line is a keyword
-                if strcmp(TLINE(1.0), '*') == 1.0
+                elseif strcmp(TLINE(1.0), '*') == 1.0
                     % The current line is a keyword definition
                     
                     % Isolate the keyword
@@ -240,22 +270,33 @@ classdef importMaterial < handle
                             parameter = lower(parameter);
                             parameter(ismember(parameter,' ,')) = [];
                             
-                            switch parameter
-                                case 'uniaxial'
-                                    material_properties.default_algorithm = 14.0;
-                                case 'sbbm'
-                                    material_properties.default_algorithm = 6.0;
-                                case 'normal'
-                                    material_properties.default_algorithm = 7.0;
-                                case 'findley'
-                                    material_properties.default_algorithm = 8.0;
-                                case 'invariant'
-                                    material_properties.default_algorithm = 9.0;
-                                case 'nasalife'
-                                    material_properties.default_algorithm = 10.0;
-                                otherwise
-                                    material_properties.default_algorithm = 6.0;
-                                    keywordWarnings(3.0) = 1.0;
+                            % Check if the parameter matches the library
+                            matchingParameter = find(strncmpi({parameter}, algStr, length(parameter)) == 1.0);
+                            
+                            %{
+                                If there is not matching parameter, use the
+                                default value
+                            %}
+                            if (isempty(matchingParameter) == 1.0) || (length(matchingParameter) ~= 1.0)
+                                material_properties.default_algorithm = 6.0;
+                                keywordWarnings(3.0) = 1.0;
+                            else
+                                switch matchingParameter
+                                    case 1.0 % Uniaxial Stress-Life
+                                        material_properties.default_algorithm = 14.0;
+                                    case 2.0 % Uniaxial Strain-Life
+                                        material_properties.default_algorithm = 13.0;
+                                    case 3.0 % SBBM
+                                        material_properties.default_algorithm = 6.0;
+                                    case 4.0 % Normal
+                                        material_properties.default_algorithm = 7.0;
+                                    case 5.0 % Findley
+                                        material_properties.default_algorithm = 8.0;
+                                    case 6.0 % Invariant
+                                        material_properties.default_algorithm = 9.0;
+                                    case 7.0 % NASALIFE
+                                        material_properties.default_algorithm = 10.0;
+                                end
                             end
                             
                             % Get the next line in the file
@@ -270,26 +311,36 @@ classdef importMaterial < handle
                             parameter = lower(parameter);
                             parameter(ismember(parameter,' ,')) = [];
                             
-                            switch parameter
-                                case 'morrow'
-                                    material_properties.default_msc = 1.0;
-                                case 'goodman'
-                                    material_properties.default_msc = 2.0;
-                                case 'soderberg'
-                                    material_properties.default_msc = 3.0;
-                                case 'walker'
-                                    material_properties.default_msc = 4.0;
-                                case 'swt'
-                                    material_properties.default_msc = 5.0;
-                                case 'gerber'
-                                    material_properties.default_msc = 6.0;
-                                case 'ratio'
-                                    material_properties.default_msc = 7.0;
-                                case 'none'
-                                    material_properties.default_msc = 8.0;
-                                otherwise
-                                    material_properties.default_msc = 2.0;
-                                    keywordWarnings(4.0) = 1.0;
+                            % Check if the parameter matches the library
+                            matchingParameter = find(strncmpi({parameter}, mscStr, length(parameter)) == 1.0);
+                            
+                            %{
+                                If there is not matching parameter, use the
+                                default value
+                            %}
+                            if (isempty(matchingParameter) == 1.0) || (length(matchingParameter) ~= 1.0)
+                                material_properties.default_msc = 2.0;
+                                keywordWarnings(4.0) = 1.0;
+                            else
+                                switch matchingParameter
+                                    case 1.0 % Morrow
+                                        material_properties.default_msc = 1.0;
+                                    case 2.0 % Goodman
+                                        material_properties.default_msc = 2.0;
+                                    case 3.0 % Soderberg
+                                        material_properties.default_msc = 3.0;
+                                    case 4.0 % Walker
+                                        material_properties.default_msc = 4.0;
+                                    case 5.0 % SWT
+                                        material_properties.default_msc = 5.0;
+                                    case 6.0 % Gerber
+                                        material_properties.default_msc = 6.0;
+                                    case 7.0 % Ratio
+                                        material_properties.default_msc = 7.0;
+                                    case 8.0 % None
+                                        material_properties.default_msc = 8.0;
+                                    otherwise
+                                end
                             end
                             
                             % Get the next line in the file
@@ -343,20 +394,29 @@ classdef importMaterial < handle
                             parameter = lower(parameter);
                             parameter(ismember(parameter,' ,')) = [];
                             
-                            switch parameter
-                                case 'uniform'
-                                    material_properties.reg_model = 1.0;
-                                case 'universal'
-                                    material_properties.reg_model = 2.0;
-                                case 'modified'
-                                    material_properties.reg_model = 3.0;
-                                case '9050'
-                                    material_properties.reg_model = 4.0;
-                                case 'none'
-                                    material_properties.reg_model = 5.0;
-                                otherwise
-                                    material_properties.reg_model = 1.0;
-                                    keywordWarnings(6.0) = 1.0;
+                            % Check if the parameter matches the library
+                            matchingParameter = find(strncmpi({parameter}, regStr, length(parameter)) == 1.0);
+                            
+                            %{
+                                If there is not matching parameter, use the
+                                default value
+                            %}
+                            if (isempty(matchingParameter) == 1.0) || (length(matchingParameter) ~= 1.0)
+                                material_properties.reg_model = 1.0;
+                                keywordWarnings(6.0) = 1.0;
+                            else
+                                switch matchingParameter
+                                    case 1.0 % Uniform
+                                        material_properties.reg_model = 1.0;
+                                    case 2.0 % Universal
+                                        material_properties.reg_model = 2.0;
+                                    case 3.0 % Modified
+                                        material_properties.reg_model = 3.0;
+                                    case 4.0 % 90/50
+                                        material_properties.reg_model = 4.0;
+                                    case 5.0 % None
+                                        material_properties.reg_model = 5.0;
+                                end
                             end
                             
                             % Get the next line in the file
@@ -513,278 +573,288 @@ classdef importMaterial < handle
                             parameter = lower(parameter);
                             parameter(ismember(parameter,' ,')) = [];
                             
-                            switch parameter
-                                case 'constants'
-                                    for dataLine = 1:2
-                                        % Get the data line
-                                        TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
-                                        
-                                        % Initialize the data line flags
-                                        flags = [];
-                                        
-                                        % If the next line is a keyword definition, continue
-                                        if (isempty(TLINE) == 0.0) && (strcmp(TLINE(1.0), '*') == 1.0)
-                                            if dataLine == 1.0
-                                                keywordWarnings(8.0) = 1.0;
-                                            end
-                                            break
-                                        elseif isempty(TLINE) == 1.0
-                                            if dataLine == 1.0
-                                                keywordWarnings(8.0) = 1.0;
-                                            end
-                                            break
-                                        end
-                                        
-                                        %{
-                                            There can be empty entries
-                                            where a property is left
-                                            undefined. Parse the line and
-                                            identify empty definitions
-                                        %}
-                                        TLINE(ismember(TLINE,' ')) = [];
-                                        
-                                        index = 1.0;
-                                        while 1.0 == 1.0
-                                            if index == length(TLINE)
+                            % Check if the parameter matches the library
+                            matchingParameter = find(strncmpi({parameter}, fatStr, length(parameter)) == 1.0);
+                            
+                            %{
+                                If there is not matching parameter, use the
+                                default value
+                            %}
+                            if (isempty(matchingParameter) == 1.0) || (length(matchingParameter) ~= 1.0)
+                                % Get the next line in the file
+                                TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
+                                
+                                keywordWarnings(8.0) = 1.0;
+                                continue
+                            else
+                                switch matchingParameter
+                                    case 1.0 % Constants
+                                        for dataLine = 1:2
+                                            % Get the data line
+                                            TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
+                                            
+                                            % Initialize the data line flags
+                                            flags = [];
+                                            
+                                            % If the next line is a keyword definition, continue
+                                            if (isempty(TLINE) == 0.0) && (strcmp(TLINE(1.0), '*') == 1.0)
+                                                if dataLine == 1.0
+                                                    keywordWarnings(8.0) = 1.0;
+                                                end
                                                 break
-                                            elseif (index == 1.0) && (strcmp(TLINE(length(TLINE) - length(strtrim(TLINE)) + 1.0), ',') == 1.0)
-                                                TLINE = ['-9e100', TLINE]; %#ok<AGROW>
-                                                index = index + 6.0;
-                                            elseif strcmp(TLINE(index:index + 1.0), ',,') == 1.0
-                                                % This value is undefined
-                                                TLINE = [TLINE(1.0: index), '-9e100', TLINE(index + 1.0:end)];
-                                                index = index + 7.0;
+                                            elseif isempty(TLINE) == 1.0
+                                                if dataLine == 1.0
+                                                    keywordWarnings(8.0) = 1.0;
+                                                end
+                                                break
+                                            end
+                                            
+                                            %{
+                                                There can be empty entries
+                                                where a property is left
+                                                undefined. Parse the line
+                                                and identify empty
+                                                definitions
+                                            %}
+                                            TLINE(ismember(TLINE,' ')) = [];
+                                            
+                                            index = 1.0;
+                                            while 1.0 == 1.0
+                                                if index == length(TLINE)
+                                                    break
+                                                elseif (index == 1.0) && (strcmp(TLINE(length(TLINE) - length(strtrim(TLINE)) + 1.0), ',') == 1.0)
+                                                    TLINE = ['-9e100', TLINE]; %#ok<AGROW>
+                                                    index = index + 6.0;
+                                                elseif strcmp(TLINE(index:index + 1.0), ',,') == 1.0
+                                                    % This value is undefined
+                                                    TLINE = [TLINE(1.0: index), '-9e100', TLINE(index + 1.0:end)];
+                                                    index = index + 7.0;
+                                                else
+                                                    index = index + 1.0;
+                                                end
+                                            end
+                                            
+                                            if dataLine == 1.0
+                                                % Get the numeric value of the data line
+                                                properties = str2num(TLINE); %#ok<ST2NM>
+                                                
+                                                % Process the data line
+                                                nProperties = length(properties);
+                                                if nProperties > 4.0
+                                                    properties = properties(1.0:4.0);
+                                                elseif nProperties < 4.0
+                                                    properties(nProperties + 1.0:4.0) = -9e100;
+                                                end
+                                                
+                                                % Sf'
+                                                if properties(1.0) ~= -9e100
+                                                    material_properties.sf = properties(1.0);
+                                                end
+                                                
+                                                % b
+                                                if properties(2.0) ~= -9e100
+                                                    material_properties.b = properties(2.0);
+                                                end
+                                                
+                                                % Ef'
+                                                if properties(3.0) ~= -9e100
+                                                    material_properties.ef = properties(3.0);
+                                                end
+                                                
+                                                % c
+                                                if properties(4.0) ~= -9e100
+                                                    material_properties.c = properties(4.0);
+                                                end
                                             else
-                                                index = index + 1.0;
+                                                % Get the numeric value of the data line
+                                                flags = str2num(TLINE); %#ok<ST2NM>
+                                                
+                                                % Process the data line
+                                                nFlags = length(flags);
+                                                if nFlags > 4.0
+                                                    flags = flags(1.0:4.0);
+                                                elseif nFlags < 4.0
+                                                    flags(nFlags + 1.0:4.0) = -9e100;
+                                                end
+                                                
+                                                % Sf'
+                                                if (flags(1.0) ~= 0.0) && (isempty(material_properties.sf) == 0.0)
+                                                    material_properties.sf_active = 1.0;
+                                                end
+                                                
+                                                % b
+                                                if (flags(2.0) ~= 0.0) && (isempty(material_properties.b) == 0.0)
+                                                    material_properties.b_active = 1.0;
+                                                end
+                                                
+                                                % Ef'
+                                                if (flags(3.0) ~= 0.0) && (isempty(material_properties.ef) == 0.0)
+                                                    material_properties.ef_active = 1.0;
+                                                end
+                                                
+                                                % c
+                                                if (flags(4.0) ~= 0.0) && (isempty(material_properties.c) == 0.0)
+                                                    material_properties.c_active = 1.0;
+                                                end
+                                                
+                                                % Get the next line in the file
+                                                TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
                                             end
                                         end
                                         
-                                        if dataLine == 1.0
-                                            % Get the numeric value of the data line
-                                            properties = str2num(TLINE); %#ok<ST2NM>
-                                            
-                                            % Process the data line
-                                            nProperties = length(properties);
-                                            if nProperties > 4.0
-                                                properties = properties(1.0:4.0);
-                                            elseif nProperties < 4.0
-                                                properties(nProperties + 1.0:4.0) = -9e100;
-                                            end
-                                            
-                                            % Sf'
-                                            if properties(1.0) ~= -9e100
-                                                material_properties.sf = properties(1.0);
-                                            end
-                                            
-                                            % b
-                                            if properties(2.0) ~= -9e100
-                                                material_properties.b = properties(2.0);
-                                            end
-                                            
-                                            % Ef'
-                                            if properties(3.0) ~= -9e100
-                                                material_properties.ef = properties(3.0);
-                                            end
-                                            
-                                            % c
-                                            if properties(4.0) ~= -9e100
-                                                material_properties.c = properties(4.0);
-                                            end
-                                        else
-                                            % Get the numeric value of the data line
-                                            flags = str2num(TLINE); %#ok<ST2NM>
-                                            
-                                            % Process the data line
-                                            nFlags = length(flags);
-                                            if nFlags > 4.0
-                                                flags = flags(1.0:4.0);
-                                            elseif nFlags < 4.0
-                                                flags(nFlags + 1.0:4.0) = -9e100;
-                                            end
-                                            
-                                            % Sf'
-                                            if (flags(1.0) ~= 0.0) && (isempty(material_properties.sf) == 0.0)
+                                        if isempty(flags) == 1.0
+                                            if isempty(material_properties.sf) == 0.0
                                                 material_properties.sf_active = 1.0;
                                             end
                                             
-                                            % b
-                                            if (flags(2.0) ~= 0.0) && (isempty(material_properties.b) == 0.0)
+                                            if isempty(material_properties.b) == 0.0
                                                 material_properties.b_active = 1.0;
                                             end
                                             
-                                            % Ef'
-                                            if (flags(3.0) ~= 0.0) && (isempty(material_properties.ef) == 0.0)
+                                            if isempty(material_properties.ef) == 0.0
                                                 material_properties.ef_active = 1.0;
                                             end
                                             
-                                            % c
-                                            if (flags(4.0) ~= 0.0) && (isempty(material_properties.c) == 0.0)
+                                            if isempty(material_properties.c) == 0.0
                                                 material_properties.c_active = 1.0;
                                             end
+                                        end
+                                    case 2.0 % Test data
+                                        % Initialize the test data buffers
+                                        n_values = [];
+                                        s_values = [];
+                                        
+                                        dataLine = 0.0;
+                                        
+                                        while 1.0 == 1.0
+                                            % Increment the data line number
+                                            dataLine = dataLine + 1.0;
                                             
-                                            % Get the next line in the file
-                                            TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
-                                        end
-                                    end
-                                    
-                                    if isempty(flags) == 1.0
-                                        if isempty(material_properties.sf) == 0.0
-                                            material_properties.sf_active = 1.0;
-                                        end
-                                        
-                                        if isempty(material_properties.b) == 0.0
-                                            material_properties.b_active = 1.0;
-                                        end
-                                        
-                                        if isempty(material_properties.ef) == 0.0
-                                            material_properties.ef_active = 1.0;
-                                        end
-                                        
-                                        if isempty(material_properties.c) == 0.0
-                                            material_properties.c_active = 1.0;
-                                        end
-                                    end
-                                case 'testdata'
-                                    % Initialize the test data buffers
-                                    n_values = [];
-                                    s_values = [];
-                                    
-                                    dataLine = 0.0;
-                                    
-                                    while 1.0 == 1.0
-                                        % Increment the data line number
-                                        dataLine = dataLine + 1.0;
-                                        
-                                        % Get the data line
-                                        TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
-                                        
-                                        % If the next line is a keyword definition, continue
-                                        if (isempty(TLINE) == 0.0) && (strcmp(TLINE(1.0), '*') == 1.0)
-                                            if dataLine == 1.0
-                                                keywordWarnings(8.0) = 1.0;
-                                            end
-                                            break
-                                        elseif isempty(TLINE) == 1.0
-                                            if dataLine == 1.0
-                                                keywordWarnings(8.0) = 1.0;
-                                            end
-                                            break
-                                        end
-                                        
-                                        % Get the numeric value of the data line
-                                        properties = str2num(TLINE); %#ok<ST2NM>
-                                        
-                                        % Get the number of S-values
-                                        nSValues = length(properties) - 1.0;
-                                        
-                                        % Process the data line
-                                        nProperties = length(properties);
-                                        if nProperties < 2.0
-                                            % Get the next line in the file
+                                            % Get the data line
                                             TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
                                             
-                                            keywordWarnings(8.0) = 1.0;
-                                            break
-                                        elseif (dataLine > 1.0) && (nSValues ~= nSValuesP)
-                                            % Get the next line in the file
-                                            TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
-                                            
-                                            keywordWarnings(8.0) = 1.0;
-                                            break
-                                        end
-                                        
-                                        n_values(dataLine) = properties(1.0); %#ok<AGROW>
-                                        s_values(dataLine, :) = properties(2.0:end); %#ok<AGROW>
-                                        
-                                        nSValuesP = nSValues;
-                                    end
-                                    
-                                    % Check if there is any S-N data
-                                    if isempty(n_values) == 0.0
-                                        % Make sure there are at least two rows
-                                        if length(n_values) < 2.0
-                                            keywordWarnings(8.0) = 1.0;
-                                            continue
-                                        end
-                                        
-                                        % Make sure the N-values are increasing
-                                        if any(diff(n_values) < 0.0) == 1.0
-                                            keywordWarnings(8.0) = 1.0;
-                                            continue
-                                        end
-                                        
-                                        % Make sure the S-values are decreasing
-                                        for i = 1:nSValues
-                                            if any(diff(s_values(1.0, :)) > 0.0) == 1.0
-                                                keywordWarnings(8.0) = 1.0;
+                                            % If the next line is a keyword definition, continue
+                                            if (isempty(TLINE) == 0.0) && (strcmp(TLINE(1.0), '*') == 1.0)
+                                                if dataLine == 1.0
+                                                    keywordWarnings(8.0) = 1.0;
+                                                end
+                                                break
+                                            elseif isempty(TLINE) == 1.0
+                                                if dataLine == 1.0
+                                                    keywordWarnings(8.0) = 1.0;
+                                                end
                                                 break
                                             end
-                                        end
-                                        
-                                        material_properties.n_values = n_values;
-                                        material_properties.s_values = s_values';
-                                    end
-                                    
-                                    %{
-                                        If the user specified more than one
-                                        S-N curve, the next keyword must be
-                                        *R RATIOS
-                                    %}
-                                    if nSValues > 1.0
-                                        if isempty(TLINE) == 1.0
-                                            while 1.0 == 1.0
+                                            
+                                            % Get the numeric value of the data line
+                                            properties = str2num(TLINE); %#ok<ST2NM>
+                                            
+                                            % Get the number of S-values
+                                            nSValues = length(properties) - 1.0;
+                                            
+                                            % Process the data line
+                                            nProperties = length(properties);
+                                            if nProperties < 2.0
                                                 % Get the next line in the file
                                                 TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
                                                 
-                                                if isempty(TLINE) == 0.0
+                                                keywordWarnings(8.0) = 1.0;
+                                                break
+                                            elseif (dataLine > 1.0) && (nSValues ~= nSValuesP)
+                                                % Get the next line in the file
+                                                TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
+                                                
+                                                keywordWarnings(8.0) = 1.0;
+                                                break
+                                            end
+                                            
+                                            n_values(dataLine) = properties(1.0); %#ok<AGROW>
+                                            s_values(dataLine, :) = properties(2.0:end); %#ok<AGROW>
+                                            
+                                            nSValuesP = nSValues;
+                                        end
+                                        
+                                        % Check if there is any S-N data
+                                        if isempty(n_values) == 0.0
+                                            % Make sure there are at least two rows
+                                            if length(n_values) < 2.0
+                                                keywordWarnings(8.0) = 1.0;
+                                                continue
+                                            end
+                                            
+                                            % Make sure the N-values are increasing
+                                            if any(diff(n_values) < 0.0) == 1.0
+                                                keywordWarnings(8.0) = 1.0;
+                                                continue
+                                            end
+                                            
+                                            % Make sure the S-values are decreasing
+                                            for i = 1:nSValues
+                                                if any(diff(s_values(1.0, :)) > 0.0) == 1.0
                                                     keywordWarnings(8.0) = 1.0;
                                                     break
                                                 end
                                             end
-                                        end
-                                        % Isolate the keyword
-                                        TOKEN = strtok(TLINE, ',');
-                                        TOKEN(ismember(TOKEN,' , *')) = [];
-                                        
-                                        if strcmpi(TOKEN, 'RRATIOS') == 0.0
-                                            keywordWarnings(8.0) = 1.0;
-                                            continue
+                                            
+                                            material_properties.n_values = n_values;
+                                            material_properties.s_values = s_values';
                                         end
                                         
-                                        % Get the next line in the file
-                                        TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
-                                        
-                                        % Get the numeric value of the data line
-                                        r_values = str2num(TLINE); %#ok<ST2NM>
-                                        
-                                        if isempty(r_values) == 1.0
-                                            keywordWarnings(8.0) = 1.0;
-                                            continue
-                                        end
-                                        
-                                        if (all(diff(r_values) > 0.0) == 0.0) || (any(r_values >= 1.0) == 1.0) || (length(r_values) ~= nSValues)
-                                            keywordWarnings(8.0) = 1.0;
-                                            continue
-                                        end
-                                        
-                                        material_properties.r_values = r_values;
-                                        
-                                        % Get the next line in the file
-                                        TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
-                                    else
                                         %{
-                                            There is only one set of S-N
-                                            data. Assign an R-value of -1
-                                            to this data
+                                            If the user specified more than
+                                            one S-N curve, the next keyword
+                                            must be *R RATIOS
                                         %}
-                                        material_properties.r_values = -1.0;
-                                    end
-                                otherwise
-                                    % Get the next line in the file
-                                    TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
-                                    
-                                    keywordWarnings(8.0) = 1.0;
-                                    continue
+                                        if nSValues > 1.0
+                                            if isempty(TLINE) == 1.0
+                                                while 1.0 == 1.0
+                                                    % Get the next line in the file
+                                                    TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
+                                                    
+                                                    if isempty(TLINE) == 0.0
+                                                        keywordWarnings(8.0) = 1.0;
+                                                        break
+                                                    end
+                                                end
+                                            end
+                                            % Isolate the keyword
+                                            TOKEN = strtok(TLINE, ',');
+                                            TOKEN(ismember(TOKEN,' , *')) = [];
+                                            
+                                            if strcmpi(TOKEN, 'RRATIOS') == 0.0
+                                                keywordWarnings(8.0) = 1.0;
+                                                continue
+                                            end
+                                            
+                                            % Get the next line in the file
+                                            TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
+                                            
+                                            % Get the numeric value of the data line
+                                            r_values = str2num(TLINE); %#ok<ST2NM>
+                                            
+                                            if isempty(r_values) == 1.0
+                                                keywordWarnings(8.0) = 1.0;
+                                                continue
+                                            end
+                                            
+                                            if (all(diff(r_values) > 0.0) == 0.0) || (any(r_values >= 1.0) == 1.0) || (length(r_values) ~= nSValues)
+                                                keywordWarnings(8.0) = 1.0;
+                                                continue
+                                            end
+                                            
+                                            material_properties.r_values = r_values;
+                                            
+                                            % Get the next line in the file
+                                            TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
+                                        else
+                                            %{
+                                                There is only one set of
+                                                S-N data. Assign an R-value
+                                                of -1 to this data
+                                            %}
+                                            material_properties.r_values = -1.0;
+                                        end
+                                end
                             end
                         case 9.0 % *CYCLIC
                             for dataLine = 1:2
@@ -898,165 +968,173 @@ classdef importMaterial < handle
                             parameter = lower(parameter);
                             parameter(ismember(parameter,' ,')) = [];
                             
-                            switch parameter
-                                case 'user'
-                                    % Get the next line in the file
-                                    TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
-                                    
-                                    if isempty(TLINE) == 1.0
-                                        keywordWarnings(10.0) = 1.0;
-                                        continue
-                                    end
-                                    
-                                    % Get the numeric value of the data line
-                                    solk = str2num(TLINE); %#ok<ST2NM>
-                                    
-                                    if isempty(solk) == 1.0
-                                        keywordWarnings(10.0) = 1.0;
-                                        continue
-                                    elseif length(solk) > 1.0
-                                        solk = solk(1.0);
-                                    end
-                                case 'socie'
-                                    solk = 0.2857;
-                                case 'general'
-                                    % Get the next line in the file
-                                    TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
-                                    
-                                    if isempty(TLINE) == 1.0
-                                        keywordWarnings(10.0) = 1.0;
-                                        continue
-                                    end
-                                    
-                                    % Get the numeric value of the data line
-                                    nssc = str2num(TLINE); %#ok<ST2NM>
-                                    
-                                    if isempty(nssc) == 1.0
-                                        keywordWarnings(10.0) = 1.0;
-                                        continue
-                                    elseif length(nssc) > 3.0
-                                        nssc = nssc(1.0:3.0);
-                                    elseif length(nssc) < 3.0
-                                        keywordWarnings(10.0) = 1.0;
-                                        continue
-                                    end
-                                    
-                                    % Get user input
-                                    r = nssc(1.0);
-                                    fi = nssc(2.0);
-                                    t = nssc(3.0);
-                                    
-                                    % Calculate k based on user input
-                                    syms k
-                                    eqn = (fi/t) == (2.0*sqrt(1.0 + k^2))/(sqrt(((2.0*k)/(1.0 - r))^2.0 + 1.0) + ((2.0*k)/(1.0- r)));
-                                    solk = eval(solve(eqn, k)); clc
-                                case 'dangvan'
-                                    % Get the next line in the file
-                                    TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
-                                    
-                                    if isempty(TLINE) == 1.0
-                                        keywordWarnings(10.0) = 1.0;
-                                        continue
-                                    end
-                                    
-                                    % Get the numeric value of the data line
-                                    nssc = str2num(TLINE); %#ok<ST2NM>
-                                    
-                                    if isempty(nssc) == 1.0
-                                        keywordWarnings(10.0) = 1.0;
-                                        continue
-                                    elseif length(nssc) > 2.0
-                                        nssc = nssc(1.0:2.0);
-                                    elseif length(nssc) < 2.0
-                                        keywordWarnings(10.0) = 1.0;
-                                        continue
-                                    end
-                                    
-                                    % Get user input
-                                    fi = nssc(1.0);
-                                    t = nssc(2.0);
-                                    
-                                    % Calculate k based on user input
-                                    solk = ((3.0*t)/(fi)) - (3.0/2.0);
-                                case 'sines'
-                                    % Get the next line in the file
-                                    TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
-                                    
-                                    if isempty(TLINE) == 1.0
-                                        keywordWarnings(10.0) = 1.0;
-                                        continue
-                                    end
-                                    
-                                    % Get the numeric value of the data line
-                                    nssc = str2num(TLINE); %#ok<ST2NM>
-                                    
-                                    if isempty(nssc) == 1.0
-                                        keywordWarnings(10.0) = 1.0;
-                                        continue
-                                    elseif length(nssc) > 3.0
-                                        nssc = nssc(1.0:3.0);
-                                    elseif length(nssc) < 3.0
-                                        keywordWarnings(10.0) = 1.0;
-                                        continue
-                                    end
-                                    
-                                    % Get user input
-                                    fi = nssc(1.0);
-                                    t = nssc(2.0);
-                                    uts = nssc(3.0);
-                                    
-                                    % Calculate k based on user input
-                                    solk = ((3.0*t*(uts + fi))/(uts*fi)) - sqrt(6.0);
-                                case 'crossland'
-                                    % Get the next line in the file
-                                    TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
-                                    
-                                    if isempty(TLINE) == 1.0
-                                        keywordWarnings(10.0) = 1.0;
-                                        continue
-                                    end
-                                    
-                                    % Get the numeric value of the data line
-                                    nssc = str2num(TLINE); %#ok<ST2NM>
-                                    
-                                    if isempty(nssc) == 1.0
-                                        keywordWarnings(10.0) = 1.0;
-                                        continue
-                                    elseif length(nssc) > 2.0
-                                        nssc = nssc(1.0:2.0);
-                                    elseif length(nssc) < 2.0
-                                        keywordWarnings(10.0) = 1.0;
-                                        continue
-                                    end
-                                    
-                                    % Get user input
-                                    fi = nssc(1.0);
-                                    t = nssc(2.0);
-                                    
-                                    % Calculate k based on user input
-                                    solk = ((3.0*t)/(fi)) - sqrt(3.0);
-                                otherwise
-                                    % Get the next line in the file
-                                    TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
-                                    
-                                    keywordWarnings(10.0) = 1.0;
-                                    continue
+                            % Check if the parameter matches the library
+                            matchingParameter = find(strncmpi({parameter}, nssStr, length(parameter)) == 1.0);
+                            
+                            %{
+                                If there is not matching parameter, use the
+                                default value
+                            %}
+                            if (isempty(matchingParameter) == 1.0) || (length(matchingParameter) ~= 1.0)
+                                TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
+                                
+                                keywordWarnings(10.0) = 1.0;
+                                continue
+                            else
+                                switch matchingParameter
+                                    case 1.0 % User
+                                        % Get the next line in the file
+                                        TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
+                                        
+                                        if isempty(TLINE) == 1.0
+                                            keywordWarnings(10.0) = 1.0;
+                                            continue
+                                        end
+                                        
+                                        % Get the numeric value of the data line
+                                        solk = str2num(TLINE); %#ok<ST2NM>
+                                        
+                                        if isempty(solk) == 1.0
+                                            keywordWarnings(10.0) = 1.0;
+                                            continue
+                                        elseif length(solk) > 1.0
+                                            solk = solk(1.0);
+                                        end
+                                    case 2.0 % Socie
+                                        solk = 0.2857;
+                                    case 3.0 % General
+                                        % Get the next line in the file
+                                        TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
+                                        
+                                        if isempty(TLINE) == 1.0
+                                            keywordWarnings(10.0) = 1.0;
+                                            continue
+                                        end
+                                        
+                                        % Get the numeric value of the data line
+                                        nssc = str2num(TLINE); %#ok<ST2NM>
+                                        
+                                        if isempty(nssc) == 1.0
+                                            keywordWarnings(10.0) = 1.0;
+                                            continue
+                                        elseif length(nssc) > 3.0
+                                            nssc = nssc(1.0:3.0);
+                                        elseif length(nssc) < 3.0
+                                            keywordWarnings(10.0) = 1.0;
+                                            continue
+                                        end
+                                        
+                                        % Get user input
+                                        r = nssc(1.0);
+                                        fi = nssc(2.0);
+                                        t = nssc(3.0);
+                                        
+                                        % Calculate k based on user input
+                                        syms k
+                                        eqn = (fi/t) == (2.0*sqrt(1.0 + k^2))/(sqrt(((2.0*k)/(1.0 - r))^2.0 + 1.0) + ((2.0*k)/(1.0- r)));
+                                        solk = eval(solve(eqn, k)); clc
+                                    case 4.0 % Dang Van
+                                        % Get the next line in the file
+                                        TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
+                                        
+                                        if isempty(TLINE) == 1.0
+                                            keywordWarnings(10.0) = 1.0;
+                                            continue
+                                        end
+                                        
+                                        % Get the numeric value of the data line
+                                        nssc = str2num(TLINE); %#ok<ST2NM>
+                                        
+                                        if isempty(nssc) == 1.0
+                                            keywordWarnings(10.0) = 1.0;
+                                            continue
+                                        elseif length(nssc) > 2.0
+                                            nssc = nssc(1.0:2.0);
+                                        elseif length(nssc) < 2.0
+                                            keywordWarnings(10.0) = 1.0;
+                                            continue
+                                        end
+                                        
+                                        % Get user input
+                                        fi = nssc(1.0);
+                                        t = nssc(2.0);
+                                        
+                                        % Calculate k based on user input
+                                        solk = ((3.0*t)/(fi)) - (3.0/2.0);
+                                    case 5.0 % Sines
+                                        % Get the next line in the file
+                                        TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
+                                        
+                                        if isempty(TLINE) == 1.0
+                                            keywordWarnings(10.0) = 1.0;
+                                            continue
+                                        end
+                                        
+                                        % Get the numeric value of the data line
+                                        nssc = str2num(TLINE); %#ok<ST2NM>
+                                        
+                                        if isempty(nssc) == 1.0
+                                            keywordWarnings(10.0) = 1.0;
+                                            continue
+                                        elseif length(nssc) > 3.0
+                                            nssc = nssc(1.0:3.0);
+                                        elseif length(nssc) < 3.0
+                                            keywordWarnings(10.0) = 1.0;
+                                            continue
+                                        end
+                                        
+                                        % Get user input
+                                        fi = nssc(1.0);
+                                        t = nssc(2.0);
+                                        uts = nssc(3.0);
+                                        
+                                        % Calculate k based on user input
+                                        solk = ((3.0*t*(uts + fi))/(uts*fi)) - sqrt(6.0);
+                                    case 6.0 % Crossland
+                                        % Get the next line in the file
+                                        TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
+                                        
+                                        if isempty(TLINE) == 1.0
+                                            keywordWarnings(10.0) = 1.0;
+                                            continue
+                                        end
+                                        
+                                        % Get the numeric value of the data line
+                                        nssc = str2num(TLINE); %#ok<ST2NM>
+                                        
+                                        if isempty(nssc) == 1.0
+                                            keywordWarnings(10.0) = 1.0;
+                                            continue
+                                        elseif length(nssc) > 2.0
+                                            nssc = nssc(1.0:2.0);
+                                        elseif length(nssc) < 2.0
+                                            keywordWarnings(10.0) = 1.0;
+                                            continue
+                                        end
+                                        
+                                        % Get user input
+                                        fi = nssc(1.0);
+                                        t = nssc(2.0);
+                                        
+                                        % Calculate k based on user input
+                                        solk = ((3.0*t)/(fi)) - sqrt(3.0);
+                                end
                             end
                             
                             if isempty(solk) == 1.0
-                                keywordWarnings(10.0) = 1.0;
+                                keywordWarnings(10.0) = 2.0;
                                 continue
                             elseif isreal(solk) == 0.0
-                                keywordWarnings(10.0) = 1.0;
+                                keywordWarnings(10.0) = 3.0;
                                 continue
                             elseif isnan(solk) == 1.0
-                                keywordWarnings(10.0) = 1.0;
+                                keywordWarnings(10.0) = 4.0;
                                 continue
                             elseif isinf(solk) == 1.0
-                                keywordWarnings(10.0) = 1.0;
+                                keywordWarnings(10.0) = 5.0;
                                 continue
                             elseif solk < 0.0
-                                keywordWarnings(10.0) = 1.0;
+                                keywordWarnings(10.0) = 6.0;
                                 continue
                             else
                                 material_properties.nssc = solk;
@@ -1074,24 +1152,33 @@ classdef importMaterial < handle
                             parameter = lower(parameter);
                             parameter(ismember(parameter,' ,')) = [];
                             
-                            switch parameter
-                                case 'wroughtsteel'
-                                    material_properties.class = 1.0;
-                                case 'ductileiron'
-                                    material_properties.class = 2.0;
-                                case 'malleableiron'
-                                    material_properties.class = 3.0;
-                                case 'wroughtiron'
-                                    material_properties.class = 4.0;
-                                case 'castiron'
-                                    material_properties.class = 5.0;
-                                case 'aluminium'
-                                    material_properties.class = 6.0;
-                                case 'other'
-                                    material_properties.class = 7.0;
-                                otherwise
-                                    material_properties.class = 1.0;
-                                    keywordWarnings(11.0) = 1.0;
+                            % Check if the parameter matches the library
+                            matchingParameter = find(strncmpi({parameter}, classStr, length(parameter)) == 1.0);
+                            
+                            %{
+                                If there is not matching parameter, use the
+                                default value
+                            %}
+                            if (isempty(matchingParameter) == 1.0) || (length(matchingParameter) ~= 1.0)
+                                material_properties.class = 1.0;
+                                keywordWarnings(11.0) = 1.0;
+                            else
+                                switch matchingParameter
+                                    case 1.0 % Wrought steel
+                                        material_properties.class = 1.0;
+                                    case 2.0 % Ductile iron
+                                        material_properties.class = 2.0;
+                                    case 3.0 % Malleable iron
+                                        material_properties.class = 3.0;
+                                    case 4.0 % Wrought iron
+                                        material_properties.class = 4.0;
+                                    case 5.0 % Cast iron
+                                        material_properties.class = 5.0;
+                                    case 6.0 % Aluminium
+                                        material_properties.class = 6.0;
+                                    case 7.0 % Other
+                                        material_properties.class = 7.0;
+                                end
                             end
                             
                             % Get the next line in the file
@@ -1136,8 +1223,28 @@ classdef importMaterial < handle
                     fprintf('WARNING: The material file ''%s'' contains no valid material definitions\n', materialFile)
             end
             
+            %{
+                Print warning in case the normal stress sensitivty constant
+                could not be evaluated
+            %}
+            if keywordWarnings(10.0) > 1.0
+                switch keywordWarnings(10.0)
+                    case 2.0
+                        fprintf('\nWARNING: In *NORMAL STRESS SENSITIVITY, the k-parameter could not be evaluated\n')
+                    case 3.0
+                        fprintf('\nWARNING: In *NORMAL STRESS SENSITIVITY, the calculated k-parameter is complex\n')
+                    case 4.0
+                        fprintf('\nWARNING: In *NORMAL STRESS SENSITIVITY, the calculated k-parameter is NaN\n')
+                    case 5.0
+                        fprintf('\nWARNING: In *NORMAL STRESS SENSITIVITY, the calculated k-parameter is INF\n')
+                    case 6.0
+                        fprintf('\nWARNING: In *NORMAL STRESS SENSITIVITY, the calculated k-parameter is negative\n')
+                    otherwise
+                end
+            end
+            
             % Summarise processed keywords
-            if any(keywordWarnings) == 1.0
+            if any(keywordWarnings == 1.0) == 1.0
                 fprintf('\nWARNING: The following keywords/parameters were not processed correctly by the material file reader:\n')
                 fprintf('-------------------------------------------------------------------------------------------------\n')
                 
@@ -1146,6 +1253,7 @@ classdef importMaterial < handle
                 
                 fprintf('*%s\n', keywords{:})
                 fprintf('Check the material file for possible syntax errors. Material data may only be partially saved\n')
+                fprintf('Default values will be used, which may cause undesirable behaviour\n')
             end
         end
     end

@@ -50,7 +50,7 @@ classdef highFrequency < handle
                 return
             end
             
-            if algorithm == 3.0
+            if (algorithm == 3.0) || (algorithm == 10.0)
                 [Sxx, Syy, Szz, Txy, Tyz, Txz, error] = highFrequency.superimposeUniaxial(Sxx, Sxx_hf, time{1}, time{2});
             else
                 [Sxx, Syy, Szz, Txy, Tyz, Txz, error] = highFrequency.superimpose(Sxx_hf, Syy_hf, Szz_hf, Txy_hf, Tyz_hf, Txz_hf,...
