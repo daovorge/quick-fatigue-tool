@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="809153522" file="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\toolbox\Mohr Solver.prj" location="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\toolbox" name="Mohr Solver" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="4027115911" file="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\toolbox\Mohr Solver.prj" location="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\toolbox" name="Mohr Solver" target="target.mlapps" target-name="Package App">
     <param.appname>Mohr Solver</param.appname>
     <param.authnamewatermark>Louis Vallance</param.authnamewatermark>
     <param.email>louisvallance@hotmail.co.uk</param.email>
@@ -11,7 +11,7 @@
       <file>${PROJECT_ROOT}\Mohr Solver_resources\icon_16.png</file>
     </param.icons>
     <param.summary>Calculate principal stresses from a tensor</param.summary>
-    <param.description>Mohr Solver allows the user to calculate the principal, normal and shear stresses from a specified Cauchy stress tensor. For guidance on using Mohr Solver, please refer to Appendix A3.5 of the Quick Fatigue Tool User Guide.</param.description>
+    <param.description>Mohr Solver allows the user to calculate the principal, normal and shear stresses from a specified Cauchy stress tensor. For guidance on using Mohr Solver, please refer to Appendix A3.5 of the Quick Fatigue Tool Appendices.</param.description>
     <param.screenshot />
     <param.version>6.10.09</param.version>
     <param.products.name>

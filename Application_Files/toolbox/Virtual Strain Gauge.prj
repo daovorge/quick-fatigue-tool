@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="1003167633" file="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\toolbox\Virtual Strain Gauge.prj" location="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\toolbox" name="Virtual Strain Gauge" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="2997286594" file="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\toolbox\Virtual Strain Gauge.prj" location="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\toolbox" name="Virtual Strain Gauge" target="target.mlapps" target-name="Package App">
     <param.appname>Virtual Strain Gauge</param.appname>
     <param.authnamewatermark>Louis Vallance</param.authnamewatermark>
     <param.email>louisvallance@hotmail.co.uk</param.email>
@@ -11,7 +11,7 @@
       <file>${PROJECT_ROOT}\Virtual Strain Gauge_resources\icon_16.png</file>
     </param.icons>
     <param.summary>Synthesisze the output of a virtual strain gauge from a strain tensor history</param.summary>
-    <param.description>Virtual Strain Gauge allows the user to create strain gauge histories from a strain tensor history. The app can be used to verify the behaviour of a real strain gauge with results obtained by FEA. For guidance on using Rosette Analysis, please refer to Appendix A3.4 of the Quick Fatigue Tool User Guide.</param.description>
+    <param.description>Virtual Strain Gauge allows the user to create strain gauge histories from a strain tensor history. The app can be used to verify the behaviour of a real strain gauge with results obtained by FEA. For guidance on using Rosette Analysis, please refer to Appendix A3.4 of the Quick Fatigue Tool Appendices.</param.description>
     <param.screenshot />
     <param.version>6.10.09</param.version>
     <param.products.name>
