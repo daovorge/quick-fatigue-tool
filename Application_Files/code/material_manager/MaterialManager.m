@@ -12,7 +12,7 @@ function varargout = MaterialManager(varargin)%#ok<*DEFNU>
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 13-Apr-2017 10:01:38 GMT
+%   Last modified 21-Jun-2017 12:45:05 GMT
     
     %%
     
@@ -51,19 +51,13 @@ else
 end
 
 % Load the help icon
-[a,~]=imread('icoR_info.jpg');
+[a,~]=imread('icoR_help.jpg');
 [r,c,~]=size(a);
 x=ceil(r/35);
 y=ceil(c/35);
 g=a(1:x:end,1:y:end,:);
 g(g==255)=5.5*255;
 set(handles.pButton_help, 'CData', g);
-
-approot = [getenv('USERPROFILE'), '\Documents\MATLAB\Apps\Material Manager'];
-
-if exist(approot, 'dir')
-    addpath(approot)
-end
 
 % Choose default command line output for MaterialManager
 handles.output = hObject;
@@ -79,7 +73,7 @@ movegui(hObject, 'center')
 
 %% Check for user materials in the DATA/MATERIAL/LOCAL directory
 % Get listing of materials
-userMaterials = dir('Data/material/local/*.mat');
+userMaterials = dir([pwd, '/Data/material/local/*.mat']);
 
 % Check number of materials
 [numberOfMaterials, ~] = size(userMaterials);
@@ -645,6 +639,13 @@ end
 
 % --- Executes on button press in pButton_eval.
 function pButton_eval_Callback(~, ~, handles)
+% Check for the prerequisite files
+if exist('preProcess.m', 'file') ~= 2.0
+    msg = sprintf('Missing class ''preProcess.m''.\r\n\r\nThe Evaluate function requires the full Quick Fatigue Tool application:\r\n\r\n/matlabcentral/fileexchange/51041-quick-fatigue-tool');
+    errordlg(msg, 'Quick Fatigue Tool')
+    return
+end
+
 % Flag to prevent messages from being written
 setappdata(0, 'evaluateMaterialMessenger', 1.0)
 

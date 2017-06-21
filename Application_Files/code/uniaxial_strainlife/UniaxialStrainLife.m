@@ -55,6 +55,17 @@ guidata(hObject, handles);
 % UIWAIT makes UniaxialStrainLife wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
+% Load icons
+[a,~]=imread('icoR_fileOpen.jpg');
+[r,c,~]=size(a);
+x=ceil(r/35);
+y=ceil(c/35);
+g=a(1:x:end,1:y:end,:);
+g(g==255)=5.5*255;
+set(handles.pButton_browseInput, 'CData', g);
+set(handles.pButton_browseMaterial, 'CData', g);
+set(handles.pButton_resultsLocation, 'CData', g);
+
 % Load the panel state
 if isappdata(0, 'panel_uniaxialStrainLife_edit_inputFile') == 1.0
     %{
@@ -305,8 +316,8 @@ set(handles.rButton_stress, 'value', 0.0)
 set(handles.rButton_strain, 'value', 1.0)
 set(handles.rButon_strainUnitsStrain, 'value', 0.0, 'enable', 'on')
 set(handles.rButton_strainUnitsMicro, 'value', 1.0, 'enable', 'on')
-set(handles.rButton_typeElastic, 'value', 1.0, 'enable', 'on')
-set(handles.rButton_typePlastic, 'value', 0.0, 'enable', 'on')
+set(handles.rButton_typeElastic, 'value', 0.0, 'enable', 'on')
+set(handles.rButton_typePlastic, 'value', 1.0, 'enable', 'on')
 
 % Material definition
 setMaterialName(handles)

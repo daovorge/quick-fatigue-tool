@@ -70,6 +70,15 @@ g=a(1:x:end,1:y:end,:);
 g(g==255)=5.5*255;
 set(handles.pButton_showDiagram, 'CData', g);
 
+[a,~]=imread('icoR_fileOpen.jpg');
+[r,c,~]=size(a);
+x=ceil(r/35);
+y=ceil(c/35);
+g=a(1:x:end,1:y:end,:);
+g(g==255)=5.5*255;
+set(handles.pButton_browseInput, 'CData', g);
+set(handles.pButton_browseOutput, 'CData', g);
+
 % Load the panel state
 if isappdata(0, 'panel_virtual_gauge_editTensor') == 1.0
     set(handles.edit_tensor, 'string', getappdata(0, 'panel_virtual_gauge_editTensor'))

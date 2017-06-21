@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="229214146" file="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\toolbox\Multiaxial Gauge Fatigue.prj" location="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\toolbox" name="Multiaxial Gauge Fatigue" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="3324628653" file="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\toolbox\Multiaxial Gauge Fatigue.prj" location="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\toolbox" name="Multiaxial Gauge Fatigue" target="target.mlapps" target-name="Package App">
     <param.appname>Multiaxial Gauge Fatigue</param.appname>
     <param.authnamewatermark>Louis Vallance</param.authnamewatermark>
     <param.email>louisvallance@hotmail.co.uk</param.email>
@@ -62,8 +62,9 @@
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\main\CardanRoots.m</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\main\cleanup.m</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\main\css.m</file>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\main\css2.m</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\main\css2b.m</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\main\css2c.m</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\main\css2d.m</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\main\eig3.m</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\main\fos.m</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\main\fosUpdate.m</file>
@@ -71,7 +72,6 @@
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\main\getAlpha.m</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\main\getSFA.m</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\main\group.m</file>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\main\importMaterial.m</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\main\interpolate.m</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\main\messenger.m</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\main\mscFileUtils.m</file>
@@ -96,6 +96,16 @@
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\odb_interface\python.m</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\virtual_gauge\RosetteDiagram.fig</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\virtual_gauge\RosetteDiagram.m</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Data\kt\default.kt</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Data\kt\juvinall-1967.kt</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Data\kt\kt_curves.m</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Data\kt\ktx_curves.m</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Data\kt\Niemann-Winter-Cast-Iron-Lamellar-Graphite.ktx</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Data\kt\Niemann-Winter-Cast-Iron-Nodular-Graphite.ktx</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Data\kt\Niemann-Winter-Cast-Steel.ktx</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Data\kt\Niemann-Winter-Malleable-Cast-Iron.ktx</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Data\kt\Niemann-Winter-Rolled-Steel.ktx</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Data\kt\rcjohnson-1973.kt</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Data\material\dnv\B1-air.mat</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Data\material\dnv\B1-cath.mat</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Data\material\dnv\B2-air.mat</file>
@@ -145,11 +155,19 @@
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Data\material\system\mat_enum.mat</file>
     </fileset.depfun>
     <fileset.resources>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\multiaxial_gauge_fatigue\orientation.jpg</file>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\odb_interface\icoR_bulb.jpg</file>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\virtual_gauge\gauge_45.png</file>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\virtual_gauge\gauge_60.png</file>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\virtual_gauge\gauge_arbitrary.png</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\material_manager\icoR_amplitude.jpg</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\material_manager\icoR_calculator.jpg</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\material_manager\icoR_delete.jpg</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\material_manager\icoR_edit.jpg</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\material_manager\icoR_fileOpen.jpg</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\material_manager\icoR_help.jpg</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\material_manager\importMaterial.m</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\multiaxial_gauge_fatigue\gauge_45.png</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\multiaxial_gauge_fatigue\gauge_60.png</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\multiaxial_gauge_fatigue\gauge_arbitrary.png</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\multiaxial_gauge_fatigue\icoR_bulb.jpg</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Application_Files\code\multiaxial_gauge_fatigue\icoR_orientation.jpg</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Data\kt</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\quick-fatigue-tool\Data\material</file>
     </fileset.resources>
     <fileset.package />

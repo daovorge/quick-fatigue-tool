@@ -60,8 +60,8 @@ guidata(hObject, handles);
 % UIWAIT makes MultiaxialFatigue wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
-% Load the orientation icon
-[a,~]=imread('orientation.jpg');
+%% Load the orientation icon
+[a,~]=imread('icoR_orientation.jpg');
 [r,c,~]=size(a);
 x=ceil(r/35);
 y=ceil(c/35);
@@ -69,7 +69,21 @@ g=a(1:x:end,1:y:end,:);
 g(g==255)=5.5*255;
 set(handles.pButton_gaugeOrientation, 'CData', g);
 
-% Load the panel state
+[a,~]=imread('icoR_fileOpen.jpg');
+[r,c,~]=size(a);
+x=ceil(r/35);
+y=ceil(c/35);
+g=a(1:x:end,1:y:end,:);
+g(g==255)=5.5*255;
+set(handles.pButton_gauge_0_path, 'CData', g);
+set(handles.pButton_gauge_45_path, 'CData', g);
+set(handles.pButton_gauge_90_path, 'CData', g);
+set(handles.pButton_browseMaterial, 'CData', g);
+set(handles.pButton_msc_user, 'CData', g);
+set(handles.pButton_location, 'CData', g);
+
+
+%% Load the panel state
 if isappdata(0, 'panel_multiaxialFatigue_edit_gauge_0') == 1.0
     % Gauge definition
     set(handles.edit_gauge_0, 'string', getappdata(0, 'panel_multiaxialFatigue_edit_gauge_0'))

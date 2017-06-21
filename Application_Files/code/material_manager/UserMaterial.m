@@ -12,7 +12,7 @@ function varargout = UserMaterial(varargin)%#ok<*DEFNU>
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 13-Apr-2017 10:01:38 GMT
+%   Last modified 21-Jun-2017 11:22:28 GMT
     
     %%
     
@@ -71,7 +71,7 @@ g=a(1:x:end,1:y:end,:);
 g(g==255)=5.5*255;
 set(handles.pButton_k, 'CData', g);
 
-[a,~]=imread('icoR_info.jpg');
+[a,~]=imread('icoR_help.jpg');
 [r,c,~]=size(a); 
 x=ceil(r/35); 
 y=ceil(c/35); 
@@ -79,7 +79,7 @@ g=a(1:x:end,1:y:end,:);
 g(g==255)=5.5*255;
 set(handles.pButton_snHelp, 'CData', g);
 
-[a,~]=imread('icoR_info.jpg');
+[a,~]=imread('icoR_help.jpg');
 [r,c,~]=size(a); 
 x=ceil(r/35); 
 y=ceil(c/35); 
@@ -1762,7 +1762,15 @@ end
 
 % --- Executes on button press in pButton_changeLocation.
 function pButton_changeLocation_Callback(~, ~, handles)
-location = uigetdir('Data/material/local', 'Select a Storage Directory');
+% Define the start path
+if exist([pwd, '/Data/material/local'], 'dir') == 7.0
+    startPath_output = [pwd, '/Data/material/local'];
+else
+    startPath_output = pwd;
+end
+
+% Get the material storage path
+location = uigetdir(startPath_output, 'Select a Storage Directory');
 
 if location == 0.0
     return

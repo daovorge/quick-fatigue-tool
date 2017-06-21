@@ -26,7 +26,7 @@ function [] = job(varargin)
 %      1 Job file options
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 10-Apr-2017 12:07:34 GMT
+%   Last modified 21-Jun-2017 09:48:34 GMT
     
     %%
     
@@ -208,14 +208,14 @@ while feof(fid) == 0.0
         % Get the length of the token
         tokenLength = length(TOKEN);
         
-        if isempty(find(strncmpi({TOKEN_umat}, kwStr, length(TOKEN_umat)) == 1.0, 1.0)) == 1.0
-            % The keyword is undefined
-            undefinedKw{index_ukw} = TOKEN_umat;
-            
-            index_ukw = index_ukw + 1.0;
-            
-            continue
-        elseif tokenLength == length(TLINE)
+        % Remove spaces and usolate the keyword
+        TOKEN(ismember(TOKEN,' *')) = [];
+        TOKEN = strtok(lower(TOKEN), ',');
+        
+        % Check if the keyword matches the library
+        matchingKw = find(strncmpi({TOKEN}, kwStr, length(TOKEN)) == 1.0);
+        
+        if tokenLength == length(TLINE)
             %{
                 There is no '=' sign in the keyword declaration or there is
                 no data after the asterisk
@@ -228,15 +228,7 @@ while feof(fid) == 0.0
                 index_pkw = index_pkw + 1.0;
             end
             continue
-        end
-        
-        % Remove spaces and asterisk from the keyword
-        TOKEN(ismember(TOKEN,' , *')) = [];
-        
-        % Check if the keyword matches the library
-        matchingKw = find(strncmpi({TOKEN}, kwStr, length(TOKEN)) == 1.0);
-        
-        if length(matchingKw) > 1.0
+        elseif length(matchingKw) > 1.0
             % The keyword definition is ambiguous
             ambiguousKw{index_akw} = TOKEN;
             

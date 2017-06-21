@@ -713,11 +713,11 @@ classdef uniaxialPreProcess < handle
                         Only the stress-strain points upto the stress
                         solution (or current strain range) are required
                     %}
-                    trueStressCurve = linspace(0.0, sigma(i) - sigma(i - 1.0), precision);
-                    trueStrainCurve = real((trueStressCurve./E) + 2.0.*(trueStressCurve./(2.0*kp)).^(1.0/np));
-                    [~, limitPoint] = min(abs(abs(trueStrainCurve) - currentStrainRange));
-                    trueStressCurveBuffer{i - 1.0} = trueStressCurve(1.0:limitPoint);
-                    trueStrainCurveBuffer{i - 1.0} = trueStrainCurve(1.0:limitPoint);
+                    %trueStressCurve = linspace(0.0, sigma(i) - sigma(i - 1.0), precision);
+                    %trueStrainCurve = real((trueStressCurve./E) + 2.0.*(trueStressCurve./(2.0*kp)).^(1.0/np));
+                    %[~, limitPoint] = min(abs(abs(trueStrainCurve) - currentStrainRange));
+                    %trueStressCurveBuffer{i - 1.0} = trueStressCurve(1.0:limitPoint);
+                    %trueStrainCurveBuffer{i - 1.0} = trueStrainCurve(1.0:limitPoint);
                 else
                     %%
                     %{
@@ -753,11 +753,11 @@ classdef uniaxialPreProcess < handle
                         Only the stress-strain points upto the stress
                         solution (or current strain range) are required
                     %}
-                    trueStressCurve = linspace(0.0, sigma(i) - sigma(i - 1.0), precision);
-                    trueStrainCurve = real((trueStressCurve./E) + 2.0.*(trueStressCurve./(2.0*kp)).^(1.0/np));
-                    [~, limitPoint] = min(abs(abs(trueStrainCurve) - currentStrainRange));
-                    trueStressCurveBuffer{i - 1.0} = trueStressCurve(1.0:limitPoint);
-                    trueStrainCurveBuffer{i - 1.0} = trueStrainCurve(1.0:limitPoint);
+                    %trueStressCurve = linspace(0.0, sigma(i) - sigma(i - 1.0), precision);
+                    %trueStrainCurve = real((trueStressCurve./E) + 2.0.*(trueStressCurve./(2.0*kp)).^(1.0/np));
+                    %[~, limitPoint] = min(abs(abs(trueStrainCurve) - currentStrainRange));
+                    %trueStressCurveBuffer{i - 1.0} = trueStressCurve(1.0:limitPoint);
+                    %trueStrainCurveBuffer{i - 1.0} = trueStrainCurve(1.0:limitPoint);
                 end
             end
             

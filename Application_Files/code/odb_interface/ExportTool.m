@@ -45,12 +45,6 @@ function ExportTool_OpeningFcn(hObject, ~, handles, varargin)
 % varargin   command line arguments to ExportTool (see VARARGIN)
 clc
 
-approot = [getenv('USERPROFILE'), '\Documents\MATLAB\Apps\Export Tool'];
-
-if exist(approot, 'dir')
-    addpath(approot)
-end
-
 % Choose default command line output for ExportTool
 handles.output = hObject;
 
@@ -159,6 +153,7 @@ if isempty(getappdata(0, 'panel_exportTool_check_LL')) == 0.0
     set(handles.check_copyToClipboard, 'value', getappdata(0, 'panel_exportTool_check_copyToClipboard'))
 end
 
+%% Load icons
 % Load the help icon
 [a,~]=imread('icoR_info.jpg');
 [r,c,~]=size(a);
@@ -169,13 +164,26 @@ g(g==255)=5.5*255;
 set(handles.frame_modelInfo, 'CData', g);
 
 % Load the tips icon
-[a,~]=imread('icoR_bulb.jpg');
+[a,~]=imread('icoR_help.jpg');
 [r,c,~]=size(a);
 x=ceil(r/35);
 y=ceil(c/35);
 g=a(1:x:end,1:y:end,:);
 g(g==255)=5.5*255;
+set(handles.pButton_fieldDataHelp, 'CData', g);
+set(handles.pButton_modelFileHelp, 'CData', g);
+set(handles.pButton_resultsFileHelp, 'CData', g);
 set(handles.pButton_dataPositionHelp, 'CData', g);
+
+[a,~]=imread('icoR_fileOpen.jpg');
+[r,c,~]=size(a);
+x=ceil(r/35);
+y=ceil(c/35);
+g=a(1:x:end,1:y:end,:);
+g(g==255)=5.5*255;
+set(handles.pButon_findFieldData, 'CData', g);
+set(handles.pButton_findModelFile, 'CData', g);
+set(handles.pButton_findResultFile, 'CData', g);
 
 %% Check screen resolution
 if isappdata(0, 'checkScreenResolution') == 0.0

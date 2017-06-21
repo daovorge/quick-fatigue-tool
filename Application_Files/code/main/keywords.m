@@ -172,7 +172,7 @@ classdef keywords < handle
             kw_partial = getappdata(0, 'kw_partial');
             kw_ambiguous = getappdata(0, 'kw_ambiguous');
 
-            if (isempty(kw_bad{:}) == 0.0) || (isempty(kw_undefined{:}) == 0.0) || (isempty(kw_partial{:}) == 0.0) || (isempty(kw_ambiguous{:}) == 0.0)
+            if (isempty(kw_bad{1.0}) == 0.0) || (isempty(kw_undefined{1.0}) == 0.0) || (isempty(kw_partial{1.0}) == 0.0) || (isempty(kw_ambiguous{1.0}) == 0.0)
                 fprintf(fid, '\r\n\r\n\tWarning: One or more keywords were not processed');
             end
             

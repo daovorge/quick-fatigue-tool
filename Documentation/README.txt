@@ -286,12 +286,13 @@ Quick Fatigue Tool User Guide.
 %	    - DPP, Damage parameter vs plane angle at worst item
 %	    - LP, Life vs plane angle at worst item
 %		- CPS, Normal stress and resultant shear stress vs plane angle at worst item
-%       - PS, Principal stresses at the worst item
+%       - P(S/E), Principal stresses and/or strains at the worst item
 %       - VM, von Mises stress at the worst item
 %       - DAC, Cumulative damage at the worst item
 %       - RHIST, Rainflow cycle histogram on the critical plane at the worst item
 %       - RC, Stress range distribution on the critical plane at the worst item
-%       - SIG, Uniaxial stress history before and after gating
+%       - SIG(S/E), Uniaxial stress and/or strain history before and after gating
+%		- LH, Tensor load histories
 %		- FOS, Factor of strength diagnostics
 %
 %
@@ -301,4 +302,4 @@ Quick Fatigue Tool User Guide.
 %   louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 20-Jun-2017 15:28:26 GMT
+%   Last modified 21-Jun-2017 12:45:05 GMT

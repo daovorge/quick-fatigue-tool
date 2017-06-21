@@ -63,6 +63,17 @@ g=a(1:x:end,1:y:end,:);
 g(g==255)=5.5*255;
 set(handles.pButton_showDiagram, 'CData', g);
 
+[a,~]=imread('icoR_fileOpen.jpg');
+[r,c,~]=size(a);
+x=ceil(r/35);
+y=ceil(c/35);
+g=a(1:x:end,1:y:end,:);
+g(g==255)=5.5*255;
+set(handles.pButton_gaugeA, 'CData', g);
+set(handles.pButton_gaugeB, 'CData', g);
+set(handles.pButton_gaugeC, 'CData', g);
+set(handles.pButton_outputLocation, 'CData', g);
+
 % UIWAIT makes rosette wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 

@@ -1,5 +1,5 @@
 function [] = template_job()
-%TEMPLATE_JOB    test job file for Quick Fatigue Tool.
+%TEMPLATE_JOB    Template job file for Quick Fatigue Tool.
 %   This function contains a list of job file options to configure a
 %   user-defined fatigue analysis.
 %
