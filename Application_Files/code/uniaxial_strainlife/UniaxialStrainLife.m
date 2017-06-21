@@ -472,10 +472,7 @@ rmappdata(0, 'uniaxial_strain_life_skip_material_manager')
 material = getappdata(0, 'material_for_uniaxial_strain_life');
 
 if isempty(material) == 0.0
-    set(handles.edit_material, 'string', getappdata(0, 'material_for_uniaxial_strain_life'))
-end
-
-if isappdata(0, 'material_for_uniaxial_strain_life') == 1.0
+    set(handles.edit_material, 'string', material)
     rmappdata(0, 'material_for_uniaxial_strain_life')
 end
 

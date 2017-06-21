@@ -20,6 +20,7 @@ classdef uniaxialAnalysis < handle
         function [damage, nCycles, error, amplitudes_strain, pairs_strain, damageParameter_stress, damageParameter_strain, damageParameter] = main(damageParameter, cael, E, Sf, b, Ef, c, kp, np, gamma, msCorrection, L, ndEndurance, fatigueLimitSress, scf, type)
             %% Initialize variables
             damage = 0.0;
+            nCycles = 0.0;
             error = 0.0;
             errorA = 0.0;
             errorB = 0.0;
