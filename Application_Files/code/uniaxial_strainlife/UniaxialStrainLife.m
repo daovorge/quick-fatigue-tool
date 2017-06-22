@@ -66,7 +66,7 @@ set(handles.pButton_browseInput, 'CData', g);
 set(handles.pButton_browseMaterial, 'CData', g);
 set(handles.pButton_resultsLocation, 'CData', g);
 
-% Load the panel state
+%% Load the panel state
 if isappdata(0, 'panel_uniaxialStrainLife_edit_inputFile') == 1.0
     %{
         figure1_CloseRequestFcn has been called on a previous occasion.
@@ -116,8 +116,20 @@ if isappdata(0, 'panel_uniaxialStrainLife_edit_inputFile') == 1.0
     end
 end
 
-% Material definition
+%% Material definition
 setMaterialName(handles)
+
+%% Check screen resolution
+if isappdata(0, 'checkScreenResolution') == 0.0
+    resolution = get(0, 'Screensize');
+    if (resolution(3.0) ~= 1920.0) || (resolution(4.0) ~= 1080.0)
+        msg1 = sprintf('Your screen resolution is set to %.0fx%.0f. This app will only display correctly at 1920x1080. ', resolution(3.0), resolution(4.0));
+        msg2 = sprintf('Text scaling must also be set to "Medium" (125%%) from the control panel:\n\n');
+        msg3 = 'Control Panel\Appearance and Personalization\Display';
+        uiwait(warndlg([msg1, msg2, msg3], 'Quick Fatigue Tool', 'modal'));
+    end
+    setappdata(0, 'checkScreenResolution', 1.0)
+end
 
 
 % --- Outputs from this function are returned to the command line.

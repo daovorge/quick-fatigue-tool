@@ -19,76 +19,34 @@ classdef virtualGaugeUtils < handle
         
         %% Blank the GUI
         function [] = blank(handles)
-            set(handles.edit_tensor, 'enable', 'off')
-            set(handles.pButton_browseInput, 'enable', 'off')
-            set(handles.text_readFrom, 'enable', 'off')
-            set(handles.rButton_rows, 'enable', 'off')
-            set(handles.rButton_cols, 'enable', 'off')
-            
-            set(handles.radiobutton_45, 'enable', 'off')
-            set(handles.radiobutton_60, 'enable', 'off')
-            set(handles.radiobutton_arbitrary, 'enable', 'off')
-            set(handles.pButton_showDiagram, 'enable', 'off')
-            
-            set(handles.check_alpha, 'enable', 'off')
-            set(handles.text_beta, 'enable', 'off')
-            set(handles.text_gamma, 'enable', 'off')
-            set(handles.edit_alpha, 'enable', 'off')
-            set(handles.edit_beta, 'enable', 'off')
-            set(handles.edit_gamma, 'enable', 'off')
-            set(handles.text_alphaUnits, 'enable', 'off')
-            set(handles.text_betaUnits, 'enable', 'off')
-            set(handles.text_gammaUnits, 'enable', 'off')
-            
-            set(handles.check_resultsLocation, 'enable', 'off')
-            set(handles.edit_output, 'enable', 'off')
-            set(handles.pButton_browseOutput, 'enable', 'off')
-            
-            set(handles.pButton_start, 'enable', 'off')
-            set(handles.pButton_close, 'enable', 'off')
+            set(findall(handles.figure1, '-property', 'Enable'), 'Enable', 'off')
         end
         
         %% Re-enable the GUI
         function [] = enable(handles)
-            set(handles.edit_tensor, 'enable', 'on')
-            set(handles.pButton_browseInput, 'enable', 'on')
-            set(handles.text_readFrom, 'enable', 'on')
-            set(handles.rButton_rows, 'enable', 'on')
-            set(handles.rButton_cols, 'enable', 'on')
+            set(findall(handles.figure1, '-property', 'Enable'), 'Enable', 'on')
             
-            set(handles.radiobutton_45, 'enable', 'on')
-            set(handles.radiobutton_60, 'enable', 'on')
-            set(handles.radiobutton_arbitrary, 'enable', 'on')
-            set(handles.pButton_showDiagram, 'enable', 'on')
-            
-            if get(handles.radiobutton_arbitrary, 'value') == 1.0
-                set(handles.check_alpha, 'enable', 'on')
-                set(handles.text_beta, 'enable', 'on')
-                set(handles.text_gamma, 'enable', 'on')
-                set(handles.text_betaUnits, 'enable', 'on')
-                set(handles.text_gammaUnits, 'enable', 'on')
-                
-                if get(handles.check_alpha, 'value') == 1.0
-                    set(handles.text_alphaUnits, 'enable', 'on')
-                    set(handles.edit_alpha, 'enable', 'on', 'backgroundColor', 'white')
-                else
+            if get(handles.radiobutton_arbitrary, 'value') == 0.0
+                set(handles.check_alpha, 'enable', 'off')
+                set(handles.text_beta, 'enable', 'off')
+                set(handles.text_gamma, 'enable', 'off')
+                set(handles.text_alphaUnits, 'enable', 'off')
+                set(handles.text_betaUnits, 'enable', 'off')
+                set(handles.text_gammaUnits, 'enable', 'off')
+                set(handles.edit_alpha, 'enable', 'off')
+                set(handles.edit_beta, 'enable', 'off')
+                set(handles.edit_gamma, 'enable', 'off')
+            else
+                if get(handles.check_alpha, 'value') == 0.0
+                    set(handles.text_alphaUnits, 'enable', 'off')
                     set(handles.edit_alpha, 'enable', 'inactive', 'backgroundColor', [177/255, 206/255, 237/255])
                 end
-                
-                set(handles.edit_beta, 'enable', 'on')
-                set(handles.edit_gamma, 'enable', 'on')
             end
             
-            set(handles.check_resultsLocation, 'enable', 'on')
-            if get(handles.check_resultsLocation, 'value') == 1.0
-                set(handles.edit_output, 'enable', 'on')
-                set(handles.pButton_browseOutput, 'enable', 'on')
-            else
-                set(handles.edit_output, 'enable', 'inactive')
+            if get(handles.check_resultsLocation, 'value') == 0.0
+                set(handles.edit_output, 'enable', 'inactive', 'backgroundColor', [177/255, 206/255, 237/255])
+                set(handles.pButton_browseOutput, 'enable', 'off')
             end
-            
-            set(handles.pButton_start, 'enable', 'on')
-            set(handles.pButton_close, 'enable', 'on')
         end
 
         %% Verify Inputs

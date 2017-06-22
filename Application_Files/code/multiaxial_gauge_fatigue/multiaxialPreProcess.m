@@ -21,149 +21,62 @@ classdef multiaxialPreProcess < handle
         
         %% Blank the GUI
         function [] = blank(handles)
-            set(handles.text_gauge_0, 'enable', 'off')
-            set(handles.text_gauge_45, 'enable', 'off')
-            set(handles.text_gauge_90, 'enable', 'off')
-            set(handles.edit_gauge_0, 'enable', 'off')
-            set(handles.edit_gauge_45, 'enable', 'off')
-            set(handles.edit_gauge_90, 'enable', 'off')
-            set(handles.pButton_gauge_0_path, 'enable', 'off')
-            set(handles.pButton_gauge_45_path, 'enable', 'off')
-            set(handles.pButton_gauge_90_path, 'enable', 'off')
-            set(handles.text_units, 'enable', 'off')
-            set(handles.pMenu_units, 'enable', 'off')
-            set(handles.text_conversionFactor, 'enable', 'off')
-            set(handles.edit_conversionFactor, 'enable', 'off')
-            set(handles.pButton_gaugeOrientation, 'enable', 'off')
-            
-            set(handles.text_material, 'enable', 'off')
-            set(handles.edit_material, 'enable', 'off')
-            set(handles.pButton_materialOptions, 'enable', 'off')
-            set(handles.pButton_browseMaterial, 'enable', 'off')
-            set(handles.pButton_createMaterial, 'enable', 'off')
-            set(handles.pButton_matManager, 'enable', 'off')
-            
-            set(handles.rButton_algorithm_ps, 'enable', 'off')
-            set(handles.rButton_algorithm_bm, 'enable', 'off')
-            set(handles.text_precision, 'enable', 'off')
-            set(handles.edit_precision, 'enable', 'off')
-            
-            set(handles.rButton_msc_none, 'enable', 'off')
-            set(handles.rButton_msc_morrow, 'enable', 'off')
-            set(handles.rButton_msc_user, 'enable', 'off')
-            set(handles.text_msc_user, 'enable', 'off')
-            set(handles.edit_msc_user, 'enable', 'off')
-            set(handles.pButton_msc_user, 'enable', 'off')
-            set(handles.check_ucs, 'enable', 'off')
-            set(handles.edit_ucs, 'enable', 'off')
-            set(handles.text_mpa, 'enable', 'off')
-            
-            set(handles.text_defineSurfaceFinish, 'enable', 'off')
-            set(handles.rButton_kt_list, 'enable', 'off')
-            set(handles.rButton_kt_value, 'enable', 'off')
-            set(handles.text_RzEq, 'enable', 'off')
-            set(handles.text_microns, 'enable', 'off')
-            set(handles.edit_rz, 'enable', 'off')
-            set(handles.text_definitionFile, 'enable', 'off')
-            set(handles.pMenu_kt_list, 'enable', 'off')
-            set(handles.text_surfaceFinish, 'enable', 'off')
-            set(handles.pMenu_surfaceFinish, 'enable', 'off')
-            set(handles.check_kt_direct, 'enable', 'off')
-            set(handles.text_KtEq, 'enable', 'off')
-            set(handles.edit_kt, 'enable', 'off')
-            
-            set(handles.check_location, 'enable', 'off')
-            set(handles.edit_location, 'enable', 'off')
-            set(handles.pButton_location, 'enable', 'off')
-            
-            set(handles.pButton_reset, 'enable', 'off')
-            set(handles.pButton_analyse, 'enable', 'off')
-            set(handles.pButton_cancel, 'enable', 'off')
+            set(findall(handles.figure1, '-property', 'Enable'), 'Enable', 'off')
         end
         
         %% Re-enable the GUI
         function [] = enable(handles)
-            set(handles.text_gauge_0, 'enable', 'on')
-            set(handles.text_gauge_45, 'enable', 'on')
-            set(handles.text_gauge_90, 'enable', 'on')
-            set(handles.edit_gauge_0, 'enable', 'on')
-            set(handles.edit_gauge_45, 'enable', 'on')
-            set(handles.edit_gauge_90, 'enable', 'on')
-            set(handles.pButton_gauge_0_path, 'enable', 'on')
-            set(handles.pButton_gauge_45_path, 'enable', 'on')
-            set(handles.pButton_gauge_90_path, 'enable', 'on')
-            set(handles.text_units, 'enable', 'on')
-            set(handles.pMenu_units, 'enable', 'on')
-            if get(handles.pMenu_units, 'value') == 3.0
-                set(handles.text_conversionFactor, 'enable', 'on')
-                set(handles.edit_conversionFactor, 'enable', 'on')
+            set(findall(handles.figure1, '-property', 'Enable'), 'Enable', 'on')
+            
+            if get(handles.pMenu_units, 'value') ~= 3.0
+                set(handles.text_conversionFactor, 'enable', 'off')
+                set(handles.edit_conversionFactor, 'enable', 'off')
             end
-            set(handles.pButton_gaugeOrientation, 'enable', 'on')
             
-            set(handles.text_material, 'enable', 'on')
-            set(handles.edit_material, 'enable', 'on')
-            set(handles.pButton_materialOptions, 'enable', 'on')
-            set(handles.pButton_browseMaterial, 'enable', 'on')
-            set(handles.pButton_createMaterial, 'enable', 'on')
-            set(handles.pButton_matManager, 'enable', 'on')
-            
-            set(handles.rButton_algorithm_ps, 'enable', 'on')
-            set(handles.rButton_algorithm_bm, 'enable', 'on')
-            set(handles.text_precision, 'enable', 'on')
-            set(handles.edit_precision, 'enable', 'on')
-            
-            set(handles.rButton_msc_none, 'enable', 'on')
-            set(handles.rButton_msc_morrow, 'enable', 'on')
-            set(handles.rButton_msc_user, 'enable', 'on')
-            if get(handles.rButton_msc_user, 'value') == 1.0
-                set(handles.text_msc_user, 'enable', 'on')
-                set(handles.edit_msc_user, 'enable', 'on')
-                set(handles.pButton_msc_user, 'enable', 'on')
-                set(handles.check_ucs, 'enable', 'on')
-                if get(handles.check_ucs, 'value') == 1.0
-                    set(handles.edit_ucs, 'enable', 'on', 'backgroundColor', 'white')
-                    set(handles.text_mpa, 'enable', 'on')
-                else
+            if get(handles.rButton_msc_user, 'value') ~= 1.0
+                set(handles.text_msc_user, 'enable', 'off')
+                set(handles.edit_msc_user, 'enable', 'off')
+                set(handles.pButton_msc_user, 'enable', 'off')
+                set(handles.check_ucs, 'enable', 'off')
+                set(handles.check_ucs, 'enable', 'off')
+                set(handles.edit_ucs, 'enable', 'off')
+                set(handles.text_mpa, 'enable', 'off')
+            else
+                if get(handles.check_ucs, 'value') == 0.0
                     set(handles.edit_ucs, 'enable', 'inactive', 'backgroundColor', [177/255, 206/255, 237/255])
+                    set(handles.text_mpa, 'enable', 'off')
                 end
-            else
-                set(handles.edit_ucs, 'enable', 'inactive', 'backgroundColor', [177/255, 206/255, 237/255])
             end
             
-            set(handles.check_kt_direct, 'enable', 'on')
-            if get(handles.check_kt_direct, 'value') == 1.0
-                set(handles.text_KtEq, 'enable', 'on')
-                set(handles.edit_kt, 'enable', 'on')
-            else
-                set(handles.text_defineSurfaceFinish, 'enable', 'on')
-                set(handles.rButton_kt_list, 'enable', 'on')
-                set(handles.rButton_kt_value, 'enable', 'on')
+            if get(handles.check_kt_direct, 'value') == 0.0
+                set(handles.text_KtEq, 'enable', 'off')
+                set(handles.edit_kt, 'enable', 'off')
                 
-                if get(handles.rButton_kt_list, 'value') == 1.0
-                    set(handles.text_definitionFile, 'enable', 'on')
-                    set(handles.pMenu_kt_list, 'enable', 'on')
-                    set(handles.text_surfaceFinish, 'enable', 'on')
-                    set(handles.pMenu_surfaceFinish, 'enable', 'on')
-                else
-                    set(handles.text_RzEq, 'enable', 'on')
-                    set(handles.text_microns, 'enable', 'on')
-                    set(handles.edit_rz, 'enable', 'on')
-                    set(handles.text_definitionFile, 'enable', 'on')
-                    set(handles.pMenu_kt_list, 'enable', 'on')
+                if get(handles.rButton_kt_value, 'value') == 0.0
+                    set(handles.text_RzEq, 'enable', 'off')
+                    set(handles.text_microns, 'enable', 'off')
+                    set(handles.edit_rz, 'enable', 'off')
                 end
-            end
-            
-            set(handles.check_location, 'enable', 'on')
-            if get(handles.check_location, 'value') == 1.0
-                set(handles.edit_location, 'enable', 'on')
-                set(handles.pButton_location, 'enable', 'on')
             else
-                set(handles.edit_location, 'enable', 'inactive')
+                set(handles.text_defineSurfaceFinish, 'enable', 'off')
+                set(handles.rButton_kt_list, 'enable', 'off')
+                set(handles.rButton_kt_value, 'enable', 'off')
+                
+                set(handles.text_definitionFile, 'enable', 'off')
+                set(handles.pMenu_kt_list, 'enable', 'off')
+                set(handles.text_surfaceFinish, 'enable', 'off')
+                set(handles.pMenu_surfaceFinish, 'enable', 'off')
+                set(handles.text_RzEq, 'enable', 'off')
+                set(handles.text_microns, 'enable', 'off')
+                set(handles.edit_rz, 'enable', 'off')
+                set(handles.text_definitionFile, 'enable', 'off')
+                set(handles.pMenu_kt_list, 'enable', 'off')
             end
             
-            set(handles.pButton_reset, 'enable', 'on')
-            set(handles.pButton_analyse, 'enable', 'on')
-            set(handles.pButton_cancel, 'enable', 'on')
+            if get(handles.check_location, 'value') == 0.0
+                set(handles.edit_location, 'enable', 'inactive')
+                set(handles.pButton_location, 'enable', 'off')
+            end
         end
 
         %% Prescan the file selection

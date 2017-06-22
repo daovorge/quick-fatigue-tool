@@ -12,7 +12,7 @@ function varargout = ExportTool(varargin)%#ok<*DEFNU>
 %      10.4 The ODB Interface
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 04-Apr-2017 13:26:59 GMT
+%   Last modified 22-Jun-2017 16:09:40 GMT
     
     %%
     
@@ -57,102 +57,6 @@ guidata(hObject, handles);
 % Position the figure in the centre of the screen
 movegui(hObject, 'center')
 
-% Load the panel state
-set(handles.edit_fieldData, 'string', getappdata(0, 'panel_exportTool_edit_fieldData'))
-
-set(handles.edit_modelFile, 'string', getappdata(0, 'panel_exportTool_edit_modelFile'))
-
-if isempty(getappdata(0, 'panel_exportTool_check_resultFile')) == 0.0
-    set(handles.check_resultFile, 'value', getappdata(0, 'panel_exportTool_check_resultFile'))
-end
-
-if isempty(getappdata(0, 'panel_exportTool_edit_resultFile')) == 1.0
-    set(handles.check_resultFile, 'value', 0.0)
-    if exist([pwd, '\Project\output'], 'dir') == 7.0
-        set(handles.edit_resultFile, 'string', [pwd, '\Project\output'], 'backgroundColor', [241/255, 241/255, 241/255], 'enable', 'inactive')
-    else
-        set(handles.edit_resultFile, 'string', [pwd, '\Project'], 'backgroundColor', [241/255, 241/255, 241/255], 'enable', 'inactive')
-    end
-    set(handles.pButton_findResultFile, 'enable', 'off')
-else
-    set(handles.edit_resultFile, 'string', getappdata(0, 'panel_exportTool_edit_resultFile'))
-end
-
-if get(handles.check_resultFile, 'value') == 1.0
-    set(handles.edit_resultFile, 'enable', 'on', 'backgroundColor', 'white')
-    set(handles.pButton_findResultFile, 'enable', 'on')
-else
-    set(handles.edit_resultFile, 'enable', 'inactive', 'backgroundColor', [241/255, 241/255, 241/255])
-    set(handles.pButton_findResultFile, 'enable', 'off')
-end
-
-set(handles.edit_partInstance, 'string', getappdata(0, 'panel_exportTool_edit_partInstance'))
-set(handles.edit_resultsStepName, 'string', getappdata(0, 'panel_exportTool_edit_resultsStepName'))
-
-if isempty(getappdata(0, 'panel_exportTool_pMenu_elementPosition')) == 0.0
-    set(handles.pMenu_elementPosition, 'value', getappdata(0, 'panel_exportTool_pMenu_elementPosition'))
-    set(handles.check_autoDeterminePosition, 'value', getappdata(0, 'panel_exportTool_check_autoDeterminePosition'))
-    set(handles.check_keepScript, 'value', getappdata(0, 'panel_exportTool_check_keepScript'))
-    set(handles.check_writeScriptOnly, 'value', getappdata(0, 'panel_exportTool_check_writeScriptOnly'))
-    
-    set(handles.edit_ODBSetName, 'string', getappdata(0, 'panel_exportTool_edit_ODBSetName'))
-    if getappdata(0, 'panel_exportTool_check_createODBSet') == 1.0
-        set(handles.check_createODBSet, 'value', 1.0)
-        set(handles.edit_ODBSetName, 'enable', 'on', 'backgroundColor', 'white')
-    else
-        set(handles.check_createODBSet, 'value', 0.0)
-        set(handles.edit_ODBSetName, 'enable', 'inactive', 'backgroundColor', [177/256, 206/256, 237/256])
-    end
-end
-
-if isappdata(0, 'panel_exportTool_check_upgrade') == 1.0
-    set(handles.check_upgrade, 'value', getappdata(0, 'panel_exportTool_check_upgrade'))
-end
-
-if isappdata(0, 'panel_exportTool_edit_abqCmd') == 1.0
-    set(handles.edit_abqCmd, 'string', getappdata(0, 'panel_exportTool_edit_abqCmd'))
-end
-
-if isappdata(0, 'panel_exportTool_check_isExplicit') == 1.0
-    set(handles.check_isExplicit, 'value', getappdata(0, 'panel_exportTool_check_isExplicit'))
-    set(handles.rButton_createNewStep, 'value', getappdata(0, 'panel_exportTool_rButton_createNewStep'))
-    set(handles.rButton_specifyExistingStep, 'value', getappdata(0, 'panel_exportTool_rButton_specifyExistingStep'))
-    
-    if get(handles.rButton_specifyExistingStep, 'value') == 1.0
-        set(handles.check_isExplicit, 'enable', 'off')
-        set(handles.edit_resultsStepName, 'backgroundColor', 'white')
-    end
-end
-
-if isappdata(0, 'panel_exportTool_rButton_selectFromList') == 1.0
-    set(handles.rButton_selectFromList, 'value', getappdata(0, 'panel_exportTool_rButton_selectFromList'))
-    set(handles.rButton_preselect, 'value', getappdata(0, 'panel_exportTool_rButton_preselect'))
-    set(handles.rButton_selectAll, 'value', getappdata(0, 'panel_exportTool_rButton_selectAll'))
-end
-
-if isempty(getappdata(0, 'panel_exportTool_check_LL')) == 0.0
-    set(handles.check_LL, 'value', getappdata(0, 'panel_exportTool_check_LL'))
-    set(handles.check_L, 'value', getappdata(0, 'panel_exportTool_check_L'))
-    set(handles.check_D, 'value', getappdata(0, 'panel_exportTool_check_D'))
-    set(handles.check_DDL, 'value', getappdata(0, 'panel_exportTool_check_DDL'))
-    set(handles.check_FOS, 'value', getappdata(0, 'panel_exportTool_check_FOS'))
-    set(handles.check_SFA, 'value', getappdata(0, 'panel_exportTool_check_SFA'))
-    set(handles.check_FRFR, 'value', getappdata(0, 'panel_exportTool_check_FRFR'))
-    set(handles.check_FRFV, 'value', getappdata(0, 'panel_exportTool_check_FRFV'))
-    set(handles.check_FRFH, 'value', getappdata(0, 'panel_exportTool_check_FRFH'))
-    set(handles.check_FRFW, 'value', getappdata(0, 'panel_exportTool_check_FRFW'))
-    set(handles.check_SMAX, 'value', getappdata(0, 'panel_exportTool_check_SMAX'))
-    set(handles.check_SMXP, 'value', getappdata(0, 'panel_exportTool_check_SMXP'))
-    set(handles.check_SMXU, 'value', getappdata(0, 'panel_exportTool_check_SMXU'))
-    set(handles.check_TRF, 'value', getappdata(0, 'panel_exportTool_check_TRF'))
-    set(handles.check_WCM, 'value', getappdata(0, 'panel_exportTool_check_WCM'))
-    set(handles.check_WCA, 'value', getappdata(0, 'panel_exportTool_check_WCA'))
-    set(handles.check_WCDP, 'value', getappdata(0, 'panel_exportTool_check_WCDP'))
-    set(handles.check_WCATAN, 'value', getappdata(0, 'panel_exportTool_check_WCATAN'))
-    
-    set(handles.check_copyToClipboard, 'value', getappdata(0, 'panel_exportTool_check_copyToClipboard'))
-end
-
 %% Load icons
 % Load the help icon
 [a,~]=imread('icoR_info.jpg');
@@ -184,6 +88,77 @@ g(g==255)=5.5*255;
 set(handles.pButon_findFieldData, 'CData', g);
 set(handles.pButton_findModelFile, 'CData', g);
 set(handles.pButton_findResultFile, 'CData', g);
+
+%% Load the panel state
+if isappdata(0, 'panel_exportTool_edit_fieldData') == 1.0
+    % Set-up
+    set(handles.edit_fieldData, 'string', getappdata(0, 'panel_exportTool_edit_fieldData'))
+    set(handles.edit_modelFile, 'string', getappdata(0, 'panel_exportTool_edit_modelFile'))
+    set(handles.check_resultFile, 'value', getappdata(0, 'panel_exportTool_check_resultFile'))
+    set(handles.edit_resultFile, 'string', getappdata(0, 'panel_exportTool_edit_resultFile'))
+    if get(handles.check_resultFile, 'value') == 1.0
+        set(handles.edit_resultFile, 'enable', 'on', 'backgroundColor', 'white')
+        set(handles.pButton_findResultFile, 'enable', 'on')
+    else
+        set(handles.edit_resultFile, 'enable', 'inactive', 'backgroundColor', [241/255, 241/255, 241/255])
+        set(handles.pButton_findResultFile, 'enable', 'off')
+    end
+    set(handles.edit_partInstance, 'string', getappdata(0, 'panel_exportTool_edit_partInstance'))
+    set(handles.edit_resultsStepName, 'string', getappdata(0, 'panel_exportTool_edit_resultsStepName'))
+    set(handles.pMenu_elementPosition, 'value', getappdata(0, 'panel_exportTool_pMenu_elementPosition'))
+    set(handles.check_autoDeterminePosition, 'value', getappdata(0, 'panel_exportTool_check_autoDeterminePosition'))
+    set(handles.check_keepScript, 'value', getappdata(0, 'panel_exportTool_check_keepScript'))
+    set(handles.check_writeScriptOnly, 'value', getappdata(0, 'panel_exportTool_check_writeScriptOnly'))
+    set(handles.edit_ODBSetName, 'string', getappdata(0, 'panel_exportTool_edit_ODBSetName'))
+    if getappdata(0, 'panel_exportTool_check_createODBSet') == 1.0
+        set(handles.check_createODBSet, 'value', 1.0)
+        set(handles.edit_ODBSetName, 'enable', 'on', 'backgroundColor', 'white')
+    else
+        set(handles.check_createODBSet, 'value', 0.0)
+        set(handles.edit_ODBSetName, 'enable', 'inactive', 'backgroundColor', [177/256, 206/256, 237/256])
+    end
+    set(handles.check_upgrade, 'value', getappdata(0, 'panel_exportTool_check_upgrade'))
+    set(handles.edit_abqCmd, 'string', getappdata(0, 'panel_exportTool_edit_abqCmd'))
+    set(handles.check_isExplicit, 'value', getappdata(0, 'panel_exportTool_check_isExplicit'))
+    set(handles.rButton_createNewStep, 'value', getappdata(0, 'panel_exportTool_rButton_createNewStep'))
+    set(handles.rButton_specifyExistingStep, 'value', getappdata(0, 'panel_exportTool_rButton_specifyExistingStep'))
+    if get(handles.rButton_specifyExistingStep, 'value') == 1.0
+        set(handles.check_isExplicit, 'enable', 'off')
+        set(handles.edit_resultsStepName, 'backgroundColor', 'white')
+    end
+    
+    % Output variables
+    set(handles.rButton_selectFromList, 'value', getappdata(0, 'panel_exportTool_rButton_selectFromList'))
+    set(handles.rButton_preselect, 'value', getappdata(0, 'panel_exportTool_rButton_preselect'))
+    set(handles.rButton_selectAll, 'value', getappdata(0, 'panel_exportTool_rButton_selectAll'))
+    set(handles.check_LL, 'value', getappdata(0, 'panel_exportTool_check_LL'))
+    set(handles.check_L, 'value', getappdata(0, 'panel_exportTool_check_L'))
+    set(handles.check_D, 'value', getappdata(0, 'panel_exportTool_check_D'))
+    set(handles.check_DDL, 'value', getappdata(0, 'panel_exportTool_check_DDL'))
+    set(handles.check_FOS, 'value', getappdata(0, 'panel_exportTool_check_FOS'))
+    set(handles.check_SFA, 'value', getappdata(0, 'panel_exportTool_check_SFA'))
+    set(handles.check_FRFR, 'value', getappdata(0, 'panel_exportTool_check_FRFR'))
+    set(handles.check_FRFV, 'value', getappdata(0, 'panel_exportTool_check_FRFV'))
+    set(handles.check_FRFH, 'value', getappdata(0, 'panel_exportTool_check_FRFH'))
+    set(handles.check_FRFW, 'value', getappdata(0, 'panel_exportTool_check_FRFW'))
+    set(handles.check_SMAX, 'value', getappdata(0, 'panel_exportTool_check_SMAX'))
+    set(handles.check_SMXP, 'value', getappdata(0, 'panel_exportTool_check_SMXP'))
+    set(handles.check_SMXU, 'value', getappdata(0, 'panel_exportTool_check_SMXU'))
+    set(handles.check_TRF, 'value', getappdata(0, 'panel_exportTool_check_TRF'))
+    set(handles.check_WCM, 'value', getappdata(0, 'panel_exportTool_check_WCM'))
+    set(handles.check_WCA, 'value', getappdata(0, 'panel_exportTool_check_WCA'))
+    set(handles.check_WCDP, 'value', getappdata(0, 'panel_exportTool_check_WCDP'))
+    set(handles.check_WCATAN, 'value', getappdata(0, 'panel_exportTool_check_WCATAN'))
+    set(handles.check_copyToClipboard, 'value', getappdata(0, 'panel_exportTool_check_copyToClipboard'))
+else
+    set(handles.check_resultFile, 'value', 0.0)
+    if exist([pwd, '\Project\output'], 'dir') == 7.0
+        set(handles.edit_resultFile, 'string', [pwd, '\Project\output'], 'backgroundColor', [241/255, 241/255, 241/255], 'enable', 'inactive')
+    else
+        set(handles.edit_resultFile, 'string', [pwd, '\Project'], 'backgroundColor', [241/255, 241/255, 241/255], 'enable', 'inactive')
+    end
+    set(handles.pButton_findResultFile, 'enable', 'off')
+end
 
 %% Check screen resolution
 if isappdata(0, 'checkScreenResolution') == 0.0
@@ -1284,136 +1259,23 @@ setappdata(0, 'panel_exportTool_check_copyToClipboard', get(handles.check_copyTo
 delete(hObject);
 
 function blankGUI(handles)
-set(handles.text_job, 'enable', 'off')
-set(handles.edit_fieldData, 'enable', 'off')
-set(handles.pButon_findFieldData, 'enable', 'off')
-set(handles.pButton_fieldDataHelp, 'enable', 'off')
-set(handles.text_modelFile, 'enable', 'off')
-set(handles.edit_modelFile, 'enable', 'off')
-set(handles.pButton_findModelFile, 'enable', 'off')
-set(handles.pButton_modelFileHelp, 'enable', 'off')
-set(handles.pButton_resultsFileHelp, 'enable', 'off')
-set(handles.pButton_dataPositionHelp, 'enable', 'off')
-set(handles.frame_modelInfo, 'enable', 'off')
-set(handles.text_execution, 'enable', 'off')
-set(handles.text_hint, 'enable', 'off')
-set(handles.check_resultFile, 'enable', 'off')
-set(handles.edit_resultFile, 'enable', 'off')
-set(handles.pButton_findResultFile, 'enable', 'off')
-set(handles.text_partInstance, 'enable', 'off')
-set(handles.edit_partInstance, 'enable', 'off')
-set(handles.text_resultsStepName, 'enable', 'off')
-set(handles.edit_resultsStepName, 'enable', 'off')
-set(handles.check_isExplicit, 'enable', 'off')
-set(handles.rButton_createNewStep, 'enable', 'off')
-set(handles.rButton_specifyExistingStep, 'enable', 'off')
-set(handles.text_elementPosition, 'enable', 'off')
-set(handles.pMenu_elementPosition, 'enable', 'off')
-set(handles.check_autoDeterminePosition, 'enable', 'off')
-set(handles.check_keepScript, 'enable', 'off')
-set(handles.check_writeScriptOnly, 'enable', 'off')
-set(handles.check_upgrade, 'enable', 'off')
-set(handles.text_abqCmd, 'enable', 'off')
-set(handles.edit_abqCmd, 'enable', 'off')
-set(handles.check_createODBSet, 'enable', 'off')
-set(handles.edit_ODBSetName, 'enable', 'off')
-set(handles.check_LL, 'enable', 'off')
-set(handles.check_L, 'enable', 'off')
-set(handles.check_D, 'enable', 'off')
-set(handles.check_DDL, 'enable', 'off')
-set(handles.check_FOS, 'enable', 'off')
-set(handles.check_SFA, 'enable', 'off')
-set(handles.check_FRFR, 'enable', 'off')
-set(handles.check_FRFV, 'enable', 'off')
-set(handles.check_FRFH, 'enable', 'off')
-set(handles.check_FRFW, 'enable', 'off')
-set(handles.check_SMAX, 'enable', 'off')
-set(handles.check_SMXP, 'enable', 'off')
-set(handles.check_SMXU, 'enable', 'off')
-set(handles.check_TRF, 'enable', 'off')
-set(handles.check_WCM, 'enable', 'off')
-set(handles.check_WCA, 'enable', 'off')
-set(handles.check_WCDP, 'enable', 'off')
-set(handles.check_WCATAN, 'enable', 'off')
-set(handles.rButton_selectFromList, 'enable', 'off')
-set(handles.rButton_preselect, 'enable', 'off')
-set(handles.rButton_selectAll, 'enable', 'off')
-set(handles.pButton_clearSelection, 'enable', 'off')
-set(handles.pButton_reset, 'enable', 'off')
-set(handles.check_copyToClipboard, 'enable', 'off')
-set(handles.pButton_start, 'enable', 'off')
-set(handles.pButton_cancel, 'enable', 'off')
+set(findall(handles.figure1, '-property', 'Enable'), 'Enable', 'off')
 
 function enableGUI(handles)
-set(handles.text_job, 'enable', 'on')
-set(handles.edit_fieldData, 'enable', 'on')
-set(handles.pButon_findFieldData, 'enable', 'on')
-set(handles.pButton_fieldDataHelp, 'enable', 'on')
-set(handles.text_modelFile, 'enable', 'on')
-set(handles.edit_modelFile, 'enable', 'on')
-set(handles.pButton_findModelFile, 'enable', 'on')
-set(handles.pButton_modelFileHelp, 'enable', 'on')
-set(handles.pButton_resultsFileHelp, 'enable', 'on')
-set(handles.pButton_dataPositionHelp, 'enable', 'on')
-set(handles.frame_modelInfo, 'enable', 'inactive')
-set(handles.text_execution, 'enable', 'on')
-set(handles.text_hint, 'enable', 'on')
-set(handles.check_resultFile, 'enable', 'on')
-if get(handles.check_resultFile, 'value') == 1.0
-    set(handles.edit_resultFile, 'enable', 'on')
-    set(handles.pButton_findResultFile, 'enable', 'on')
-else
-    set(handles.edit_resultFile, 'enable', 'inactive')
+set(findall(handles.figure1, '-property', 'Enable'), 'Enable', 'on')
+
+if get(handles.check_resultFile, 'value') == 0.0
+    set(handles.edit_resultFile, 'enable', 'off')
+    set(handles.pButton_findResultFile, 'enable', 'off')
 end
-set(handles.text_partInstance, 'enable', 'on')
-set(handles.edit_partInstance, 'enable', 'on')
-set(handles.text_resultsStepName, 'enable', 'on')
-set(handles.edit_resultsStepName, 'enable', 'on')
-set(handles.rButton_createNewStep, 'enable', 'on')
-set(handles.rButton_specifyExistingStep, 'enable', 'on')
-if get(handles.rButton_createNewStep, 'value') == 1.0
-    set(handles.check_isExplicit, 'enable', 'on')
+
+if get(handles.rButton_createNewStep, 'value') == 0.0
+    set(handles.check_isExplicit, 'enable', 'off')
 end
-set(handles.text_elementPosition, 'enable', 'on')
-set(handles.pMenu_elementPosition, 'enable', 'on')
-set(handles.check_autoDeterminePosition, 'enable', 'on')
-set(handles.check_writeScriptOnly, 'enable', 'on')
-set(handles.check_keepScript, 'enable', 'on')
-set(handles.check_upgrade, 'enable', 'on')
-set(handles.text_abqCmd, 'enable', 'on')
-set(handles.edit_abqCmd, 'enable', 'on')
-set(handles.check_createODBSet, 'enable', 'on')
-if get(handles.check_createODBSet, 'value') == 1.0
-    set(handles.edit_ODBSetName, 'enable', 'on')
-else
+
+if get(handles.check_createODBSet, 'value') == 0.0
     set(handles.edit_ODBSetName, 'enable', 'inactive')
 end
-set(handles.check_LL, 'enable', 'on')
-set(handles.check_L, 'enable', 'on')
-set(handles.check_D, 'enable', 'on')
-set(handles.check_DDL, 'enable', 'on')
-set(handles.check_FOS, 'enable', 'on')
-set(handles.check_SFA, 'enable', 'on')
-set(handles.check_FRFR, 'enable', 'on')
-set(handles.check_FRFV, 'enable', 'on')
-set(handles.check_FRFH, 'enable', 'on')
-set(handles.check_FRFW, 'enable', 'on')
-set(handles.check_SMAX, 'enable', 'on')
-set(handles.check_SMXP, 'enable', 'on')
-set(handles.check_SMXU, 'enable', 'on')
-set(handles.check_TRF, 'enable', 'on')
-set(handles.check_WCM, 'enable', 'on')
-set(handles.check_WCA, 'enable', 'on')
-set(handles.check_WCDP, 'enable', 'on')
-set(handles.check_WCATAN, 'enable', 'on')
-set(handles.rButton_selectFromList, 'enable', 'on')
-set(handles.rButton_preselect, 'enable', 'on')
-set(handles.rButton_selectAll, 'enable', 'on')
-set(handles.pButton_clearSelection, 'enable', 'on')
-set(handles.pButton_reset, 'enable', 'on')
-set(handles.check_copyToClipboard, 'enable', 'on')
-set(handles.pButton_start, 'enable', 'on')
-set(handles.pButton_cancel, 'enable', 'on')
 
 
 % --- Executes on button press in frame_modelInfo.

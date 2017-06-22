@@ -12,7 +12,7 @@ function varargout = rosette(varargin)%#ok<*DEFNU>
 %      A3.3 Rosette Analysis
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 04-Apr-2017 13:26:59 GMT
+%   Last modified 22-Jun-2017 16:09:40 GMT
     
     %%
     
@@ -54,7 +54,7 @@ clc
 % Update handles structure
 guidata(hObject, handles);
 
-% Load the tips icon
+%% Load the icons
 [a,~]=imread('icoR_bulb.jpg');
 [r,c,~]=size(a);
 x=ceil(r/35);
@@ -62,6 +62,14 @@ y=ceil(c/35);
 g=a(1:x:end,1:y:end,:);
 g(g==255)=5.5*255;
 set(handles.pButton_showDiagram, 'CData', g);
+
+[a,~]=imread('icoR_info.jpg');
+[r,c,~]=size(a);
+x=ceil(r/35);
+y=ceil(c/35);
+g=a(1:x:end,1:y:end,:);
+g(g==255)=5.5*255;
+set(handles.pButton_strainUnits, 'CData', g);
 
 [a,~]=imread('icoR_fileOpen.jpg');
 [r,c,~]=size(a);
@@ -77,7 +85,7 @@ set(handles.pButton_outputLocation, 'CData', g);
 % UIWAIT makes rosette wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
-% Load the panel state
+%% Load the panel state
 if isappdata(0, 'rosette_edit_gaugeA') == 1.0
     set(handles.edit_gaugeA, 'string', getappdata(0, 'rosette_edit_gaugeA'))
     set(handles.edit_gaugeB, 'string', getappdata(0, 'rosette_edit_gaugeB'))
@@ -591,3 +599,10 @@ function check_referenceOrientation_Callback(~, ~, ~)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of check_referenceOrientation
+
+
+% --- Executes on button press in pButton_strainUnits.
+function pButton_strainUnits_Callback(~, ~, ~)
+% hObject    handle to pButton_strainUnits (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)

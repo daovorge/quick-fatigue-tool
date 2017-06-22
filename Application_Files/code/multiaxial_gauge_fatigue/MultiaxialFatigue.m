@@ -13,7 +13,7 @@ function varargout = MultiaxialFatigue(varargin)%#ok<*DEFNU>
 %      A3.2 Multiaxial Gauge Fatigue
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 12-Apr-2017 12:25:20 GMT
+%   Last modified 22-Jun-2017 16:09:40 GMT
     
     %%
     
@@ -60,7 +60,7 @@ guidata(hObject, handles);
 % UIWAIT makes MultiaxialFatigue wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
-%% Load the orientation icon
+%% Load icons
 [a,~]=imread('icoR_options.jpg');
 [r,c,~]=size(a);
 x=ceil(r/35);
@@ -150,11 +150,7 @@ if isappdata(0, 'panel_multiaxialFatigue_edit_gauge_0') == 1.0
         
     set(handles.edit_msc_user, 'string', getappdata(0, 'panel_multiaxialFatigue_edit_msc_user'))
     
-    if isempty(getappdata(0, 'panel_multiaxialFatigue_edit_precision')) == 0.0
-        set(handles.edit_precision, 'string', getappdata(0, 'panel_multiaxialFatigue_edit_precision'))
-    else
-        set(handles.edit_precision, 'string', 18.0)
-    end
+    set(handles.edit_precision, 'string', getappdata(0, 'panel_multiaxialFatigue_edit_precision'))
     
     % Surface finish
     if getappdata(0, 'panel_multiaxialFatigue_rButton_kt_list') == 0.0
@@ -267,6 +263,8 @@ else
     else
         set(handles.edit_material, 'string', [])
     end
+    
+    set(handles.edit_precision, 'string', 18.0)
 end
 
 %% Initialize the strain gauge orientation
@@ -1149,19 +1147,25 @@ switch get(eventdata.NewValue, 'tag')
         set(handles.check_ucs, 'enable', 'on')
         if get(handles.check_ucs, 'value') == 1.0
             set(handles.edit_ucs, 'enable', 'on')
+            set(handles.text_mpa, 'enable', 'on')
+        else
+            set(handles.edit_ucs, 'enable', 'inactive')
+            set(handles.text_mpa, 'enable', 'off')
         end
     case 'rButton_msc_morrow'
+        set(handles.text_mpa, 'enable', 'off')
         set(handles.text_msc_user, 'enable', 'off')
         set(handles.edit_msc_user, 'enable', 'off')
         set(handles.pButton_msc_user, 'enable', 'off')
         set(handles.check_ucs, 'enable', 'off')
-        set(handles.edit_ucs, 'enable', 'inactive')
+        set(handles.edit_ucs, 'enable', 'off')
     otherwise
+        set(handles.text_mpa, 'enable', 'off')
         set(handles.text_msc_user, 'enable', 'off')
         set(handles.edit_msc_user, 'enable', 'off')
         set(handles.pButton_msc_user, 'enable', 'off')
         set(handles.check_ucs, 'enable', 'off')
-        set(handles.edit_ucs, 'enable', 'inactive')
+        set(handles.edit_ucs, 'enable', 'off')
 end
 
 
@@ -1297,7 +1301,7 @@ function pButton_reset_Callback(~, ~, handles)
 set(handles.edit_gauge_0, 'string', [])
 set(handles.edit_gauge_45, 'string', [])
 set(handles.edit_gauge_90, 'string', [])
-set(handles.pMenu_units, 'value', 1.0)
+set(handles.pMenu_units, 'value', 2.0)
 setappdata(0, 'panel_multiaxialFatigue_gauge_path', [pwd, '/Data/gauge'])
 set(handles.text_conversionFactor, 'enable', 'off')
 set(handles.edit_conversionFactor, 'enable', 'off')
@@ -1379,7 +1383,7 @@ set(handles.edit_msc_user, 'enable', 'off')
 set(handles.edit_msc_user, 'string', [])
 set(handles.pButton_msc_user, 'enable', 'off')
 set(handles.check_ucs, 'enable', 'off', 'value', 0.0)
-set(handles.edit_ucs, 'enable', 'inactive', 'backgroundColor', [177/255, 206/255, 237/255], 'string', [])
+set(handles.edit_ucs, 'enable', 'off', 'string', [])
 set(handles.text_mpa, 'enable', 'off')
 setappdata(0, 'panel_multiaxialFatigue_msc_path', [pwd, '/Data/msc'])
 set(handles.text_defineSurfaceFinish, 'enable', 'on')

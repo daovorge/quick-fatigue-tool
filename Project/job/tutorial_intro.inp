@@ -25,6 +25,9 @@
 200e3, 0.33, 400, 325
 *FATIGUE, constants
 930, -0.095, , ,
+*FATIGUE, test data
+1e4, 363
+1e7, 188.3
 *END MATERIAL
 **
 **Job definition
@@ -32,7 +35,7 @@
 *JOB DESCRIPTION = Demonstration of a simple loading
 **Material definition
 *MATERIAL = steel
-*USE SN = 0
+*USE SN = 1
 **
 **Loading definition
 *HISTORY = [200, -200]

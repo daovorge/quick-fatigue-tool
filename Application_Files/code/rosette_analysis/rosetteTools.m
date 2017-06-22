@@ -11,112 +11,36 @@ classdef rosetteTools < handle
 %      A3.3 Rosette Analysis
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 04-Apr-2017 13:26:59 GMT
+%   Last modified 22-Jun-2017 16:09:40 GMT
     
     %%
     
     methods (Static = true)
         %% Blank the GUI
         function [] = blank(handles)
-            set(handles.text_gaugeA, 'enable', 'off')
-            set(handles.text_gaugeB, 'enable', 'off')
-            set(handles.text_gaugeC, 'enable', 'off')
-            
-            set(handles.edit_gaugeA, 'enable', 'off')
-            set(handles.edit_gaugeB, 'enable', 'off')
-            set(handles.edit_gaugeC, 'enable', 'off')
-            
-            set(handles.pButton_gaugeA, 'enable', 'off')
-            set(handles.pButton_gaugeB, 'enable', 'off')
-            set(handles.pButton_gaugeC, 'enable', 'off')
-            
-            set(handles.text_alpha, 'enable', 'off')
-            set(handles.text_beta, 'enable', 'off')
-            set(handles.text_gamma, 'enable', 'off')
-            
-            set(handles.edit_alpha, 'enable', 'off')
-            set(handles.edit_beta, 'enable', 'off')
-            set(handles.edit_gamma, 'enable', 'off')
-            
-            set(handles.text_alphaUnits, 'enable', 'off')
-            set(handles.text_betaUnits, 'enable', 'off')
-            set(handles.text_gammaUnits, 'enable', 'off')
-            
-            set(handles.text_gaugeDiagram, 'enable', 'off')
-            set(handles.pButton_showDiagram, 'enable', 'off')
-            
-            set(handles.text_outputType, 'enable', 'off')
-            
-            set(handles.text_E, 'enable', 'off')
-            set(handles.edit_E, 'enable', 'off')
-            set(handles.text_eUnits, 'enable', 'off')
-            set(handles.text_poisson, 'enable', 'off')
-            set(handles.edit_poisson, 'enable', 'off')
-            
-            set(handles.check_outputLocation, 'enable', 'off')
-            set(handles.edit_outputLocation, 'enable', 'off')
-            set(handles.pButton_outputLocation, 'enable', 'off')
-            set(handles.check_referenceStrain, 'enable', 'off')
-            set(handles.check_referenceOrientation, 'enable', 'off')
-            
-            set(handles.pButton_start, 'enable', 'off')
-            set(handles.pButton_cancel, 'enable', 'off')
+            set(findall(handles.figure1, '-property', 'Enable'), 'Enable', 'off')
         end
         
         %% Show the GUI
         function [] = show(handles)
-            set(handles.text_gaugeA, 'enable', 'on')
-            set(handles.text_gaugeB, 'enable', 'on')
-            set(handles.text_gaugeC, 'enable', 'on')
+            set(findall(handles.figure1, '-property', 'Enable'), 'Enable', 'on')
             
-            set(handles.edit_gaugeA, 'enable', 'on')
-            set(handles.edit_gaugeB, 'enable', 'on')
-            set(handles.edit_gaugeC, 'enable', 'on')
-            
-            set(handles.pButton_gaugeA, 'enable', 'on')
-            set(handles.pButton_gaugeB, 'enable', 'on')
-            set(handles.pButton_gaugeC, 'enable', 'on')
-            
-            set(handles.text_alpha, 'enable', 'on')
-            set(handles.text_beta, 'enable', 'on')
-            set(handles.text_gamma, 'enable', 'on')
-            
-            set(handles.edit_alpha, 'enable', 'on')
-            set(handles.edit_beta, 'enable', 'on')
-            set(handles.edit_gamma, 'enable', 'on')
-            
-            set(handles.text_alphaUnits, 'enable', 'on')
-            set(handles.text_betaUnits, 'enable', 'on')
-            set(handles.text_gammaUnits, 'enable', 'on')
-            
-            set(handles.text_gaugeDiagram, 'enable', 'on')
-            set(handles.pButton_showDiagram, 'enable', 'on')
-            
-            set(handles.text_outputType, 'enable', 'on')
-            if getappdata(0, 'rosette_pMenu_outputType') == 2.0
-                set(handles.text_E, 'enable', 'on')
-                set(handles.edit_E, 'enable', 'on')
-                set(handles.text_eUnits, 'enable', 'on')
-                set(handles.text_poisson, 'enable', 'on')
-                set(handles.edit_poisson, 'enable', 'on')
+            if getappdata(0, 'rosette_pMenu_outputType') == 1.0
+                set(handles.text_E, 'enable', 'off')
+                set(handles.edit_E, 'enable', 'off')
+                set(handles.text_eUnits, 'enable', 'off')
+                set(handles.text_poisson, 'enable', 'off')
+                set(handles.edit_poisson, 'enable', 'off')
             end
             
-            set(handles.check_outputLocation, 'enable', 'on')
-            if get(handles.check_outputLocation, 'value') == 1.0
-                set(handles.edit_outputLocation, 'enable', 'on')
-                set(handles.pButton_outputLocation, 'enable', 'on')
-            else
-               set(handles.edit_outputLocation, 'enable', 'inactive', 'backgroundColor', [177/255, 206/255, 237/255]) 
+            if get(handles.check_outputLocation, 'value') == 0.0
+                set(handles.edit_outputLocation, 'enable', 'inactive', 'backgroundColor', [177/255, 206/255, 237/255])
+                set(handles.pButton_outputLocation, 'enable', 'off') 
             end
-            set(handles.check_referenceStrain, 'enable', 'on')
-            set(handles.check_referenceOrientation, 'enable', 'on')
-            
-            set(handles.pButton_start, 'enable', 'on')
-            set(handles.pButton_cancel, 'enable', 'on')
         end
         
         %% Verify inputs
-        function [alpha, beta, gamma, E, v, outputLocation, gaugeA, gaugeB, gaugeC, error, errorMessage] = verifyInput(handles)
+        function [alpha, beta, gamma, E, v, outputLocation, gaugeDataA, gaugeDataB, gaugeDataC, error, errorMessage] = verifyInput(handles)
             % Initialize output
             alpha = -1.0;
             beta = -1.0;
@@ -124,78 +48,143 @@ classdef rosetteTools < handle
             E = -1.0;
             v = -1.0;
             outputLocation = -1.0;
-            gaugeA = -1.0;
-            gaugeB = -1.0;
-            gaugeC = -1.0;
             error = 0.0;
             errorMessage = -1.0;
+            gaugeANumeric = 0.0;
+            gaugeBNumeric = 0.0;
+            gaugeCNumeric = 0.0;
             
-            % Verify the gauge definitions
+            gaugeDataA = [];
+            gaugeDataB = [];
+            gaugeDataC = [];
+            
             gaugeFileA = get(handles.edit_gaugeA, 'string');
             gaugeFileB = get(handles.edit_gaugeB, 'string');
             gaugeFileC = get(handles.edit_gaugeC, 'string');
             
-            if isempty(gaugeFileA) == 1.0
-                error = 1.0;
-                errorMessage = 'All three gauge signals must be defined.';
-                return
-            elseif exist(gaugeFileA, 'file') ~= 2.0
-                flag = exist(gaugeFileA, 'file');
+            % Verify the gauge definitions
+            
+            %% Check if the input is a numeric array
+            %{
+                The user can supply the gauge definition directly as a
+                numeric array. Before trying to search for the file, see if
+                the input can be evaluated as an array
+            %}
+            % Gauge A
+            if (strcmpi(gaugeFileA(1.0), '[') == 1.0) && (isnumeric(str2num(gaugeFileA)) == 1.0) %#ok<ST2NM>
+                gaugeDataA = str2num(gaugeFileA); %#ok<ST2NM>
+                gaugeANumeric = 1.0;
                 
-                switch flag
-                    case 0.0
-                        errorMessage = 'The definition file for Gauge A could not be found.';
-                    case 7.0
-                        errorMessage = 'The definition for Gauge A appears to be a directory.';
-                    otherwise
-                        errorMessage = 'The definition of Gauge A is invalid.';
+                if isempty(gaugeDataA) == 1.0
+                    errorMessage = sprintf('Error while processing input for Gauge A: ''%s''.\n\nThe expression could not be evaluated.', gaugeFileA);
+                    error = 1.0;
+                    return
                 end
+            end
+            
+            % Gauge B
+            if (strcmpi(gaugeFileB(1.0), '[') == 1.0) && (isnumeric(str2num(gaugeFileB)) == 1.0) %#ok<ST2NM>
+                gaugeDataB = str2num(gaugeFileB); %#ok<ST2NM>
+                gaugeBNumeric = 1.0;
                 
+                if isempty(gaugeDataB) == 1.0
+                    errorMessage = sprintf('Error while processing input for Gauge B: ''%s''.\n\nThe expression could not be evaluated.', gaugeFileB);
+                    error = 1.0;
+                    return
+                end
+            end
+            
+            % Gauge C
+            if (strcmpi(gaugeFileC(1.0), '[') == 1.0) && (isnumeric(str2num(gaugeFileC)) == 1.0) %#ok<ST2NM>
+                gaugeDataC = str2num(gaugeFileC); %#ok<ST2NM>
+                gaugeCNumeric = 1.0;
+                
+                if isempty(gaugeDataC) == 1.0
+                    errorMessage = sprintf('Error while processing input for Gauge C: ''%s''.\n\nThe expression could not be evaluated.', gaugeFileC);
+                    error = 1.0;
+                    return
+                end
+            end
+            
+            %% Check if the input is a file
+            % Gauge A
+            if (gaugeANumeric == 0.0) && (exist(gaugeFileA, 'file') == 0.0)
+                errorMessage = sprintf('Error while processing input for Gauge A: ''%s''.\n\nThe expression is not a valid file path or a numerical array.', gaugeFileA);
                 error = 1.0;
                 return
             end
             
-            if isempty(gaugeFileB) == 1.0
-                error = 1.0;
-                errorMessage = 'All three gauge signals must be defined.';
-                return
-            elseif exist(gaugeFileB, 'file') ~= 2.0
-                flag = exist(gaugeFileB, 'file');
-                
-                switch flag
-                    case 0.0
-                        errorMessage = 'The definition file for Gauge B could not be found.';
-                    case 7.0
-                        errorMessage = 'The definition for Gauge B appears to be a directory.';
-                    otherwise
-                        errorMessage = 'The definition of Gauge B is invalid.';
-                end
-                
+            % Gauge B
+            if (gaugeBNumeric == 0.0) && (exist(gaugeFileB, 'file') == 0.0)
+                errorMessage = sprintf('Error while processing input for Gauge B: ''%s''.\n\nThe expression is not a valid file path or a numerical array.', gaugeFileB);
                 error = 1.0;
                 return
             end
             
-            if isempty(gaugeFileC) == 1.0
-                error = 1.0;
-                errorMessage = 'All three gauge signals must be defined.';
-                return
-            elseif exist(gaugeFileC, 'file') ~= 2.0
-                flag = exist(gaugeFileC, 'file');
-                
-                switch flag
-                    case 0.0
-                        errorMessage = 'The definition file for Gauge C could not be found.';
-                    case 7.0
-                        errorMessage = 'The definition for Gauge C appears to be a directory.';
-                    otherwise
-                        errorMessage = 'The definition of Gauge C is invalid.';
-                end
-                
+            % Gauge C
+            if (gaugeCNumeric == 0.0) && (exist(gaugeFileC, 'file') == 0.0)
+                errorMessage = sprintf('Error while processing input for Gauge C: ''%s''.\n\nThe expression is not a valid file path or a numerical array.', gaugeFileC);
                 error = 1.0;
                 return
             end
             
-            % Check the gauge orientation defintition
+            %% Check if the file can be read
+            % Gauge A
+            if gaugeANumeric == 0.0
+                try
+                    gaugeDataA = dlmread(gaugeFileA);
+                catch
+                    errorMessage = sprintf('Error while processing input for Gauge A: ''%s''.\n\nThe file could not be read.', gaugeFileA);
+                    error = 1.0;
+                    return
+                end
+            end
+            
+            % Gauge B
+            if gaugeBNumeric == 0.0
+                try
+                    gaugeDataB = dlmread(gaugeFileB);
+                catch
+                    errorMessage = sprintf('Error while processing input for Gauge B: ''%s''.\n\nThe file could not be read.', gaugeFileB);
+                    error = 1.0;
+                    return
+                end
+            end
+            
+            % Gauge C
+            if gaugeCNumeric == 0.0
+                try
+                    gaugeDataC = dlmread(gaugeFileC);
+                catch
+                    errorMessage = sprintf('Error while processing input for Gauge C: ''%s''.\n\nThe file could not be read.', gaugeFileC);
+                    error = 1.0;
+                    return
+                end
+            end
+            
+            %% Check for non-numeric data in each file
+            % Gauge A
+            if (any(any(isinf(gaugeDataA))) == 1.0) || (any(any(isnan(gaugeDataA))) == 1.0) || (any(any(isreal(gaugeDataA))) == 0.0)
+                errorMessage = sprintf('Error while processing input for Gauge A: ''%s''.\n\nSome of the data has inf, NaN or complex values.', gaugeFileA);
+                error = 1.0;
+                return
+            end
+            
+            % Gauge B
+            if (any(any(isinf(gaugeDataB))) == 1.0) || (any(any(isnan(gaugeDataB))) == 1.0) || (any(any(isreal(gaugeDataB))) == 0.0)
+                errorMessage = sprintf('Error while processing input for Gauge B: ''%s''.\n\nSome of the data has inf, NaN or complex values.', gaugeFileB);
+                error = 1.0;
+                return
+            end
+            
+            % Gauge C
+            if (any(any(isinf(gaugeDataC))) == 1.0) || (any(any(isnan(gaugeDataC))) == 1.0) || (any(any(isreal(gaugeDataC))) == 0.0)
+                errorMessage = sprintf('Error while processing input for Gauge C: ''%s''.\n\nSome of the data has inf, NaN or complex values.', gaugeFileC);
+                error = 1.0;
+                return
+            end
+            
+            %% Check the gauge orientation defintition
             alpha = str2double(get(handles.edit_alpha, 'string'));
             
             if isempty(get(handles.edit_alpha, 'string')) == 1.0
@@ -252,7 +241,7 @@ classdef rosetteTools < handle
                 return
             end
             
-            % Check the definition of E and v
+            %% Check the definition of E and v
             if getappdata(0, 'rosette_pMenu_outputType') == 2.0
                 E = str2double(get(handles.edit_E, 'string'));
                 
@@ -289,7 +278,7 @@ classdef rosetteTools < handle
                 end
             end
             
-            % Verify the output definition
+            %% Verify the output definition
             if get(handles.check_outputLocation, 'value') == 1.0
                 outputLocation = get(handles.edit_outputLocation, 'string');
                 
@@ -318,24 +307,12 @@ classdef rosetteTools < handle
                 outputLocation = [pwd, '\Project\output\rosette_analysis_results'];
             end
             
-            % Verify the gauge data
-            try
-                gaugeA = dlmread(gaugeFileA);
-                [r, c] = size(gaugeA);
-                
-                if r > c
-                    gaugeA = gaugeA';
-                end
-            catch exceptionMessage
-                error = 1.0;
-                errorMessage = sprintf('Error while processing ''%s''. The file could not be read.\r\n\r\n%s', gaugeFileA, exceptionMessage.message);
-                return
-            end
+            %% Verify the dimensions of the gauge data
+            % Gauge A
+            [r, c] = size(gaugeDataA);
             
-            if any(any(isinf(gaugeA))) == 1.0 || any(any(isnan(gaugeA))) == 1.0 || any(any(isreal(gaugeA))) == 0.0
-                error = 1.0;
-                errorMessage = sprintf('Error while processing ''%s''. Some of the data has inf, NaN or complex values.', gaugeFileA);
-                return
+            if r > c
+                gaugeDataA = gaugeDataA';
             end
             
             if r > 1.0 && c > 1.0
@@ -344,23 +321,11 @@ classdef rosetteTools < handle
                 return
             end
             
-            try
-                gaugeB = dlmread(gaugeFileB);
-                [r, c] = size(gaugeB);
-                
-                if r > c
-                    gaugeB = gaugeB';
-                end
-            catch exceptionMessage
-                error = 1.0;
-                errorMessage = sprintf('Error while processing ''%s''. The file could not be read.\r\n\r\n%s', gaugeFileB, exceptionMessage.message);
-                return
-            end
+            % Gauge B
+            [r, c] = size(gaugeDataB);
             
-            if any(any(isinf(gaugeB))) == 1.0 || any(any(isnan(gaugeB))) == 1.0 || any(any(isreal(gaugeB))) == 0.0
-                error = 1.0;
-                errorMessage = sprintf('Error while processing ''%s''. Some of the data has inf, NaN or complex values.', gaugeFileB);
-                return
+            if r > c
+                gaugeDataB = gaugeDataB';
             end
             
             if r > 1.0 && c > 1.0
@@ -369,23 +334,11 @@ classdef rosetteTools < handle
                 return
             end
             
-            try
-                gaugeC = dlmread(gaugeFileC);
-                [r, c] = size(gaugeC);
-                
-                if r > c
-                    gaugeC = gaugeC';
-                end
-            catch exceptionMessage
-                error = 1.0;
-                errorMessage = sprintf('Error while processing ''%s''. The file could not be read.\r\n\r\n%s', gaugeFileC, exceptionMessage.message);
-                return
-            end
+            % Gauge C
+            [r, c] = size(gaugeDataC);
             
-            if any(any(isinf(gaugeC))) == 1.0 || any(any(isnan(gaugeC))) == 1.0 || any(any(isreal(gaugeC))) == 0.0
-                error = 1.0;
-                errorMessage = sprintf('Error while processing ''%s''. Some of the data has inf, NaN or complex values.', gaugeFileC);
-                return
+            if r > c
+                gaugeDataC = gaugeDataC';
             end
             
             if r > 1.0 && c > 1.0
@@ -394,32 +347,34 @@ classdef rosetteTools < handle
                 return
             end
             
-            
-            % Make sure the signals are the same length
-            lengths = [length(gaugeA), length(gaugeB) length(gaugeC)];
+            %% Make sure the signals are the same length
+            lengths = [length(gaugeDataA), length(gaugeDataB) length(gaugeDataC)];
             if length(unique(lengths)) ~= 1.0
                 longest = max(lengths);
                 
-                if length(gaugeA) ~= longest
-                    diff = longest - length(gaugeA);
-                    gaugeA = [gaugeA, zeros(1.0, diff)];
+                % Gauge A
+                if length(gaugeDataA) ~= longest
+                    diff = longest - length(gaugeDataA);
+                    gaugeDataA = [gaugeDataA, zeros(1.0, diff)];
                 end
                 
-                if length(gaugeB) ~= longest
-                    diff = longest - length(gaugeB);
-                    gaugeB = [gaugeB, zeros(1.0, diff)];
+                % Gauge B
+                if length(gaugeDataB) ~= longest
+                    diff = longest - length(gaugeDataB);
+                    gaugeDataB = [gaugeDataB, zeros(1.0, diff)];
                 end
                 
-                if length(gaugeC) ~= longest
-                    diff = longest - length(gaugeC);
-                    gaugeC = [gaugeC, zeros(1.0, diff)];
+                % Gauge C
+                if length(gaugeDataC) ~= longest
+                    diff = longest - length(gaugeDataC);
+                    gaugeDataC = [gaugeDataC, zeros(1.0, diff)];
                 end
             end
         end
         
         %% Calcualte strain from gauge data
         function [E1, E2, E12M, thetaP, thetaS, E11, E22, E12, S1, S2, S12M, S11, S22, S12, error, errorMessage] = processGauges(gaugeA, gaugeB, gaugeC, alpha, beta, gamma, E, v, referenceStrain, referenceOrientation)
-            % Initialize output variables
+            %% Initialize output variables
             E1 = -1.0;
             E2 = -1.0;
             E12M = -1.0;
@@ -442,7 +397,7 @@ classdef rosetteTools < handle
             error = -1.0;
             errorMessage = -1.0;
             
-            % Search for special cases
+            %% Search for special cases
             if alpha == 0.0 && beta == 45.0 && gamma == 45.0 % Rectangular
                 % Reference strains
                 E11 = gaugeA;
@@ -492,21 +447,21 @@ classdef rosetteTools < handle
             
             %% Get principal stresses if requested:
             if getappdata(0, 'rosette_pMenu_outputType') == 2.0
-                S1 = (E./(1.0 - v^2)).*(E1 + v.*E2);
-                S2 = (E./(1.0 - v^2)).*(E2 + v.*E1);
+                S1 = 1e-6.*((E./(1.0 - v^2)).*(E1 + v.*E2));
+                S2 = 1e-6*((E./(1.0 - v^2)).*(E2 + v.*E1));
                 
                 % Maximum shear stress
                 S12M = 0.5.*(S1 - S2);
                 
                 if referenceStrain == 1.0
                     % Calculate the reference stress as well
-                    S11 = (E./(1.0 - v^2)).*(E11 + v.*E22);
-                    S22 = (E./(1.0 - v^2)).*(E22 + v.*E11);
-                    S12 = (E12*E)/(2.0*(1.0 + v));
+                    S11 = 1e-6.*((E./(1.0 - v^2)).*(E11 + v.*E22));
+                    S22 = 1e-6.*((E./(1.0 - v^2)).*(E22 + v.*E11));
+                    S12 = 1e-6.*((E12*E)/(2.0*(1.0 + v)));
                 end
             end
             
-            %% Get maximum shear stress and strain
+            %% Get maximum shear strain
             % Maximum shear strain
             E12M = 0.5.*(E1 - E2);
             
@@ -545,14 +500,6 @@ classdef rosetteTools < handle
                 end
             end
             
-            % Convert strain to microstrain
-            E1 = E1*1e6;
-            E2 = E2*1e6;
-            E12M = E12M*1e6;
-            E11 = E11*1e6;
-            E22 = E22*1e6;
-            E12 = E12*1e6;
-            
             fid = fopen([outputLocation, '\', dateString, '.dat'], 'w+');
             
             % Check for valid FID
@@ -569,13 +516,13 @@ classdef rosetteTools < handle
                         
                         fprintf(fid, 'Strain units: uE\r\n');
                         fprintf(fid, 'PE1\tPE2\tE12 Max\tPhi D (degrees)\tPhi S (degrees)\tE11R\tE22R\tE12R\r\n');
-                        fprintf(fid, '%.4g\t%.4g\t%.4g\t%.4g\t%.4g\t%.4g\t%.4g\t%.4g\r\n', tableA');
+                        fprintf(fid, '%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\r\n', tableA');
                     else
                         tableB = [E1; E2; E12M; E11; E22; E12; S1; S2; S12M; S11; S22; S12; thetaP; thetaS]';
                         
                         fprintf(fid, 'Strain units: uE\r\nStress units: MPa\r\n');
                         fprintf(fid, 'PE1\tPE2\tE12 Max\tE11R\tE22R\tE12R\tPS1\tPS2\tS12 Max\tS11R\tS22R\tS12R\tPhi D (degrees)\tPhi S (degrees)\r\n');
-                        fprintf(fid, '%.4g\t%.4g\t%.4g\t%.4g\t%.4g\t%.4g\t%.4g\t%.4g\t%.4g\t%.4g\t%.4g\t%.4g\t%.4g\t%.4g\r\n', tableB');
+                        fprintf(fid, '%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\r\n', tableB');
                     end
                 else
                     if getappdata(0, 'rosette_pMenu_outputType') == 1.0
@@ -583,13 +530,13 @@ classdef rosetteTools < handle
                         
                         fprintf(fid, 'Strain units: uE\r\n');
                         fprintf(fid, 'PE1\tPE2\tE12 Max\tE11R\tE22R\tE12R\r\n');
-                        fprintf(fid, '%.4g\t%.4g\t%.4g\t%.4g\t%.4g\t%.4g\r\n', tableA');
+                        fprintf(fid, '%f\t%f\t%f\t%f\t%f\t%f\r\n', tableA');
                     else
                         tableB = [E1; E2; E12M; E11; E22; E12; S1; S2; S12M; S11; S22; S12]';
                         
                         fprintf(fid, 'Strain units: uE\tStress units: MPa\r\n');
                         fprintf(fid, 'PE1\tPE2\tE12 Max\tE11R\tE22R\tE12R\tPS1\tPS2\tS12 Max\tS11R\tS22R\tS12R\r\n');
-                        fprintf(fid, '%.4g\t%.4g\t%.4g\t%.4g\t%.4g\t%.4g\t%.4g\t%.4g\t%.4g\t%.4g\t%.4g\t%.4g\r\n', tableB');
+                        fprintf(fid, '%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\r\n', tableB');
                     end
                 end
             else
@@ -599,13 +546,13 @@ classdef rosetteTools < handle
                         
                         fprintf(fid, 'Strain units: uE\r\n');
                         fprintf(fid, 'PE1\tPE2\tE12 Max\tPhi D (degrees)\tPhi S (degrees)\r\n');
-                        fprintf(fid, '%.4g\t%.4g\t%.4g\t%.4g\t%.4g\r\n', tableA');
+                        fprintf(fid, '%f\t%f\t%f\t%f\t%f\r\n', tableA');
                     else
                         tableB = [E1; E2; E12M; S1; S2; S12M; thetaP; thetaS]';
                         
                         fprintf(fid, 'Strain units: uE\r\nStress units: MPa\r\n');
                         fprintf(fid, 'PE1\tPE2\tE12 Max\tPS1\tPS2\tS12 Max\tPhi D (degrees)\tPhi S (degrees)\r\n');
-                        fprintf(fid, '%.4g\t%.4g\t%.4g\t%.4g\t%.4g\t%.4g\t%.4g\t%.4g\r\n', tableB');
+                        fprintf(fid, '%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\r\n', tableB');
                     end
                 else
                     if getappdata(0, 'rosette_pMenu_outputType') == 1.0
@@ -613,13 +560,13 @@ classdef rosetteTools < handle
                         
                         fprintf(fid, 'Strain units: uE\r\n');
                         fprintf(fid, 'PE1\tPE2\tE12 Max\r\n');
-                        fprintf(fid, '%.4g\t%.4g\t%.4g\r\n', tableA');
+                        fprintf(fid, '%f\t%f\t%f\r\n', tableA');
                     else
                         tableB = [E1; E2; E12M; S1; S2; S12M]';
                         
                         fprintf(fid, 'Strain units: uE\r\nStress units: MPa\r\n');
                         fprintf(fid, 'PE1\tPE2\tE12 Max\tPS1\tPS2\tS12 Max\r\n');
-                        fprintf(fid, '%.4g\t%.4g\t%.4g\t%.4g\t%.4g\t%.4g\r\n', tableB');
+                        fprintf(fid, '%f\t%f\t%f\t%f\t%f\t%f\r\n', tableB');
                     end
                 end
             end

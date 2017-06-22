@@ -12,7 +12,7 @@ function varargout = virtualGauge(varargin)
 %      A3.4 Virtual Strain Gauge
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 04-Apr-2017 13:26:59 GMT
+%   Last modified 22-Jun-2017 16:09:40 GMT
     
     %%
     
@@ -61,7 +61,7 @@ if exist(approot, 'dir')
     addpath(approot)
 end
 
-% Load the tips icon
+%% Load the tips icon
 [a,~]=imread('icoR_bulb.jpg');
 [r,c,~]=size(a);
 x=ceil(r/35);
@@ -69,6 +69,22 @@ y=ceil(c/35);
 g=a(1:x:end,1:y:end,:);
 g(g==255)=5.5*255;
 set(handles.pButton_showDiagram, 'CData', g);
+
+[a,~]=imread('icoR_info.jpg');
+[r,c,~]=size(a);
+x=ceil(r/35);
+y=ceil(c/35);
+g=a(1:x:end,1:y:end,:);
+g(g==255)=5.5*255;
+set(handles.pButton_strainUnits, 'CData', g);
+
+[a,~]=imread('icoR_help.jpg');
+[r,c,~]=size(a);
+x=ceil(r/35);
+y=ceil(c/35);
+g=a(1:x:end,1:y:end,:);
+g(g==255)=5.5*255;
+set(handles.pButton_help, 'CData', g);
 
 [a,~]=imread('icoR_fileOpen.jpg');
 [r,c,~]=size(a);
@@ -79,7 +95,7 @@ g(g==255)=5.5*255;
 set(handles.pButton_browseInput, 'CData', g);
 set(handles.pButton_browseOutput, 'CData', g);
 
-% Load the panel state
+%% Load the panel state
 if isappdata(0, 'panel_virtual_gauge_editTensor') == 1.0
     set(handles.edit_tensor, 'string', getappdata(0, 'panel_virtual_gauge_editTensor'))
     set(handles.rButton_rows, 'value', getappdata(0, 'panel_virtual_gauge_radioButton_rows'))
@@ -504,3 +520,17 @@ if get(handles.rButton_cols, 'value') == 1.0
 else
     set(handles.rButton_cols, 'value', 1.0)
 end
+
+
+% --- Executes on button press in pButton_strainUnits.
+function pButton_strainUnits_Callback(~, ~, ~)
+% hObject    handle to pButton_strainUnits (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in pButton_help.
+function pButton_help_Callback(~, ~, ~)
+% hObject    handle to pButton_help (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
