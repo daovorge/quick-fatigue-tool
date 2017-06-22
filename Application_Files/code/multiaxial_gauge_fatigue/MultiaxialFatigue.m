@@ -61,13 +61,14 @@ guidata(hObject, handles);
 % uiwait(handles.figure1);
 
 %% Load the orientation icon
-[a,~]=imread('icoR_orientation.jpg');
+[a,~]=imread('icoR_options.jpg');
 [r,c,~]=size(a);
 x=ceil(r/35);
 y=ceil(c/35);
 g=a(1:x:end,1:y:end,:);
 g(g==255)=5.5*255;
 set(handles.pButton_gaugeOrientation, 'CData', g);
+set(handles.pButton_materialOptions, 'CData', g);
 
 [a,~]=imread('icoR_fileOpen.jpg');
 [r,c,~]=size(a);

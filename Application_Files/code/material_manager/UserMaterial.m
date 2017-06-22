@@ -78,13 +78,6 @@ y=ceil(c/35);
 g=a(1:x:end,1:y:end,:);
 g(g==255)=5.5*255;
 set(handles.pButton_snHelp, 'CData', g);
-
-[a,~]=imread('icoR_help.jpg');
-[r,c,~]=size(a); 
-x=ceil(r/35); 
-y=ceil(c/35); 
-g=a(1:x:end,1:y:end,:);
-g(g==255)=5.5*255;
 set(handles.pButton_rHelp, 'CData', g);
 
 [a,~]=imread('icoR_delete.jpg');
@@ -832,12 +825,12 @@ switch get(hObject, 'value')
         set(handles.edit_nssc, 'enable', 'inactive')
         set(handles.edit_nssc, 'backgroundColor', [177/255, 206/255, 237/255])
         
-        set(handles.pButton_k, 'enable', 'on', 'backgroundColor', [1 1 1])
+        set(handles.pButton_k, 'enable', 'on')
     case 1.0
         set(handles.edit_nssc, 'enable', 'on')
         set(handles.edit_nssc, 'backgroundColor', [1, 1, 1])
         
-        set(handles.pButton_k, 'enable', 'off', 'backgroundColor', [170/255 170/255 170/255])
+        set(handles.pButton_k, 'enable', 'off')
         set(handles.edit_nssc, 'string', getappdata(0, 'nssc_value'))
 end
 
@@ -1044,11 +1037,11 @@ else
     set(handles.edit_poisson, 'string', '0.33', 'enable', 'inactive', 'backgroundColor', [241/255, 241/255, 241/255])
     set(handles.check_poisson, 'value', 0.0)
     set(handles.edit_snData, 'string', 'Undefined')
-    set(handles.pButton_viewSNData, 'enable', 'off', 'backgroundColor', [170/255 170/255 170/255])
-    set(handles.pButton_rmSNData, 'enable', 'off', 'backgroundColor', [170/255 170/255 170/255])
+    set(handles.pButton_viewSNData, 'enable', 'off')
+    set(handles.pButton_rmSNData, 'enable', 'off')
     set(handles.edit_rValues, 'string', 'Undefined')
-    set(handles.pButton_viewRValues, 'enable', 'off', 'backgroundColor', [170/255 170/255 170/255])
-    set(handles.pButton_rmRValues, 'enable', 'off', 'backgroundColor', [170/255 170/255 170/255])
+    set(handles.pButton_viewRValues, 'enable', 'off')
+    set(handles.pButton_rmRValues, 'enable', 'off')
     set(handles.edit_snData, 'backgroundColor', [(241/255), (241/255), (241/255)])
     set(handles.edit_rValues, 'backgroundColor', [(241/255), (241/255), (241/255)])
     setappdata(0, 'panel_userMaterial_snData', [pwd, '/Data/material/sn_data'])
@@ -1178,10 +1171,10 @@ else
     set(handles.edit_poisson, 'string', '0.33')
 end
 
-if ~isempty(properties.material_properties.s_values)
+if isempty(properties.material_properties.s_values) == 0.0
     set(handles.edit_snData, 'string', 'Selected')
-    set(handles.pButton_viewSNData, 'enable', 'on', 'backgroundColor', [1.0, 1.0, 1.0])
-    set(handles.pButton_rmSNData, 'enable', 'on', 'backgroundColor', [1.0, 1.0, 1.0])
+    set(handles.pButton_viewSNData, 'enable', 'on')
+    set(handles.pButton_rmSNData, 'enable', 'on')
     
     set(handles.edit_snData, 'backgroundColor', [(204/255), 1, (204/255)])
     
@@ -1191,10 +1184,10 @@ end
 
 if isempty(properties.material_properties.r_values) == 0.0
     set(handles.edit_rValues, 'string', 'Selected')
-    set(handles.pButton_viewRValues, 'enable', 'on', 'backgroundColor', [1.0, 1.0, 1.0])
-    set(handles.pButton_rmRValues, 'enable', 'on', 'backgroundColor', [1.0, 1.0, 1.0])
+    set(handles.pButton_viewRValues, 'enable', 'on')
+    set(handles.pButton_rmRValues, 'enable', 'on')
     
-    set(handles.edit_rValues, 'backgroundColor', [(204/255), 1, (204/255)])
+    set(handles.edit_rValues, 'backgroundColor', [(204/255), 1.0, (204/255)])
     
     setappdata(gcf, 'R_values', properties.material_properties.r_values)
 end
@@ -1404,8 +1397,8 @@ if isempty(r_values) == 0.0
 end
 
 set(handles.edit_snData, 'string', 'Selected')
-set(handles.pButton_rmSNData, 'enable', 'on', 'backgroundColor', [1.0, 1.0, 1.0])
-set(handles.pButton_viewSNData, 'enable', 'on', 'backgroundColor', [1.0, 1.0, 1.0])
+set(handles.pButton_rmSNData, 'enable', 'on')
+set(handles.pButton_viewSNData, 'enable', 'on')
 
 set(handles.edit_snData, 'backgroundColor', [(204.0/255.0), 1.0, (204.0/255.0)])
 
@@ -1440,8 +1433,8 @@ if strcmpi(answer, 'no') || isempty(answer)
 end
 
 set(handles.edit_snData, 'string', 'Undefined')
-set(handles.pButton_rmSNData, 'enable', 'off', 'backgroundColor', [170/255 170/255 170/255])
-set(handles.pButton_viewSNData, 'enable', 'off', 'backgroundColor', [170/255 170/255 170/255])
+set(handles.pButton_rmSNData, 'enable', 'off')
+set(handles.pButton_viewSNData, 'enable', 'off')
 
 set(handles.edit_snData, 'backgroundColor', [(241/255), (241/255), (241/255)])
 
@@ -1624,8 +1617,8 @@ if isempty(S) == 0.0
 end
 
 set(handles.edit_rValues, 'string', 'Selected')
-set(handles.pButton_rmRValues, 'enable', 'on', 'backgroundColor', [1.0, 1.0, 1.0])
-set(handles.pButton_viewRValues, 'enable', 'on', 'backgroundColor', [1.0, 1.0, 1.0])
+set(handles.pButton_rmRValues, 'enable', 'on')
+set(handles.pButton_viewRValues, 'enable', 'on')
 
 set(handles.edit_rValues, 'backgroundColor', [(204.0/255.0), 1.0, (204.0/255.0)])
 
@@ -1669,8 +1662,8 @@ if strcmpi(answer, 'no') || isempty(answer)
 end
 
 set(handles.edit_rValues, 'string', 'Undefined')
-set(handles.pButton_rmRValues, 'enable', 'off', 'backgroundColor', [170/255 170/255 170/255])
-set(handles.pButton_viewRValues, 'enable', 'off', 'backgroundColor', [170/255 170/255 170/255])
+set(handles.pButton_rmRValues, 'enable', 'off')
+set(handles.pButton_viewRValues, 'enable', 'off')
 
 set(handles.edit_rValues, 'backgroundColor', [(241/255), (241/255), (241/255)])
 
