@@ -62,7 +62,27 @@ classdef rosetteTools < handle
             gaugeFileB = get(handles.edit_gaugeB, 'string');
             gaugeFileC = get(handles.edit_gaugeC, 'string');
             
-            % Verify the gauge definitions
+            %% Check if the file exists
+            % Gauge A
+            if isempty(gaugeFileA) == 1.0
+                errorMessage = 'All three gauges must be specified.';
+                error = 1.0;
+                return
+            end
+            
+            % Gauge B
+            if isempty(gaugeFileB) == 1.0
+                errorMessage = 'All three gauges must be specified.';
+                error = 1.0;
+                return
+            end
+            
+            % Gauge C
+            if isempty(gaugeFileC) == 1.0
+                errorMessage = 'All three gauges must be specified.';
+                error = 1.0;
+                return
+            end
             
             %% Check if the input is a numeric array
             %{
