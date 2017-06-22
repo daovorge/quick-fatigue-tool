@@ -12,7 +12,7 @@ function varargout = virtualGauge(varargin)
 %      A3.4 Virtual Strain Gauge
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 22-Jun-2017 16:09:40 GMT
+%   Last modified 22-Jun-2017 18:03:00 GMT
     
     %%
     
@@ -530,7 +530,14 @@ function pButton_strainUnits_Callback(~, ~, ~)
 
 
 % --- Executes on button press in pButton_help.
-function pButton_help_Callback(~, ~, ~)
-% hObject    handle to pButton_help (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+function pButton_help_Callback(~, ~, handles)
+virtualGaugeUtils.blank(handles)
+
+msg1 = sprintf('Specify the three plane strain tensor components E11, E22 and E12.\n\n');
+msg2 = sprintf('Input must be an ASCII text file containing the strain data. The data can\n');
+msg3 = sprintf('be Nx3 or 3xN, where N is the number of samples in the strain history.');
+
+helpdlg([msg1, msg2, msg3], 'Quick fatigue Tool')
+
+uiwait
+virtualGaugeUtils.enable(handles)

@@ -95,8 +95,17 @@ if isappdata(0, 'rosette_edit_gaugeA') == 1.0
     set(handles.edit_beta, 'string', getappdata(0, 'rosette_edit_beta'))
     set(handles.edit_gamma, 'string', getappdata(0, 'rosette_edit_gamma'))
     
+    set(handles.pMenu_outputType, 'value', getappdata(0, 'rosette_pMenu_outputType'))
     set(handles.edit_E, 'string', getappdata(0, 'rosette_edit_E'))
     set(handles.edit_poisson, 'string', getappdata(0, 'rosette_edit_poisson'))
+    
+    if getappdata(0, 'rosette_pMenu_outputType') == 2.0
+        set(handles.text_E, 'enable', 'on')
+        set(handles.edit_E, 'enable', 'on')
+        set(handles.text_eUnits, 'enable', 'on')
+        set(handles.text_poisson, 'enable', 'on')
+        set(handles.edit_poisson, 'enable', 'on')
+    end
     
     check_outputLocation = getappdata(0, 'rosette_check_outputLocation');
     set(handles.check_outputLocation, 'value', check_outputLocation)
@@ -457,6 +466,7 @@ setappdata(0, 'rosette_edit_alpha', get(handles.edit_alpha, 'string'))
 setappdata(0, 'rosette_edit_beta', get(handles.edit_beta, 'string'))
 setappdata(0, 'rosette_edit_gamma', get(handles.edit_gamma, 'string'))
 
+setappdata(0, 'rosette_pMenu_outputType', get(handles.pMenu_outputType, 'value'))
 setappdata(0, 'rosette_edit_E', get(handles.edit_E, 'string'))
 setappdata(0, 'rosette_edit_poisson', get(handles.edit_poisson, 'string'))
 
