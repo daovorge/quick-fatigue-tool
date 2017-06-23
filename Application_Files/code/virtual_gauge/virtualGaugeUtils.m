@@ -26,6 +26,8 @@ classdef virtualGaugeUtils < handle
         function [] = enable(handles)
             set(findall(handles.figure1, '-property', 'Enable'), 'Enable', 'on')
             
+            set(handles.pButton_strainUnits, 'enable', 'inactive')
+            
             if get(handles.radiobutton_arbitrary, 'value') == 0.0
                 set(handles.check_alpha, 'enable', 'off')
                 set(handles.text_beta, 'enable', 'off')

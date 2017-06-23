@@ -1264,6 +1264,8 @@ set(findall(handles.figure1, '-property', 'Enable'), 'Enable', 'off')
 function enableGUI(handles)
 set(findall(handles.figure1, '-property', 'Enable'), 'Enable', 'on')
 
+set(handles.frame_modelInfo, 'enable', 'inactive')
+
 if get(handles.check_resultFile, 'value') == 0.0
     set(handles.edit_resultFile, 'enable', 'off')
     set(handles.pButton_findResultFile, 'enable', 'off')

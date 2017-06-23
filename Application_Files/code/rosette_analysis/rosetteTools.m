@@ -25,6 +25,8 @@ classdef rosetteTools < handle
         function [] = show(handles)
             set(findall(handles.figure1, '-property', 'Enable'), 'Enable', 'on')
             
+            set(handles.pButton_strainUnits, 'enable', 'inactive')
+            
             if getappdata(0, 'rosette_pMenu_outputType') == 1.0
                 set(handles.text_E, 'enable', 'off')
                 set(handles.edit_E, 'enable', 'off')
