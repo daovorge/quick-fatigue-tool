@@ -246,6 +246,8 @@ set(findall(handles.figure1, '-property', 'Enable'), 'Enable', 'off')
 function enable(handles)
 set(findall(handles.figure1, '-property', 'Enable'), 'Enable', 'on')
 
+set(handles.pButton_warning, 'enable', 'inactive')
+
 
 % --- Executes when user attempts to close figure1.
 function figure1_CloseRequestFcn(hObject, ~, handles)
