@@ -39,21 +39,6 @@ Quick Fatigue Tool User Guide.
 %   if necessary. On Windows machines, UI objects look best when the global
 %   icon size is set to 125% (Control Panel\All Control Panel Items\Display)
 %
-%	>> When starting the Material Manager App, materials do not appear in the
-%	local database
-%
-%	This is a bug. Switch to the System Database, then switch back to Local.
-%	The materials in the Local Database should now appear as normal.
-%
-%	>> When starting the Material Manager App, materials do not appear in the
-%	local database even after switching databases as above. Also when trying to
-%	create a material, the user receives the following error: "Undefined function
-%	or variable 'UserMaterial'"
-%
-%	The necessary files are probably not on the MATLAB path. Select the
-%	'Application_Files' and 'Project' folders from the current folder window, 
-%	right-click and select 'Add to Path -> Selected Folders and Subfolders'.
-%
 %	>> When starting an analysis with the Multiaxial Gauge Fatigue App, the
 %	user receives the following error: "Error while processing material
 %	'material.mat'. The file could not be located."
@@ -302,4 +287,4 @@ Quick Fatigue Tool User Guide.
 %   louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 22-Jun-2017 18:03:00 GMT
+%   Last modified 23-Jun-2017 14:55:29 GMT

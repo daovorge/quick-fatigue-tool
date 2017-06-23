@@ -11,7 +11,7 @@ classdef rosetteTools < handle
 %      A3.3 Rosette Analysis
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 22-Jun-2017 16:09:40 GMT
+%   Last modified 23-Jun-2017 08:19:31 GMT
     
     %%
     

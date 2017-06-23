@@ -7,7 +7,8 @@ function varargout = kSolution(varargin)%#ok<*DEFNU>
 %   KSOLUTION is used internally by Quick Fatigue Tool. The user is
 %   not required to run this file.
 %
-%   See also evaluateMaterial, MaterialManager, UserMaterial.
+%   See also checkDataPath, defaultDataPath, evaluateMaterial,
+%   importMaterial, material, MaterialManager, UserMaterial.
 %
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials

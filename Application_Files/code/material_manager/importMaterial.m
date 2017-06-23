@@ -5,7 +5,8 @@ classdef importMaterial < handle
 %   IMPORTMATERIAL is used internally by Quick Fatigue Tool. The user is
 %   not required to run this file.
 %
-%   See also keywords, fetchMaterial, job.
+%   See also keywords, fetchMaterial, job, checkDataPath, defaultDataPath,
+%   evaluateMaterial, kSolution, material, MaterialManager, UserMaterial.
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
 %   Last modified 20-Jun-2017 14:41:51 GMT

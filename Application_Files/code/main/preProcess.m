@@ -39,8 +39,8 @@ classdef preProcess < handle
                end
            else
                %{
-                   The material was specified without a path. Check the
-                   local material database first
+                   The material was specified without a path. Check
+                   DATA\MATERIAL\LOCAL first
                %}
                if exist(['Data/material/local/', material], 'file') == 2.0
                    material = ['Data/material/local/', material];

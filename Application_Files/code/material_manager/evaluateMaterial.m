@@ -5,7 +5,8 @@ function [] = evaluateMaterial(fileName, material, error)
 %   EVALUATEMATERIAL is used internally by Quick Fatigue Tool. The user is
 %   not required to run this file.
 %
-%   See also kSolution, MaterialManager, UserMaterial.
+%   See also checkDataPath, defaultDataPath, evaluateMaterial,
+%   importMaterial, kSolution, material, MaterialManager, UserMaterial.
 %
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials

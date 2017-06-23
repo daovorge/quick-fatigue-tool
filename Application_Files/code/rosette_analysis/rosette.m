@@ -12,7 +12,7 @@ function varargout = rosette(varargin)%#ok<*DEFNU>
 %      A3.3 Rosette Analysis
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 22-Jun-2017 16:09:40 GMT
+%   Last modified 23-Jun-2017 08:19:31 GMT
     
     %%
     
@@ -117,6 +117,7 @@ if isappdata(0, 'rosette_edit_gaugeA') == 1.0
     end
     set(handles.check_referenceStrain, 'value', getappdata(0, 'rosette_check_referenceStrain'))
     set(handles.check_referenceOrientation, 'value', getappdata(0, 'rosette_check_referenceOrientation'))
+    set(handles.check_referenceStrain, 'string', getappdata(0, 'rosette_text_referenceStrain'))
 end
 
 setappdata(0, 'rosette_pMenu_outputType', 1.0)
@@ -474,6 +475,7 @@ setappdata(0, 'rosette_check_outputLocation', get(handles.check_outputLocation, 
 setappdata(0, 'rosette_edit_outputLocation', get(handles.edit_outputLocation, 'string'))
 setappdata(0, 'rosette_check_referenceStrain', get(handles.check_referenceStrain, 'value'))
 setappdata(0, 'rosette_check_referenceOrientation', get(handles.check_referenceOrientation, 'value'))
+setappdata(0, 'rosette_text_referenceStrain', get(handles.check_referenceStrain, 'string'))
 
 delete(hObject);
 

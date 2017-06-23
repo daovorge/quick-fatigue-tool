@@ -6,13 +6,14 @@ function varargout = UserMaterial(varargin)%#ok<*DEFNU>
 %   USERMATERIAL is used internally by Quick Fatigue Tool. The user is
 %   not required to run this file.
 %
-%   See also evaluateMaterial, kSolution, MaterialManager.
+%   See also checkDataPath, defaultDataPath, evaluateMaterial,
+%   importMaterial, kSolution, material, MaterialManager.
 %
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 21-Jun-2017 11:22:28 GMT
+%   Last modified 23-Jun-2017 13:18:41 GMT
     
     %%
     
@@ -46,7 +47,7 @@ function UserMaterial_OpeningFcn(hObject, ~, handles, varargin)
 
 clc
 
-% Button images
+% Load icons
 [a,~]=imread('icoR_delete.jpg');
 [r,c,~]=size(a); 
 x=ceil(r/35); 
@@ -204,7 +205,12 @@ end
 set(handles.pMenu_msc, 'string', string)
 
 % Set the default material save location
-set(handles.edit_location, 'string', [pwd, '\Data\material\local'])
+qft_localMaterialDataPath = getappdata(0, 'qft_localMaterialDataPath');
+if isempty(qft_localMaterialDataPath) == 1.0
+    set(handles.edit_location, 'string', pwd)
+else
+    set(handles.edit_location, 'string', getappdata(0, 'qft_localMaterialDataPath'))
+end
 
 % Disable return button if applicable
 if (isappdata(0, 'multiaxial_gauge_fatigue_skip_material_manager') == 1.0) || (isappdata(0, 'uniaxial_strain_life_skip_material_manager') == 1.0)
@@ -682,8 +688,10 @@ end
 %% Did the user specify a custom save location?
 if get(handles.check_location, 'value') == 1.0
     pathname = [get(handles.edit_location, 'string'), '\'];
+elseif isempty(getappdata(0, 'qft_localMaterialDataPath')) == 0.0
+    pathname = [getappdata(0, 'qft_localMaterialDataPath'), '\'];
 else
-    pathname = 'Data/material/local/';
+    pathname = [pwd, '\'];
 end
 
 shortFilename = get(handles.edit_name, 'string');
@@ -1017,7 +1025,12 @@ else
     set(handles.edit_name, 'string', 'Material-1')
     set(handles.edit_comment, 'string', '')
     set(handles.edit_location, 'enable', 'inactive', 'backgroundColor', [241/255, 241/255, 241/255])
-    set(handles.edit_location, 'string', [pwd, '\Data\material\local'])
+    qft_localMaterialDataPath = getappdata(0, 'qft_localMaterialDataPath');
+    if isempty(qft_localMaterialDataPath) == 1.0
+        set(handles.edit_location, 'string', pwd)
+    else
+        set(handles.edit_location, 'string', getappdata(0, 'qft_localMaterialDataPath'))
+    end
     set(handles.check_location, 'value', 0.0)
     set(handles.pButton_changeLocation, 'enable', 'off')
     set(handles.pMenu_monoResponse, 'value', 1.0)
@@ -1756,7 +1769,7 @@ end
 % --- Executes on button press in pButton_changeLocation.
 function pButton_changeLocation_Callback(~, ~, handles)
 % Define the start path
-if exist([pwd, '/Data/material/local'], 'dir') == 7.0
+if exist(getappdata(0, 'qft_localMaterialDataPath'), 'dir') == 7.0
     startPath_output = [pwd, '/Data/material/local'];
 else
     startPath_output = pwd;
@@ -1771,21 +1784,31 @@ end
 
 set(handles.edit_location, 'string', location)
 
-setappdata(0, 'location', location)
+setappdata(0, 'qft_materialLocation', location)
 
 % --- Executes on button press in check_location.
 function check_location_Callback(hObject, ~, handles)
+qft_localMaterialDataPath = getappdata(0, 'qft_localMaterialDataPath');
+
 switch get(hObject, 'value')
     case 0.0
         set(handles.edit_location, 'enable', 'inactive', 'backgroundColor', [241/255, 241/255, 241/255])
-        set(handles.edit_location, 'string', [pwd, '\Data\material\local'])
+        
+        if isempty(qft_localMaterialDataPath) == 0.0
+            set(handles.edit_location, 'string', qft_localMaterialDataPath)
+        else
+            set(handles.edit_location, 'string', pwd)
+        end
+        
         set(handles.pButton_changeLocation, 'enable', 'off')
     case 1.0
         set(handles.edit_location, 'enable', 'on', 'backgroundColor', 'white')
-        if isappdata(0, 'location') == 1.0
-            set(handles.edit_location, 'string', getappdata(0, 'location'))
+        if isappdata(0, 'qft_materialLocation') == 1.0
+            set(handles.edit_location, 'string', getappdata(0, 'qft_materialLocation'))
+        elseif isempty(qft_localMaterialDataPath) == 0.0
+            set(handles.edit_location, 'string', qft_localMaterialDataPath)
         else
-            set(handles.edit_location, 'string', [pwd, '\Data\material\local'])
+            set(handles.edit_location, 'string', pwd)
         end
         set(handles.pButton_changeLocation, 'enable', 'on')
     otherwise
@@ -1801,8 +1824,8 @@ function figure1_ResizeFcn(~, ~, ~)
 
 % --- Executes when user attempts to close figure1.
 function figure1_CloseRequestFcn(hObject, ~, ~)
-if isappdata(0, 'location') == 1.0
-    rmappdata(0, 'location')
+if isappdata(0, 'qft_materialLocation') == 1.0
+    rmappdata(0, 'qft_materialLocation')
 end
 
 if isappdata(0, 'e_value') == 1.0
@@ -1816,5 +1839,7 @@ end
 if isappdata(0, 'b_value') == 1.0
     rmappdata(0, 'b_value')
 end
+
+setappdata(0, 'qft_suppressDataPath', 1.0)
 
 delete(hObject);
