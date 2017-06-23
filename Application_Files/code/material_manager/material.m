@@ -17,6 +17,7 @@ classdef material < handle
 %   MATERIAL.copy(OLDNAME, NEWNAME)
 %   MATERIAL.query(MATERIALNAME)
 %   MATERIAL.database(PATH)
+%   MATERIAL.checkDatabase(PATH)
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
 %   Last modified 23-Jun-2017 14:55:29 GMT
@@ -736,6 +737,11 @@ classdef material < handle
         
         %% Set the local database
         function [] = database(path)
+            %MATERIAL.DATABASE    Change the local material database.
+            %
+            %   Reference section in Quick Fatigue Tool User Guide
+            %      5 Materials
+            
             % Check the input
             if exist(path, 'dir') ~= 7.0
                 fprintf('ERROR: The specified path is inavlid.')
@@ -761,6 +767,16 @@ classdef material < handle
         
         %% Check the local database
         function [error, localPath] = checkDatabase()
+            %MATERIAL.CHECKDATABASE    Check the local material database.
+            %
+            %   MATERIAL.CHECKDATABASE() checks if the local material
+            %   datase has been set. If it has not been set, the function
+            %   checks for a marker file in case a previously-defined
+            %   database is available.
+            %
+            %   Reference section in Quick Fatigue Tool User Guide
+            %      5 Materials
+            
             % Initialize the error flag
             error = 0.0;
             
