@@ -12,7 +12,7 @@ function varargout = virtualGauge(varargin)
 %      A3.4 Virtual Strain Gauge
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 22-Jun-2017 18:03:00 GMT
+%   Last modified 24-Jun-2017 11:06:56 GMT
     
     %%
     
@@ -51,6 +51,9 @@ handles.output = hObject;
 
 % Update handles structure
 guidata(hObject, handles);
+
+%% Set symbol font for strain units
+set(handles.text_strainUnitsB, 'string', '[me].', 'FontName', 'symbol')
 
 % UIWAIT makes virtualGauge wait for user response (see UIRESUME)
 % uiwait(handles.figure1);

@@ -12,7 +12,7 @@ function varargout = rosette(varargin)%#ok<*DEFNU>
 %      A3.3 Rosette Analysis
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 23-Jun-2017 08:19:31 GMT
+%   Last modified 24-Jun-2017 11:06:56 GMT
     
     %%
     
@@ -53,6 +53,9 @@ clc
 
 % Update handles structure
 guidata(hObject, handles);
+
+%% Set symbol font for strain units
+set(handles.text_strainUnitsB, 'string', '[me].', 'FontName', 'symbol')
 
 %% Load the icons
 [a,~]=imread('icoR_bulb.jpg');
