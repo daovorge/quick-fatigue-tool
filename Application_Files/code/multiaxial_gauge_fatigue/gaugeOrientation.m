@@ -55,7 +55,7 @@ handles.output = hObject;
 guidata(hObject, handles);
 
 % UIWAIT makes gaugeOrientation wait for user response (see UIRESUME)
-% uiwait(handles.figure1);
+% uiwait(handles.GaugeOrientation);
 
 % Load the tips icon
 [a,~]=imread('icoR_bulb.jpg');
@@ -103,7 +103,7 @@ varargout{1} = handles.output;
 
 % --- Executes on button press in pButton_cancel.
 function pButton_cancel_Callback(~, ~, ~) %#ok<*DEFNU>
-close gaugeOrientation
+close 'Gauge Orientation'
 
 
 % --- Executes on button press in pButton_ok.
@@ -203,7 +203,7 @@ setappdata(0, 'gaugeOrientation_edit_alpha', get(handles.edit_alpha, 'string'))
 setappdata(0, 'gaugeOrientation_edit_beta', get(handles.edit_beta, 'string'))
 setappdata(0, 'gaugeOrientation_edit_gamma', get(handles.edit_gamma, 'string'))
 
-close gaugeOrientation
+close 'Gauge Orientation'
 
 
 
@@ -372,9 +372,9 @@ switch get(eventdata.NewValue, 'tag')
 end
 
 
-% --- Executes when user attempts to close figure1.
-function figure1_CloseRequestFcn(hObject, ~, ~)
-% hObject    handle to figure1 (see GCBO)
+% --- Executes when user attempts to close GaugeOrientation.
+function GaugeOrientation_CloseRequestFcn(hObject, ~, ~)
+% hObject    handle to GaugeOrientation (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 

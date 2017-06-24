@@ -1,8 +1,8 @@
-function varargout = defaultDataPath(varargin)%#ok<*DEFNU>
-%DEFAULTDATAPATH    QFT functions for Material Manager.
+function varargout = LocalMaterialDatabase(varargin)%#ok<*DEFNU>
+%LOCALMATERIALDATABASE    QFT functions for Material Manager.
 %   These functions are used to set the default user local material path.
 %   
-%   DEFAULTDATAPATH is used internally by Quick Fatigue Tool. The user is
+%   LOCALMATERIALDATABASE is used internally by Quick Fatigue Tool. The user is
 %   not required to run this file.
 %
 %   See also checkDataPath, evaluateMaterial, importMaterial, kSolution,
@@ -20,8 +20,8 @@ function varargout = defaultDataPath(varargin)%#ok<*DEFNU>
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @defaultDataPath_OpeningFcn, ...
-                   'gui_OutputFcn',  @defaultDataPath_OutputFcn, ...
+                   'gui_OpeningFcn', @LocalMaterialDatabase_OpeningFcn, ...
+                   'gui_OutputFcn',  @LocalMaterialDatabase_OutputFcn, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -36,22 +36,22 @@ end
 % End initialization code - DO NOT EDIT
 
 
-% --- Executes just before defaultDataPath is made visible.
-function defaultDataPath_OpeningFcn(hObject, ~, handles, varargin)
+% --- Executes just before LocalMaterialDatabase is made visible.
+function LocalMaterialDatabase_OpeningFcn(hObject, ~, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to defaultDataPath (see VARARGIN)
+% varargin   command line arguments to LocalMaterialDatabase (see VARARGIN)
 
-% Choose default command line output for defaultDataPath
+% Choose default command line output for LocalMaterialDatabase
 handles.output = hObject;
 
 % Update handles structure
 guidata(hObject, handles);
 
-% UIWAIT makes defaultDataPath wait for user response (see UIRESUME)
-% uiwait(handles.figure1);
+% UIWAIT makes LocalMaterialDatabase wait for user response (see UIRESUME)
+% uiwait(handles.LocalMaterialDatabase);
 
 % Position the figure in the centre of the screen
 movegui(hObject, 'center')
@@ -131,7 +131,7 @@ end
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = defaultDataPath_OutputFcn(~, ~, handles) 
+function varargout = LocalMaterialDatabase_OutputFcn(~, ~, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -213,7 +213,7 @@ catch
 end
 
 % Close the GUI
-close defaultDataPath
+close 'Set Local Material Database'
 
 
 % --- Executes on button press in pButton_cancel.
@@ -224,12 +224,12 @@ function pButton_cancel_Callback(~, ~, ~)
 %}
 setappdata(0, 'qft_suppressDataPath', 1.0)
 
-close defaultDataPath
+close 'Set Local Material Database'
 
 
-% --- Executes when figure1 is resized.
-function figure1_ResizeFcn(~, ~, ~)
-% hObject    handle to figure1 (see GCBO)
+% --- Executes when LocalMaterialDatabase is resized.
+function LocalMaterialDatabase_ResizeFcn(~, ~, ~)
+% hObject    handle to LocalMaterialDatabase (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -241,17 +241,17 @@ function pButton_warning_Callback(~, ~, ~)
 % handles    structure with handles and user data (see GUIDATA)
 
 function blank(handles)
-set(findall(handles.figure1, '-property', 'Enable'), 'Enable', 'off')
+set(findall(handles.LocalMaterialDatabase, '-property', 'Enable'), 'Enable', 'off')
 
 function enable(handles)
-set(findall(handles.figure1, '-property', 'Enable'), 'Enable', 'on')
+set(findall(handles.LocalMaterialDatabase, '-property', 'Enable'), 'Enable', 'on')
 
 set(handles.pButton_warning, 'enable', 'inactive')
 
 
-% --- Executes when user attempts to close figure1.
-function figure1_CloseRequestFcn(hObject, ~, handles)
-% hObject    handle to figure1 (see GCBO)
+% --- Executes when user attempts to close LocalMaterialDatabase.
+function LocalMaterialDatabase_CloseRequestFcn(hObject, ~, handles)
+% hObject    handle to LocalMaterialDatabase (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 setappdata(0, 'qft_suppressDataPath', 1.0)

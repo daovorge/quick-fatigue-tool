@@ -52,7 +52,7 @@ handles.output = hObject;
 guidata(hObject, handles);
 
 % UIWAIT makes ExportTool wait for user response (see UIRESUME)
-% uiwait(handles.figure1);
+% uiwait(handles.ExportTool);
 
 % Position the figure in the centre of the screen
 movegui(hObject, 'center')
@@ -319,7 +319,7 @@ set(handles.rButton_selectAll, 'value', 0.0)
 
 % --- Executes on button press in pButton_cancel.
 function pButton_cancel_Callback(~, ~, ~)
-close ExportTool
+close 'Export Tool (ODB Interface)'
 
 % --- Executes on button press in pButton_start.
 function pButton_start_Callback(hObject, eventdata, handles)
@@ -785,7 +785,7 @@ if get(handles.check_copyToClipboard, 'value') == 1.0
 end
 
 % Re-enable the GUI
-close ExportTool
+close 'Export Tool (ODB Interface)'
 
 
 function edit_fieldData_Callback(~, ~, ~)
@@ -1208,8 +1208,8 @@ setappdata(0, 'variableSelectReset', 1.0)
 panel_selection_SelectionChangeFcn(hObject, eventdata, handles)
 
 
-% --- Executes when user attempts to close figure1.
-function figure1_CloseRequestFcn(hObject, ~, handles)
+% --- Executes when user attempts to close ExportTool.
+function ExportTool_CloseRequestFcn(hObject, ~, handles)
 % Save the panel state
 setappdata(0, 'panel_exportTool_edit_fieldData', get(handles.edit_fieldData, 'string'))
 setappdata(0, 'panel_exportTool_edit_modelFile', get(handles.edit_modelFile, 'string'))
@@ -1259,10 +1259,10 @@ setappdata(0, 'panel_exportTool_check_copyToClipboard', get(handles.check_copyTo
 delete(hObject);
 
 function blankGUI(handles)
-set(findall(handles.figure1, '-property', 'Enable'), 'Enable', 'off')
+set(findall(handles.ExportTool, '-property', 'Enable'), 'Enable', 'off')
 
 function enableGUI(handles)
-set(findall(handles.figure1, '-property', 'Enable'), 'Enable', 'on')
+set(findall(handles.ExportTool, '-property', 'Enable'), 'Enable', 'on')
 
 set(handles.frame_modelInfo, 'enable', 'inactive')
 

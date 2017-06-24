@@ -52,7 +52,7 @@ handles.output = hObject;
 guidata(hObject, handles);
 
 % UIWAIT makes RosetteDiagram wait for user response (see UIRESUME)
-% uiwait(handles.figure1);
+% uiwait(handles.VirtualStrainGauge);
 
 % Read in the gauge image
 set(handles.gauge_axes, 'visible', 'on')
@@ -82,4 +82,4 @@ varargout{1} = handles.output;
 
 % --- Executes on button press in pButton_dismiss.
 function pButton_dismiss_Callback(~, ~, ~) %#ok<*DEFNU>
-close RosetteDiagram
+close 'Rosette Diagram'

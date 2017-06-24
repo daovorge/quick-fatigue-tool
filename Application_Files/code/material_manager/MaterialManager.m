@@ -156,7 +156,7 @@ varargout{1} = handles.output;
 function list_database_Callback(hObject, eventdata, handles)
 if ischar(get(handles.list_database, 'string')) == 1.0
     if isempty(getappdata(0, 'qft_localMaterialDataPath')) == 1.0
-        close MaterialManager
+        close 'Material Manager'
         checkDataPath
         MaterialManager
         return
@@ -203,8 +203,8 @@ end
 
 % --- Executes on button press in pButton_create.
 function pButton_create_Callback(~, ~, ~)
-close MaterialManager
-UserMaterial
+close 'Material Manager'
+MaterialEditor
 
 
 % --- Executes on button press in pButton_edit.
@@ -213,8 +213,8 @@ setappdata(0, 'editMaterial', 1.0)
 materials = get(handles.list_database, 'string');
 setappdata(0, 'materialToEdit', materials(get(handles.list_database, 'value')))
 
-close MaterialManager
-UserMaterial
+close 'Material Manager'
+MaterialEditor
 
 
 % --- Executes on button press in pButton_copy.
@@ -414,7 +414,7 @@ end
 
 % --- Executes on button press in pButton_close.
 function pButton_close_Callback(~, ~, ~)
-close MaterialManager
+close 'Material Manager'
 
 
 % --- Executes when selected object is changed in panel_database.
@@ -677,7 +677,7 @@ end
 
 % --- Executes on button press in pButton_import.
 function pButton_import_Callback(~, ~, ~)
-close MaterialManager
+close 'Material Manager'
 
 % Get the local material path
 localPath = getappdata(0, 'qft_localMaterialDataPath');
@@ -891,9 +891,9 @@ end
 
 % --- Executes on button press in pButton_snHelp.
 function pButton_help_Callback(~, ~, ~)
-close MaterialManager
-defaultDataPath
-uiwait(defaultDataPath)
+close 'Material Manager'
+LocalMaterialDatabase
+uiwait(LocalMaterialDatabase)
 MaterialManager
 return
 

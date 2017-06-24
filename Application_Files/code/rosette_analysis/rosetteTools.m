@@ -18,12 +18,12 @@ classdef rosetteTools < handle
     methods (Static = true)
         %% Blank the GUI
         function [] = blank(handles)
-            set(findall(handles.figure1, '-property', 'Enable'), 'Enable', 'off')
+            set(findall(handles.RosetteAnalysis, '-property', 'Enable'), 'Enable', 'off')
         end
         
         %% Show the GUI
         function [] = show(handles)
-            set(findall(handles.figure1, '-property', 'Enable'), 'Enable', 'on')
+            set(findall(handles.RosetteAnalysis, '-property', 'Enable'), 'Enable', 'on')
             
             set(handles.pButton_strainUnits, 'enable', 'inactive')
             

@@ -59,7 +59,7 @@ clc
 guidata(hObject, handles);
 
 % UIWAIT makes mohrsCircle wait for user response (see UIRESUME)
-% uiwait(handles.figure1);
+% uiwait(handles.MohrSolver);
 
 % Set units
 setappdata(0, 'units', 0)

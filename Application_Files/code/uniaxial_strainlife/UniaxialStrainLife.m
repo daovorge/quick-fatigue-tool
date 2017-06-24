@@ -53,7 +53,7 @@ handles.output = hObject;
 guidata(hObject, handles);
 
 % UIWAIT makes UniaxialStrainLife wait for user response (see UIRESUME)
-% uiwait(handles.figure1);
+% uiwait(handles.UniaxialStrainLife);
 
 % Load icons
 [a,~]=imread('icoR_fileOpen.jpg');
@@ -307,12 +307,12 @@ uniaxialPostProcess.outputMsgBox(nCycles, life, cael, outputPath)
 
 %% Close the GUI
 warning('on', 'all')
-close UniaxialStrainLife
+close 'Uniaxial Strain-Life'
 
 
 % --- Executes on button press in pButton_cancel.
 function pButton_cancel_Callback(~, ~, ~)
-close UniaxialStrainLife
+close 'Uniaxial Strain-Life'
 
 
 % --- Executes on button press in pButton_reset.
@@ -684,8 +684,8 @@ end
 enable(handles)
 
 
-% --- Executes when user attempts to close figure1.
-function figure1_CloseRequestFcn(hObject, ~, handles)
+% --- Executes when user attempts to close UniaxialStrainLife.
+function UniaxialStrainLife_CloseRequestFcn(hObject, ~, handles)
 % Save the panel state
 
 % Input definition
@@ -715,11 +715,11 @@ setappdata(0, 'panel_uniaxialStrainLife_edit_resultsLocation', get(handles.edit_
 delete(hObject);
 
 function blank(handles)
-set(findall(handles.figure1, '-property', 'Enable'), 'Enable', 'off')
+set(findall(handles.UniaxialStrainLife, '-property', 'Enable'), 'Enable', 'off')
 
 
 function enable(handles)
-set(findall(handles.figure1, '-property', 'Enable'), 'Enable', 'on')
+set(findall(handles.UniaxialStrainLife, '-property', 'Enable'), 'Enable', 'on')
 
 % Input definition
 if get(handles.rButton_stress, 'value') == 1.0

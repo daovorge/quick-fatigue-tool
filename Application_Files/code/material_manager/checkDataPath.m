@@ -36,12 +36,12 @@ if isempty(localPath) == 1.0
             
             setappdata(0, 'qft_localMaterialDataPath', dataPath)
         catch
-            defaultDataPath
-            uiwait(defaultDataPath)
+            LocalMaterialDatabase
+            uiwait(LocalMaterialDatabase)
         end
     else
-        defaultDataPath
-        uiwait(defaultDataPath)
+        LocalMaterialDatabase
+        uiwait(LocalMaterialDatabase)
     end
 else
     %{

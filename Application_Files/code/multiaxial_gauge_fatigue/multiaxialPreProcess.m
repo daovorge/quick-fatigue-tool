@@ -21,12 +21,12 @@ classdef multiaxialPreProcess < handle
         
         %% Blank the GUI
         function [] = blank(handles)
-            set(findall(handles.figure1, '-property', 'Enable'), 'Enable', 'off')
+            set(findall(handles.MultiaxialGaugeFatigue, '-property', 'Enable'), 'Enable', 'off')
         end
         
         %% Re-enable the GUI
         function [] = enable(handles)
-            set(findall(handles.figure1, '-property', 'Enable'), 'Enable', 'on')
+            set(findall(handles.MultiaxialGaugeFatigue, '-property', 'Enable'), 'Enable', 'on')
             
             if get(handles.pMenu_units, 'value') ~= 3.0
                 set(handles.text_conversionFactor, 'enable', 'off')
