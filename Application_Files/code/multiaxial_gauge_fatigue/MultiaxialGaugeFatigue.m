@@ -1011,7 +1011,7 @@ function pButton_createMaterial_Callback(~, ~, handles)
 multiaxialPreProcess.blank(handles)
 
 setappdata(0, 'multiaxial_gauge_fatigue_skip_material_manager', 1.0)
-UserMaterial
+MaterialEditor
 uiwait
 
 multiaxialPreProcess.enable(handles)

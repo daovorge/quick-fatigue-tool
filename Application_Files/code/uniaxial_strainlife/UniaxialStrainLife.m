@@ -477,7 +477,7 @@ function pButton_createMaterial_Callback(~, ~, handles)
 blank(handles)
 
 setappdata(0, 'uniaxial_strain_life_skip_material_manager', 1.0)
-UserMaterial
+MaterialEditor
 uiwait
 
 rmappdata(0, 'uniaxial_strain_life_skip_material_manager')

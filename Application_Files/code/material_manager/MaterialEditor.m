@@ -47,7 +47,7 @@ function MaterialEditor_OpeningFcn(hObject, ~, handles, varargin)
 
 clc
 
-% Load icons
+%% Load icons
 [a,~]=imread('icoR_delete.jpg');
 [r,c,~]=size(a); 
 x=ceil(r/35); 
@@ -105,6 +105,7 @@ g=a(1:x:end,1:y:end,:);
 g(g==255)=5.5*255;
 set(handles.pButton_changeLocation, 'CData', g);
 
+%% Other tasks
 % Choose default command line output for MaterialEditor
 handles.output = hObject;
 
@@ -117,7 +118,7 @@ movegui(hObject, 'center')
 % Define SIMULIA blue color
 setappdata(0, 'simulia_blue', [177/255, 206/255, 237/255])
 
-% Populate dialogue box with user material for editing if user pressed
+%% Populate dialogue box with user material for editing if user pressed
 % "EDIT" in the material manager
 if isappdata(0, 'editMaterial')
     % Get the name of the material to edit
