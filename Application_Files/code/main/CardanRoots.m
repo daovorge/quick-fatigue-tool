@@ -169,4 +169,3 @@ S3 = j2*u+j*v;
 roots = [S1 S2 S3];
 
 end % CardanCmplx
-
