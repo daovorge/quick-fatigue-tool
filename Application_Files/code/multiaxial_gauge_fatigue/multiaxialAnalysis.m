@@ -6,8 +6,8 @@ classdef multiaxialAnalysis < handle
 %   MULTIAXIALANALYSIS is used internally by Quick Fatigue Tool. The user is
 %   not required to run this file.
 %   
-%   See also multiaxialPostProcess, multiaxialPreProcess, gaugeOrientation,
-%   materialOptions, MultiaxialFatigue.
+%   See also AdvancedMaterialOptions, gaugeOrientation, 
+%   MultiaxialGaugeFatigue, multiaxialPostProcess, multiaxialPreProcess.
 %   
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.2 Multiaxial Gauge Fatigue

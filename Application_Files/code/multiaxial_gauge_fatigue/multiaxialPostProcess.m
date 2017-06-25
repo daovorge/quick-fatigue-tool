@@ -6,8 +6,8 @@ classdef multiaxialPostProcess < handle
 %   MULTIAXIALPOSTPROCESS is used internally by Quick Fatigue Tool. The
 %   user is not required to run this file.
 %   
-%   See also multiaxialAnalysis, multiaxialPreProcess, gaugeOrientation,
-%   materialOptions, MultiaxialFatigue.
+%   See also AdvancedMaterialOptions, gaugeOrientation, multiaxialAnalysis,
+%   MultiaxialGaugeFatigue, multiaxialPreProcess.
 %   
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.2 Multiaxial Gauge Fatigue

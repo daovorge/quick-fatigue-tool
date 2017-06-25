@@ -6,8 +6,8 @@ function varargout = AdvancedMaterialOptions(varargin)
 %   ADVANCEDMATERIALOPTIONS is used internally by Quick Fatigue Tool. The
 %   user is not required to run this file.
 %   
-%   See also multiaxialAnalysis, multiaxialPostProcess,
-%   multiaxialPreProcess, gaugeOrientation, MultiaxialFatigue.
+%   See also gaugeOrientation, multiaxialAnalysis, MultiaxialGaugeFatigue,
+%   multiaxialPostProcess, multiaxialPreProcess.
 %   
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.2 Multiaxial Gauge Fatigue

@@ -6,7 +6,7 @@ function varargout = mohrsCircle(varargin)%#ok<*DEFNU>
 %   MOHRSCIRCLE is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %
-%   See also circle.
+%   See also circle, MohrSolver.
 %
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.5 Mohr Solver

@@ -6,8 +6,8 @@ classdef multiaxialPreProcess < handle
 %   MULTIAXIALPREPROCESS is used internally by Quick Fatigue Tool. The
 %   user is not required to run this file.
 %   
-%   See also multiaxialAnalysis, multiaxialPostProcess, gaugeOrientation,
-%   materialOptions, MultiaxialFatigue.
+%   See also AdvancedMaterialOptions, gaugeOrientation, multiaxialAnalysis,
+%   MultiaxialGaugeFatigue, multiaxialPostProcess.
 %   
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.2 Multiaxial Gauge Fatigue

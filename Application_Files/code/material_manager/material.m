@@ -18,6 +18,13 @@ classdef material < handle
 %   MATERIAL.query(MATERIALNAME)
 %   MATERIAL.database(PATH)
 %   MATERIAL.checkDatabase(PATH)
+%
+%   See also checkDataPath, evaluateMaterial, importMaterial,
+%   kValueCalculator, LocalMaterialDatabase, MaterialEditor,
+%   MaterialManager.
+%
+%   Reference section in Quick Fatigue Tool User Guide
+%      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
 %   Last modified 23-Jun-2017 14:55:29 GMT

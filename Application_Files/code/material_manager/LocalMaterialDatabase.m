@@ -5,8 +5,8 @@ function varargout = LocalMaterialDatabase(varargin)%#ok<*DEFNU>
 %   LOCALMATERIALDATABASE is used internally by Quick Fatigue Tool. The user is
 %   not required to run this file.
 %
-%   See also checkDataPath, evaluateMaterial, importMaterial, kSolution,
-%   material, MaterialManager, UserMaterial.
+%   See also checkDataPath, evaluateMaterial, importMaterial,
+%   kValueCalculator, material, MaterialEditor, MaterialManager.
 %
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials

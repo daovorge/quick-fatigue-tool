@@ -5,7 +5,7 @@ classdef virtualGaugeUtils < handle
 %   VIRTUALGAUGEUTILS is used internally by Quick Fatigue Tool. The
 %   user is not required to run this file.
 %   
-%   See also RosetteDiagram, virtualGauge.
+%   See also RosetteDiagram, VirtualStrainGauge.
 %   
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.4 Virtual Strain Gauge

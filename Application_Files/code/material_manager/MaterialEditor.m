@@ -6,8 +6,8 @@ function varargout = MaterialEditor(varargin)%#ok<*DEFNU>
 %   MATERIALEDITOR is used internally by Quick Fatigue Tool. The user is
 %   not required to run this file.
 %
-%   See also checkDataPath, defaultDataPath, evaluateMaterial,
-%   importMaterial, kSolution, material, MaterialManager.
+%   See also checkDataPath, evaluateMaterial, importMaterial,
+%   kValueCalculator, LocalMaterialDatabase, material, MaterialManager.
 %
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials

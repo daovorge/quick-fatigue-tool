@@ -7,8 +7,8 @@ function varargout = kValueCalculator(varargin)%#ok<*DEFNU>
 %   KVALUECALCULATOR is used internally by Quick Fatigue Tool. The user is
 %   not required to run this file.
 %
-%   See also checkDataPath, defaultDataPath, evaluateMaterial,
-%   importMaterial, material, MaterialManager, UserMaterial.
+%   See also checkDataPath, evaluateMaterial, importMaterial,
+%   LocalMaterialDatabase, material, MaterialEditor, MaterialManager.
 %
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials

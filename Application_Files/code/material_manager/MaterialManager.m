@@ -6,8 +6,8 @@ function varargout = MaterialManager(varargin)%#ok<*DEFNU>
 %   MATERIALMANAGER is used internally by Quick Fatigue Tool. The user is
 %   not required to run this file.
 %
-%   See also checkDataPath, defaultDataPath, evaluateMaterial,
-%   importMaterial, kSolution, material, UserMaterial.
+%   See also checkDataPath, evaluateMaterial, importMaterial,
+%   kValueCalculator, LocalMaterialDatabase, material, MaterialEditor.
 %
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials

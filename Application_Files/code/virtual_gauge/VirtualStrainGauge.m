@@ -6,7 +6,7 @@ function varargout = VirtualStrainGauge(varargin)
 %   VIRTUALSTRAINGAUGE is used internally by Quick Fatigue Tool. The user is
 %   not required to run this file.
 %
-%   See also virtualGaugeUtils, RosetteDiagram.
+%   See also RosetteDiagram, virtualGaugeUtils.
 %
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.4 Virtual Strain Gauge

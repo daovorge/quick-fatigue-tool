@@ -5,7 +5,7 @@ classdef rosetteTools < handle
 %   ROSETTETOOLS is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %   
-%   See also rosette.
+%   See also RosetteAnalysis.
 %   
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.3 Rosette Analysis

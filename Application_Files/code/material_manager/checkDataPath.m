@@ -4,8 +4,8 @@ function [] = checkDataPath()
 %   CHECKDATAPATH is used internally by Quick Fatigue Tool. The user
 %   is not required to run this file.
 %
-%   See also defaultDataPath, evaluateMaterial, importMaterial, kSolution,
-%   material, MaterialManager, UserMaterial.
+%   See also evaluateMaterial, importMaterial, kValueCalculator,
+%   LocalMaterialDatabase, material, MaterialEditor, MaterialManager.
 %
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials

@@ -6,7 +6,7 @@ function varargout = RosetteDiagram(varargin)
 %   ROSETTEDIAGRAM is used internally by Quick Fatigue Tool. The
 %   user is not required to run this file.
 %   
-%   See also virtualGaugeUtils, virtualGauge.
+%   See also virtualGaugeUtils, VirtualStrainGauge.
 %   
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.4 Virtual Strain Gauge

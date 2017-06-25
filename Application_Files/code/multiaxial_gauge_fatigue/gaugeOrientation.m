@@ -6,8 +6,8 @@ function varargout = gaugeOrientation(varargin)
 %   GAUGEORIENTATION is used internally by Quick Fatigue Tool. The
 %   user is not required to run this file.
 %   
-%   See also multiaxialAnalysis, multiaxialPostProcess,
-%   multiaxialPreProcess, materialOptions, MultiaxialFatigue.
+%   See also AdvancedMaterialOptions, multiaxialAnalysis,
+%   MultiaxialGaugeFatigue, multiaxialPostProcess, multiaxialPreProcess.
 %   
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.2 Multiaxial Gauge Fatigue
