@@ -295,30 +295,11 @@ enable(handles)
 
 
 function blank(handles)
-set(handles.rButton_rectangular, 'enable', 'off')
-set(handles.rButton_delta, 'enable', 'off')
-set(handles.rButton_user, 'enable', 'off')
-set(handles.pButton_diagram, 'enable', 'off')
-
-set(handles.text_alpha, 'enable', 'off')
-set(handles.text_beta, 'enable', 'off')
-set(handles.text_gamma, 'enable', 'off')
-set(handles.edit_alpha, 'enable', 'off')
-set(handles.edit_beta, 'enable', 'off')
-set(handles.edit_gamma, 'enable', 'off')
-set(handles.text_unitsAlpha, 'enable', 'off')
-set(handles.text_unitsBeta, 'enable', 'off')
-set(handles.text_unitsGamma, 'enable', 'off')
-
-set(handles.pButton_ok, 'enable', 'off')
-set(handles.pButton_cancel, 'enable', 'off')
+set(findall(handles.GaugeOrientation, '-property', 'Enable'), 'Enable', 'off')
 
 
 function enable(handles)
-set(handles.rButton_rectangular, 'enable', 'on')
-set(handles.rButton_delta, 'enable', 'on')
-set(handles.rButton_user, 'enable', 'on')
-set(handles.pButton_diagram, 'enable', 'on')
+set(findall(handles.GaugeOrientation, '-property', 'Enable'), 'Enable', 'on')
 
 if get(handles.rButton_user, 'value') == 1.0
     set(handles.text_alpha, 'enable', 'on')
