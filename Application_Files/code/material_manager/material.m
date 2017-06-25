@@ -82,7 +82,7 @@ classdef material < handle
             %
             %   Reference section in Quick Fatigue Tool User Guide
             %      5 Materials
-            UserMaterial
+            MaterialEditor
         end
         
         %% Import material into local database from text file
@@ -488,7 +488,7 @@ classdef material < handle
             setappdata(0, 'editMaterial', 1.0)
             
             setappdata(0, 'materialToEdit', userMaterial)
-            UserMaterial
+            MaterialEditor
         end
         
         %% Rename material in local database
