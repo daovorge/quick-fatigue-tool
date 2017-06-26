@@ -166,6 +166,8 @@ end
 
 % --- Executes on button press in pButton_userDataDirectory.
 function pButton_userDataDirectory_Callback(~, ~, handles)
+blank(handles)
+
 % Define the start path
 outputDirectory = uigetdir(pwd, 'Output Directory');
 
@@ -175,9 +177,13 @@ else
     set(handles.edit_userDataDirectory, 'string', outputDirectory)
 end
 
+enable(handles)
+
 
 % --- Executes on button press in pButton_ok.
 function pButton_ok_Callback(~, ~, handles)
+blank(handles)
+
 if get(handles.check_defaultDataDirectory, 'value') == 1.0
     % The default LOCAL directory is selected
     dataPath = [pwd, '\Data\material\local'];
@@ -188,7 +194,6 @@ else
     dataPath = get(handles.edit_userDataDirectory, 'string');
     
     if exist(dataPath, 'dir') ~= 7.0
-        blank(handles)
         errordlg('Please select a valid directory.', 'Quick Fatigue Tool')
         uiwait
         enable(handles)
@@ -213,6 +218,7 @@ catch
 end
 
 % Close the GUI
+enable(handles)
 close 'Set Local Material Database'
 
 
@@ -246,6 +252,14 @@ set(findall(handles.LocalMaterialDatabase, '-property', 'Enable'), 'Enable', 'of
 function enable(handles)
 set(findall(handles.LocalMaterialDatabase, '-property', 'Enable'), 'Enable', 'on')
 
+if get(handles.check_defaultDataDirectory, 'value') == 1.0
+    set(handles.text_currentDatabase, 'enable', 'off')
+    set(handles.edit_userDataDirectory, 'enable', 'off')
+    set(handles.pButton_userDataDirectory, 'enable', 'off')
+elseif strcmpi(get(handles.check_defaultDataDirectory, 'string'), 'Default (currently unavailable)') == 1.0
+    set(handles.check_defaultDataDirectory, 'enable', 'off')
+end
+
 set(handles.pButton_warning, 'enable', 'inactive')
 
 
@@ -278,6 +292,8 @@ end
 
 % --- Executes on button press in pButton_help.
 function pButton_help_Callback(~, ~, handles)
+blank(handles)
+
 if strcmpi(get(handles.check_defaultDataDirectory, 'enable'), 'off') == 1.0
     msg1 = sprintf('The default local material directory is currently unavailable because it\n');
     msg2 = sprintf('does not exist on the MATLAB path.\n\n');
@@ -295,3 +311,6 @@ else
     msg4 = sprintf('path to the new folder.\n');
     msgbox([msg1, msg2, msg3, msg4], 'Quick Fatigue Tool')
 end
+
+uiwait
+enable(handles)

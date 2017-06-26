@@ -13,7 +13,7 @@ function varargout = MaterialManager(varargin)%#ok<*DEFNU>
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 26-Jun-2017 09:15:32 GMT
+%   Last modified 26-Jun-2017 12:18:36 GMT
     
     %%
     
@@ -219,6 +219,9 @@ MaterialEditor
 
 % --- Executes on button press in pButton_copy.
 function pButton_copy_Callback(hObject, eventdata, handles)
+% Disable the GUI
+blank(handles)
+
 % Get the local material path
 localPath = getappdata(0, 'qft_localMaterialDataPath');
 
@@ -236,11 +239,18 @@ end
 
 % First check that the material name is valid
 if isempty(copiedMaterial) == 1.0
+    % Enable the GUI
+    enable(handles)
+    
     return
 elseif isempty(regexp(copiedMaterial, '[/\\*:?"<>|]', 'once')) == 0.0
     message1 = sprintf('The material name cannot contain any of the following characters:\n\n');
     message2 = sprintf('/ \\ * : ? " < > | ');
     errordlg([message1, message2], 'Quick Fatigue Tool')
+    uiwait
+    
+    % Enable the GUI
+    enable(handles)
     return
 else
     % Check if the material already exists
@@ -254,6 +264,10 @@ else
             else
                 errordlg(message, 'Quick Fatigue Tool')
             end
+            
+            % Enable the GUI
+            uiwait
+            enable(handles)
             return
         end
     end
@@ -273,6 +287,10 @@ if get(handles.rButton_user, 'value') == 1.0
             message = sprintf('Could not copy %s.\n\nMake sure the material name does not contain any illegal characters.', copiedMaterial);
         end
         errordlg(message, 'Quick Fatigue Tool')
+        uiwait
+        
+        % Enable the GUI
+        enable(handles)
         return
     end
     
@@ -301,6 +319,9 @@ else
     % If there was an error while reading the system databse, RETURN
     if isstruct(properties) == 0.0
         if properties == 0.0
+            % Enable the GUI
+            enable(handles)
+            
             return
         end
     end
@@ -313,6 +334,10 @@ else
     catch
         message = sprintf('Cannot fetch ''%s'' because the local database is not currently on the MATLAB path.', copiedMaterial);
         errordlg(message, 'Quick Fatigue Tool')
+        uiwait
+        
+        % Enable the GUI
+        enable(handles)
         return
     end
     
@@ -321,9 +346,15 @@ else
     panel_database_SelectionChangeFcn(hObject, eventdata, handles)
 end
 
+% Enable the GUI
+enable(handles)
+
 
 % --- Executes on button press in pButton_rename.
 function pButton_rename_Callback(~, ~, handles)
+% Disable the GUI
+blank(handles)
+
 % Get the current list of materials
 materials = get(handles.list_database, 'string');
 
@@ -337,11 +368,17 @@ message = sprintf('Rename %s to:', material);
 % Ask user for new name
 newName = char(inputdlg(message, 'Rename Material', 1.0, {material}));
 if isempty(newName) == 1.0
+    % Enable the GUI
+    enable(handles)
     return
 elseif isempty(regexp(newName, '[/\\*:?"<>|]', 'once')) == 0.0
     message1 = sprintf('The material name cannot contain any of the following characters:\n\n');
     message2 = sprintf('/ \\ * : ? " < > | ');
     errordlg([message1, message2], 'Quick Fatigue Tool')
+    uiwait
+    
+    % Enable the GUI
+    enable(handles)
     return
 elseif strcmp(newName, material) == 1.0
     % Material already exists
@@ -351,6 +388,7 @@ elseif strcmp(newName, material) == 1.0
         message = sprintf('%s already exists in the local database and cannot be overwritten.', newName);
     end
     errordlg(message, 'Quick Fatigue Tool')
+    uiwait
 else
     % Create paths to old and new material names
     fullpathOld = [localPath, '\', material, '.mat'];
@@ -366,6 +404,10 @@ else
             message = sprintf('Material name %s is invalid.', newName);
         end
         errordlg(message, 'Quick Fatigue Tool')
+        uiwait
+        
+        % Enable the GUI
+        enable(handles)
         return
     end
     
@@ -374,9 +416,16 @@ else
     set(handles.list_database, 'string', materials)
 end
 
+% Enable the GUI
+enable(handles)
+return
+
 
 % --- Executes on button press in pButton_delete.
 function pButton_delete_Callback(~, ~, handles)
+% Disable the GUI
+blank(handles)
+
 % Get the local material path
 localPath = getappdata(0, 'qft_localMaterialDataPath');
 
@@ -408,8 +457,13 @@ if strcmpi(response, 'yes') == 1.0
         set(handles.list_database, 'value', 1.0)
     end
 else
+    % Enable the GUI
+    enable(handles)
     return
 end
+
+% Enable the GUI
+enable(handles)
 
 
 % --- Executes on button press in pButton_close.
@@ -422,7 +476,7 @@ function panel_database_SelectionChangeFcn(~, eventdata, handles)
 try
     tag = get(eventdata.NewValue, 'Tag');
 catch
-    tag = getappdata(0, 'startTag');
+    tag = 'rButton_user';
 end
 
 switch tag
@@ -582,6 +636,9 @@ end
 
 % --- Executes on button press in pButton_query.
 function pButton_query_Callback(~, ~, handles)
+% Disable the GUI
+blank(handles)
+
 % Get the local material path
 localPath = getappdata(0, 'qft_localMaterialDataPath');
 
@@ -606,6 +663,10 @@ else
     if exist(fullpath, 'file') == 0.0
         msg = sprintf('Could not query ''%s.mat'' because the file no longer exists in the local database.', material);
         errordlg(msg, 'Quick Fatigue Tool')
+        uiwait
+        
+        % Enable the GUI
+        enable(handles)
         return
     else
         load(fullpath)
@@ -623,8 +684,15 @@ else
     end
 end
 
+% Enable the GUI
+uiwait
+enable(handles)
+
 % --- Executes on button press in pButton_eval.
 function pButton_eval_Callback(~, ~, handles)
+% Disable the GUI
+blank(handles)
+
 % Flag to prevent messages from being written
 setappdata(0, 'evaluateMaterialMessenger', 1.0)
 
@@ -649,6 +717,9 @@ if getappdata(0, 'regressionModel') == 5.0
     msg2 = sprintf('Select a regression model using the drop-down menu in the ''Derivation'' region of the Material Editor, or using the keyword *REGRESSION.');
     errordlg([msg1, msg2], 'Quick Fatigue Tool')
     uiwait
+    
+    % Enable the GUI
+    enable(handles)
     return
 end
 
@@ -662,6 +733,9 @@ fileName = sprintf('Project/output/material_reports/%s_report.dat', material);
 evaluateMaterial(fileName, material, error)
 
 if (error > 0.0)
+    % Enable the GUI
+    enable(handles)
+    
     return
 end
 
@@ -684,6 +758,9 @@ if strcmpi(userResponse, 'Open in MATLAB...')
 elseif strcmpi(userResponse, 'Open in Windows...')
     winopen(fileName)
 end
+
+% Enable the GUI
+enable(handles)
 
 
 

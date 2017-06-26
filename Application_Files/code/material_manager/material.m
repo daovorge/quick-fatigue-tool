@@ -597,6 +597,11 @@ classdef material < handle
             
             clc
             
+            [error, ~] = material.checkDatabase();
+            if error == 1.0
+                return
+            end
+            
             % Flag to prevent messages from being written
             setappdata(0, 'evaluateMaterialMessenger', 1.0)
             
@@ -611,7 +616,7 @@ classdef material < handle
                 evaluation process and warn the user
             %}
             if getappdata(0, 'regressionModel') == 5.0
-                msg1 = sprintf('ERROR: Material "%s" cannot be evaluated because it is not associated with a regression model.\n\n', userMaterial);
+                msg1 = sprintf('ERROR: Material "%s" cannot be evaluated because it is not associated with a regression model.\n', userMaterial);
                 msg2 = sprintf('Select a regression model using the drop-down menu in the ''Derivation'' region of the Material Editor, or using the keyword *REGRESSION.\n');
                 fprintf([msg1, msg2])
                 return
@@ -762,7 +767,7 @@ classdef material < handle
             
             % Check the input
             if exist(path, 'dir') ~= 7.0
-                fprintf('ERROR: The specified path is inavlid.')
+                fprintf('ERROR: The specified path is inavlid.\n')
                 return
             else
                 setappdata(0, 'qft_localMaterialDataPath', path)

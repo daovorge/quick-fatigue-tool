@@ -8,7 +8,7 @@ classdef keywords < handle
 %   See also importMaterial, fetchMaterial, job.
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 20-Jun-2017 15:28:26 GMT
+%   Last modified 26-Jun-2017 11:49:37 GMT
     
     %%
     
@@ -174,6 +174,8 @@ classdef keywords < handle
 
             if (isempty(kw_bad{1.0}) == 0.0) || (isempty(kw_undefined{1.0}) == 0.0) || (isempty(kw_partial{1.0}) == 0.0) || (isempty(kw_ambiguous{1.0}) == 0.0)
                 fprintf(fid, '\r\n\r\n\tWarning: One or more keywords were not processed');
+            else
+                fprintf(fid, '\r\n\r\n\tThe input file has been read successfully');
             end
             
             % Badly defined keywords

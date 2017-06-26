@@ -749,8 +749,10 @@ classdef messenger < handle
                                     fprintf(fidType(i), ['-> Items with lives less than 1e6 %s have been written to ''%s\\Project\\output\\%s\\Data Files\\warn_lcf_items.dat''', returnType{i}], getappdata(0, 'loadEqUnits'), pwd, getappdata(0, 'jobName'));
                                 end
                                 
-                                rmappdata(0, 'transitionLife')
-                                rmappdata(0, 'transitionLifeRatio')
+                                if i == X
+                                    rmappdata(0, 'transitionLife')
+                                    rmappdata(0, 'transitionLifeRatio')
+                                end
                                 
                                 setappdata(0, 'messageFileWarnings', 1.0)
                             elseif any(L < 1e6)
@@ -903,7 +905,9 @@ classdef messenger < handle
                         if isappdata(0, 'warning_79_suppressGuidanceMessage') == 0.0
                             fprintf(fidType(i), ['-> Guidance on obtaining an accurate FOS solution can be found in Section 8.3.4 of the Quick Fatigue Tool User Guide', returnType{i}]);
                         else
-                            rmappdata(0, 'warning_79_suppressGuidanceMessage')
+                            if i == X
+                                rmappdata(0, 'warning_79_suppressGuidanceMessage')
+                            end
                         end
 
                         setappdata(0, 'messageFileNotes', 1.0)
@@ -1158,7 +1162,9 @@ classdef messenger < handle
 
                             setappdata(0, 'messageFileWarnings', 1.0)
                         else
-                            rmappdata(0, 'suppress_ID123')
+                            if i == X
+                                rmappdata(0, 'suppress_ID123')
+                            end
                         end
                     case 124.0
                         if getappdata(0, 'outputField') == 1.0
@@ -1490,7 +1496,10 @@ classdef messenger < handle
                         if isappdata(0, 'message169_environmentFileName') == 1.0
                             fprintf(fidType(i), [returnType{i}, '***NOTE: Reading settings from local environment file ''%s''', returnType{i}], getappdata(0, 'message169_environmentFileName'));
                             fprintf(fidType(i), ['-> Settings in the local environment file supercede those in the global environment file', returnType{i}]);
-                            rmappdata(0, 'message169_environmentFileName')
+                            
+                            if i == X
+                                rmappdata(0, 'message169_environmentFileName')
+                            end
                         end
                     case 170.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The environment variable ''modifiedGoodman'' has been defined as a cell, but this is not recommended here. Only numeric values are supported so the definition should be a numeric array', returnType{i}]);
@@ -1567,7 +1576,7 @@ classdef messenger < handle
                     case 185.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Whenever results are exported to an output database containing steps written by Quick Fatigue Tool, if the step name is not specified then the default step name may clash with existing steps', returnType{i}]);
 
-                        if isappdata(0, 'writeMessage_185') == 1.0
+                        if (isappdata(0, 'writeMessage_185') == 1.0) && (i == X)
                             rmappdata(0, 'writeMessage_185')
                         end
                     case 186.0
@@ -1575,7 +1584,7 @@ classdef messenger < handle
                         fprintf(fidType(i), ['The following job file option will be ignored:', returnType{i}]);
                         fprintf(fidType(i), ['-> FEA_PROCEDURE', returnType{i}]);
 
-                        if isappdata(0, 'writeMessage_186') == 1.0
+                        if (isappdata(0, 'writeMessage_186') == 1.0) && (i == X)
                             rmappdata(0, 'writeMessage_186')
                         end
                     case 187.0
@@ -2064,8 +2073,10 @@ classdef messenger < handle
                         end
                             
                         fprintf(fidType(i), ['-> The Morrow mean stress correction will be used instead', returnType{i}]);
-
-                        rmappdata(0, 'message_259_msCorrection')
+                        
+                        if i == X
+                            rmappdata(0, 'message_259_msCorrection')
+                        end
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 260.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The Uniaxial Strain-Life algorithm has been used in a continuation analysis, but the material state file from the previous job could not be found', returnType{i}]);
