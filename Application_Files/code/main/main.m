@@ -11,10 +11,10 @@ function [] = main(flags)
 %   Author contact: louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 26-Jun-2017 12:18:36 GMT
+%   Last modified 26-Jun-2017 14:12:14 GMT
 
 % Begin main code - DO NOT EDIT
-format long;    clc;    warning('off', 'all')
+format long;    clc;    warning('off', 'all');    tic_pre = tic;
 
 %% READ SETTINGS FROM THE ENVIRONMENT FILE
 error = preProcess.readEnvironment(flags{45.0});
@@ -36,11 +36,6 @@ if error == 1.0
     return
 end
 
-%% TIMER FOR DATA CHECK ANALYSIS
-if getappdata(0, 'dataCheck') > 0.0
-    tic_dataCheck = tic;
-end
-
 %% INITIALIZE MESSAGE FILE FLAGS
 setappdata(0, 'messageFileNotes', 0.0)
 setappdata(0, 'messageFileWarnings', 0.0)
@@ -48,7 +43,7 @@ setappdata(0, 'messageFileWarnings', 0.0)
 %% PRINT COMMAND WINDOW HEADER
 fprintf('[NOTICE] Quick Fatigue Tool 6.11-00')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2017)')
-fprintf('\n[NOTICE] Last modified 26-Jun-2017 12:18:36 GMT')
+fprintf('\n[NOTICE] Last modified 26-Jun-2017 14:12:14 GMT')
 
 cleanExit = 0.0;
 
@@ -375,9 +370,6 @@ end
 virtualStrainGauge(Sxx, Syy, Txy, Szz, Txz, Tyz)
 
 %% INITIALISE ANALYSIS VARIABLES
-fprintf('\n[NOTICE] End analysis preprocessor')
-fprintf(fid_status, '\n[NOTICE] End analysis preprocessor');
-
 % Set the default design life for the analysis
 if strcmpi(designLife, 'cael') == 1.0
     if algorithm == 8.0
@@ -469,16 +461,23 @@ if getappdata(0, 'dataCheck') > 0.0
         printTensor(Sxx, Syy, Szz, Txy, Tyz, Txz)
     end
 
-	setappdata(0, 'dataCheck_time', toc(tic_dataCheck))
-	fprintf('\n[NOTICE] Data Check complete (%fs)\n', toc(tic_dataCheck))
+	setappdata(0, 'dataCheck_time', toc(tic_pre))
+	fprintf('\n[NOTICE] Data Check complete (%fs)\n', toc(tic_pre))
     messenger.writeMessage(-999.0)
     fprintf(fid_status, '\r\n\r\nTHE ANALYSIS HAS COMPLETED SUCCESSFULLY');
     fclose(fid_status);
     return
 end
 
+fprintf('\n[NOTICE] End analysis preprocessor')
+fprintf(fid_status, '\n[NOTICE] End analysis preprocessor');
+
+% End the pre-processor timer
+setappdata(0, 'toc_pre', toc(tic_pre))
+messenger.writeMessage(262.0)
+
 % Start the timer
-tic
+tic_main = tic;
 
 % Warn if multiple items are being used with the FOS algorithm
 messenger.writeMessage(30.0)
@@ -783,6 +782,7 @@ setappdata(0, 'worstItem', worstAnalysisItem_original)
 %% ADDITIONAL ANALYSIS CODE FOR USER OUTPUT
 fprintf('\n[NOTICE] Begin analysis postprocessor')
 fprintf(fid_status, '\n[NOTICE] Begin analysis postprocessor');
+tic_post = tic;
 
 phiOnCP = nodalPhiC(worstAnalysisItem);
 thetaOnCP = nodalThetaC(worstAnalysisItem);
@@ -1025,12 +1025,17 @@ if getappdata(0, 'autoExport_ODB') == 1.0
     end
 end
 
+%% End the post-processor timer
+setappdata(0, 'toc_post', toc(tic_post))
+messenger.writeMessage(263.0)
+
 %% CLOSE THE MESSAGE FILE
 messenger.writeMessage(-1.0)
 messenger.writeMessage(-999.0)
 
 fprintf('\n[NOTICE] End analysis postprocessor')
 fprintf(fid_status, '\n[NOTICE] End analysis postprocessor');
+analysisTime = toc(tic_main);
 
 %% WRITE LOG FILE
 messenger.writeLog(jobName, jobDescription, dataset, material,...
@@ -1038,7 +1043,7 @@ messenger.writeLog(jobName, jobDescription, dataset, material,...
     nodalElimination, planePrecision, worstAnalysisItem, thetaOnCP,...
     phiOnCP, outputField, algorithm, nodalDamage, worstMainID, worstSubID,...
     dir, step, cael, msCorrection, nlMaterial, removedItems,...
-    hotspotWarning, loadEqVal, loadEqUnits, elementType, offset)
+    hotspotWarning, loadEqVal, loadEqUnits, elementType, offset, analysisTime)
 
 % SAVE WORKSPACE TO FILE
 if any(debugItems == totalCounter) == 1.0

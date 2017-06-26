@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 12-Jun-2017 09:23:37 GMT
+%   Last modified 26-Jun-2017 14:12:14 GMT
 
     %%
 
@@ -2088,6 +2088,10 @@ classdef messenger < handle
                         fprintf(fidType(i), ['-> Any accumulated plasticity from the prvious analysis will be reset to zero, and the current elastic stress history will be treated as a new loading event', returnType{i}]);
 
                         setappdata(0, 'messageFileWarnings', 1.0)
+                    case 262.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Analysis preprocessor completed in %fs', returnType{i}], getappdata(0, 'toc_pre'));
+                    case 263.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Analysis postprocessor completed in %fs', returnType{i}], getappdata(0, 'toc_post'));
                 end
             end
         end
@@ -2124,7 +2128,8 @@ classdef messenger < handle
                 worstAnalysisItem, thetaOnCP, phiOnCP, outputField,...
                 algorithm, nodalDamage, worstMainID, worstSubID, dir,...
                 step, cael, msCorrection, nlMaterial, removed,...
-                hotspotWarning, loadEqVal, loadEqUnits, elementType, offset)
+                hotspotWarning, loadEqVal, loadEqUnits, elementType,...
+                offset, analysisTime)
 
             % Open the log file for writing
             logFile = [dir, sprintf('%s.log', jobName)];
@@ -3244,10 +3249,9 @@ classdef messenger < handle
                 end
             end
 
-            currentTime = toc;
-            hrs = floor(currentTime/3600);
-            mins = floor((currentTime - (3600*hrs))/60);
-            secs = currentTime - (hrs*3600) - (mins*60);
+            hrs = floor(analysisTime/3600);
+            mins = floor((analysisTime - (3600*hrs))/60);
+            secs = analysisTime - (hrs*3600) - (mins*60);
             if mins < 10
                 fprintf('Analysis time                             : %.0f:0%.0f:%.3f\n\n', hrs, mins, secs)
                 fprintf(fid, 'Analysis time                             : %.0f:0%.0f:%.3f\r\n\r\n', hrs, mins, secs);
