@@ -11,7 +11,7 @@ function [] = main(flags)
 %   Author contact: louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 26-Jun-2017 14:12:14 GMT
+%   Last modified 26-Jun-2017 15:32:30 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');    tic_pre = tic;
@@ -43,7 +43,7 @@ setappdata(0, 'messageFileWarnings', 0.0)
 %% PRINT COMMAND WINDOW HEADER
 fprintf('[NOTICE] Quick Fatigue Tool 6.11-00')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2017)')
-fprintf('\n[NOTICE] Last modified 26-Jun-2017 14:12:14 GMT')
+fprintf('\n[NOTICE] Last modified 26-Jun-2017 15:32:30 GMT')
 
 cleanExit = 0.0;
 
@@ -686,7 +686,7 @@ for groups = 1:G
 
         % REPORT PROGRESS
         [reported, x] = status(fid_status, analysedNodes, totalCounter, N2, nodalDamage, mainID, subID,...
-            reported, x0, x);
+            reported, x0, x, tic_pre);
     end
 
     % Save the worst damage for the current group
