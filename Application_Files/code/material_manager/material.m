@@ -27,7 +27,7 @@ classdef material < handle
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 23-Jun-2017 14:55:29 GMT
+%   Last modified 26-Jun-2017 09:15:32 GMT
     
     %%
     
@@ -605,6 +605,17 @@ classdef material < handle
             
             % Remove flag
             rmappdata(0, 'evaluateMaterialMessenger')
+            
+            %{
+                If the material has no regression model selected, abort the
+                evaluation process and warn the user
+            %}
+            if getappdata(0, 'regressionModel') == 5.0
+                msg1 = sprintf('ERROR: Material "%s" cannot be evaluated because it is not associated with a regression model.\n\n', userMaterial);
+                msg2 = sprintf('Select a regression model using the drop-down menu in the ''Derivation'' region of the Material Editor, or using the keyword *REGRESSION.\n');
+                fprintf([msg1, msg2])
+                return
+            end
             
             % Remove '.mat' extension
             userMaterial(end - 3.0:end) = [];
