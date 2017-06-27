@@ -101,9 +101,9 @@ if isappdata(0, 'panel_uniaxialStrainLife_edit_inputFile') == 1.0
         set(handles.edit_walkerGamma, 'enable', 'on')
     end
     
-    if get(handles.rButton_typePlastic, 'value') == 1.0
-        set(handles.text_scf, 'enable', 'off')
-        set(handles.edit_scf, 'enable', 'off')
+    if get(handles.rButton_typeElastic, 'value') == 1.0
+        set(handles.text_scf, 'enable', 'on')
+        set(handles.edit_scf, 'enable', 'on')
     end
     
     % Output definition
@@ -335,8 +335,8 @@ set(handles.rButton_typePlastic, 'value', 1.0, 'enable', 'on')
 setMaterialName(handles)
 
 % Analysis definition
-set(handles.text_scf, 'enable', 'on')
-set(handles.edit_scf, 'string', '1', 'enable', 'on')
+set(handles.text_scf, 'enable', 'off')
+set(handles.edit_scf, 'string', '1', 'enable', 'off')
 set(handles.pMenu_msc, 'value', 2.0)
 set(handles.text_walkerGamma, 'enable', 'off')
 set(handles.edit_walkerGamma, 'enable', 'off', 'string', '')
