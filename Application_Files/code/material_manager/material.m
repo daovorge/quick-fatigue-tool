@@ -28,7 +28,7 @@ classdef material < handle
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
-%   Last modified 27-Jun-2017 16:21:27 GMT
+%   Last modified 27-Jun-2017 17:16:18 GMT
     
     %%
     
@@ -760,11 +760,34 @@ classdef material < handle
         end
         
         %% Set the local database
-        function [] = database(path)
+        function [] = database(varargin)
             %MATERIAL.DATABASE    Change the local material database.
             %
             %   Reference section in Quick Fatigue Tool User Guide
             %      5 Materials
+            
+            clc
+            
+            % Process arguments
+            switch nargin
+                case 0.0
+                    fprintf('ERROR: Not enough input arguments.\n')
+                    return
+                case 1.0
+                    path = varargin{1.0};
+                    save = 0.0;
+                case 2.0
+                    path = varargin{1.0};
+                    save = varargin{2.0};
+                    
+                    if (save ~= 0.0) && (save ~= 1.0)
+                        fprintf('ERROR: The SAVE argument must be 0.0 or 1.0.\n')
+                        return
+                    end
+                otherwise
+                    fprintf('ERROR: Too many input arguments.\n')
+                    return
+            end
             
             % Check the input
             if exist(path, 'dir') ~= 7.0
@@ -793,9 +816,11 @@ classdef material < handle
                 is an automatically generated file which contains the saved
                 MATLAB path.
             %}
-            try
-                material.saveDatabase(path)
-            catch
+            if save == 1.0
+                try
+                    material.saveDatabase(path)
+                catch
+                end
             end
         end
         
@@ -856,6 +881,8 @@ classdef material < handle
             %
             %   Reference section in Quick Fatigue Tool User Guide
             %      5 Materials
+            
+            clc
             
             % Read data from PATHDEF
             pathDefFiles = which('pathdef', '-ALL');
