@@ -16,7 +16,7 @@ classdef material < handle
 %   MATERIAL.evaluate(MATERIALNAME)
 %   MATERIAL.copy(OLDNAME, NEWNAME)
 %   MATERIAL.query(MATERIALNAME)
-%   MATERIAL.database(PATH)
+%   MATERIAL.database(VARARGIN)
 %   MATERIAL.checkDatabase(PATH)
 %   MATERIAL.saveDatabase(PATH)
 %   MATERIAL.searchDatabase()
