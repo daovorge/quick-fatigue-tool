@@ -7,13 +7,14 @@ classdef algorithm_sbbm < handle
 %   not required to run this file.
 %   
 %   See also algorithm_bs7608, algorithm_findley, algorithm_nasa,
-%   algorithm_ns, algorithm_sip, algorithm_usl.
+%   algorithm_ns, algorithm_sip, algorithm_uel, algorithm_usl,
+%   algorithm_user.
 %   
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.2 Stress-based Brown-Miller
 %   
-%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 12-May-2017 15:25:52 GMT
+%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
+%   Last modified 08-Jun-2017 10:07:12 GMT
     
     %%
     
@@ -49,10 +50,13 @@ classdef algorithm_sbbm < handle
             nodalPhiC(node) = phiC;
             nodalThetaC(node) = thetaC;
             
+            % Residual stress
+            residualStress = getappdata(0, 'residualStress');
+            
             % Perform a mean stress correction on the nodal damage parameter if necessary
             if msCorrection < 7.0
                 x = nodalPairs{node};
-                [nodalDamageParameter(node), ~, ~] = analysis.msc(max(damageParameter), x(damageParameter == max(damageParameter), :), msCorrection);
+                [nodalDamageParameter(node), ~, ~] = analysis.msc(max(damageParameter), x(damageParameter == max(damageParameter), :), msCorrection, residualStress);
             end
             
             % Perform a damage calculation on the current analysis item
@@ -217,7 +221,7 @@ classdef algorithm_sbbm < handle
             
             % Perform mean stress correction if necessary
             if msCorrection < 7.0
-                [cycles, mscWarning, overflowCycles] = analysis.msc(cycles, pairs, msCorrection);
+                [cycles, mscWarning, overflowCycles] = analysis.msc(cycles, pairs, msCorrection, residualStress);
             else
                 mscWarning = 0.0;
             end
@@ -278,13 +282,10 @@ classdef algorithm_sbbm < handle
                 
                 % Calculate Kt factors for each value of Nf if applicable
                 if plasticSN == 1.0 && kt ~= 1.0
-                    ktn = zeros(1.0, length(Nf));
                     radius = getappdata(0, 'notchRootRadius');
                     constant = getappdata(0, 'notchSensitivityConstant');
                     
-                    for ktIndex = 1:length(Nf)
-                        ktn(ktIndex) = analysis.getKtn(Nf(ktIndex), constant, radius);
-                    end
+                    ktn = analysis.getKtn(Nf, constant, radius);
                 else
                     ktn = ones(1.0, length(Nf));
                 end
@@ -295,7 +296,7 @@ classdef algorithm_sbbm < handle
                 end
                 
                 % Check if strain-based materials data is available
-                if (isempty(Ef) || isempty(c)) || plasticSN == 0.0
+                if (isempty(Ef) == 1.0 || isempty(c) == 1.0) || plasticSN == 0.0
                     for index = 1:numberOfCycles
                         % If the cycle is purely compressive, assume no damage
                         if (min(pairs(index, :)) < 0.0 && max(pairs(index, :)) <= 0.0) && (getappdata(0, 'ndCompression') == 1.0)
@@ -325,10 +326,10 @@ classdef algorithm_sbbm < handle
                             % Use only the HCF stress zone of the SN curve
                             if msCorrection == 1.0
                                 % Apply Morrow mean stress correction
-                                quotient = (cycles(index) + residualStress)/(1.65*morrowSf(index));
+                                quotient = (cycles(index))/(1.65*morrowSf(index));
                             else
                                 % No mean stress correction was requested
-                                quotient = (cycles(index) + residualStress)/(1.65*Sf);
+                                quotient = (cycles(index))/(1.65*Sf);
                             end
                             
                             % Raise the LHS to the power of 1/b so that LHS == Nf
@@ -355,10 +356,10 @@ classdef algorithm_sbbm < handle
                                 % Use only the HCF stress zone of the SN curve
                                 if msCorrection == 1.0
                                     % Apply Morrow mean stress correction
-                                    quotient = (ktn*cycles(index) + residualStress)/(1.65*morrowSf(index));
+                                    quotient = (ktn*cycles(index))/(1.65*morrowSf(index));
                                 else
                                     % No mean stress correction was requested
-                                    quotient = (ktn*cycles(index) + residualStress)/(1.65*Sf);
+                                    quotient = (ktn*cycles(index))/(1.65*Sf);
                                 end
                                 
                                 if life > b2Nf
@@ -413,10 +414,10 @@ classdef algorithm_sbbm < handle
                                 BM = E*((((1.65*morrowSf(index))/E)*(Nf).^b) + (1.75*Ef)*((Nf).^c));
                             else
                                 % No mean stress correction was requested
-                                BM = E*((((1.65*Sf)/E)*(Nf).^b) + (Ef*1.75)*((Nf).^c));
+                                BM = E*((((1.65*Sf)/E)*(Nf).^b) + (1.75*Ef)*((Nf).^c));
                             end
                             
-                            life = 10^(interp1(log10((1.0./ktn).*BM), log10(Nf), log10(cycles(index) + residualStress), 'linear', 'extrap'));
+                            life = 0.5*10^(interp1(log10((1.0./ktn).*BM), log10(Nf), log10(cycles(index)), 'linear', 'extrap'));
                             
                             % If the life was above the knee-point,
                             % re-calculate the life using B2
@@ -429,15 +430,16 @@ classdef algorithm_sbbm < handle
                                     BM = E*((((1.65*Sf)/E)*(Nf).^b2) + (Ef*1.75)*((Nf).^c));
                                 end
                                 
-                                life = 10^(interp1(log10((1./ktn).*BM), log10(Nf), log10(cycles(index) + residualStress), 'linear', 'extrap'));
+                                life = 0.5*10^(interp1(log10((1.0./ktn).*BM), log10(Nf), log10(cycles(index)), 'linear', 'extrap'));
                             end
                             
                             if life < 0.0
                                 life = 0.0;
                             end
+                            
+                            % Invert the life value to get the damage
+                            cumulativeDamage(index) = (1.0/life);
                         end
-                        % Invert the life value to get the damage
-                        cumulativeDamage(index) = (1.0/life);
                     end
                 end
             end

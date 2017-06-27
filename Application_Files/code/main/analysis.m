@@ -1,11 +1,9 @@
 classdef analysis < handle
 %ANALYSIS    QFT class for general analysis tasks.
-%   This class contains methods for general analysis tasks.
-%   
 %   ANALYSIS is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %   
-%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
 %   Last modified 25-Apr-2017 12:13:25 GMT
     
     %%
@@ -645,7 +643,7 @@ classdef analysis < handle
             % Get value of Kt at the given life (Kt_f)
             switch method
                 case 1.0 % Peterson (default)
-                    ktn = 1.0 + ((kt - 1.0)/(0.915 + ((200.0)/((log10(N))^4.0))));
+                    ktn = 1.0 + ((kt - 1.0)./(0.915 + ((200.0)./((log10(N)).^4.0))));
                 case 2.0 % Peterson B
                     ktn = 1.0 + ((kt - 1.0)/(1.0 + (constant/radius)));
                 case 3.0 % Neuber
@@ -657,7 +655,7 @@ classdef analysis < handle
                 case 6.0 % Notch sensitivity
                     ktn = 1.0 + constant*(kt - 1.0);
                 otherwise % Peterson (default)
-                    ktn = 1.0 + ((kt - 1.0)/(0.915 + ((200.0)/((log10(N))^4.0))));
+                    ktn = 1.0 + ((kt - 1.0)./(0.915 + ((200.0)./((log10(N)).^4.0))));
             end
         end
         
@@ -703,7 +701,7 @@ classdef analysis < handle
         end
         
         %% Mean stress correction
-        function [mscCycles, warning, overflowCycles] = msc(cycles, pairs, msCorrection)
+        function [mscCycles, warning, overflowCycles] = msc(cycles, pairs, msCorrection, residual)
             % Initialize output
             warning = 0.0;
             k = 1.0;
@@ -712,7 +710,7 @@ classdef analysis < handle
             
             % Check if the UTS is available
             uts = getappdata(0, 'uts');
-            if isempty(uts) && (msCorrection == 5.0 || msCorrection == 7.0)
+            if (isempty(uts) == 1.0) && (msCorrection == 5.0 || msCorrection == 7.0)
                 mscCycles = cycles;
                 return
             end
@@ -728,6 +726,9 @@ classdef analysis < handle
             
             % Get the mean stress from each cycle
             Sm = 0.5*(pairs(:, 1.0) + pairs(:, 2.0));
+            
+            % Add the residual stress to the mean stress
+            Sm = Sm + residual;
             
             % Get the corrected stress amplitudes
             switch msCorrection

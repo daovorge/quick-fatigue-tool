@@ -1,4 +1,4 @@
-function [epsilon, sigma, error] = css2(sigma_e, E, kp, np)
+function [rfData, epsilon, sigma, error] = css2(sigma_e, E, kp, np)
 %CSS2    QFT function to calculate nonlinear elastic stress-strain.
 %   This function calculates the nonlinear elastic stress and strain from
 %   an elastic stress tensor.
@@ -6,12 +6,24 @@ function [epsilon, sigma, error] = css2(sigma_e, E, kp, np)
 %   CSS2 is used internally by Quick Fatigue Tool. The user
 %   is not required to run this file.
 %   
-%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 04-Apr-2017 13:26:59 GMT
+%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
+%   Last modified 08-Jun-2017 11:15:47 GMT
     
     %%
     
 error = 0.0;
+%% Initialize RFDATA
+%{
+    1: Min. stress
+    2: Max. stress
+    3: Min. strain
+    4: Max. strain
+    5: Min. index
+    6: Max. index
+%}
+rfData = zeros(1.0, 6.0);
+rfDataIndex = 0.0;
+
 %% Prepare the stress signal
 % If the signal is all zero, return zeros of the same length
 if any(sigma_e) == 0.0
@@ -61,6 +73,7 @@ end
 
 %% Initialize analysis variables
 precision = 1e3;
+overshoot = 1.5;
 method = 'linear';
 
 % Get the signal length
@@ -82,10 +95,10 @@ sigma = zeros(1.0, signalLength);
     strain. This is a safe guess since the strain stress is
     larger than the true strain
 %}
-trueStrainCurve = linspace(1e-12, (1.5*sigma_e(2.0))/E, precision);
+trueStrainCurve = linspace(1e-12, (overshoot*sigma_e(2.0))/E, precision);
 
 %{
-    The true strain curve is found by substituting the true
+    The true stress curve is found by substituting the true
     strain curve into the monotonic R-O equation
 %}
 % Neuber substitution from sigma_e*eps_e == sigma_t*eps_t
@@ -160,7 +173,6 @@ matMemFirstExcursionIndex = 2.0;
 ratchetStress = 0.0;
 
 for i = 3:signalLength
-    
     %{
         Calculate the current strain range. If the signal did
         not reverse direction, the current strain range must
@@ -226,7 +238,7 @@ for i = 3:signalLength
         
         %{
             The stable loop strain range is taken to be the
-            strain rang eof the previously closed cycle
+            strain range of the previously closed cycle
         %}
         matMemFirstExcursionIndex = i;
         
@@ -251,9 +263,9 @@ for i = 3:signalLength
         end
         
         if currentDirection == -1.0
-            trueStrainCurve = linspace(1e-12, -1.5*(stressRange/E), precision);
+            trueStrainCurve = linspace(1e-12, -overshoot*(stressRange/E), precision);
         else
-            trueStrainCurve = linspace(1e-12, 1.5*(stressRange/E), precision);
+            trueStrainCurve = linspace(1e-12, overshoot*(stressRange/E), precision);
         end
         
         % Calculate the stress-strain curve
@@ -265,11 +277,11 @@ for i = 3:signalLength
         if matMemFirstExcursion == 1.0
             ratchetStress = ratchetStress + stressRangeBeyondClosure;
             
-            Nb = (currentStressRange^2)./(E.*trueStrainCurve);
+            Nb = (stressRange^2.0)./(E.*trueStrainCurve);
             f = real((Nb./E) + (Nb./kp).^(1.0/np) - trueStrainCurve);
         else
-            Nb = (currentStressRange^2)./(E.*trueStrainCurve);
-            f = real((Nb./E) + 2.0.*(Nb./(2*kp)).^(1.0/np) - trueStrainCurve);
+            Nb = (stressRange^2)./(E.*trueStrainCurve);
+            f = real((Nb./E) + 2.0.*(Nb./(2.0*kp)).^(1.0/np) - trueStrainCurve);
         end
         
         % Solve for the strain range
@@ -284,21 +296,48 @@ for i = 3:signalLength
         % Solve for the stress range
         currentStrainRange = abs(epsilon(i) - epsilon(i - 1.0));
         trueStressCurve = linspace(0.0, currentStrainRange*E, precision);
-        trueStrainCurve = real((trueStressCurve./E) + 2.*(trueStressCurve./(2*kp)).^(1.0/np));
-        stressRange = interp1(trueStrainCurve, trueStressCurve, currentStrainRange, method, 'extrap');
         
         if matMemFirstExcursion == 1.0
-            if currentDirection == -1.0
-                sigma(i) = sigma(1.0) - stressRange;
-            else
-                sigma(i) = sigma(1.0) + stressRange;
-            end
+            trueStrainCurve = real((trueStressCurve./E) + (trueStressCurve./(kp)).^(1.0/np));
         else
-            if currentDirection == -1.0
-                sigma(i) = sigma(i - 3.0) - stressRange;
+            trueStrainCurve = real((trueStressCurve./E) + 2.0.*(trueStressCurve./(2.0*kp)).^(1.0/np));
+        end
+        
+        if all(trueStrainCurve == 0.0) == 1.0
+            sigma(i) = sigma(i - 1.0);
+        else
+            stressRange = interp1(trueStrainCurve, trueStressCurve, currentStrainRange, method, 'extrap');
+            
+            if matMemFirstExcursion == 1.0
+                if currentDirection == -1.0
+                    sigma(i) = sigma(1.0) - stressRange;
+                else
+                    sigma(i) = sigma(1.0) + stressRange;
+                end
             else
-                sigma(i) = sigma(i - 3.0) + stressRange;
+                if currentDirection == -1.0
+                    sigma(i) = sigma(i - 3.0) - stressRange;
+                else
+                    sigma(i) = sigma(i - 3.0) + stressRange;
+                end
             end
+            
+            % Update the rainflow buffer
+            
+            % Update the rainflow cycle index
+            rfDataIndex = rfDataIndex + 1.0;
+            
+            % Count the stress cycle
+            rfData(rfDataIndex, 1.0) = sigma(i - 1.0);
+            rfData(rfDataIndex, 2.0) = sigma(i);
+            
+            % Count the strain cycle
+            rfData(rfDataIndex, 3.0) = epsilon(i - 1.0);
+            rfData(rfDataIndex, 4.0) = epsilon(i);
+            
+            % Position in the history
+            rfData(rfDataIndex, 5.0) = i - 1.0;
+            rfData(rfDataIndex, 6.0) = i;
         end
     elseif (currentStressRange == previousStressRange) && (i > 3.0) && (allowClosure == 1.0)
         %%
@@ -321,14 +360,14 @@ for i = 3:signalLength
         allowClosure = 1.0;
         
         if currentDirection == -1.0
-            trueStrainCurve = linspace(1e-12, -1.5*(currentStressRange/E), precision);
+            trueStrainCurve = linspace(1e-12, -overshoot*(currentStressRange/E), precision);
         else
-            trueStrainCurve = linspace(1e-12, 1.5*(currentStressRange/E), precision);
+            trueStrainCurve = linspace(1e-12, overshoot*(currentStressRange/E), precision);
         end
         
         % Calculate the stress-strain curve
-        Nb = (currentStressRange^2)./(E.*trueStrainCurve);
-        f = real((Nb./E) + 2.0.*(Nb./(2*kp)).^(1.0/np) - trueStrainCurve);
+        Nb = (currentStressRange^2.0)./(E.*trueStrainCurve);
+        f = real((Nb./E) + 2.0.*(Nb./(2.0*kp)).^(1.0/np) - trueStrainCurve);
         
         % Solve for the stress range
         strainRange = interp1(f, trueStrainCurve, 0.0, method, 'extrap');
@@ -338,14 +377,62 @@ for i = 3:signalLength
         % Solve for the stress range
         trueStressCurve = linspace(0.0, currentStrainRange*E, precision);
         
-        trueStrainCurve = real((trueStressCurve./E) + 2.*(trueStressCurve./(2*kp)).^(1.0/np));
-        stressRange = interp1(trueStrainCurve, trueStressCurve, currentStrainRange, method, 'extrap');
+        trueStrainCurve = real((trueStressCurve./E) + 2.0.*(trueStressCurve./(2*kp)).^(1.0/np));
         
-        if currentDirection == -1.0
-            sigma(i) = sigma(i - 1.0) - stressRange;
+        if all(trueStrainCurve == 0.0) == 1.0
+            sigma(i) = sigma(i - 1.0);
         else
-            sigma(i) = sigma(i - 1.0) + stressRange;
+            stressRange = interp1(trueStrainCurve, trueStressCurve, currentStrainRange, method, 'extrap');
+            
+            if currentDirection == -1.0
+                sigma(i) = sigma(i - 1.0) - stressRange;
+            else
+                sigma(i) = sigma(i - 1.0) + stressRange;
+            end
+            
+            % Update the rainflow buffer
+            
+            % Update the rainflow cycle index
+            rfDataIndex = rfDataIndex + 1.0;
+            
+            % Count the stress cycle
+            rfData(rfDataIndex, 1.0) = sigma(i - 1.0);
+            rfData(rfDataIndex, 2.0) = sigma(i);
+            
+            % Count the strain cycle
+            rfData(rfDataIndex, 3.0) = epsilon(i - 1.0);
+            rfData(rfDataIndex, 4.0) = epsilon(i);
+            
+            % Position in the history
+            rfData(rfDataIndex, 5.0) = i - 1.0;
+            rfData(rfDataIndex, 6.0) = i;
         end
+    elseif (currentStressRange == 2.0*previousStressRange) && (i == 3.0)
+        %%
+        %{
+            On the first cyclic excursion, the stress range is exacty
+            double the range of the monotonic excursion, creating a
+            symmetrical hysteresis loop
+        %}
+        epsilon(i) = -epsilon(i - 1.0);
+        sigma(i) = -sigma(i - 1.0);
+        
+        % Update the rainflow buffer
+        
+        % Update the rainflow cycle index
+        rfDataIndex = rfDataIndex + 1.0;
+        
+        % Count the stress cycle
+        rfData(rfDataIndex, 1.0) = sigma(i - 1.0);
+        rfData(rfDataIndex, 2.0) = sigma(i);
+        
+        % Count the strain cycle
+        rfData(rfDataIndex, 3.0) = epsilon(i - 1.0);
+        rfData(rfDataIndex, 4.0) = epsilon(i);
+        
+        % Position in the history
+        rfData(rfDataIndex, 5.0) = i - 1.0;
+        rfData(rfDataIndex, 6.0) = i;
     else
         %%
         %{
@@ -364,13 +451,13 @@ for i = 3:signalLength
         allowClosure = 1.0;
         
         if currentDirection == -1.0
-            trueStrainCurve = linspace(1e-12, -1.5*(currentStressRange/E), precision);
+            trueStrainCurve = linspace(1e-12, -overshoot*(currentStressRange/E), precision);
         else
-            trueStrainCurve = linspace(1e-12, 1.5*(currentStressRange/E), precision);
+            trueStrainCurve = linspace(1e-12, overshoot*(currentStressRange/E), precision);
         end
         
-        Nb = (currentStressRange^2)./(E.*trueStrainCurve);
-        f = real((Nb./E) + 2.0.*(Nb./(2*kp)).^(1.0/np) - trueStrainCurve);
+        Nb = (currentStressRange.^2.0)./(E.*trueStrainCurve);
+        f = real((Nb./E) + 2.0.*(Nb./(2.0*kp)).^(1.0/np) - trueStrainCurve);
         
         % Solve for the strain range
         strainRange = interp1(f, trueStrainCurve, 0.0, method, 'extrap');
@@ -381,7 +468,13 @@ for i = 3:signalLength
         currentStrainRange = abs(epsilon(i) - epsilon(i - 1.0));
         trueStressCurve = linspace(0.0, currentStrainRange*E, precision);
         
-        trueStrainCurve = real((trueStressCurve./E) + 2.*(trueStressCurve./(2*kp)).^(1.0/np));
+        trueStrainCurve = real((trueStressCurve./E) + 2.0.*(trueStressCurve./(2.0*kp)).^(1.0/np));
+        
+        if all(trueStrainCurve == 0.0) == 1.0
+            sigma(i) = sigma(i - 1.0);
+            continue
+        end
+        
         stressRange = interp1(trueStrainCurve, trueStressCurve, currentStrainRange, method, 'extrap');
         
         if currentDirection == -1.0

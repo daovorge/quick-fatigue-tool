@@ -6,8 +6,8 @@ function [] = getRMinus1Curve(useSN, msCorrection, nSets, G)
 %   GETRMINUS1CURVE is used internally by Quick Fatigue Tool. The user is
 %   not required to run this file.
 %   
-%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 04-Apr-2017 13:26:59 GMT
+%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
+%   Last modified 08-Jun-2017 09:59:37 GMT
     
     %%
     
@@ -37,11 +37,7 @@ for groups = 1:G
         radius = group_materialProps(groups).notchRootRadius;
         
         if kt ~= 1.0
-            ktn = zeros(1.0, length(S));
-            for ktIndex = 1:length(S)
-                ktn(ktIndex) = analysis.getKtn(Ni(ktIndex), constant, radius);
-            end
-            
+            ktn = analysis.getKtn(Ni, constant, radius);
             group_materialProps(groups).sValues = S.*(1.0./ktn);
             
             % Save the material properties for the current group

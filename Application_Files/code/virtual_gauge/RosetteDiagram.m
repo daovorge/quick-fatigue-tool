@@ -6,12 +6,12 @@ function varargout = RosetteDiagram(varargin)
 %   ROSETTEDIAGRAM is used internally by Quick Fatigue Tool. The
 %   user is not required to run this file.
 %   
-%   See also virtualGaugeUtils, virtualGauge.
+%   See also virtualGaugeUtils, VirtualStrainGauge.
 %   
-%   Reference section in Quick Fatigue Tool User Guide
+%   Reference section in Quick Fatigue Tool Appendices
 %      A3.4 Virtual Strain Gauge
 %   
-%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
 %   Last modified 04-Apr-2017 13:26:59 GMT
     
     %%
@@ -52,7 +52,7 @@ handles.output = hObject;
 guidata(hObject, handles);
 
 % UIWAIT makes RosetteDiagram wait for user response (see UIRESUME)
-% uiwait(handles.figure1);
+% uiwait(handles.VirtualStrainGauge);
 
 % Read in the gauge image
 set(handles.gauge_axes, 'visible', 'on')
@@ -82,4 +82,4 @@ varargout{1} = handles.output;
 
 % --- Executes on button press in pButton_dismiss.
 function pButton_dismiss_Callback(~, ~, ~) %#ok<*DEFNU>
-close RosetteDiagram
+close 'Rosette Diagram'

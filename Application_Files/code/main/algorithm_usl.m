@@ -7,12 +7,13 @@ classdef algorithm_usl < handle
 %   required to run this file.
 %   
 %   See also algorithm_bs7608, algorithm_findley, algorithm_nasa,
-%   algorithm_ns, algorithm_sbbm, algorithm_sip.
+%   algorithm_ns, algorithm_sbbm, algorithm_sip, algorith_uel,
+%   algorithm_user.
 %   
 %   Reference section in Quick Fatigue Tool User Guide
-%      6.7 Uniaxial Stress-Life
+%      6.8 Uniaxial Stress-Life
 %   
-%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
 %   Last modified 12-May-2017 15:25:52 GMT
     
     %%
@@ -62,11 +63,14 @@ classdef algorithm_usl < handle
             %% Get current damage parameter
             nodalDamageParameter(node) = max(cycles);
             
-            %% Perform a mean stress correection on the nodal damage parameter if necessary
+            % Residual stress
+            residualStress = getappdata(0, 'residualStress');
+            
+            %% Perform a mean stress correction on the nodal damage parameter if necessary
             if msCorrection < 7.0
                 x = nodalPairs{node};
                 largestPair = find(cycles == max(cycles));
-                [nodalDamageParameter(node), ~, ~] = analysis.msc(max(cycles), x(largestPair(1), :), msCorrection);
+                [nodalDamageParameter(node), ~, ~] = analysis.msc(max(cycles), x(largestPair(1), :), msCorrection, residualStress);
             end
             
             %% Perform a damage calculation on the current analysis item
@@ -100,7 +104,7 @@ classdef algorithm_usl < handle
             
             % Perform mean stress correction if necessary
             if msCorrection < 7.0
-                [cycles, mscWarning, overflowCycles] = analysis.msc(cycles, pairs, msCorrection);
+                [cycles, mscWarning, overflowCycles] = analysis.msc(cycles, pairs, msCorrection, residualStress);
             else
                 mscWarning = 0.0;
             end
@@ -173,7 +177,7 @@ classdef algorithm_usl < handle
                         cumulativeDamage(index) = 0.0;
                     else
                         % Divide the LHS by Sf' so that LHS == Nf^b
-                        quotient = (cycles(index) + residualStress)/Sf;
+                        quotient = (cycles(index))/Sf;
                         
                         % Raise the LHS to the power of 1/b so that LHS == Nf
                         life = 0.5*quotient^(1.0/b);
@@ -192,7 +196,7 @@ classdef algorithm_usl < handle
                             
                             ktn = analysis.getKtn(life, constant, radius);
                             
-                            quotient = (ktn*cycles(index) + residualStress)/Sf;
+                            quotient = (ktn*cycles(index))/Sf;
                             
                             if life > b2Nf
                                 life = 0.5*quotient^(1.0/b2);

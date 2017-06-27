@@ -9,7 +9,7 @@ function [] = fos(gateTensors, tensorGate, coldItems, algorithm, msCorrection, N
 %   Reference section in Quick Fatigue Tool User Guide
 %      8.3 Factor of Strength
 %   
-%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
 %   Last modified 04-Apr-2017 13:26:59 GMT
     
     %%
@@ -250,9 +250,9 @@ for groups = 1:G
             end
             
             switch algorithm
-                case 3.0 % UNIAXIAL STRESS-LIFE
-                    [~, ~, nodalDamage, nodalDamageParameter, ~] = algorithm_usl.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, L,...
-                        totalCounter, nodalDamage, msCorrection, nodalAmplitudes, nodalPairs, nodalDamageParameter, gateTensors, tensorGate);
+                case 3.0 % UNIAXIAL STRAIN-LIFE
+                    [~, ~, ~, ~, nodalDamage, nodalDamageParameter, ~, ~] = algorithm_uel.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, L,...
+                        totalCounter, nodalDamage, msCorrection, nodalDamageParameter, gateTensors, tensorGate);
                 case 4.0 % STRESS-BASED BROWN-MILLER
                     [nodalDamageParameter, ~, ~, ~, ~, nodalDamage] = algorithm_sbbm.main(Sxxi, Syyi, Szzi,...
                         Txyi, Tyzi, Txzi, L, step(totalCounter), planePrecision(totalCounter),...
@@ -293,6 +293,9 @@ for groups = 1:G
                     [~, ~, nodalDamage, nodalDamageParameter] = algorithm_nasa.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi,...
                         L, totalCounter, nodalDamage, nodalAmplitudes, nodalPairs, nodalDamageParameter, s1i, s2i, s3i,...
                         signConvention, gateTensors, tensorGate, vm, nasalifeParameter);
+                case 10.0 % UNIAXIAL STRESS-LIFE
+                    [~, ~, nodalDamage, nodalDamageParameter, ~] = algorithm_usl.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, L,...
+                        totalCounter, nodalDamage, msCorrection, nodalAmplitudes, nodalPairs, nodalDamageParameter, gateTensors, tensorGate);
                 otherwise
             end
             

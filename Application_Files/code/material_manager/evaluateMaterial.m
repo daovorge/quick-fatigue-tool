@@ -5,13 +5,14 @@ function [] = evaluateMaterial(fileName, material, error)
 %   EVALUATEMATERIAL is used internally by Quick Fatigue Tool. The user is
 %   not required to run this file.
 %
-%   See also kSolution, MaterialManager, UserMaterial.
+%   See also checkDataPath, importMaterial, kValueCalculator,
+%   LocalMaterialDatabase, material, MaterialEditor, MaterialManager.
 %
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials
 %   
-%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 04-Apr-2017 13:26:59 GMT
+%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
+%   Last modified 26-Jun-2017 09:15:32 GMT
     
     %%
     
@@ -270,4 +271,30 @@ end
 
 %% Close the file
 fclose(fid);
+
+%% Clear the material data
+setappdata(0, 'defaultAlgorithm', [])
+setappdata(0, 'defaultMSC', [])
+setappdata(0, 'fsc', [])
+setappdata(0, 'cael', [])
+setappdata(0, 'E', [])
+setappdata(0, 'uts', [])
+setappdata(0, 'poisson', [])
+setappdata(0, 's_values', [])
+setappdata(0, 'n_values', [])
+setappdata(0, 'r_values', [])
+setappdata(0, 'residualStress', [])
+setappdata(0, 'k', [])
+setappdata(0, 'ndEndurance', [])
+setappdata(0, 'b', [])
+setappdata(0, 'b2', [])
+setappdata(0, 'ucs', [])
+setappdata(0, 'Sf', [])
+setappdata(0, 'Ef', [])
+setappdata(0, 'c', [])
+setappdata(0, 'kp', [])
+setappdata(0, 'np', [])
+setappdata(0, 'twops', [])
+setappdata(0, 'TfPrime', [])
+setappdata(0, 'Tfs', [])
 end

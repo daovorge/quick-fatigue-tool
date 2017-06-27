@@ -1,5 +1,5 @@
 function [] = template_job()
-%TEMPLATE_JOB    test job file for Quick Fatigue Tool.
+%TEMPLATE_JOB    Template job file for Quick Fatigue Tool.
 %   This function contains a list of job file options to configure a
 %   user-defined fatigue analysis.
 %
@@ -16,7 +16,7 @@ function [] = template_job()
 %   Reference section in Quick Fatigue Tool User Settings Reference Guide
 %      1 Job file options
 %   
-%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
 %   Last modified 12-May-2017 15:25:52 GMT
 
 %% JOB
@@ -116,14 +116,15 @@ GROUP = {'DEFAULT'};
 % ANALYSIS ALGORITHM
 %{
     0: Default
-    3: Uniaxial Stress-Life
+    3: Uniaxial Strain-Life
     4: Stress-based Brown-Miller (CP)
     5: Normal Stress (CP)
     6: Findley's Method (CP)
     7: Stress Invariant Parameter
     8: BS 7608 Fatigue of welded steel joints (CP)
     9: NASALIFE
-    10: User-defined
+    10: Uniaxial Stress-Life
+    11: User-defined
 %}
 ALGORITHM = 0.0;
 

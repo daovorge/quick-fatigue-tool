@@ -5,8 +5,8 @@ function [] = cleanup(status)
 %   CLEANUP is used internally by Quick Fatigue Tool. The user
 %   is not required to run this file.
 %   
-%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 30-May-2017 10:53:46 GMT
+%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
+%   Last modified 26-Jun-2017 15:32:30 GMT
     
     %%
     
@@ -70,9 +70,9 @@ if status == 1.0
     fid = fopen(errLogFile, 'w');
     
     % Write file header
-    fprintf(fid, 'Quick Fatigue Tool 6.10-09\r\n');
+    fprintf(fid, 'Quick Fatigue Tool 6.11-00\r\n');
     fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-    fprintf(fid, 'Last modified 30-May-2017 10:53:46 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 26-Jun-2017 15:32:30 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');
@@ -154,7 +154,7 @@ if status == 1.0
     if getappdata(0, 'E047') == 1.0
         fprintf(fid, '\r\n\r\n***ERROR: No load histories were specified');
         
-        if getappdata(0, 'algorithm') == 3.0
+        if getappdata(0, 'algorithm') == 10.0
             fprintf(fid, '\r\n-> The Uniaxial Stress-Life algorithm requires a single load history');
         else
             fprintf(fid, '\r\nIf the loading is a dataset sequence:\r\n-> Specify at least two stress datasets using the DATASET option\r\n-> Set HISTORY = []\r\n');
@@ -201,6 +201,8 @@ if status == 1.0
         
         switch getappdata(0, 'algorithm')
             case 3.0
+                fprintf(fid, '\r\n-> The Uniaxial Strain-Life algorithm requires the following material constants: Sf'', b, Ef'', c, E, kp, np');
+            case 10.0
                 fprintf(fid, '\r\n-> The Uniaxial Stress-Life algorithm requires the following material constants: Sf'', b');
             case 4.0
                 if getappdata(0, 'plasticSN') == 1.0
@@ -604,6 +606,7 @@ if status == 1.0
     end
     if getappdata(0, 'E044') == 1.0
         fprintf(fid, '\r\n\r\n***ERROR: The exposure time for the low or high frequency data is undefined');
+        fprintf(fid, '\r\n-> The exposure time is set by the HF_TIME option');
         fprintf(fid, '\r\n\r\nError code: E044');
         rmappdata(0, 'E044')
     end
@@ -806,7 +809,7 @@ if status == 1.0
         rmappdata(0, 'E080')
     end
     if getappdata(0, 'E081') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: FRF envelopes are defined as a cell with the frfEnvelope variable, but the number of definitions does not match the number of groups');
+        fprintf(fid, '\r\n\r\n***ERROR: FRF envelopes are defined as a cell with the FATIGUE_RESERVE_FACTOR option, but the number of definitions does not match the number of groups');
         fprintf(fid, '\r\n-> There are %.0f FRF envelope definitions and %.0f analysis groups', getappdata(0, 'error_log_081_NfrfDefinitions'), getappdata(0, 'error_log_081_NGroups'));
         fprintf(fid, '\r\n-> Make sure the FRF envelope definition references the correct number of analysis groups');
         fprintf(fid, '\r\n\r\nError code: E081');
@@ -814,8 +817,8 @@ if status == 1.0
     end
     if getappdata(0, 'E082') == 1.0
         fprintf(fid, '\r\n\r\n***ERROR: The FRF envelope definition is invalid');
-        fprintf(fid, '\r\n-> For a single analysis group, frfEnvelope should be a single value');
-        fprintf(fid, '\r\n-> For multiple analysis groups, frfEnvelope must either be a numerical array of envelope numbers, or a cell array of envelope numbers and/or user defined FRF files');
+        fprintf(fid, '\r\n-> For a single analysis group, FATIGUE_RESERVE_FACTOR should be a single value');
+        fprintf(fid, '\r\n-> For multiple analysis groups, FATIGUE_RESERVE_FACTOR must either be a numerical array of envelope numbers, or a cell array of envelope numbers and/or user defined FRF files');
         fprintf(fid, '\r\n\r\nError code: E082');
         rmappdata(0, 'E082')
     end
@@ -1092,7 +1095,7 @@ if status == 1.0
         rmappdata(0, 'E119')
     end
     if getappdata(0, 'E120') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: FRF mean stress (tensile) normalization parameters are defined as a cell with the frfNormParamMeanT variable, but the number of definitions does not match the number of user-defined FRF envelopes');
+        fprintf(fid, '\r\n\r\n***ERROR: FRF mean stress (tensile) normalization parameters are defined as a cell with the frfNormParamMeanT environment variable, but the number of definitions does not match the number of user-defined FRF envelopes');
         fprintf(fid, '\r\n-> There are %.0f FRF mean stress (tensile) normalization parameters and %.0f user-defined FRF envelopes', getappdata(0, 'error_log_120_NfrfDefinitions'), getappdata(0, 'error_log_120_NGroups'));
         fprintf(fid, '\r\n-> Make sure the FRF mean stress (tensile) normalization parameter definition references the correct number of user-defined FRF envelopes');
         fprintf(fid, '\r\n\r\nError code: E120');
@@ -1120,7 +1123,7 @@ if status == 1.0
         rmappdata(0, 'E123')
     end
     if getappdata(0, 'E124') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: FRF stress amplitude normalization parameters are defined as a cell with the frfNormParamAmp variable, but the number of definitions does not match the number of user-defined FRF envelopes');
+        fprintf(fid, '\r\n\r\n***ERROR: FRF stress amplitude normalization parameters are defined as a cell with the frfNormParamAmp environment variable, but the number of definitions does not match the number of user-defined FRF envelopes');
         fprintf(fid, '\r\n-> There are %.0f FRF stress amplitude normalization parameters and %.0f user-defined FRF envelopes', getappdata(0, 'error_log_124_NfrfDefinitions'), getappdata(0, 'error_log_124_NGroups'));
         fprintf(fid, '\r\n-> Make sure the FRF stress amplitude normalization parameter definition references the correct number of user-defined FRF envelopes');
         fprintf(fid, '\r\n\r\nError code: E124');
@@ -1141,7 +1144,7 @@ if status == 1.0
         rmappdata(0, 'E126')
     end
     if getappdata(0, 'E127') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: FRF mean stress (compressive) normalization parameters are defined as a cell with the frfNormParamMeanC variable, but the number of definitions does not match the number of user-defined FRF envelopes');
+        fprintf(fid, '\r\n\r\n***ERROR: FRF mean stress (compressive) normalization parameters are defined as a cell with the frfNormParamMeanC environment variable, but the number of definitions does not match the number of user-defined FRF envelopes');
         fprintf(fid, '\r\n-> There are %.0f FRF mean stress (compressive) normalization parameters and %.0f user-defined FRF envelopes', getappdata(0, 'error_log_127_NfrfDefinitions'), getappdata(0, 'error_log_127_NGroups'));
         fprintf(fid, '\r\n-> Make sure the FRF mean stress (compressive) normalization parameter definition references the correct number of user-defined FRF envelopes');
         fprintf(fid, '\r\n\r\nError code: E127');
@@ -1325,7 +1328,7 @@ if status == 1.0
     end
     if getappdata(0, 'E142') == 1.0
         fprintf(fid, '\r\n\r\n***ERROR: The Walker gamma definition in group %.0f is %.3g', getappdata(0, 'error_log_142_group'), getappdata(0, 'error_log_142_gamma'));
-        fprintf(fid, '\r\n-> Negative values of the Walker gamma parameter are not permitted');
+        fprintf(fid, '\r\n-> The Walker gamma parameter must be in the range (0 <= Gamma <= 1)');
         fprintf(fid, '\r\n\r\nError code: E142');
         rmappdata(0, 'E142')
     end

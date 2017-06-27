@@ -6,13 +6,13 @@ function varargout = gaugeOrientation(varargin)
 %   GAUGEORIENTATION is used internally by Quick Fatigue Tool. The
 %   user is not required to run this file.
 %   
-%   See also multiaxialAnalysis, multiaxialPostProcess,
-%   multiaxialPreProcess, materialOptions, MultiaxialFatigue.
+%   See also AdvancedMaterialOptions, multiaxialAnalysis,
+%   MultiaxialGaugeFatigue, multiaxialPostProcess, multiaxialPreProcess.
 %   
-%   Reference section in Quick Fatigue Tool User Guide
+%   Reference section in Quick Fatigue Tool Appendices
 %      A3.2 Multiaxial Gauge Fatigue
 %   
-%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
 %   Last modified 12-Apr-2017 12:25:20 GMT
     
     %%
@@ -55,7 +55,7 @@ handles.output = hObject;
 guidata(hObject, handles);
 
 % UIWAIT makes gaugeOrientation wait for user response (see UIRESUME)
-% uiwait(handles.figure1);
+% uiwait(handles.GaugeOrientation);
 
 % Load the tips icon
 [a,~]=imread('icoR_bulb.jpg');
@@ -103,7 +103,7 @@ varargout{1} = handles.output;
 
 % --- Executes on button press in pButton_cancel.
 function pButton_cancel_Callback(~, ~, ~) %#ok<*DEFNU>
-close gaugeOrientation
+close 'Gauge Orientation'
 
 
 % --- Executes on button press in pButton_ok.
@@ -203,7 +203,7 @@ setappdata(0, 'gaugeOrientation_edit_alpha', get(handles.edit_alpha, 'string'))
 setappdata(0, 'gaugeOrientation_edit_beta', get(handles.edit_beta, 'string'))
 setappdata(0, 'gaugeOrientation_edit_gamma', get(handles.edit_gamma, 'string'))
 
-close gaugeOrientation
+close 'Gauge Orientation'
 
 
 
@@ -295,30 +295,11 @@ enable(handles)
 
 
 function blank(handles)
-set(handles.rButton_rectangular, 'enable', 'off')
-set(handles.rButton_delta, 'enable', 'off')
-set(handles.rButton_user, 'enable', 'off')
-set(handles.pButton_diagram, 'enable', 'off')
-
-set(handles.text_alpha, 'enable', 'off')
-set(handles.text_beta, 'enable', 'off')
-set(handles.text_gamma, 'enable', 'off')
-set(handles.edit_alpha, 'enable', 'off')
-set(handles.edit_beta, 'enable', 'off')
-set(handles.edit_gamma, 'enable', 'off')
-set(handles.text_unitsAlpha, 'enable', 'off')
-set(handles.text_unitsBeta, 'enable', 'off')
-set(handles.text_unitsGamma, 'enable', 'off')
-
-set(handles.pButton_ok, 'enable', 'off')
-set(handles.pButton_cancel, 'enable', 'off')
+set(findall(handles.GaugeOrientation, '-property', 'Enable'), 'Enable', 'off')
 
 
 function enable(handles)
-set(handles.rButton_rectangular, 'enable', 'on')
-set(handles.rButton_delta, 'enable', 'on')
-set(handles.rButton_user, 'enable', 'on')
-set(handles.pButton_diagram, 'enable', 'on')
+set(findall(handles.GaugeOrientation, '-property', 'Enable'), 'Enable', 'on')
 
 if get(handles.rButton_user, 'value') == 1.0
     set(handles.text_alpha, 'enable', 'on')
@@ -372,9 +353,9 @@ switch get(eventdata.NewValue, 'tag')
 end
 
 
-% --- Executes when user attempts to close figure1.
-function figure1_CloseRequestFcn(hObject, ~, ~)
-% hObject    handle to figure1 (see GCBO)
+% --- Executes when user attempts to close GaugeOrientation.
+function GaugeOrientation_CloseRequestFcn(hObject, ~, ~)
+% hObject    handle to GaugeOrientation (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 

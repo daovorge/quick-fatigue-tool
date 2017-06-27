@@ -16,9 +16,18 @@ classdef material < handle
 %   MATERIAL.evaluate(MATERIALNAME)
 %   MATERIAL.copy(OLDNAME, NEWNAME)
 %   MATERIAL.query(MATERIALNAME)
+%   MATERIAL.database(PATH)
+%   MATERIAL.checkDatabase(PATH)
+%
+%   See also checkDataPath, evaluateMaterial, importMaterial,
+%   kValueCalculator, LocalMaterialDatabase, MaterialEditor,
+%   MaterialManager.
+%
+%   Reference section in Quick Fatigue Tool User Guide
+%      5 Materials
 %   
-%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 29-May-2017 14:33:59 GMT
+%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
+%   Last modified 26-Jun-2017 09:15:32 GMT
     
     %%
     
@@ -44,7 +53,14 @@ classdef material < handle
             %      5 Materials
             
             clc
-            localMaterials = dir([pwd, '\Data\material\local\*.mat']);
+            
+            % Check the local database
+            [error, localPath] = material.checkDatabase();
+            if error == 1.0
+                return
+            end
+            
+            localMaterials = dir([localPath, '\*.mat']);
             
             fprintf('Materials in local database:\n\n')
             
@@ -55,6 +71,7 @@ classdef material < handle
                     fprintf('%s\n', localMaterials(i).name(1.0:end - 4.0))
                 end
             end
+            fprintf('\nCurrent database: %s\n', localPath)
         end
         
         %% Createa a new material
@@ -65,7 +82,7 @@ classdef material < handle
             %
             %   Reference section in Quick Fatigue Tool User Guide
             %      5 Materials
-            UserMaterial
+            MaterialEditor
         end
         
         %% Import material into local database from text file
@@ -100,6 +117,12 @@ classdef material < handle
             clc
             setappdata(0, 'materialManagerImport', 1.0)
             
+            % Check the local database
+            [error, localPath] = material.checkDatabase();
+            if error == 1.0
+                return
+            end
+            
             % Check that the material exists
             if exist(userMaterial, 'file') == 0.0
                 fprintf('ERROR: Unable to locate material ''%s''.\n', userMaterial)
@@ -108,7 +131,7 @@ classdef material < handle
             
             [error, material_properties, materialName, ~, ~] = importMaterial.processFile(userMaterial, -1.0); %#ok<ASGLU>
             
-            if exist(['Data/material/local/', materialName, '.mat'], 'file') == 2.0
+            if exist([localPath, '\', materialName, '.mat'], 'file') == 2.0
                 % User is attempting to overwrite an existing material
                 response = questdlg(sprintf('The material ''%s'' already exists in the local database. Do you wish to overwrite the material?', materialName), 'Quick Fatigue Tool', 'Overwrite', 'Keep file', 'Cancel', 'Overwrite');
                 
@@ -122,13 +145,13 @@ classdef material < handle
                     end
                     
                     % Rename the original material
-                    movefile(['Data/material/local/', materialName, '.mat'], ['Data/material/local/', oldMaterial, '.mat'])
+                    movefile([localPath, '\', materialName, '.mat'], [localPath, '\', oldMaterial, '.mat'])
                 end
             end
             
             % Save the material
             try
-                save(['Data/material/local/', materialName], 'material_properties')
+                save([localPath, '\', materialName], 'material_properties')
             catch
                 fprintf('ERROR: Unable to save material ''%s''. Make sure the material save location has read/write access.\n', materialName)
                 return
@@ -151,6 +174,12 @@ classdef material < handle
             %      5 Materials
             
             clc
+            
+            % Check the local database
+            [error, localPath] = material.checkDatabase();
+            if error == 1.0
+                return
+            end
             
             quest1 = sprintf('Select a database:\n\n');
             quest2 = sprintf('1: Steel (SAE)\n');
@@ -406,7 +435,7 @@ classdef material < handle
             materialName = char(materialF);
             
             % Check if the material already exists
-            userMaterials = dir('Data/material/local/*.mat');
+            userMaterials = dir([localPath, '/*.mat']);
             
             for i = 1:length(userMaterials)
                 if strcmpi([materialName, '.mat'], userMaterials(i).name) == 1.0
@@ -417,7 +446,7 @@ classdef material < handle
             
             % Save the copy in the /LOCAL directory
             try
-                save(['Data\material\local\', materialName, '.mat'], 'material_properties')
+                save([localPath, '\', materialName, '.mat'], 'material_properties')
             catch
                 fprintf('ERROR: Cannot fetch ''%s'' because the local database is not currently on the MATLAB path.\n', copiedMaterial);
                 return
@@ -428,7 +457,7 @@ classdef material < handle
         end
         
         %% Edit material in local database
-        function [] = edit(material)
+        function [] = edit(userMaterial)
             %MATERIAL.EDIT    Edit material in the local database.
             %   This function opens the material editor GUI for a selected
             %   material in the local database.
@@ -439,20 +468,27 @@ classdef material < handle
             %      5 Materials
             
             clc
-            if strcmpi(material(end - 3.0:end), '.mat') == 1.0
-                material = material(1.0:end - 4.0);
+            
+            % Check the local database
+            [error, localPath] = material.checkDatabase();
+            if error == 1.0
+                return
+            end
+            
+            if strcmpi(userMaterial(end - 3.0:end), '.mat') == 1.0
+                userMaterial = userMaterial(1.0:end - 4.0);
             end
             
             % Check that the material exists in the local directory
-            if exist([pwd, '\Data\material\local\', material, '.mat'], 'file') == 0.0
-                fprintf('ERROR: Material ''%s'' does not exist in the local database.\n', material);
+            if exist([localPath, '\', userMaterial, '.mat'], 'file') == 0.0
+                fprintf('ERROR: Material ''%s'' does not exist in the local database.\n', userMaterial);
                 return
             end
             
             setappdata(0, 'editMaterial', 1.0)
             
-            setappdata(0, 'materialToEdit', material)
-            UserMaterial
+            setappdata(0, 'materialToEdit', userMaterial)
+            MaterialEditor
         end
         
         %% Rename material in local database
@@ -466,6 +502,13 @@ classdef material < handle
             %      5 Materials
             
             clc
+            
+            % Check the local database
+            [error, localPath] = material.checkDatabase();
+            if error == 1.0
+                return
+            end
+            
             if isempty(newName) == 1.0
                 return
             elseif isempty(regexp(newName, '[/\\*:?"<>|]', 'once')) == 0.0
@@ -481,8 +524,8 @@ classdef material < handle
                 return
             else
                 % Create paths to old and new material names
-                fullpathOld = [pwd, '\Data\material\local\', oldName, '.mat'];
-                fullpathNew = [pwd, '\Data\material\local\', newName, '.mat'];
+                fullpathOld = [localPath, '\', oldName, '.mat'];
+                fullpathNew = [localPath, '\', newName, '.mat'];
                 
                 % Rename the material
                 try
@@ -516,6 +559,12 @@ classdef material < handle
             
             clc
             
+            % Check the local database
+            [error, localPath] = material.checkDatabase();
+            if error == 1.0
+                return
+            end
+            
             for i = 1:nargin
                 materialToRemove = varargin{i};
                 
@@ -523,7 +572,7 @@ classdef material < handle
                     materialToRemove = materialToRemove(1.0:end - 4.0);
                 end
                 
-                fullpath = [pwd, '\Data\material\local\', materialToRemove, '.mat'];
+                fullpath = [localPath, '\', materialToRemove, '.mat'];
                 if exist(fullpath, 'file') ~= 0.0
                     delete(fullpath);
                 else
@@ -537,7 +586,7 @@ classdef material < handle
         end
         
         %% Evaluate material in local database
-        function [] = evaluate(material)
+        function [] = evaluate(userMaterial)
             %MATERIAL.EVALUATE    Evaluate material in the local database.
             %
             %   MATERIAL.EVALUATE(MATERIAL) evaluates the material MATERIAL
@@ -548,23 +597,39 @@ classdef material < handle
             
             clc
             
+            [error, ~] = material.checkDatabase();
+            if error == 1.0
+                return
+            end
+            
             % Flag to prevent messages from being written
             setappdata(0, 'evaluateMaterialMessenger', 1.0)
             
             % Read material properties
-            error = preProcess.getMaterial(material, 0.0, 1.0);
+            error = preProcess.getMaterial(userMaterial, 0.0, 1.0);
             
             % Remove flag
             rmappdata(0, 'evaluateMaterialMessenger')
             
+            %{
+                If the material has no regression model selected, abort the
+                evaluation process and warn the user
+            %}
+            if getappdata(0, 'regressionModel') == 5.0
+                msg1 = sprintf('ERROR: Material "%s" cannot be evaluated because it is not associated with a regression model.\n', userMaterial);
+                msg2 = sprintf('Select a regression model using the drop-down menu in the ''Derivation'' region of the Material Editor, or using the keyword *REGRESSION.\n');
+                fprintf([msg1, msg2])
+                return
+            end
+            
             % Remove '.mat' extension
-            material(end - 3.0:end) = [];
+            userMaterial(end - 3.0:end) = [];
             
             % Create file name
-            fileName = sprintf('Project/output/material_reports/%s_report.dat', material);
+            fileName = sprintf('Project/output/material_reports/%s_report.dat', userMaterial);
             
             % Write material evaluation results to file
-            evaluateMaterial(fileName, material, error)
+            evaluateMaterial(fileName, userMaterial, error)
             
             if (error > 0.0)
                 return
@@ -603,6 +668,12 @@ classdef material < handle
             
             clc
             
+            % Check the local database
+            [error, localPath] = material.checkDatabase();
+            if error == 1.0
+                return
+            end
+            
             if strcmpi(oldName(end - 3.0:end), '.mat') == 1.0
                 oldName = oldName(1.0:end - 4.0);
             end
@@ -630,8 +701,8 @@ classdef material < handle
             end
             
             % Save the new material
-            oldPath = ['Data\material\local\', oldName, '.mat'];
-            newPath = ['Data\material\local\', newName, '.mat'];
+            oldPath = [localPath, '\', oldName, '.mat'];
+            newPath = [localPath, '\', newName, '.mat'];
             
             try
                 copyfile(oldPath, newPath)
@@ -659,12 +730,18 @@ classdef material < handle
             
             clc
             
+            % Check the local database
+            [error, localPath] = material.checkDatabase();
+            if error == 1.0
+                return
+            end
+            
             if strcmpi(material(end - 3.0:end), '.mat') == 1.0
                 material = material(1.0:end - 4.0);
             end
             
             % Get the material properties
-            fullpath = ['Data\material\local\', material, '.mat'];
+            fullpath = [localPath, '\', material, '.mat'];
             if exist(fullpath, 'file') == 0.0
                 fprintf('ERROR: Material ''%s'' does not exist in the local database.\n', material);
                 return
@@ -678,6 +755,79 @@ classdef material < handle
                 fprintf('No information available for ''%s''.\n', material);
             else
                 fprintf('Information for material ''%s'': %s\n', material, material_properties.comment);
+            end
+        end
+        
+        %% Set the local database
+        function [] = database(path)
+            %MATERIAL.DATABASE    Change the local material database.
+            %
+            %   Reference section in Quick Fatigue Tool User Guide
+            %      5 Materials
+            
+            % Check the input
+            if exist(path, 'dir') ~= 7.0
+                fprintf('ERROR: The specified path is inavlid.\n')
+                return
+            else
+                setappdata(0, 'qft_localMaterialDataPath', path)
+            end
+            
+            % Delete the old marker file if it exists
+            currentPath = getappdata(0, 'currentLocalPath');
+            if exist([currentPath, '\qft-local-material.txt'], 'file') == 2.0
+                delete([currentPath, '\qft-local-material.txt'])
+            end
+            
+            % Write the marker file
+            try
+                fid = fopen([path, '\qft-local-material.txt'], 'w+');
+                fprintf(fid, '%s', path);
+                fclose(fid);
+            catch
+            end
+        end
+        
+        %% Check the local database
+        function [error, localPath] = checkDatabase()
+            %MATERIAL.CHECKDATABASE    Check the local material database.
+            %
+            %   MATERIAL.CHECKDATABASE() checks if the local material
+            %   datase has been set. If it has not been set, the function
+            %   checks for a marker file in case a previously-defined
+            %   database is available.
+            %
+            %   Reference section in Quick Fatigue Tool User Guide
+            %      5 Materials
+            
+            % Initialize the error flag
+            error = 0.0;
+            
+            % Get the path to the current local material database
+            localPath = getappdata(0, 'qft_localMaterialDataPath');
+            
+            if isempty(localPath) == 1.0
+                % The default path is not set
+                if exist('qft-local-material.txt', 'file') == 2.0
+                    try
+                        localPath = which('qft-local-material.txt');
+                        [localPath, ~, ~] = fileparts(localPath);
+                        
+                        setappdata(0, 'qft_localMaterialDataPath', localPath)
+                    catch
+                        % The local material database is currently undefined
+                        fprintf('ERROR: The local material database is undefined.\n')
+                        fprintf('Please specify the local material database with material.database(PATH).\n')
+                        error = 1.0;
+                        return
+                    end
+                else
+                    % The local material database is currently undefined
+                    fprintf('ERROR: The local material database is undefined.\n')
+                    fprintf('Please specify the local material database with material.database(PATH).\n')
+                    error = 1.0;
+                    return
+                end
             end
         end
     end

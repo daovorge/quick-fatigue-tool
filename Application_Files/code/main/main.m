@@ -10,11 +10,11 @@ function [] = main(flags)
 %
 %   Author contact: louisvallance@hotmail.co.uk
 %
-%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 30-May-2017 10:53:46 GMT
+%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
+%   Last modified 26-Jun-2017 15:32:30 GMT
 
 % Begin main code - DO NOT EDIT
-format long;    clc;    warning('off', 'all')
+format long;    clc;    warning('off', 'all');    tic_pre = tic;
 
 %% READ SETTINGS FROM THE ENVIRONMENT FILE
 error = preProcess.readEnvironment(flags{45.0});
@@ -36,19 +36,14 @@ if error == 1.0
     return
 end
 
-%% TIMER FOR DATA CHECK ANALYSIS
-if getappdata(0, 'dataCheck') > 0.0
-    tic_dataCheck = tic;
-end
-
 %% INITIALIZE MESSAGE FILE FLAGS
 setappdata(0, 'messageFileNotes', 0.0)
 setappdata(0, 'messageFileWarnings', 0.0)
 
 %% PRINT COMMAND WINDOW HEADER
-fprintf('[NOTICE] Quick Fatigue Tool 6.10-09')
+fprintf('[NOTICE] Quick Fatigue Tool 6.11-00')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2017)')
-fprintf('\n[NOTICE] Last modified 30-May-2017 10:53:46 GMT')
+fprintf('\n[NOTICE] Last modified 26-Jun-2017 15:32:30 GMT')
 
 cleanExit = 0.0;
 
@@ -78,7 +73,7 @@ fileName = sprintf('Project/output/%s/%s.sta', jobName, jobName);
 fid_status = fopen(fileName, 'w+');
 setappdata(0, 'fid_status', fid_status)
 c = clock;
-fprintf(fid_status, '[NOTICE] Quick Fatigue Tool 6.10-09\t%s', datestr(datenum(c(1.0), c(2.0), c(3.0), c(4.0), c(5.0), c(6.0))));
+fprintf(fid_status, '[NOTICE] Quick Fatigue Tool 6.11-00\t%s', datestr(datenum(c(1.0), c(2.0), c(3.0), c(4.0), c(5.0), c(6.0))));
 
 fprintf('\n[NOTICE] The job file "%s.m" has been submitted for analysis', jobName)
 fprintf(fid_status, '\n[NOTICE] The job file "%s.m" has been submitted for analysis', jobName);
@@ -292,7 +287,7 @@ end
 nodalElimination = getappdata(0, 'nodalElimination');
 
 % Only if Uniaxial Stress-Life or BS 7608 are not being used for analysis
-if (algorithm ~= 3.0) && (algorithm ~= 8.0)
+if (algorithm ~= 10.0) && (algorithm ~= 8.0) && (algorithm ~= 3.0)
     if (nodalElimination > 0.0) && (N > 1.0)
         fprintf('\n[PRE] Optimizing datasets')
         fprintf(fid_status, '\n[PRE] Optimizing datasets');
@@ -321,7 +316,7 @@ else
         messenger.writeMessage(20.0)
     end
 
-    if nodalElimination > 0.0 && algorithm == 3.0
+    if nodalElimination > 0.0 && (algorithm == 10.0 || algorithm == 3.0)
         messenger.writeMessage(21.0)
     end
 
@@ -352,7 +347,7 @@ step = getappdata(0, 'stepSize');
 % Check that total number of required steps is an integer
 if mod(180.0, step) ~= 0.0 || step < 1.0 || step > 180.0
     step = 15.0;
-    if (algorithm ~= 8.0) && (algorithm ~= 3.0)
+    if (algorithm ~= 8.0) && (algorithm ~= 10.0) && (algorithm ~= 3.0)
         messenger.writeMessage(61.0)
     end
 end
@@ -364,7 +359,7 @@ planePrecision = floor(180.0./step) + 1.0;
 setappdata(0, 'planePrecision', planePrecision)
 
 %% CHECK THE LOAD PROPORTIONALITY
-if getappdata(0, 'checkLoadProportionality') == 1.0 && (algorithm ~= 3.0 && algorithm ~= 7.0 && algorithm ~= 9.0 && algorithm ~= 6.0)
+if getappdata(0, 'checkLoadProportionality') == 1.0 && (algorithm ~= 10.0 && algorithm ~= 3.0 && algorithm ~= 7.0 && algorithm ~= 9.0 && algorithm ~= 6.0)
     fprintf('\n[PRE] Performing load proportionality checks')
     fprintf(fid_status, '\n[PRE] Performing load proportionality checks');
 
@@ -375,9 +370,6 @@ end
 virtualStrainGauge(Sxx, Syy, Txy, Szz, Txz, Tyz)
 
 %% INITIALISE ANALYSIS VARIABLES
-fprintf('\n[NOTICE] End analysis preprocessor')
-fprintf(fid_status, '\n[NOTICE] End analysis preprocessor');
-
 % Set the default design life for the analysis
 if strcmpi(designLife, 'cael') == 1.0
     if algorithm == 8.0
@@ -469,16 +461,23 @@ if getappdata(0, 'dataCheck') > 0.0
         printTensor(Sxx, Syy, Szz, Txy, Tyz, Txz)
     end
 
-	setappdata(0, 'dataCheck_time', toc(tic_dataCheck))
-	fprintf('\n[NOTICE] Data Check complete (%fs)\n', toc(tic_dataCheck))
+	setappdata(0, 'dataCheck_time', toc(tic_pre))
+	fprintf('\n[NOTICE] Data Check complete (%fs)\n', toc(tic_pre))
     messenger.writeMessage(-999.0)
     fprintf(fid_status, '\r\n\r\nTHE ANALYSIS HAS COMPLETED SUCCESSFULLY');
     fclose(fid_status);
     return
 end
 
+fprintf('\n[NOTICE] End analysis preprocessor')
+fprintf(fid_status, '\n[NOTICE] End analysis preprocessor');
+
+% End the pre-processor timer
+setappdata(0, 'toc_pre', toc(tic_pre))
+messenger.writeMessage(262.0)
+
 % Start the timer
-tic
+tic_main = tic;
 
 % Warn if multiple items are being used with the FOS algorithm
 messenger.writeMessage(30.0)
@@ -600,11 +599,11 @@ for groups = 1:G
         %%%%%%%%%%%%%%%%%%%%%%FATIGUE ANALYSIS ALGORITHM%%%%%%%%%%%%%%%%%%%%%%%
 
         switch algorithm
-            case 3.0 % UNIAXIAL STRESS-LIFE
-                [nodalAmplitudes, nodalPairs, nodalDamage, nodalDamageParameter, damageParameter]...
-                    = algorithm_usl.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, signalLength,...
-                    totalCounter, nodalDamage, msCorrection, nodalAmplitudes, nodalPairs,...
-                    nodalDamageParameter, gateTensors, tensorGate);
+            case 3.0 % UNIAXIAL STRAIN-LIFE
+                [nodalAmplitudes, nodalAmplitudes_strain, nodalPairs, nodalPairs_strain, nodalDamage, nodalDamageParameter, damageParameter, damageParameter_strain]...
+                    = algorithm_uel.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, signalLength,...
+                    totalCounter, nodalDamage, msCorrection, nodalDamageParameter,...
+                    gateTensors, tensorGate, s1i, s2i, s3i);
             case 4.0 % STRESS-BASED BROWN-MILLER
                 [nodalDamageParameter, nodalAmplitudes, nodalPairs,...
                     nodalPhiC, nodalThetaC, nodalDamage, maxPhiCurve] =...
@@ -661,7 +660,12 @@ for groups = 1:G
                     = algorithm_nasa.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, signalLength,...
                     totalCounter, nodalDamage, nodalAmplitudes, nodalPairs, nodalDamageParameter,...
                     s1i, s2i, s3i, signConvention, gateTensors, tensorGate, vonMises_i, nasalifeParameter);
-            case 10.0 % USER-DEFINED
+            case 10.0 % UNIAXIAL STRESS-LIFE
+                [nodalAmplitudes, nodalPairs, nodalDamage, nodalDamageParameter, damageParameter]...
+                    = algorithm_usl.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, signalLength,...
+                    totalCounter, nodalDamage, msCorrection, nodalAmplitudes, nodalPairs,...
+                    nodalDamageParameter, gateTensors, tensorGate);
+            case 11.0 % USER-DEFINED
                 [nodalDamageParameter, nodalAmplitudes, nodalPairs, nodalDamage] = algorithm_user.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, totalCounter, msCorrection);
             otherwise
         end
@@ -682,7 +686,7 @@ for groups = 1:G
 
         % REPORT PROGRESS
         [reported, x] = status(fid_status, analysedNodes, totalCounter, N2, nodalDamage, mainID, subID,...
-            reported, x0, x);
+            reported, x0, x, tic_pre);
     end
 
     % Save the worst damage for the current group
@@ -778,6 +782,7 @@ setappdata(0, 'worstItem', worstAnalysisItem_original)
 %% ADDITIONAL ANALYSIS CODE FOR USER OUTPUT
 fprintf('\n[NOTICE] Begin analysis postprocessor')
 fprintf(fid_status, '\n[NOTICE] Begin analysis postprocessor');
+tic_post = tic;
 
 phiOnCP = nodalPhiC(worstAnalysisItem);
 thetaOnCP = nodalThetaC(worstAnalysisItem);
@@ -841,9 +846,8 @@ if (outputHistory == 1.0) || (outputField == 1.0) || (outputFigure == 1.0)
     fprintf(fid_status, '\n[POST] Calculating worst item output');
 
     switch algorithm
-        case 3.0 % UNIAXIAL STRESS-LIFE
-            algorithm_usl.worstItemAnalysis(signalLength, msCorrection,...
-                nodalAmplitudes, nodalPairs)
+        case 3.0 % UNIAXIAL STRAIN-LIFE
+            algorithm_uel.worstItemAnalysis(signalLength, nodalAmplitudes, nodalAmplitudes_strain, nodalPairs, nodalPairs_strain)
         case 4.0
             % STRESS-BASED BROWN-MILLER
             algorithm_sbbm.worstItemAnalysis(worstNodeTensor, phiOnCP,...
@@ -877,6 +881,9 @@ if (outputHistory == 1.0) || (outputField == 1.0) || (outputFigure == 1.0)
             algorithm_nasa.worstItemAnalysis(worstAnalysisItem, G,...
                 worstNodeTensor, signalLength, s1i, s2i, s3i,...
                 signConvention, gateTensors, tensorGate, nasalifeParameter)
+        case 10.0 % UNIAXIAL STRESS-LIFE
+            algorithm_usl.worstItemAnalysis(signalLength, msCorrection,...
+                nodalAmplitudes, nodalPairs)
         otherwise
     end
 end
@@ -918,7 +925,15 @@ postProcess.getNumberOfCycles()
 
 %% GET WCM AND WCA FOR FIELD OR HISTORY OUTPUT
 if outputField == 1.0 || outputHistory == 1.0
-    postProcess.getWorstCycleMeanAmp()
+    if algorithm == 1.0 || algorithm == 2.0 || algorithm == 3.0
+        % Worst cycle for each item
+        setappdata(0, 'nodalAmplitudes_strain', nodalAmplitudes_strain)
+        setappdata(0, 'nodalPairs_strain', nodalPairs_strain)
+        
+        postProcess_e.getWorstCycleMeanAmp()
+    else
+        postProcess.getWorstCycleMeanAmp()
+    end
 end
 
 if outputField == 1.0
@@ -928,6 +943,8 @@ if outputField == 1.0
 
     if algorithm == 8.0
         algorithm_bs7608.getFields()
+    elseif algorithm == 1.0 || algorithm == 2.0 || algorithm == 3.0
+        postProcess_e.getFields(algorithm, msCorrection, gateTensors, tensorGate, coldItems, fid_status)
     else
         postProcess.getFields(algorithm, msCorrection, gateTensors, tensorGate, coldItems, fid_status)
     end
@@ -935,6 +952,8 @@ if outputField == 1.0
     %% EXPORT FIELDS
     if algorithm == 8.0
         algorithm_bs7608.exportFields(loadEqUnits)
+    elseif algorithm == 1.0 || algorithm == 2.0 || algorithm == 3.0
+        postProcess_e.exportFields(loadEqUnits, coldItems)
     else
         postProcess.exportFields(loadEqUnits, coldItems)
     end
@@ -949,6 +968,8 @@ if (outputHistory == 1.0) || (outputFigure == 1.0)
 
     if algorithm == 8.0
         algorithm_bs7608.getHistories(loadEqUnits, outputField, outputFigure)
+    elseif algorithm == 1.0 || algorithm == 2.0 || algorithm == 3.0
+        postProcess_e.getHistories(algorithm, loadEqUnits, outputField, outputFigure, damageParameter, damageParameter_strain)
     else
         postProcess.getHistories(algorithm, loadEqUnits, outputField, outputFigure, damageParameter, G)
     end
@@ -957,6 +978,8 @@ if (outputHistory == 1.0) || (outputFigure == 1.0)
         %% EXPORT HISTORIES
         if algorithm == 8.0
             algorithm_bs7608.exportHistories(loadEqUnits)
+        elseif algorithm == 1.0 || algorithm == 2.0 || algorithm == 3.0
+            postProcess_e.exportHistories(algorithm, loadEqUnits)
         else
             postProcess.exportHistories(algorithm, loadEqUnits)
         end
@@ -1002,12 +1025,17 @@ if getappdata(0, 'autoExport_ODB') == 1.0
     end
 end
 
+%% End the post-processor timer
+setappdata(0, 'toc_post', toc(tic_post))
+messenger.writeMessage(263.0)
+
 %% CLOSE THE MESSAGE FILE
 messenger.writeMessage(-1.0)
 messenger.writeMessage(-999.0)
 
 fprintf('\n[NOTICE] End analysis postprocessor')
 fprintf(fid_status, '\n[NOTICE] End analysis postprocessor');
+analysisTime = toc(tic_main);
 
 %% WRITE LOG FILE
 messenger.writeLog(jobName, jobDescription, dataset, material,...
@@ -1015,7 +1043,7 @@ messenger.writeLog(jobName, jobDescription, dataset, material,...
     nodalElimination, planePrecision, worstAnalysisItem, thetaOnCP,...
     phiOnCP, outputField, algorithm, nodalDamage, worstMainID, worstSubID,...
     dir, step, cael, msCorrection, nlMaterial, removedItems,...
-    hotspotWarning, loadEqVal, loadEqUnits, elementType, offset)
+    hotspotWarning, loadEqVal, loadEqUnits, elementType, offset, analysisTime)
 
 % SAVE WORKSPACE TO FILE
 if any(debugItems == totalCounter) == 1.0

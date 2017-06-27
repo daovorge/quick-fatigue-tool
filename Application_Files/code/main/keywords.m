@@ -7,8 +7,8 @@ classdef keywords < handle
 %
 %   See also importMaterial, fetchMaterial, job.
 %   
-%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 04-Apr-2017 13:26:59 GMT
+%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
+%   Last modified 26-Jun-2017 11:49:37 GMT
     
     %%
     
@@ -162,55 +162,59 @@ classdef keywords < handle
                 fprintf(fid, '\r\n\t(NONE)\r\');
             else
                 for i = 1:length(kw_processed)
-                    if i == length(kw_processed)
-                        fprintf(fid, '\r\n\t*%s\r\n', kw_processed{i});
-                    else
-                        fprintf(fid, '\r\n\t*%s', kw_processed{i});
-                    end
+                    fprintf(fid, '\r\n\t*%s', kw_processed{i});
                 end
+            end
+
+            % Get problematic keywords
+            kw_bad = getappdata(0, 'kw_bad');
+            kw_undefined = getappdata(0, 'kw_undefined');
+            kw_partial = getappdata(0, 'kw_partial');
+            kw_ambiguous = getappdata(0, 'kw_ambiguous');
+
+            if (isempty(kw_bad{1.0}) == 0.0) || (isempty(kw_undefined{1.0}) == 0.0) || (isempty(kw_partial{1.0}) == 0.0) || (isempty(kw_ambiguous{1.0}) == 0.0)
+                fprintf(fid, '\r\n\r\n\tWarning: One or more keywords were not processed');
+            else
+                fprintf(fid, '\r\n\r\n\tThe input file has been read successfully');
             end
             
             % Badly defined keywords
-            kw_bad = getappdata(0, 'kw_bad');
             if isempty(kw_bad{1.0}) == 0.0
-                fprintf(fid, '\r\n\tWarning: The following keywords were not processed:');
+                fprintf(fid, '\r\n\tThe following keywords contain syntax errors:');
                 
                 for i = 1:length(kw_bad)
-                    if i == length(kw_bad)
-                        fprintf(fid, '\r\n\t*%s\r\n', kw_bad{i});
-                    else
-                        fprintf(fid, '\r\n\t*%s', kw_bad{i});
-                    end
+                    fprintf(fid, '\r\n\t*%s', kw_bad{i});
                 end
             end
             
             % Undefined keywords
-            kw_undefined = getappdata(0, 'kw_undefined');
             if isempty(kw_undefined{1.0}) == 0.0
-                fprintf(fid, '\r\n\tWarning: The following keywords were not recognised:');
+                fprintf(fid, '\r\n\tThe following keywords were not recognised:');
                 
                 for i = 1:length(kw_undefined)
-                    if i == length(kw_undefined)
-                        fprintf(fid, '\r\n\t*%s\r\n', kw_undefined{i});
-                    else
-                        fprintf(fid, '\r\n\t*%s', kw_undefined{i});
-                    end
+                    fprintf(fid, '\r\n\t*%s', kw_undefined{i});
                 end
             end
             
             % Partial keywords
-            kw_partial = getappdata(0, 'kw_partial');
             if isempty(kw_partial{1.0}) == 0.0
-                fprintf(fid, '\r\n\tWarning: The following keywords were declared but not defined:');
+                fprintf(fid, '\r\n\tThe following keywords were declared but not defined:');
                 
                 for i = 1:length(kw_partial)
-                    if i == length(kw_partial)
-                        fprintf(fid, '\r\n\t%s\r\n', kw_partial{i});
-                    else
-                        fprintf(fid, '\r\n\t%s', kw_partial{i});
-                    end
+                    fprintf(fid, '\r\n\t%s', kw_partial{i});
                 end
             end
+            
+            % Ambiguous keywords
+            if isempty(kw_ambiguous{1.0}) == 0.0
+                fprintf(fid, '\r\n\tThe following keywords are ambiguous:');
+                
+                for i = 1:length(kw_ambiguous)
+                    fprintf(fid, '\r\n\t*%s', kw_ambiguous{i});
+                end
+            end
+
+            fprintf(fid, '\r\n');
         end
     end
 end

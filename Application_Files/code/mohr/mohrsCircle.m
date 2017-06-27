@@ -6,12 +6,12 @@ function varargout = mohrsCircle(varargin)%#ok<*DEFNU>
 %   MOHRSCIRCLE is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %
-%   See also circle.
+%   See also circle, MohrSolver.
 %
-%   Reference section in Quick Fatigue Tool User Guide
+%   Reference section in Quick Fatigue Tool Appendices
 %      A3.5 Mohr Solver
 %   
-%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
 %   Last modified 04-Apr-2017 13:26:59 GMT
     
     %%
@@ -59,7 +59,7 @@ clc
 guidata(hObject, handles);
 
 % UIWAIT makes mohrsCircle wait for user response (see UIRESUME)
-% uiwait(handles.figure1);
+% uiwait(handles.MohrSolver);
 
 % Set units
 setappdata(0, 'units', 0)

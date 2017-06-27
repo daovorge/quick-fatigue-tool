@@ -1,5 +1,5 @@
 function [reported, x] = status(fid_status, analysedNodes, node, N2, nodalDamage, mainID, subID,...
-        reported, x0, x)
+        reported, x0, x, tic_pre)
 %status    QFT function for status file.
 %   This function contains code to write information to the status (.sta)
 %   file.
@@ -7,13 +7,13 @@ function [reported, x] = status(fid_status, analysedNodes, node, N2, nodalDamage
 %   status is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %   
-%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
 %   Last modified 04-Apr-2017 13:26:59 GMT
     
     %%
     
     %% REPORT PROGRESS
-    currentTime = toc;
+    currentTime = toc(tic_pre);
     if analysedNodes == 1.0 || analysedNodes == N2
         hrs = floor(currentTime/3600);
         mins = floor((currentTime - (3600*hrs))/60);

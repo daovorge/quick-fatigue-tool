@@ -76,11 +76,15 @@ classdef algorithm_user < handle
 %   
 %   ALGORITHM_USER is used internally by Quick Fatigue Tool. The user is
 %   not required to run this file.
+%
+%   See also algorithm_bs7608, algorithm_findley, algorithm_nasa,
+%   algorithm_ns, algorithm_sbbm, algorithm_sip, algorithm_uel,
+%   algorithm_usl.
 %   
 %   Reference section in Quick Fatigue Tool User Guide
-%      6.9 User-defined algorithms
+%      6.10 User-defined algorithms
 %   
-%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
 %   Last modified 19-May-2017 16:27:36 GMT
     
     %%

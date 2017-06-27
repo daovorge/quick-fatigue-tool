@@ -1,16 +1,16 @@
 function [] = virtualStrainGauge(xx_o, yy_o, xy_o, zz, xz, yz)
 %VIRTUALSTRAINGAUGE    QFT function for virtual strain gauges.
-%    This function contains code for the calculation of virtual strain
-%    gauge data.
+%   This function contains code for the calculation of virtual strain
+%   gauge data.
 %
-%    VIRTUALSTRAINGAUGE is used internally by Quick Fatigue Tool. The user
-%    is not required to run this file.
-%
+%   VIRTUALSTRAINGAUGE is used internally by Quick Fatigue Tool. The user
+%   is not required to run this file.
+%   
 %   Reference section in Quick Fatigue Tool User Guide
 %      4.9 Virtual strain gauges
-%    
-%    Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%    Last modified 04-Apr-2017 13:26:59 GMT
+%   
+%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
+%   Last modified 08-Jun-2017 12:59:03 GMT
     
     %%
     
@@ -250,9 +250,9 @@ for gaugeNumber = 1:N
         yy = yy./E;
         xy = xy./G;
     else
-        [xx_temp, ~, ~] = css2(xx, E, kp, np);
-        [yy_temp, ~, ~] = css2(yy, E, kp, np);
-        [xy_temp, ~, ~] = css2(xy, E, kp, np);
+        [~, xx_temp, ~, ~] = css2b(xx, E, kp, np);
+        [~, yy_temp, ~, ~] = css2b(yy, E, kp, np);
+        [~, xy_temp, ~, ~] = css2b(xy, E, kp, np);
         
         if length(xx_temp) ~= length(xx)
             diff = abs(length(xx_temp) - length(xx));

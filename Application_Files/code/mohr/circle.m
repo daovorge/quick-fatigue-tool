@@ -6,12 +6,12 @@ function C = circle(mark, varargin)
 %   CIRCLE is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %
-%   See also mohrsCircle.
+%   See also mohrsCircle, MohrSolver.
 %
-%   Reference section in Quick Fatigue Tool User Guide
+%   Reference section in Quick Fatigue Tool Appendices
 %      A3.5 Mohr's circle solver
 %   
-%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
 %   Last modified 04-Apr-2017 13:26:59 GMT
     
     %%

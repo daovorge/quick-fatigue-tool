@@ -1,5 +1,5 @@
 ==========================
-QUICK FATIGUE TOOL 6.10-09
+QUICK FATIGUE TOOL 6.11-00
 ==========================
 Copyright Louis Vallance 2017
 
@@ -38,21 +38,6 @@ Quick Fatigue Tool User Guide.
 %   screen sizes may cause UI object to appear incorrectly. Re-size the window
 %   if necessary. On Windows machines, UI objects look best when the global
 %   icon size is set to 125% (Control Panel\All Control Panel Items\Display)
-%
-%	>> When starting the Material Manager App, materials do not appear in the
-%	local database
-%
-%	This is a bug. Switch to the System Database, then switch back to Local.
-%	The materials in the Local Database should now appear as normal.
-%
-%	>> When starting the Material Manager App, materials do not appear in the
-%	local database even after switching databases as above. Also when trying to
-%	create a material, the user receives the following error: "Undefined function
-%	or variable 'UserMaterial'"
-%
-%	The necessary files are probably not on the MATLAB path. Select the
-%	'Application_Files' and 'Project' folders from the current folder window, 
-%	right-click and select 'Add to Path -> Selected Folders and Subfolders'.
 %
 %	>> When starting an analysis with the Multiaxial Gauge Fatigue App, the
 %	user receives the following error: "Error while processing material
@@ -286,12 +271,13 @@ Quick Fatigue Tool User Guide.
 %	    - DPP, Damage parameter vs plane angle at worst item
 %	    - LP, Life vs plane angle at worst item
 %		- CPS, Normal stress and resultant shear stress vs plane angle at worst item
-%       - PS, Principal stresses at the worst item
+%       - P(S/E), Principal stresses and/or strains at the worst item
 %       - VM, von Mises stress at the worst item
 %       - DAC, Cumulative damage at the worst item
 %       - RHIST, Rainflow cycle histogram on the critical plane at the worst item
 %       - RC, Stress range distribution on the critical plane at the worst item
-%       - SIG, Uniaxial stress history before and after gating
+%       - SIG(S/E), Uniaxial stress and/or strain history before and after gating
+%		- LH, Tensor load histories
 %		- FOS, Factor of strength diagnostics
 %
 %
@@ -300,5 +286,5 @@ Quick Fatigue Tool User Guide.
 %   M.Sc. Louis Vallance, AMIMechE
 %   louisvallance@hotmail.co.uk
 %
-%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 30-May-2017 10:53:46 GMT
+%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
+%   Last modified 26-Jun-2017 15:32:30 GMT

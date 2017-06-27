@@ -7,12 +7,13 @@ classdef algorithm_ns < handle
 %   required to run this file.
 %   
 %   See also algorithm_bs7608, algorithm_findley, algorithm_nasa,
-%   algorithm_sbbm, algorithm_sip, algorithm_usl.
+%   algorithm_sbbm, algorithm_sip, algorithm_uel, algorithm_usl,
+%   algorithm_user.
 %   
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.3 Normal Stress
 %   
-%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
 %   Last modified 12-May-2017 15:25:52 GMT
     
     %%
@@ -43,12 +44,15 @@ classdef algorithm_ns < handle
             nodalAmplitudes{node} = amplitudes;
             nodalPairs{node} = pairs;
             
+            % Residual stress
+            residualStress = getappdata(0, 'residualStress');
+            
             % Perform a mean stress correction on the nodal damage
             % parameter if necessary
             if msCorrection < 7.0
                 x = nodalPairs{node};
                 largestPair = find(amplitudes == max(amplitudes));
-                [nodalDamageParameter(node), ~, ~] = analysis.msc(damageParameter, x(largestPair(1.0), :), msCorrection);
+                [nodalDamageParameter(node), ~, ~] = analysis.msc(damageParameter, x(largestPair(1.0), :), msCorrection, residualStress);
             end
             
             % Record angle
@@ -214,7 +218,7 @@ classdef algorithm_ns < handle
             
             % Perform mean stress correction if necessary
             if msCorrection < 7.0
-                [cycles, mscWarning, overflowCycles] = analysis.msc(cycles, pairs, msCorrection);
+                [cycles, mscWarning, overflowCycles] = analysis.msc(cycles, pairs, msCorrection, residualStress);
             else
                 mscWarning = 0.0;
             end
@@ -291,9 +295,9 @@ classdef algorithm_ns < handle
                     else
                         % Divide the LHS by Sf' so that LHS == Nf^b
                         if msCorrection == 1.0
-                            quotient = (cycles(index) + residualStress)/morrowSf(index);
+                            quotient = (cycles(index))/morrowSf(index);
                         else
-                            quotient = (cycles(index) + residualStress)/Sf;
+                            quotient = (cycles(index))/Sf;
                         end
                         
                         % Raise the LHS to the power of 1/b so that LHS == Nf
@@ -314,9 +318,9 @@ classdef algorithm_ns < handle
                             ktn = analysis.getKtn(life, constant, radius);
                             
                             if msCorrection == 1.0
-                                quotient = (ktn*cycles(index) + residualStress)/morrowSf(index);
+                                quotient = (ktn*cycles(index))/morrowSf(index);
                             else
-                                quotient = (ktn*cycles(index) + residualStress)/Sf;
+                                quotient = (ktn*cycles(index))/Sf;
                             end
                             
                             if life > b2Nf

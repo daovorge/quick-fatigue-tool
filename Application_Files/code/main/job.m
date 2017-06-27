@@ -25,8 +25,8 @@ function [] = job(varargin)
 %   Reference section in Quick Fatigue Tool User Settings Reference Guide
 %      1 Job file options
 %   
-%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 10-Apr-2017 12:07:34 GMT
+%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
+%   Last modified 21-Jun-2017 09:48:34 GMT
     
     %%
     
@@ -153,7 +153,14 @@ while feof(fid) == 0.0
         % Remove spaces and asterisk from the keyword
         TOKEN_umat = TOKEN;
         TOKEN_umat(ismember(TOKEN_umat,' *')) = [];
-        if strcmpi(strtok(lower(TOKEN_umat), ','), 'USERMATERIAL') == 1.0
+        
+        % Isolate the keyword
+        TOKEN_umat = strtok(lower(TOKEN_umat), ',');
+        
+        % Check if the keyword matches the library
+        matchingKw = find(strncmpi({TOKEN_umat}, {'USERMATERIAL'}, length(TOKEN_umat)) == 1.0);
+        
+        if matchingKw == 1.0
             [error, material_properties, materialName, nTLINE_material, nTLINE_total] = importMaterial.processFile(inputFile, nTLINE_total); %#ok<ASGLU>
             
             %{
@@ -193,8 +200,20 @@ while feof(fid) == 0.0
             TOKEN = strtok(TLINE, '=');
         end
         
+        % Check if the current line is a comment
+        if (length(TLINE) > 1.0) && (strcmp(TLINE(1.0:2.0), '**') == 1.0)
+            continue
+        end
+        
         % Get the length of the token
         tokenLength = length(TOKEN);
+        
+        % Remove spaces and usolate the keyword
+        TOKEN(ismember(TOKEN,' *')) = [];
+        TOKEN = strtok(lower(TOKEN), ',');
+        
+        % Check if the keyword matches the library
+        matchingKw = find(strncmpi({TOKEN}, kwStr, length(TOKEN)) == 1.0);
         
         if tokenLength == length(TLINE)
             %{
@@ -209,15 +228,7 @@ while feof(fid) == 0.0
                 index_pkw = index_pkw + 1.0;
             end
             continue
-        end
-        
-        % Remove spaces and asterisk from the keyword
-        TOKEN(ismember(TOKEN,' , *')) = [];
-        
-        % Check if the keyword matches the library
-        matchingKw = find(strncmpi({TOKEN}, kwStr, length(TOKEN)) == 1.0);
-        
-        if length(matchingKw) > 1.0
+        elseif length(matchingKw) > 1.0
             % The keyword definition is ambiguous
             ambiguousKw{index_akw} = TOKEN;
             
@@ -326,6 +337,7 @@ setappdata(0, 'kw_partial', partialKw)
 setappdata(0, 'kw_processed', processedKeywords)
 setappdata(0, 'kw_undefined', undefinedKw)
 setappdata(0, 'kw_bad', badKw)
+setappdata(0, 'kw_ambiguous', ambiguousKw)
 
 %% CLOSE THE FILE AND SUBMIT THE JOB
 % Close the input file

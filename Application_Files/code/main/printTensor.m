@@ -9,8 +9,8 @@ function [] = printTensor(Sxx, Syy, Szz, Txy, Tyz, Txz)
 %   Reference section in Quick Fatigue Tool User Guide
 %      2.4.2 Configuring a data check analysis
 %    
-%    Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%    Last modified 04-Apr-2017 13:26:59 GMT
+%    Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
+%    Last modified 15-Jun-2017 12:32:06 GMT
     
     %%
     
@@ -72,16 +72,18 @@ fprintf(fid, '%.0f\t%.0f\t%.4f\t%.4f\r\n', data');
 fclose(fid);
 
 %% Worst tensor file
-% Concatenate field data
-data = [mainID; subID; s11; s22; s33; s12; s13; s23]';
-
-dir = [getappdata(0, 'outputDirectory'), 'Data Files/datacheck_tensor.dat'];
-
-fid = fopen(dir, 'w+');
-
-fprintf(fid, 'WORST TENSOR [WHOLE MODEL]\r\nJob:\t%s\r\nUnits:\tMPa\r\n', getappdata(0, 'jobName'));
-
-fprintf(fid, 'Main ID\tSub ID\tS11\tS22\tS33\tS12\tS13\tS23\r\n');
-fprintf(fid, '%.0f\t%.0f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\r\n', data');
-
-fclose(fid);
+if length(mainID) == length(s11)
+    % Concatenate field data
+    data = [mainID; subID; s11; s22; s33; s12; s13; s23]';
+    
+    dir = [getappdata(0, 'outputDirectory'), 'Data Files/datacheck_tensor.dat'];
+    
+    fid = fopen(dir, 'w+');
+    
+    fprintf(fid, 'WORST TENSOR [WHOLE MODEL]\r\nJob:\t%s\r\nUnits:\tMPa\r\n', getappdata(0, 'jobName'));
+    
+    fprintf(fid, 'Main ID\tSub ID\tS11\tS22\tS33\tS12\tS13\tS23\r\n');
+    fprintf(fid, '%.0f\t%.0f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\r\n', data');
+    
+    fclose(fid);
+end

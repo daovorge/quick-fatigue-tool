@@ -11,8 +11,8 @@ function [cumulativeDamage] = interpolate(cumulativeDamage, pairs, msCorrection,
 %   Reference section in Quick Fatigue Tool User Guide
 %      5.4 Using custom stress-life data
 %   
-%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 12-May-2017 15:25:52 GMT
+%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
+%   Last modified 08-Jun-2017 10:05:25 GMT
     
     %%
     
@@ -27,6 +27,8 @@ ndEndurance = getappdata(0, 'ndEndurance');
 enduranceScale = getappdata(0, 'enduranceScaleFactor');
 cyclesToRecover = abs(round(getappdata(0, 'cyclesToRecover')));
 kt = getappdata(0, 'kt');
+radius = getappdata(0, 'notchRootRadius');
+constant = getappdata(0, 'notchSensitivityConstant');
 
 if (sets == 1.0) || (sets > 1.0 && msCorrection ~= 7.0)
     %{
@@ -92,7 +94,7 @@ if (sets == 1.0) || (sets > 1.0 && msCorrection ~= 7.0)
             cumulativeDamage(index) = 0.0;
         else
             % Interpolate directly to get the damage
-            cumulativeDamage(index) = (10^(interp1(log10(S), log10(N), log10(cycles(index) + residualStress), 'linear', 'extrap')))^-1.0;
+            cumulativeDamage(index) = (10^(interp1(log10(S), log10(N), log10(cycles(index)), 'linear', 'extrap')))^-1.0;
             
             if cumulativeDamage < 0.0
                 cumulativeDamage(index) = 1.0;
@@ -109,6 +111,9 @@ elseif msCorrection == 7.0
     
     % Get the S-values at R=-1.0 if required later
     s_Rminus1 = getappdata(0, 's_values_reduced');
+    
+    % Add the residual stress to the cycle
+    pairs = pairs + residualStress;
     
     for index = 1:numberOfCycles
         %{
@@ -136,7 +141,7 @@ elseif msCorrection == 7.0
                     Otherwise, the cycle may still be damaging, but the
                     R-ratios mean stress correction will not be applied
                 %}
-                cumulativeDamage(index) = (10^(interp1(log10(s_Rminus1), log10(N), log10(cycles(index) + residualStress), 'linear', 'extrap')))^-1.0;
+                cumulativeDamage(index) = (10^(interp1(log10(s_Rminus1), log10(N), log10(cycles(index)), 'linear', 'extrap')))^-1.0;
             end
             continue
         end
@@ -340,20 +345,16 @@ elseif msCorrection == 7.0
             cumulativeDamage(index) = 0.0;
         else
             %{
-                Find the value of Kt for the SN curve and scale the S
+                Find the value of Kt for the S-N curve and scale the S
                 datapoints if applicable
             %}
             if kt ~= 1.0
-                ktn = zeros(1.0, length(Si));
-                for ktIndex = 1:length(Si)
-                    ktn(ktIndex) = analysis.getKtn(N(ktIndex));
-                end
-                
+                ktn = analysis.getKtn(N, constant, radius);
                 Si = Si.*(1.0./ktn);
             end
             
             % Interpolate directly to get the damage
-            cumulativeDamage(index) = (10^(interp1(log10(Si), log10(N), log10(cycles(index) + residualStress), 'linear', 'extrap')))^-1.0;
+            cumulativeDamage(index) = (10^(interp1(log10(Si), log10(N), log10(cycles(index)), 'linear', 'extrap')))^-1.0;
             
             if cumulativeDamage(index) < 0.0 || isinf(cumulativeDamage(index))
                 cumulativeDamage(index) = 1.0;

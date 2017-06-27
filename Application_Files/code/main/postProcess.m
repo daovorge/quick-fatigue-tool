@@ -10,8 +10,8 @@ classdef postProcess < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      10 Output
 %   
-%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 09-May-2017 16:25:00 GMT
+%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
+%   Last modified 14-Jun-2017 14:41:28 GMT
     
     %%
     
@@ -489,7 +489,7 @@ classdef postProcess < handle
                 
                 if getappdata(0, 'figure_HD') == 1.0
                     if outputFigure == 1.0
-                        if algorithm == 3.0
+                        if algorithm == 10.0
                             msg = sprintf('HD, Haigh diagram for item %.0f.%.0f', mainID, subID);
                             figureTitle = 'MATLAB Figures/ANHD + HD, Haigh diagram for all items';
                         else
@@ -716,8 +716,8 @@ classdef postProcess < handle
             
             Sxx = getappdata(0, 'worstNodeSxx');
         
-            if getappdata(0, 'figure_CN') == 1.0 && outputFigure == 1.0
-                if algorithm == 3.0
+            if getappdata(0, 'figure_CNS') == 1.0 && outputFigure == 1.0
+                if algorithm == 10.0
                     normalOnCP = 0.5*Sxx;
                     setappdata(0, 'CN', normalOnCP);
                     msg = sprintf('CN, Maximum normal (hydrostatic) stress history for item %.0f.%.0f', mainID, subID);
@@ -748,12 +748,9 @@ classdef postProcess < handle
                 if strcmpi(gridLines, 'on') == 1.0 || str2double(gridLines) == 1.0
                     grid on
                 end
-            end
-            
-            %% CS (Shear stress on critical plane)
-            
-            if getappdata(0, 'figure_CS') == 1.0 && outputFigure == 1.0
-                if algorithm == 3.0
+                
+                %% CS (Shear stress on critical plane)
+                if algorithm == 10.0
                     shearOnCP = 0.5*(abs(Sxx));
                     setappdata(0, 'CS', shearOnCP);
                     msg = sprintf('CS, Maximum shear (Tresca) stress history for item %.0f.%.0f', mainID, subID);
@@ -795,7 +792,7 @@ classdef postProcess < handle
                 end
             end
             
-            if (algorithm < 7.0) && (algorithm ~= 3.0)
+            if (algorithm < 7.0) && (algorithm ~= 10.0)
                 thetaOnCP = getappdata(0, 'thetaOnCP');
                 
                 figureFormat = getappdata(0, 'figureFormat');
@@ -1079,7 +1076,7 @@ classdef postProcess < handle
                             legend(l1, 'Infinite Life Envelope')
                         end
 
-                        msg = sprintf('DAC, Cumulative damage at item %.0f.%.0f', mainID, subID);
+                        msg = sprintf('DAC, Cumulative damage for item %.0f.%.0f', mainID, subID);
                         xlabel('Cycle', 'FontSize', fontX)
                         ylabel('Normalised Damage', 'FontSize', fontY)
                         title(msg, 'FontSize', fontTitle)
@@ -1118,7 +1115,7 @@ classdef postProcess < handle
                 set(get(gca, 'child'), 'FaceColor', 'interp', 'CDataMode', 'auto');
                 colorbar
                 
-                msg = sprintf('RHIST, Rainflow cycle histogram at item %.0f.%.0f', mainID, subID);
+                msg = sprintf('RHIST, Rainflow cycle histogram for item %.0f.%.0f', mainID, subID);
                 xlabel('Mean Stress (MPa)', 'FontSize', fontX)
                 ylabel('Stress Range (MPa)', 'FontSize', fontY)
                 title(msg, 'FontSize', fontTitle)
@@ -1141,7 +1138,7 @@ classdef postProcess < handle
             
             if outputFigure == 1.0 && outputField == 1.0 && getappdata(0, 'figure_RC') == 1.0
                 f12 = figure('visible', 'off');
-                msg = sprintf('RC, Stress range distribution at item %.0f.%.0f', mainID, subID);
+                msg = sprintf('RC, Stress range distribution for item %.0f.%.0f', mainID, subID);
                 title(msg, 'FontSize', fontTitle)
                 rhistData = [Sm'; 2.0*amplitudes]';
                 [h, bins] = hist3(rhistData, [nBins, nBins]);
@@ -1175,7 +1172,7 @@ classdef postProcess < handle
             % Only if the Uniaxial Stress-Life algorithm is used
             % Only if peak-valley detection, noise reduction or high
             % frequency data was used
-            if (outputFigure == 1.0 && algorithm == 3.0 && getappdata(0, 'figure_SIG') == 1.0) &&...
+            if (outputFigure == 1.0 && algorithm == 10.0 && getappdata(0, 'figure_SIG') == 1.0) &&...
                     ((getappdata(0, 'noiseReduction') == 1.0 ||...
                     (getappdata(0, 'gateHistories') == 1.0) || (getappdata(0, 'gateHistories') == 2.0)) ||...
                     getappdata(0, 'gateTensors') == 1.0 || getappdata(0, 'gateTensors') == 2.0)
@@ -1231,7 +1228,7 @@ classdef postProcess < handle
                 if strcmpi(figureFormat, 'fig') == true
                     postProcess.makeVisible([dir, '.fig'])
                 end
-            elseif (outputFigure == 1.0 && algorithm == 3.0 && getappdata(0, 'figure_SIG') == 1.0)
+            elseif (outputFigure == 1.0 && algorithm == 10.0 && getappdata(0, 'figure_SIG') == 1.0)
                 f12 = figure('visible', 'off');
                 oldSignal = getappdata(0, 'SIGOriginalSignal');
                 
@@ -1256,6 +1253,108 @@ classdef postProcess < handle
                 end
                 
                 dir = [root, 'MATLAB Figures/SIG, Uniaxial load history'];
+                saveas(f12, dir, figureFormat)
+                if strcmpi(figureFormat, 'fig') == true
+                    postProcess.makeVisible([dir, '.fig'])
+                end
+            end
+            
+            %% LH LOAD HISTORIES
+            if getappdata(0, 'figure_LH') == 1.0 && outputFigure == 1.0 && algorithm ~= 10.0
+                Sxx = getappdata(0, 'worstNodeSxx');
+                Syy = getappdata(0, 'worstNodeSyy');
+                Szz = getappdata(0, 'worstNodeSzz');
+                Txy = getappdata(0, 'worstNodeTxy');
+                Tyz = getappdata(0, 'worstNodeTyz');
+                Txz = getappdata(0, 'worstNodeTxz');
+                
+                f12 = figure('visible', 'off');
+                
+                subplot(3.0, 2.0, 1.0)
+                plot(Sxx, '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
+                xlabel('Sample', 'FontSize', fontX)
+                ylabel('Stress (MPa)', 'FontSize', fontY)
+                title(sprintf('S11 for item %.0f.%.0f', mainID, subID'), 'FontSize', fontTitle)
+                try
+                    axis tight
+                catch
+                    % Don't tighten the axis
+                end
+                if strcmpi(gridLines, 'on') == 1.0 || gridLines == 1.0
+                    grid on
+                end
+                
+                subplot(3.0, 2.0, 2.0)
+                plot(Syy, '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
+                xlabel('Sample', 'FontSize', fontX)
+                ylabel('Stress (MPa)', 'FontSize', fontY)
+                title(sprintf('S22 for item %.0f.%.0f', mainID, subID'), 'FontSize', fontTitle)
+                try
+                    axis tight
+                catch
+                    % Don't tighten the axis
+                end
+                if strcmpi(gridLines, 'on') == 1.0 || gridLines == 1.0
+                    grid on
+                end
+                
+                subplot(3.0, 2.0, 3.0)
+                plot(Szz, '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
+                xlabel('Sample', 'FontSize', fontX)
+                ylabel('Stress (MPa)', 'FontSize', fontY)
+                title(sprintf('S33 for item %.0f.%.0f', mainID, subID'), 'FontSize', fontTitle)
+                try
+                    axis tight
+                catch
+                    % Don't tighten the axis
+                end
+                if strcmpi(gridLines, 'on') == 1.0 || gridLines == 1.0
+                    grid on
+                end
+                
+                subplot(3.0, 2.0, 4.0)
+                plot(Txy, '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
+                xlabel('Sample', 'FontSize', fontX)
+                ylabel('Stress (MPa)', 'FontSize', fontY)
+                title(sprintf('S12 for item %.0f.%.0f', mainID, subID'), 'FontSize', fontTitle)
+                try
+                    axis tight
+                catch
+                    % Don't tighten the axis
+                end
+                if strcmpi(gridLines, 'on') == 1.0 || gridLines == 1.0
+                    grid on
+                end
+                
+                subplot(3.0, 2.0, 5.0)
+                plot(Tyz, '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
+                xlabel('Sample', 'FontSize', fontX)
+                ylabel('Stress (MPa)', 'FontSize', fontY)
+                title(sprintf('S23 for item %.0f.%.0f', mainID, subID'), 'FontSize', fontTitle)
+                try
+                    axis tight
+                catch
+                    % Don't tighten the axis
+                end
+                if strcmpi(gridLines, 'on') == 1.0 || gridLines == 1.0
+                    grid on
+                end
+                
+                subplot(3.0, 2.0, 6.0)
+                plot(Txz, '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
+                xlabel('Sample', 'FontSize', fontX)
+                ylabel('Stress (MPa)', 'FontSize', fontY)
+                title(sprintf('S13 for item %.0f.%.0f', mainID, subID'), 'FontSize', fontTitle)
+                try
+                    axis tight
+                catch
+                    % Don't tighten the axis
+                end
+                if strcmpi(gridLines, 'on') == 1.0 || gridLines == 1.0
+                    grid on
+                end
+                
+                dir = [root, 'MATLAB Figures/LH, Load history'];
                 saveas(f12, dir, figureFormat)
                 if strcmpi(figureFormat, 'fig') == true
                     postProcess.makeVisible([dir, '.fig'])
@@ -1356,7 +1455,7 @@ classdef postProcess < handle
                 
                 fprintf(fid, 'Units:\tMPa\r\n');
                 
-                fprintf(fid, 'Item #\tMean stress\tStress Amplitude\t\tCycle #\tMean stress\tStress Amplitude\r\n');
+                fprintf(fid, 'Item #\tMean stress\tStress amplitude\t\tCycle #\tMean stress\tStress amplitude\r\n');
                 fprintf(fid, sprintf('%%.0f.%%.0f\t%%%s\t%%%s\t\t%%%s\t%%%s\t%%%s\r\n', h, h, h, h, h), [dataA(1.0:shortLength, :), dataB(1.0:shortLength, :)]');
                 
                 if lengthA > lengthB
@@ -1373,7 +1472,7 @@ classdef postProcess < handle
                 plane orientations
             %}
             
-            if (algorithm < 7.0) && (algorithm ~= 3.0)
+            if (algorithm < 7.0) && (algorithm ~= 10.0)
                 steps = getappdata(0, 'stepSize');
                 step = steps(getappdata(0, 'worstItem'));
                 planes = 0:step:180;
@@ -1880,11 +1979,11 @@ classdef postProcess < handle
             end
             
             if removeCarriageReturn == 1.0
-                fprintf('[POST] Starting Quick Fatigue Tool 6.10-09 ODB Interface');
-                fprintf(fid_status, '\n[POST] Starting Quick Fatigue Tool 6.10-09 ODB Interface');
+                fprintf('[POST] Starting Quick Fatigue Tool 6.11-00 ODB Interface');
+                fprintf(fid_status, '\n[POST] Starting Quick Fatigue Tool 6.11-00 ODB Interface');
             else
-                fprintf('[POST] Quick Fatigue Tool 6.10-09 ODB Interface');
-                fprintf(fid_status, '\n[POST] Quick Fatigue Tool 6.10-09 ODB Interface');
+                fprintf('[POST] Quick Fatigue Tool 6.11-00 ODB Interface');
+                fprintf(fid_status, '\n[POST] Quick Fatigue Tool 6.11-00 ODB Interface');
             end
             
             % Delete the upgrade log file
@@ -1900,7 +1999,7 @@ classdef postProcess < handle
             
             % Open the log file for writing
             fid_debug = fopen([sprintf('Project/output/%s/Data Files/', jobName), resultsDatabaseName, '.log'], 'w+');
-            fprintf(fid_debug, 'Quick Fatigue Tool 6.10-09 ODB Interface Log');
+            fprintf(fid_debug, 'Quick Fatigue Tool 6.11-00 ODB Interface Log');
             
             % Get the selected position
             userPosition = getappdata(0, 'odbResultPosition');

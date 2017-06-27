@@ -6,13 +6,14 @@ function varargout = MaterialManager(varargin)%#ok<*DEFNU>
 %   MATERIALMANAGER is used internally by Quick Fatigue Tool. The user is
 %   not required to run this file.
 %
-%   See also evaluateMaterial, kSolution, UserMaterial.
+%   See also checkDataPath, evaluateMaterial, importMaterial,
+%   kValueCalculator, LocalMaterialDatabase, material, MaterialEditor.
 %
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials
 %   
-%   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 13-Apr-2017 10:01:38 GMT
+%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
+%   Last modified 26-Jun-2017 12:18:36 GMT
     
     %%
     
@@ -37,33 +38,34 @@ end
 
 
 % --- Executes just before MaterialManager is made visible.
-function MaterialManager_OpeningFcn(hObject, eventdata, handles, varargin)
+function MaterialManager_OpeningFcn(hObject, ~, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to MaterialManager (see VARARGIN)
 
+% If a material is being imported, do not clear the command window
 if isappdata(0, 'importMaterial') == 0.0
     clc
 else
     rmappdata(0, 'importMaterial')
 end
 
+% Get the local data path
+checkDataPath
+if isappdata(0, 'qft_suppressDataPath') == 1.0
+    rmappdata(0, 'qft_suppressDataPath')
+end
+
 % Load the help icon
-[a,~]=imread('icoR_info.jpg');
+[a,~]=imread('icoR_options.jpg');
 [r,c,~]=size(a);
 x=ceil(r/35);
 y=ceil(c/35);
 g=a(1:x:end,1:y:end,:);
 g(g==255)=5.5*255;
 set(handles.pButton_help, 'CData', g);
-
-approot = [getenv('USERPROFILE'), '\Documents\MATLAB\Apps\Material Manager'];
-
-if exist(approot, 'dir')
-    addpath(approot)
-end
 
 % Choose default command line output for MaterialManager
 handles.output = hObject;
@@ -79,10 +81,11 @@ movegui(hObject, 'center')
 
 %% Check for user materials in the DATA/MATERIAL/LOCAL directory
 % Get listing of materials
-userMaterials = dir('Data/material/local/*.mat');
+userMaterials = dir([getappdata(0, 'qft_localMaterialDataPath'), '/*.mat*']);
 
 % Check number of materials
 [numberOfMaterials, ~] = size(userMaterials);
+
 if numberOfMaterials < 1.0
     set(handles.pButton_edit, 'enable', 'off')
     set(handles.pButton_copy, 'enable', 'off')
@@ -91,7 +94,11 @@ if numberOfMaterials < 1.0
     set(handles.pButton_query, 'enable', 'off')
     set(handles.pButton_eval, 'enable', 'off')
     
-    set(handles.list_database, 'string', 'No user materials to display.')
+    if isempty(getappdata(0, 'qft_localMaterialDataPath')) == 1.0
+        set(handles.list_database, 'string', 'Click to set local database...')
+    else
+        set(handles.list_database, 'string', 'No user materials to display.')
+    end
 else
     materialStrings = cell(1, numberOfMaterials);
     
@@ -121,10 +128,6 @@ systemMaterials = {mat_enum.sae_steel{:}, mat_enum.bs_steel{:},...
 
 setappdata(gcf, 'systemMaterials', systemMaterials)
 
-%% Force database refresh
-setappdata(0, 'forceLocalDatabaseRefresh', 1.0)
-panel_database_SelectionChangeFcn(hObject, eventdata, handles)
-
 %% Check screen resolution
 if isappdata(0, 'checkScreenResolution') == 0.0
     resolution = get(0, 'Screensize');
@@ -152,7 +155,14 @@ varargout{1} = handles.output;
 % --- Executes on selection change in list_database.
 function list_database_Callback(hObject, eventdata, handles)
 if ischar(get(handles.list_database, 'string')) == 1.0
-    return
+    if isempty(getappdata(0, 'qft_localMaterialDataPath')) == 1.0
+        close 'Material Manager'
+        checkDataPath
+        MaterialManager
+        return
+    else
+        return
+    end
 end
 
 try
@@ -193,8 +203,8 @@ end
 
 % --- Executes on button press in pButton_create.
 function pButton_create_Callback(~, ~, ~)
-close MaterialManager
-UserMaterial
+close 'Material Manager'
+MaterialEditor
 
 
 % --- Executes on button press in pButton_edit.
@@ -203,12 +213,18 @@ setappdata(0, 'editMaterial', 1.0)
 materials = get(handles.list_database, 'string');
 setappdata(0, 'materialToEdit', materials(get(handles.list_database, 'value')))
 
-close MaterialManager
-UserMaterial
+close 'Material Manager'
+MaterialEditor
 
 
 % --- Executes on button press in pButton_copy.
 function pButton_copy_Callback(hObject, eventdata, handles)
+% Disable the GUI
+blank(handles)
+
+% Get the local material path
+localPath = getappdata(0, 'qft_localMaterialDataPath');
+
 materials = get(handles.list_database, 'string');
 material = materials{get(handles.list_database, 'value')};
 if get(handles.rButton_user, 'value') == 1.0
@@ -223,15 +239,22 @@ end
 
 % First check that the material name is valid
 if isempty(copiedMaterial) == 1.0
+    % Enable the GUI
+    enable(handles)
+    
     return
 elseif isempty(regexp(copiedMaterial, '[/\\*:?"<>|]', 'once')) == 0.0
     message1 = sprintf('The material name cannot contain any of the following characters:\n\n');
     message2 = sprintf('/ \\ * : ? " < > | ');
     errordlg([message1, message2], 'Quick Fatigue Tool')
+    uiwait
+    
+    % Enable the GUI
+    enable(handles)
     return
 else
     % Check if the material already exists
-    userMaterials = dir('Data/material/local/*.mat');
+    userMaterials = dir([getappdata(0, 'qft_localMaterialDataPath'), '/*.mat*']);
     
     for i = 1:length(userMaterials)
         if strcmpi([copiedMaterial, '.mat'], userMaterials(i).name) == 1.0
@@ -241,6 +264,10 @@ else
             else
                 errordlg(message, 'Quick Fatigue Tool')
             end
+            
+            % Enable the GUI
+            uiwait
+            enable(handles)
             return
         end
     end
@@ -248,8 +275,8 @@ end
 
 if get(handles.rButton_user, 'value') == 1.0
     % Save the new material
-    oldPath = ['Data\material\local\', material, '.mat'];
-    newPath = ['Data\material\local\', copiedMaterial, '.mat'];
+    oldPath = [localPath, '\', material, '.mat'];
+    newPath = [localPath, '\', copiedMaterial, '.mat'];
     
     try
         copyfile(oldPath, newPath)
@@ -260,11 +287,15 @@ if get(handles.rButton_user, 'value') == 1.0
             message = sprintf('Could not copy %s.\n\nMake sure the material name does not contain any illegal characters.', copiedMaterial);
         end
         errordlg(message, 'Quick Fatigue Tool')
+        uiwait
+        
+        % Enable the GUI
+        enable(handles)
         return
     end
     
     % Get listing of materials from /LOCAL directory
-    userMaterials = dir('Data/material/local/*.mat');
+    userMaterials = dir([getappdata(0, 'qft_localMaterialDataPath'), '/*.mat*']);
     [numberOfMaterials, ~] = size(userMaterials);
     
     materialStrings = cell(1, numberOfMaterials);
@@ -288,6 +319,9 @@ else
     % If there was an error while reading the system databse, RETURN
     if isstruct(properties) == 0.0
         if properties == 0.0
+            % Enable the GUI
+            enable(handles)
+            
             return
         end
     end
@@ -296,24 +330,36 @@ else
     
     % Save the copy in the /LOCAL directory
     try
-        save(['Data\material\local\', copiedMaterial, '.mat'], 'material_properties')
+        save([localPath, '\', copiedMaterial, '.mat'], 'material_properties')
     catch
         message = sprintf('Cannot fetch ''%s'' because the local database is not currently on the MATLAB path.', copiedMaterial);
         errordlg(message, 'Quick Fatigue Tool')
+        uiwait
+        
+        % Enable the GUI
+        enable(handles)
         return
     end
     
     % Switch back to the local database view
     set(handles.rButton_user, 'value', 1.0)
-    setappdata(0, 'forceLocalDatabaseRefresh', 1.0)
     panel_database_SelectionChangeFcn(hObject, eventdata, handles)
 end
+
+% Enable the GUI
+enable(handles)
 
 
 % --- Executes on button press in pButton_rename.
 function pButton_rename_Callback(~, ~, handles)
+% Disable the GUI
+blank(handles)
+
 % Get the current list of materials
 materials = get(handles.list_database, 'string');
+
+% Get the local material path
+localPath = getappdata(0, 'qft_localMaterialDataPath');
 
 % Find the material being renamed
 material = char(materials(get(handles.list_database, 'value')));
@@ -322,11 +368,17 @@ message = sprintf('Rename %s to:', material);
 % Ask user for new name
 newName = char(inputdlg(message, 'Rename Material', 1.0, {material}));
 if isempty(newName) == 1.0
+    % Enable the GUI
+    enable(handles)
     return
 elseif isempty(regexp(newName, '[/\\*:?"<>|]', 'once')) == 0.0
     message1 = sprintf('The material name cannot contain any of the following characters:\n\n');
     message2 = sprintf('/ \\ * : ? " < > | ');
     errordlg([message1, message2], 'Quick Fatigue Tool')
+    uiwait
+    
+    % Enable the GUI
+    enable(handles)
     return
 elseif strcmp(newName, material) == 1.0
     % Material already exists
@@ -336,10 +388,11 @@ elseif strcmp(newName, material) == 1.0
         message = sprintf('%s already exists in the local database and cannot be overwritten.', newName);
     end
     errordlg(message, 'Quick Fatigue Tool')
+    uiwait
 else
     % Create paths to old and new material names
-    fullpathOld = ['Data\material\local\', material, '.mat'];
-    fullpathNew = ['Data\material\local\', newName, '.mat'];
+    fullpathOld = [localPath, '\', material, '.mat'];
+    fullpathNew = [localPath, '\', newName, '.mat'];
     
     % Rename the material
     try
@@ -351,6 +404,10 @@ else
             message = sprintf('Material name %s is invalid.', newName);
         end
         errordlg(message, 'Quick Fatigue Tool')
+        uiwait
+        
+        % Enable the GUI
+        enable(handles)
         return
     end
     
@@ -359,16 +416,26 @@ else
     set(handles.list_database, 'string', materials)
 end
 
+% Enable the GUI
+enable(handles)
+return
+
 
 % --- Executes on button press in pButton_delete.
 function pButton_delete_Callback(~, ~, handles)
+% Disable the GUI
+blank(handles)
+
+% Get the local material path
+localPath = getappdata(0, 'qft_localMaterialDataPath');
+
 materials = get(handles.list_database, 'string');
 materialToDelete = materials{get(handles.list_database, 'value')};
 question = sprintf('OK to delete %s?', materialToDelete);
 response = questdlg(question, 'Quick Fatigue Tool');
 
-if strcmpi(response, 'yes')
-    fullpath = ['Data\material\local\', materialToDelete, '.mat'];
+if strcmpi(response, 'yes') == 1.0
+    fullpath = [localPath, '\', materialToDelete, '.mat'];
     if exist(fullpath, 'file') ~= 0.0
         delete(fullpath);
     end
@@ -390,13 +457,18 @@ if strcmpi(response, 'yes')
         set(handles.list_database, 'value', 1.0)
     end
 else
+    % Enable the GUI
+    enable(handles)
     return
 end
+
+% Enable the GUI
+enable(handles)
 
 
 % --- Executes on button press in pButton_close.
 function pButton_close_Callback(~, ~, ~)
-close MaterialManager
+close 'Material Manager'
 
 
 % --- Executes when selected object is changed in panel_database.
@@ -404,117 +476,76 @@ function panel_database_SelectionChangeFcn(~, eventdata, handles)
 try
     tag = get(eventdata.NewValue, 'Tag');
 catch
-    tag = getappdata(0, 'startTag');
+    tag = 'rButton_user';
 end
 
-if getappdata(0, 'forceLocalDatabaseRefresh') == 1.0
-    setappdata(0, 'forceLocalDatabaseRefresh', 0.0)
-    
-    set(handles.list_database, 'value', 1.0)
-    %% Enable/Disable buttons
-    set(handles.pButton_create, 'enable', 'on')
-    set(handles.pButton_import, 'enable', 'on')
-    set(handles.pButton_edit, 'enable', 'on')
-    set(handles.pButton_rename, 'enable', 'on')
-    set(handles.pButton_delete, 'enable', 'on')
-    set(handles.pButton_copy, 'string', 'Copy...')
-    
-    %% Check for user materials in the DATA/MATERIAL/LOCAL directory
-    % Get listing of materials
-    userMaterials = dir('Data/material/local/*.mat');
-    % Check number of materials
-    [numberOfMaterials, ~] = size(userMaterials);
-    if numberOfMaterials < 1.0
-        set(handles.pButton_edit, 'enable', 'off')
-        set(handles.pButton_copy, 'enable', 'off')
-        set(handles.pButton_rename, 'enable', 'off')
-        set(handles.pButton_delete, 'enable', 'off')
-        set(handles.pButton_query, 'enable', 'off')
-        set(handles.pButton_eval, 'enable', 'off')
-        
-        set(handles.list_database, 'string', 'No user materials to display')
-    else
+switch tag
+    case 'rButton_user'
+        set(handles.list_database, 'value', 1.0)
+        %% Enable/Disable buttons
+        set(handles.pButton_create, 'enable', 'on')
+        set(handles.pButton_import, 'enable', 'on')
         set(handles.pButton_edit, 'enable', 'on')
-        set(handles.pButton_copy, 'enable', 'on')
         set(handles.pButton_rename, 'enable', 'on')
         set(handles.pButton_delete, 'enable', 'on')
-        set(handles.pButton_query, 'enable', 'on')
-        set(handles.pButton_eval, 'enable', 'on')
+        set(handles.pButton_copy, 'string', 'Copy...')
         
-        materialStrings = cell(1.0, numberOfMaterials);
-        
-        for i = 1:numberOfMaterials
-            userMaterials(i).name(end - 3.0:end) = [];
-            materialStrings{i} = userMaterials(i).name;
-        end
-        
-        set(handles.list_database, 'string', materialStrings)
-    end
-else
-    switch tag
-        case 'rButton_user'
-            set(handles.list_database, 'value', 1.0)
-            %% Enable/Disable buttons
-            set(handles.pButton_create, 'enable', 'on')
-            set(handles.pButton_import, 'enable', 'on')
+        %% Check for user materials in the DATA/MATERIAL/LOCAL directory
+        % Get listing of materials
+        userMaterials = dir([getappdata(0, 'qft_localMaterialDataPath'), '/*.mat*']);
+        % Check number of materials
+        [numberOfMaterials, ~] = size(userMaterials);
+        if numberOfMaterials < 1
+            set(handles.pButton_edit, 'enable', 'off')
+            set(handles.pButton_copy, 'enable', 'off')
+            set(handles.pButton_rename, 'enable', 'off')
+            set(handles.pButton_delete, 'enable', 'off')
+            set(handles.pButton_query, 'enable', 'off')
+            set(handles.pButton_eval, 'enable', 'off')
+            
+            if isempty(getappdata(0, 'qft_localMaterialDataPath')) == 1.0
+                set(handles.list_database, 'string', 'Click to set local database...')
+            else
+                set(handles.list_database, 'string', 'No user materials to display.')
+            end
+        else
             set(handles.pButton_edit, 'enable', 'on')
+            set(handles.pButton_copy, 'enable', 'on')
             set(handles.pButton_rename, 'enable', 'on')
             set(handles.pButton_delete, 'enable', 'on')
-            set(handles.pButton_copy, 'string', 'Copy...')
+            set(handles.pButton_query, 'enable', 'on')
+            set(handles.pButton_eval, 'enable', 'on')
             
-            %% Check for user materials in the DATA/MATERIAL/LOCAL directory
-            % Get listing of materials
-            userMaterials = dir('Data/material/local/*.mat');
-            % Check number of materials
-            [numberOfMaterials, ~] = size(userMaterials);
-            if numberOfMaterials < 1
-                set(handles.pButton_edit, 'enable', 'off')
-                set(handles.pButton_copy, 'enable', 'off')
-                set(handles.pButton_rename, 'enable', 'off')
-                set(handles.pButton_delete, 'enable', 'off')
-                set(handles.pButton_query, 'enable', 'off')
-                set(handles.pButton_eval, 'enable', 'off')
-                
-                set(handles.list_database, 'string', 'No user materials to display')
-            else
-                set(handles.pButton_edit, 'enable', 'on')
-                set(handles.pButton_copy, 'enable', 'on')
-                set(handles.pButton_rename, 'enable', 'on')
-                set(handles.pButton_delete, 'enable', 'on')
-                set(handles.pButton_query, 'enable', 'on')
-                set(handles.pButton_eval, 'enable', 'on')
-                
-                materialStrings = cell(1, numberOfMaterials);
-                
-                for i = 1:numberOfMaterials
-                    userMaterials(i).name(end-3:end) = [];
-                    materialStrings{i} = userMaterials(i).name;
-                end
-                
-                set(handles.list_database, 'string', materialStrings)
+            materialStrings = cell(1, numberOfMaterials);
+            
+            for i = 1:numberOfMaterials
+                userMaterials(i).name(end-3:end) = [];
+                materialStrings{i} = userMaterials(i).name;
             end
-        case 'rButton_qft'
-            %% Populate list with system database
-            if getappdata(0, 'errorMissingENums') == 1.0
-                errordlg('Missing file ''mat_enums.mat''. Check that the file exists in Data/material/system.', 'Quick Fatigue Tool')
-                set(handles.rButton_user, 'value', 1.0)
-                return
-            else
-                set(handles.list_database, 'value', 1.0)
-                %% Enable/Disable buttons
-                set(handles.pButton_copy, 'enable', 'on')
-                set(handles.pButton_create, 'enable', 'off')
-                set(handles.pButton_import, 'enable', 'off')
-                set(handles.pButton_edit, 'enable', 'off')
-                set(handles.pButton_rename, 'enable', 'off')
-                set(handles.pButton_query, 'enable', 'on')
-                set(handles.pButton_delete, 'enable', 'off')
-                set(handles.pButton_copy, 'string', 'Fetch...')
-                set(handles.pButton_eval, 'enable', 'off')
-                
-                set(handles.list_database, 'string', getappdata(gcf, 'systemMaterials'))
-            end
-    end
+            
+            set(handles.list_database, 'string', materialStrings)
+        end
+    case 'rButton_qft'
+        %% Populate list with system database
+        if getappdata(0, 'errorMissingENums') == 1.0
+            errordlg('Missing file ''mat_enums.mat''. Check that the file exists in Data/material/system.', 'Quick Fatigue Tool')
+            set(handles.rButton_user, 'value', 1.0)
+            return
+        else
+            set(handles.list_database, 'value', 1.0)
+            %% Enable/Disable buttons
+            set(handles.pButton_copy, 'enable', 'on')
+            set(handles.pButton_create, 'enable', 'off')
+            set(handles.pButton_import, 'enable', 'off')
+            set(handles.pButton_edit, 'enable', 'off')
+            set(handles.pButton_rename, 'enable', 'off')
+            set(handles.pButton_query, 'enable', 'on')
+            set(handles.pButton_delete, 'enable', 'off')
+            set(handles.pButton_copy, 'string', 'Fetch...')
+            set(handles.pButton_eval, 'enable', 'off')
+            
+            set(handles.list_database, 'string', getappdata(gcf, 'systemMaterials'))
+        end
 end
 
 
@@ -605,6 +636,12 @@ end
 
 % --- Executes on button press in pButton_query.
 function pButton_query_Callback(~, ~, handles)
+% Disable the GUI
+blank(handles)
+
+% Get the local material path
+localPath = getappdata(0, 'qft_localMaterialDataPath');
+
 value = get(handles.list_database, 'value');
 
 materials = get(handles.list_database, 'string');
@@ -622,10 +659,14 @@ if get(handles.rButton_qft, 'value') == 1.0
     end
 else
     % Get the material properties
-    fullpath = ['Data\material\local\', material, '.mat'];
+    fullpath = [localPath, '\', material, '.mat'];
     if exist(fullpath, 'file') == 0.0
         msg = sprintf('Could not query ''%s.mat'' because the file no longer exists in the local database.', material);
         errordlg(msg, 'Quick Fatigue Tool')
+        uiwait
+        
+        % Enable the GUI
+        enable(handles)
         return
     else
         load(fullpath)
@@ -643,8 +684,15 @@ else
     end
 end
 
+% Enable the GUI
+uiwait
+enable(handles)
+
 % --- Executes on button press in pButton_eval.
 function pButton_eval_Callback(~, ~, handles)
+% Disable the GUI
+blank(handles)
+
 % Flag to prevent messages from being written
 setappdata(0, 'evaluateMaterialMessenger', 1.0)
 
@@ -660,6 +708,21 @@ error = preProcess.getMaterial(material, 0.0, 1.0);
 % Remove flag
 rmappdata(0, 'evaluateMaterialMessenger')
 
+%{
+    If the material has no regression model selected, abort the evaluation
+    process and warn the user
+%}
+if getappdata(0, 'regressionModel') == 5.0
+    msg1 = sprintf('Material "%s" cannot be evaluated because it is not associated with a regression model.\n\n', material);
+    msg2 = sprintf('Select a regression model using the drop-down menu in the ''Derivation'' region of the Material Editor, or using the keyword *REGRESSION.');
+    errordlg([msg1, msg2], 'Quick Fatigue Tool')
+    uiwait
+    
+    % Enable the GUI
+    enable(handles)
+    return
+end
+
 % Remove '.mat' extension
 material(end - 3.0:end) = [];
 
@@ -670,6 +733,9 @@ fileName = sprintf('Project/output/material_reports/%s_report.dat', material);
 evaluateMaterial(fileName, material, error)
 
 if (error > 0.0)
+    % Enable the GUI
+    enable(handles)
+    
     return
 end
 
@@ -693,11 +759,19 @@ elseif strcmpi(userResponse, 'Open in Windows...')
     winopen(fileName)
 end
 
+% Enable the GUI
+enable(handles)
+
 
 
 % --- Executes on button press in pButton_import.
 function pButton_import_Callback(~, ~, ~)
-close MaterialManager
+close 'Material Manager'
+
+% Get the local material path
+localPath = getappdata(0, 'qft_localMaterialDataPath');
+
+setappdata(0, 'qft_suppressDataPath', 1.0)
 
 % Define the start path
 if isappdata(0, 'panel_materialManager_import_path') == 1.0
@@ -729,7 +803,7 @@ end
 
 if isMat == 1.0
     % Source and destination paths cannot be the same
-    if strcmpi(fullpath, [pwd, '\Data\material\local\', materialName, ext]) == 1.0
+    if strcmpi(fullpath, [localPath, '\', materialName, ext]) == 1.0
         message = sprintf('Cannot copy ''%s'' to itself.', materialName);
         errordlg(message, 'Quick Fatigue Tool')
         uiwait
@@ -738,7 +812,7 @@ if isMat == 1.0
     end
     
     % Perform file checks on the .mat file
-    if exist(['Data/material/local/', materialName, '.mat'], 'file') == 2.0
+    if exist([localPath, '\', materialName, '.mat'], 'file') == 2.0
         % User is attempting to overwrite an existing material
         response = questdlg(sprintf('The material ''%s'' already exists in the local database. Do you wish to overwrite the material?', materialName), 'Quick Fatigue Tool', 'Overwrite', 'Keep file', 'Cancel', 'Overwrite');
         
@@ -747,13 +821,13 @@ if isMat == 1.0
             return
         elseif strcmpi(response, 'Keep file') == 1.0
             % Change the name of the new results output database
-            oldMaterial = ['Data/material/local/', materialName, '.mat'];
+            oldMaterial = [localPath, '\', materialName, '.mat'];
             while exist(oldMaterial, 'file') == 2.0
                 oldMaterial = [oldMaterial(1.0:end - 4.0) , '-old', '.mat'];
             end
             
             % Rename the original material
-            movefile(['Data/material/local/', materialName, '.mat'], oldMaterial)
+            movefile([localPath, '\', materialName, '.mat'], oldMaterial)
         end
     end
     
@@ -769,7 +843,7 @@ if isMat == 1.0
     end
     
     % Copy the selected file into the user material database
-    [success, ~, ~] = copyfile(fullpath, ['Data/material/local/', filename]);
+    [success, ~, ~] = copyfile(fullpath, [localPath, '\', filename]);
     
     if success == 0.0
         message = sprintf('Unable to copy ''%s'' from ''%s'' to the local database.', filename, pathname);
@@ -801,7 +875,7 @@ else
         errordlg(msg, 'Quick Fatigue Tool')
         uiwait
     else
-        if exist(['Data/material/local/', materialName, '.mat'], 'file') == 2.0
+        if exist([localPath, '\', materialName, '.mat'], 'file') == 2.0
             % User is attempting to overwrite an existing material
             response = questdlg(sprintf('The material ''%s'' already exists in the local database. Do you wish to overwrite the material?', materialName), 'Quick Fatigue Tool', 'Overwrite', 'Keep file', 'Cancel', 'Overwrite');
             
@@ -810,19 +884,19 @@ else
                 return
             elseif strcmpi(response, 'Keep file') == 1.0
                 % Change the name of the new results output database
-                oldMaterial = ['Data/material/local/', materialName];
+                oldMaterial = [localPath, '\', materialName];
                 while exist([oldMaterial, '.mat'], 'file') == 2.0
                     oldMaterial = [oldMaterial , '-old']; %#ok<AGROW>
                 end
                 
                 % Rename the original material
-                movefile(['Data/material/local/', materialName, '.mat'], [oldMaterial, '.mat'])
+                movefile([localPath, '\', materialName, '.mat'], [oldMaterial, '.mat'])
             end
         end
         
         % Save the material
         try
-            save(['Data/material/local/', materialName], 'material_properties')
+            save([localPath, '\', materialName], 'material_properties')
         catch
             errordlg(sprintf('Unable to save material ''%s''. Make sure the material save location has read/write access.', materialName), 'Quick Fatigue Tool')
             return
@@ -906,14 +980,11 @@ end
 
 % --- Executes on button press in pButton_snHelp.
 function pButton_help_Callback(~, ~, ~)
-ln1 = sprintf('Create and manage materials for fatigue analysis.\n\n');
-ln2 = sprintf('Local Database:\n');
-ln3 = sprintf('Materials used for analysis. Materials in the local database\n');
-ln4 = sprintf('are stored in Data/material/local\n\n');
-ln5 = sprintf('System Database:\n');
-ln6 = sprintf('Write-protected database containing QFT material library.\n');
-ln7 = sprintf('To use these materials, select the material then select "Fetch"');
-msgbox([ln1, ln2, ln3, ln4, ln5, ln6, ln7], 'Material Databases')
+close 'Material Manager'
+LocalMaterialDatabase
+uiwait(LocalMaterialDatabase)
+MaterialManager
+return
 
 
 % --- Executes when user attempts to close MaterialManager.
@@ -924,3 +995,18 @@ function MaterialManager_CloseRequestFcn(hObject, ~, ~)
 
 % Hint: delete(hObject) closes the figure
 delete(hObject);
+
+function blank(handles)
+set(findall(handles.MaterialManager, '-property', 'Enable'), 'Enable', 'off')
+
+function enable(handles)
+set(findall(handles.MaterialManager, '-property', 'Enable'), 'Enable', 'on')
+
+if get(handles.rButton_qft, 'value') == 1.0
+    set(handles.pButton_create, 'enable', 'off')
+    set(handles.pButton_import, 'enable', 'off')
+    set(handles.pButton_edit, 'enable', 'off')
+    set(handles.pButton_rename, 'enable', 'off')
+    set(handles.pButton_delete, 'enable', 'off')
+    set(handles.pButton_eval, 'enable', 'off')
+end
