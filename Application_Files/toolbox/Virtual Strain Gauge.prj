@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="1916276000" file="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox\Virtual Strain Gauge.prj" location="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox" name="Virtual Strain Gauge" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="2477154876" file="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox\Virtual Strain Gauge.prj" location="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox" name="Virtual Strain Gauge" target="target.mlapps" target-name="Package App">
     <param.appname>Virtual Strain Gauge</param.appname>
     <param.authnamewatermark>Louis Vallance</param.authnamewatermark>
     <param.email>louisvallance@hotmail.co.uk</param.email>
@@ -13,7 +13,7 @@
     <param.summary>Synthesisze the output of a virtual strain gauge from a strain tensor history</param.summary>
     <param.description>Virtual Strain Gauge allows the user to create strain gauge histories from a strain tensor history. The app can be used to verify the behaviour of a real strain gauge with results obtained by FEA. For guidance on using Rosette Analysis, please refer to Appendix A3.4 of the Quick Fatigue Tool Appendices.</param.description>
     <param.screenshot />
-    <param.version>6.11.00</param.version>
+    <param.version>6.11.01</param.version>
     <param.products.name>
       <item>MATLAB</item>
       <item>Image Processing Toolbox</item>

@@ -12,8 +12,8 @@ function varargout = MaterialEditor(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials
 %   
-%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 23-Jun-2017 13:18:41 GMT
+%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
+%   Last modified 27-Jun-2017 16:21:27 GMT
     
     %%
     
@@ -198,7 +198,7 @@ end
 
 % Set the "Algorithm unavailable" warning string
 alg = get(handles.pMenu_algorithm, 'value');
-if (alg > 0.0 && alg < 5.0) || (alg > 10.0 && alg < 14.0)
+if (alg > 0.0 && alg < 5.0) || (alg == 11.0)
     set(handles.text_algorithmUnavailable, 'visible', 'on')
 end
 

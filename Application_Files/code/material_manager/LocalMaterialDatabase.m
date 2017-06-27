@@ -11,8 +11,8 @@ function varargout = LocalMaterialDatabase(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials
 %   
-%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 23-Jun-2017 13:18:41 GMT
+%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
+%   Last modified 27-Jun-2017 16:21:27 GMT
     
     %%
 
@@ -92,6 +92,7 @@ set(handles.pButton_help, 'CData', g);
 %% Load the panel state
 if isappdata(0, 'defaultDataPath_check_defaultDataDirectory') == 1.0
     set(handles.check_defaultDataDirectory, 'value', getappdata(0, 'defaultDataPath_check_defaultDataDirectory'))
+    set(handles.check_saveLocalPath, 'value', getappdata(0, 'defaultDataPath_check_saveLocalPath'))
     
     if get(handles.check_defaultDataDirectory, 'value') == 0.0
         set(handles.text_currentDatabase, 'enable', 'on')
@@ -209,12 +210,23 @@ if exist([currentPath, '\qft-local-material.txt'], 'file') == 2.0
     delete([currentPath, '\qft-local-material.txt'])
 end
 
-% Write the marker file
+% Write the new marker file
 try
     fid = fopen([dataPath, '\qft-local-material.txt'], 'w+');
     fprintf(fid, '%s', dataPath);
     fclose(fid);
 catch
+end
+
+%{
+    Try to add the local material directory to PATHDEF.m. This is an
+    automatically generated file which contains the saved MATLAB path.
+%}
+if get(handles.check_saveLocalPath, 'value') == 1.0
+    try
+        material.saveDatabase(dataPath)
+    catch
+    end
 end
 
 % Close the GUI
@@ -272,6 +284,7 @@ setappdata(0, 'qft_suppressDataPath', 1.0)
 
 % Save the panel state
 setappdata(0, 'defaultDataPath_check_defaultDataDirectory', get(handles.check_defaultDataDirectory, 'value'))
+setappdata(0, 'defaultDataPath_check_saveLocalPath', get(handles.check_saveLocalPath, 'value'))
 
 % Hint: delete(hObject) closes the figure
 delete(hObject);
@@ -314,3 +327,15 @@ end
 
 uiwait
 enable(handles)
+
+
+% --- Executes on button press in check_saveLocalPath.
+function check_saveLocalPath_Callback(hObject, ~, handles)
+if get(hObject, 'value') == 1.0
+    blank(handles)
+    msg1 = sprintf('This option edits PATHDEF.m. ');
+    msg2 = sprintf('It is strongly recommended that you create a back-up of this file.');
+    warndlg([msg1, msg2], 'Quick Fatigue Tool')
+    uiwait
+    enable(handles)
+end

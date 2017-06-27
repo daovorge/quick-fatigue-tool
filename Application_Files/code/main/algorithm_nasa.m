@@ -13,7 +13,7 @@ classdef algorithm_nasa < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.7 NASALIFE
 %   
-%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
 %   Last modified 12-May-2017 15:25:52 GMT
     
     %%

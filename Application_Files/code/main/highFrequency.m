@@ -6,7 +6,7 @@ classdef highFrequency < handle
 %   HIGHFREQUENCY is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
 %   Last modified 19-Jun-2017 16:18:57 GMT
     
     %%

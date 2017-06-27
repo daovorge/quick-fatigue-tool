@@ -10,7 +10,7 @@ function [] = checkDataPath()
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials
 %   
-%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
 %   Last modified 23-Jun-2017 13:18:41 GMT
     
     %%

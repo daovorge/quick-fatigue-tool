@@ -18,6 +18,7 @@ classdef material < handle
 %   MATERIAL.query(MATERIALNAME)
 %   MATERIAL.database(PATH)
 %   MATERIAL.checkDatabase(PATH)
+%   MATERIAL.saveDatabase(PATH)
 %
 %   See also checkDataPath, evaluateMaterial, importMaterial,
 %   kValueCalculator, LocalMaterialDatabase, MaterialEditor,
@@ -26,8 +27,8 @@ classdef material < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials
 %   
-%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 26-Jun-2017 09:15:32 GMT
+%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
+%   Last modified 27-Jun-2017 16:21:27 GMT
     
     %%
     
@@ -779,11 +780,21 @@ classdef material < handle
                 delete([currentPath, '\qft-local-material.txt'])
             end
             
-            % Write the marker file
+            % Write the new marker file
             try
                 fid = fopen([path, '\qft-local-material.txt'], 'w+');
                 fprintf(fid, '%s', path);
                 fclose(fid);
+            catch
+            end
+            
+            %{
+                Try to add the local material directory to PATHDEF.m. This
+                is an automatically generated file which contains the saved
+                MATLAB path.
+            %}
+            try
+                material.saveDatabase(path)
             catch
             end
         end
@@ -829,6 +840,82 @@ classdef material < handle
                     return
                 end
             end
+        end
+        
+        %% Save the local material database to PATHDEF.m
+        function saveDatabase(path)
+            %MATERIAL.SAVEDATABASE    Saves the current local material
+            %    database to PATHDEF.
+            %
+            %   MATERIAL.SAVEDATABASE(PATH) checks if the local material
+            %   database directory is already saved to the MATLAB path. If
+            %   not, the file is re-written with this location included.
+            %
+            %   WARNING: This function modifies PATHDEF.m, which is an
+            %   automatically generated MATLAB file.
+            %
+            %   Reference section in Quick Fatigue Tool User Guide
+            %      5 Materials
+            
+            % Read data from PATHDEF
+            pathDefFiles = which('pathdef', '-ALL');
+            pathDefFile = pathDefFiles{1.0};
+            
+            % READ FILE
+            fid = fopen(pathDefFile);
+            
+            data = char(fread(fid, 'char')');
+            fclose(fid);
+            
+            data(data == 13.0) = []; % Remove carriage returns
+            
+            % STRSPLIT2
+            f = [0.0, strfind(data, 10.0), length(data) + 1.0];
+            i0 = f(1:end - 1.0) + 1.0;
+            i1 = f(2:end) - 1.0;
+            n = length(f) - 1.0;
+            data2 = cell(n, 1.0);
+            for i=1:n
+                data2{i} = data(i0(i):i1(i));
+            end
+            data = data2;
+            
+            %{
+                Before writing the local material database path to
+                PATHDEF.m, first parse the current path definition to check
+                if the directory is already on the path
+            %}
+            cellfind = @(string)(@(cell_contents)(strcmp(string, cell_contents)));
+            logical_cells = cellfun(cellfind(sprintf('     ''%s;'', ...', path)), data);
+            
+            if any(logical_cells) == 1.0
+                return
+            end
+
+            % Open PATHDEF for reading
+            fid = fopen(pathDefFile, 'r');
+            
+            % Find the number of lines until the beginning of the path definition
+            keepGoing = 1.0;    index = 1.0;
+            while keepGoing == 1.0
+                tLine = fgetl(fid);
+                if strcmp(tLine, '%%% BEGIN ENTRIES %%%') == 1.0
+                    break
+                end
+                index = index + 1.0;
+            end
+            
+            % Close PATHDEF
+            fclose(fid);
+            
+            % Re-open PATHDEF for writing, discard existing contents
+            fid = fopen(pathDefFile, 'wt');
+            
+            % Re-build PATHDEF from DATA and insert the local material path
+            fprintf(fid, '%s\n', data{1.0:index});
+            fprintf(fid, '     ''%s;'', ...\n', path);
+            fprintf(fid,'%s\n',data{(index + 1.0):end});
+            fclose(fid);
         end
     end
 end
