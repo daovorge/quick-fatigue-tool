@@ -70,7 +70,6 @@ set(handles.pButton_userDataDirectory, 'CData', g);
 if isempty(changeDatabase) == 0.0
     [a,~]=imread('icoR_info.jpg');
     set(handles.text_warning, 'string', 'Change the current local material database.')
-    set(handles.text_currentDatabase, 'string', 'Current local material directory:')
 else
     [a,~]=imread('icoR_warning.jpg');
 end
@@ -97,6 +96,7 @@ if isappdata(0, 'defaultDataPath_check_defaultDataDirectory') == 1.0
     if get(handles.check_defaultDataDirectory, 'value') == 0.0
         set(handles.text_currentDatabase, 'enable', 'on')
         set(handles.edit_userDataDirectory, 'enable', 'on')
+        set(handles.edit_userDataDirectory, 'backgroundColor', 'white')
         set(handles.pButton_userDataDirectory, 'enable', 'on')
     end
 end
@@ -143,7 +143,7 @@ else
         set(handles.check_defaultDataDirectory, 'value', 0.0)
         
         set(handles.text_currentDatabase, 'enable', 'on')
-        set(handles.edit_userDataDirectory, 'enable', 'on')
+        set(handles.edit_userDataDirectory, 'enable', 'on', 'backgroundColor', 'white')
         set(handles.pButton_userDataDirectory, 'enable', 'on')
     end
 end
@@ -284,7 +284,8 @@ set(findall(handles.LocalMaterialDatabase, '-property', 'Enable'), 'Enable', 'on
 
 if get(handles.check_defaultDataDirectory, 'value') == 1.0
     set(handles.text_currentDatabase, 'enable', 'off')
-    set(handles.edit_userDataDirectory, 'enable', 'off')
+    set(handles.edit_userDataDirectory, 'enable', 'inactive')
+    set(handles.edit_userDataDirectory, 'backgroundColor', [177/255, 206/255, 237/255])
     set(handles.pButton_userDataDirectory, 'enable', 'off')
 elseif getappdata(0, 'missingDefaultLocalDatabase') == 1.0
     set(handles.check_defaultDataDirectory, 'enable', 'off')
@@ -330,7 +331,8 @@ if get(hObject, 'value') == 1.0
         end
         
         set(handles.text_currentDatabase, 'enable', 'off')
-        set(handles.edit_userDataDirectory, 'enable', 'off')
+        set(handles.edit_userDataDirectory, 'enable', 'inactive')
+        set(handles.edit_userDataDirectory, 'backgroundColor', [177/255, 206/255, 237/255])
         set(handles.pButton_userDataDirectory, 'enable', 'off')
     else
         %{
@@ -346,6 +348,7 @@ if get(hObject, 'value') == 1.0
         set(handles.text_currentDatabase, 'enable', 'on')
         set(handles.edit_userDataDirectory, 'enable', 'on')
         set(handles.edit_userDataDirectory, 'string', pwd)
+        set(handles.edit_userDataDirectory, 'backgroundColor', 'white')
         set(handles.pButton_userDataDirectory, 'enable', 'on')
         
         blank(handles)
@@ -362,6 +365,7 @@ else
     
     set(handles.text_currentDatabase, 'enable', 'on')
     set(handles.edit_userDataDirectory, 'enable', 'on')
+    set(handles.edit_userDataDirectory, 'backgroundColor', 'white')
     set(handles.pButton_userDataDirectory, 'enable', 'on')
 end
 
