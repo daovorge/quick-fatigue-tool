@@ -1,5 +1,4 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="3114561881" file="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox\Multiaxial Gauge Fatigue.prj" location="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox" name="Multiaxial Gauge Fatigue" target="target.mlapps" target-name="Package App">
     <param.appname>Multiaxial Gauge Fatigue</param.appname>
     <param.authnamewatermark>Louis Vallance</param.authnamewatermark>
     <param.email>louisvallance@hotmail.co.uk</param.email>
@@ -112,6 +111,7 @@
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Data\kt\rcjohnson-1973.kt</file>
     </fileset.depfun>
     <fileset.resources>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\material_manager\material.m</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\multiaxial_gauge_fatigue\gauge_45.png</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\multiaxial_gauge_fatigue\gauge_60.png</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\multiaxial_gauge_fatigue\gauge_arbitrary.png</file>

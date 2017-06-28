@@ -19,6 +19,7 @@ classdef material < handle
 %   MATERIAL.database(PATH)
 %   MATERIAL.checkDatabase(PATH)
 %   MATERIAL.saveDatabase(PATH)
+%   MATERIAL.searchDatabase()
 %
 %   See also checkDataPath, evaluateMaterial, importMaterial,
 %   kValueCalculator, LocalMaterialDatabase, MaterialEditor,
@@ -28,7 +29,7 @@ classdef material < handle
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
-%   Last modified 27-Jun-2017 17:16:18 GMT
+%   Last modified 28-Jun-2017 14:13:12 GMT
     
     %%
     
@@ -763,6 +764,13 @@ classdef material < handle
         function [] = database(varargin)
             %MATERIAL.DATABASE    Change the local material database.
             %
+            %   DATABASE(PATH) sets the local material database path with
+            %   PATH.
+            %
+            %   DATABASE(PATH, SAVE) sets the local material database path
+            %   with PATH, and writes the value of PATH to PATHDEF, where
+            %   SAVE is a flag with a value of 1.0.
+            %
             %   Reference section in Quick Fatigue Tool User Guide
             %      5 Materials
             
@@ -943,6 +951,62 @@ classdef material < handle
             fprintf(fid, '     ''%s;'', ...\n', path);
             fprintf(fid,'%s\n',data{(index + 1.0):end});
             fclose(fid);
+        end
+        
+        %% Search PATHDEF.m for DATA\MATERIAL\LOCAL
+        function [localPath] = searchDatabase()
+            %MATERIAL.SEARCHDATABASE    Searches PATHDEF.m for a local
+            %   material database entry.
+            %
+            %   MATERIAL.SEARCHDATABASE() checks PATHDEF for an
+            %   existing path to DATA\MATERIAL\LOCAL.
+            %
+            %   Reference section in Quick Fatigue Tool User Guide
+            %      5 Materials
+            
+            clc
+            
+            % Initialize output
+            localPath = [];
+            
+            % Read data from PATHDEF
+            pathDefFiles = which('pathdef', '-ALL');
+            pathDefFile = pathDefFiles{1.0};
+            
+            % READ FILE
+            fid = fopen(pathDefFile);
+            
+            data = char(fread(fid, 'char')');
+            fclose(fid);
+            
+            data(data == 13.0) = []; % Remove carriage returns
+            
+            % STRSPLIT2
+            f = [0.0, strfind(data, 10.0), length(data) + 1.0];
+            i0 = f(1:end - 1.0) + 1.0;
+            i1 = f(2:end) - 1.0;
+            n = length(f) - 1.0;
+            data2 = cell(n, 1.0);
+            for i=1:n
+                data2{i} = data(i0(i):i1(i));
+            end
+            data = data2;
+            
+            %{
+                Before writing the local material database path to
+                PATHDEF.m, first parse the current path definition to check
+                if the directory is already on the path
+            %}
+            for i = 1:length(data);
+                localPath = char(data{i});
+                if isempty(strfind(localPath, 'Data\material\local')) == 0.0
+                    break
+                end
+            end
+            
+            if isempty(localPath) == 0.0
+                localPath(ismember(localPath,'''     ;'', ...')) = [];
+            end
         end
     end
 end

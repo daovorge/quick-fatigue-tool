@@ -64,7 +64,7 @@ if length(sigma_e) > 2.0
     end
 end
 
-%% Add previous elasticstress point to history
+%% Add previous elastic stress point to history
 sigma_e = [0.0, sigma_pe, sigma_e];
 
 %% Initialize analysis variables

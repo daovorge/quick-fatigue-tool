@@ -1203,7 +1203,7 @@ classdef preProcess < handle
                 setappdata(0, 'message_8_group', groups)
                 messenger.writeMessage(8.0)
             elseif reg_model ~= 5.0
-                twops = preProcess.yield(E, kp, np);
+                twops = preProcess.yield(kp, np);
                 setappdata(0, 'twops', twops)
                 setappdata(0, 'twops_status', 1.0)
                 
@@ -1235,29 +1235,8 @@ classdef preProcess < handle
         end
         
         %% Approximate the yield stress:
-        function twops = yield(E, K, n)
-            
-            % Solve mss for 0.2% proof stress
-            e_proof = 0.002;
-            
-            So = 1000;
-            f = (So/E) + (So/K)^(1.0/n) - e_proof;
-            df = (1.0/E) + (1.0/(n*K))*(So/K)^((1.0 - n)/n);
-            S = So - (f/df);
-            
-            niter = 1.0;
-            tol = 1e-4;
-            iter = 100.0;
-            
-            while (abs(S - So) > tol)&&(niter < iter)
-                So = S;
-                f = (So/E) + (So/K)^(1.0/n) - e_proof;
-                df = (1.0/E) + (1.0/(n*K))*(So/K)^((1.0 - n)/n);
-                
-                S = So - (f/df);
-                niter = niter + 1.0;
-            end
-            twops = real(S);
+        function twops = yield(K, n)
+            twops = K*(0.002)^n;
         end
         
         %% Remove intermediate dat from load history
