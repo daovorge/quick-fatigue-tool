@@ -319,7 +319,7 @@ set(handles.rButton_selectAll, 'value', 0.0)
 
 % --- Executes on button press in pButton_cancel.
 function pButton_cancel_Callback(~, ~, ~)
-close 'Export Tool (ODB Interface)'
+close 'Export Tool (Abaqus ODB Interface)'
 
 % --- Executes on button press in pButton_start.
 function pButton_start_Callback(hObject, eventdata, handles)
@@ -785,7 +785,7 @@ if get(handles.check_copyToClipboard, 'value') == 1.0
 end
 
 % Re-enable the GUI
-close 'Export Tool (ODB Interface)'
+close 'Export Tool (Abaqus ODB Interface)'
 
 
 function edit_fieldData_Callback(~, ~, ~)
