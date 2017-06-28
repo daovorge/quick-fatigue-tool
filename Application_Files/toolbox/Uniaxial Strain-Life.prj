@@ -1,4 +1,5 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
+  <configuration build-checksum="1377714436" file="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox\Uniaxial Strain-Life.prj" location="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox" name="Uniaxial Strain-Life" target="target.mlapps" target-name="Package App">
     <param.appname>Uniaxial Strain-Life</param.appname>
     <param.authnamewatermark>Louis Vallance</param.authnamewatermark>
     <param.email>louisvallance@hotmail.co.uk</param.email>
