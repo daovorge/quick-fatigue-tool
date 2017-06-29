@@ -656,14 +656,25 @@ end
 
 % --- Executes on button press in pButton_ok.
 function pButton_ok_Callback(~, ~, handles)
+% Blank the GUI
+blank(handles)
+
 %% First check that the material name is valid
 if isempty(get(handles.edit_name, 'string')) == 1.0
     errordlg('A material name must be entered.', 'Quick Fatigue Tool')
+    uiwait
+    
+    % Enable the GUI
+    enable(handles)
     return
 elseif isempty(regexp(get(handles.edit_name, 'string'), '[/\\*:?"<>|]', 'once')) == 0.0
     message1 = sprintf('The material name cannot contain any of the following characters:\n\n');
     message2 = sprintf('/ \\ * : ? " < > | ');
     errordlg([message1, message2], 'Quick Fatigue Tool')
+    uiwait
+    
+    % Enable the GUI
+    enable(handles)
     return
 end
 
@@ -684,6 +695,10 @@ if isempty(S) == 0.0
             ln2 = sprintf('The material will not be saved.');
             ln = [ln1, ln2];
             errordlg(ln, 'Quick Fatigue Tool')
+            uiwait
+            
+            % Enable the GUI
+            enable(handles)
             return
         end
     end
@@ -713,6 +728,8 @@ else
     response = questdlg(msg, 'Quick Fatigue Tool');
     
     if (strcmpi(response, 'no') == 1.0) || (strcmpi(response, 'cancel') == 1.0) || (isempty(response) == 1.0)
+        % Enable the GUI
+        enable(handles)
         return
     end
 end
@@ -722,9 +739,17 @@ material_properties = saveMaterial(handles); %#ok<NASGU>
 %% Check that the save directory exists
 if strcmpi(pathname, '\') == 1.0
     errordlg('The material save location cannot be empty.', 'Quick Fatigue Tool')
+    uiwait
+    
+    % Enable the GUI
+    enable(handles)
     return
 elseif exist(pathname, 'dir') == 0.0
     errordlg('The material save location does not exist.', 'Quick Fatigue Tool')
+    uiwait
+    
+    % Enable the GUI
+    enable(handles)
     return
 end
 
@@ -733,6 +758,10 @@ try
     save(fullpath, 'material_properties')
 catch
     errordlg('Unable to save material. Make sure the material save location has read/write access.', 'Quick Fatigue Tool')
+    uiwait
+    
+    % Enable the GUI
+    enable(handles)
     return
 end
 
@@ -759,14 +788,20 @@ setappdata(0, 'qft_suppressDataPath', 1.0)
 
 % --- Executes on button press in pButton_close.
 function pButton_close_Callback(hObject, eventdata, handles)
+% Blank the GUI
+blank(handles)
+
 answer = questdlg('Save changes made in the User Material dialogue?',...
     'Quick Fatigue Tool', 'Yes', 'No', 'Cancel', 'Cancel');
-if strcmpi(answer, 'yes')
+if strcmpi(answer, 'yes') == 1.0
     setappdata(0, 'pressed_cancel_skip_material_manager', 1.0)
     pButton_ok_Callback(hObject, eventdata, handles)
     rmappdata(0, 'pressed_cancel_skip_material_manager')
-elseif strcmpi(answer, 'no')
+elseif strcmpi(answer, 'no') == 1.0
     close 'Material Editor'
+else
+    % Enable the GUI
+    enable(handles)
 end
 
 
@@ -1022,8 +1057,14 @@ end
 
 % --- Executes on button press in pButton_reset.
 function pButton_reset_Callback(~, ~, handles)
+% Blank the GUI
+blank(handles)
+
 response = questdlg('All fields will be reset. OK to continue?', 'Quick Fatigue Tool', 'Yes', 'No', 'No');
-if strcmpi(response, 'no') || isempty(response)
+if (strcmpi(response, 'no') == 1.0) || (isempty(response) == 1.0)
+    
+    % Enable the GUI
+    enable(handles)
     return
 else
     %% Reset objects to their original state
@@ -1100,6 +1141,9 @@ else
     set(handles.text_sf_units, 'enable', 'off')
     set(handles.text_kp_units, 'enable', 'off')
 end
+
+% Enable the GUI
+enable(handles)
 
 function material_properties = saveMaterial(handles)
 material_properties = struct(...
@@ -1261,15 +1305,21 @@ set(handles.pMenu_class, 'value', properties.material_properties.class)
 
 
 % --- Executes on button press in pButton_manager.
-function pButton_manager_Callback(~, ~, ~)
+function pButton_manager_Callback(~, ~, handles)
+% Blank the GUI
+blank(handles)
+
 answer = questdlg('Unsaved changes will be lost. OK to return to Material Manager?',...
     'Quick Fatigue Tool', 'Yes', 'No', 'No');
-if strcmpi(answer, 'yes')
+if strcmpi(answer, 'yes') == 1.0
     % Suppress local material path dialogue
     setappdata(0, 'qft_suppressDataPath', 1.0)
     
     close 'Material Editor'
     MaterialManager
+else
+    % Enable the GUI
+    enable(handles)
 end
 
 function edit_comment_Callback(~, ~, ~)
@@ -1778,8 +1828,13 @@ enable(handles)
 
 % --- Executes on button press in pButton_rmRValues.
 function pButton_rmRValues_Callback(~, ~, handles)
+% Blank the GUI
+blank(handles)
+
 answer = questdlg('Remove R-values?', 'Quick Fatigue Tool', 'Yes', 'No', 'No');
-if strcmpi(answer, 'no') || isempty(answer)
+if (strcmpi(answer, 'no') == 1.0) || (isempty(answer) == 1.0)
+    % Enable the GUI
+    enable(handles)
     return
 end
 
@@ -1791,9 +1846,15 @@ set(handles.edit_rValues, 'backgroundColor', [(241/255), (241/255), (241/255)])
 
 rmappdata(gcf, 'R_values')
 
+% Enable the GUI
+enable(handles)
+
 
 % --- Executes on button press in pButton_viewRValues.
-function pButton_viewRValues_Callback(~, ~, ~)
+function pButton_viewRValues_Callback(hObject, eventdata, handles)
+% Blank the GUI
+blank(handles)
+
 r_values = getappdata(gcf, 'R_values');
 if length(r_values) == 1.0
     r_values = {sprintf('%g', r_values)};
@@ -1804,6 +1865,8 @@ end
 user_rValues = inputdlg('Redefine R-value list:', 'R-Values', 1.0, r_values);
 
 if isempty(user_rValues) == 1.0
+    % Enable the GUI
+    enable(handles)
     return
 end
 
@@ -1813,7 +1876,11 @@ r_values = str2num(user_rValues{:}); %#ok<ST2NM>
 if isempty(r_values) == 1.0 || any(isnan(r_values)) == 1.0
     errordlg('Could not read R-values due to a syntax error.', 'Quick Fatigue Tool')
     uiwait
-    pButton_viewRValues_Callback
+    
+    % Enable the GUI
+    enable(handles)
+    
+    pButton_viewRValues_Callback(hObject, eventdata, handles)
     return
 end
 
@@ -1821,7 +1888,11 @@ end
 if all(diff(r_values) > 0.0) == 0.0
     errordlg('R-values must be strictly increasing.', 'Quick Fatigue Tool')
     uiwait
-    pButton_viewRValues_Callback
+    
+    % Enable the GUI
+    enable(handles)
+    
+    pButton_viewRValues_Callback(hObject, eventdata, handles)
     return
 end
 
@@ -1829,7 +1900,11 @@ end
 if any(r_values >= 1.0) == 1.0
     errordlg('R-values must less than 1.', 'Quick Fatigue Tool')
     uiwait
-    pButton_viewRValues_Callback
+    
+    % Enable the GUI
+    enable(handles)
+    
+    pButton_viewRValues_Callback(hObject, eventdata, handles)
     return
 end
 
@@ -1838,7 +1913,7 @@ setappdata(gcf, 'R_values', r_values)
 % Check that the number of R-values matches the S-N data
 S = getappdata(gcf, 'S_values');
 
-if ~isempty(S)
+if isempty(S) == 0.0
     % Get the number of S-N data sets
     [sets, ~] = size(S);
     
@@ -1848,10 +1923,12 @@ if ~isempty(S)
         ln3 = sprintf('S-N datasets: %.0f', sets);
         warndlg([ln1, ln2, ln3], 'Quick Fatigue Tool')
         uiwait
-        pButton_viewRValues_Callback
+        pButton_viewRValues_Callback(hObject, eventdata, handles)
     end
 end
 
+% Enable the GUI
+enable(handles)
 
 
 function edit_location_Callback(~, ~, ~)
@@ -1969,6 +2046,7 @@ simuliaBlue = getappdata(0, 'simulia_blue');
 if get(handles.check_location, 'value') == 0.0
     set(handles.edit_location, 'enable', 'inactive')
     set(handles.edit_location, 'enable', 'off')
+    set(handles.pButton_changeLocation, 'enable', 'off')
 end
 if get(handles.check_cael, 'value') == 0.0
     set(handles.edit_cael, 'enable', 'inactive', 'backgroundColor', simuliaBlue)
