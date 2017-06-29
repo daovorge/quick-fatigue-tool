@@ -11,7 +11,7 @@ function [] = main(flags)
 %   Author contact: louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
-%   Last modified 28-Jun-2017 14:13:12 GMT
+%   Last modified 29-Jun-2017 15:31:21 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');    tic_pre = tic;
@@ -43,7 +43,7 @@ setappdata(0, 'messageFileWarnings', 0.0)
 %% PRINT COMMAND WINDOW HEADER
 fprintf('[NOTICE] Quick Fatigue Tool 6.11-01')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2017)')
-fprintf('\n[NOTICE] Last modified 28-Jun-2017 14:13:12 GMT')
+fprintf('\n[NOTICE] Last modified 29-Jun-2017 15:31:21 GMT')
 
 cleanExit = 0.0;
 
@@ -452,6 +452,12 @@ if peekAnalysis == 1.0
 end
 
 %% MAIN ANALYSIS
+% Inform the user how many items will be analysed
+messenger.writeMessage(168.0)
+
+% Print a summary of the memory state
+messenger.writeMessage(133.0)
+
 if getappdata(0, 'dataCheck') > 0.0
     %{
         If the job is a data check analysis, abort here. Print the
@@ -495,12 +501,6 @@ groupIDBuffer = getappdata(0, 'groupIDBuffer');
 
 % Set a counter which runs from 1 to the total number of analysis items
 totalCounter = 0.0;
-
-% Inform the user how many items will be analysed
-messenger.writeMessage(168.0)
-
-% Print a summary of the memory state
-messenger.writeMessage(133.0)
 
 % Calculate items at which debug information is to be written
 [debugItems, cacheOverlay] = qftWorkspace.initialize(N, [], jobName, []);
