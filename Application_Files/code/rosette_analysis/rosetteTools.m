@@ -70,6 +70,10 @@ classdef rosetteTools < handle
                 errorMessage = 'All three gauges must be specified.';
                 error = 1.0;
                 return
+            elseif get(handles.edit_gaugeA, 'foregroundColor') ==  [0.5, 0.5, 0.5] %#ok<BDSCA>
+                errorMessage = 'All three gauges must be specified.';
+                error = 1.0;
+                return
             end
             
             % Gauge B
@@ -77,10 +81,18 @@ classdef rosetteTools < handle
                 errorMessage = 'All three gauges must be specified.';
                 error = 1.0;
                 return
+            elseif get(handles.edit_gaugeB, 'foregroundColor') ==  [0.5, 0.5, 0.5] %#ok<BDSCA>
+                errorMessage = 'All three gauges must be specified.';
+                error = 1.0;
+                return
             end
             
             % Gauge C
             if isempty(gaugeFileC) == 1.0
+                errorMessage = 'All three gauges must be specified.';
+                error = 1.0;
+                return
+            elseif get(handles.edit_gaugeC, 'foregroundColor') ==  [0.5, 0.5, 0.5] %#ok<BDSCA>
                 errorMessage = 'All three gauges must be specified.';
                 error = 1.0;
                 return

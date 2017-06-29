@@ -31,6 +31,11 @@ classdef uniaxialPreProcess < handle
                 uiwait
                 error = 1.0;
                 return
+            elseif get(handles.edit_inputFile, 'foregroundColor') ==  [0.5, 0.5, 0.5] %#ok<BDSCA>
+                errordlg('A load history must be specified.', 'Quick Fatigue Tool')
+                uiwait
+                error = 1.0;
+                return
             end
             
             %% Check if the input is a numeric array

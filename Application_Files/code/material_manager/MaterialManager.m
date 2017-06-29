@@ -209,6 +209,19 @@ MaterialEditor
 
 % --- Executes on button press in pButton_edit.
 function pButton_edit_Callback(~, ~, handles)
+%{
+    Before opening the material, check that it exists on the local material
+    path
+%}
+% Get the local material path
+if isempty(getappdata(0, 'qft_localMaterialDataPath')) == 1.0
+    blank(handles)
+    errordlg('The selected material does not exist on the local material path.', 'Quick Fatigue Tool')
+    uiwait
+    enable(handles)
+    return
+end
+
 setappdata(0, 'editMaterial', 1.0)
 materials = get(handles.list_database, 'string');
 setappdata(0, 'materialToEdit', materials(get(handles.list_database, 'value')))

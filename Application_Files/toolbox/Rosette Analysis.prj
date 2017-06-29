@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="2676573270" file="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox\Rosette Analysis.prj" location="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox" name="Rosette Analysis" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="2993606950" file="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox\Rosette Analysis.prj" location="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox" name="Rosette Analysis" target="target.mlapps" target-name="Package App">
     <param.appname>Rosette Analysis</param.appname>
     <param.authnamewatermark>Louis Vallance</param.authnamewatermark>
     <param.email>louisvallance@hotmail.co.uk</param.email>
@@ -43,16 +43,18 @@
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\rosette_analysis\RosetteAnalysis.m</file>
     </fileset.main>
     <fileset.depfun>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\common\findjobj.m</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\common\setInitialHelp.m</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\rosette_analysis\RosetteAnalysis.fig</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\rosette_analysis\rosetteTools.m</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\virtual_gauge\RosetteDiagram.fig</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\virtual_gauge\RosetteDiagram.m</file>
     </fileset.depfun>
     <fileset.resources>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\rosette_analysis\gauge_arbitrary.png</file>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\rosette_analysis\icoR_bulb.jpg</file>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\rosette_analysis\icoR_fileOpen.jpg</file>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\rosette_analysis\icoR_info.jpg</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\common\gauge_arbitrary.png</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\common\icoR_bulb.jpg</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\common\icoR_fileOpen.jpg</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\common\icoR_info.jpg</file>
     </fileset.resources>
     <fileset.package />
     <build-deliverables>

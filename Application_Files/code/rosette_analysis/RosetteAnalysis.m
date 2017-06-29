@@ -88,11 +88,22 @@ set(handles.pButton_outputLocation, 'CData', g);
 % UIWAIT makes RosetteAnalysis wait for user response (see UIRESUME)
 % uiwait(handles.RosetteAnalysis);
 
+% Set initial help string
+setInitialHelp(handles.edit_gaugeA, 'Strain history file or numerical expression...')
+setInitialHelp(handles.edit_gaugeB, 'Strain history file or numerical expression...')
+setInitialHelp(handles.edit_gaugeC, 'Strain history file or numerical expression...')
+
 %% Load the panel state
 if isappdata(0, 'rosette_edit_gaugeA') == 1.0
-    set(handles.edit_gaugeA, 'string', getappdata(0, 'rosette_edit_gaugeA'))
-    set(handles.edit_gaugeB, 'string', getappdata(0, 'rosette_edit_gaugeB'))
-    set(handles.edit_gaugeC, 'string', getappdata(0, 'rosette_edit_gaugeC'))
+    if strcmpi(getappdata(0, 'rosette_edit_gaugeA'), sprintf('Strain history file or numerical expression...')) == 0.0
+        set(handles.edit_gaugeA, 'string', getappdata(0, 'rosette_edit_gaugeA'), 'fontAngle', 'normal', 'foregroundColor', 'black')
+    end
+    if strcmpi(getappdata(0, 'rosette_edit_gaugeB'), sprintf('Strain history file or numerical expression...')) == 0.0
+        set(handles.edit_gaugeB, 'string', getappdata(0, 'rosette_edit_gaugeB'), 'fontAngle', 'normal', 'foregroundColor', 'black')
+    end
+    if strcmpi(getappdata(0, 'rosette_edit_gaugeC'), sprintf('Strain history file or numerical expression...')) == 0.0
+        set(handles.edit_gaugeC, 'string', getappdata(0, 'rosette_edit_gaugeC'), 'fontAngle', 'normal', 'foregroundColor', 'black')
+    end
     
     set(handles.edit_alpha, 'string', getappdata(0, 'rosette_edit_alpha'))
     set(handles.edit_beta, 'string', getappdata(0, 'rosette_edit_beta'))
@@ -235,10 +246,10 @@ else
     [file, path, ~] = uigetfile('*.txt', 'Strain Data for Gauge A');
 end
 
-if isequal(file,0) || isequal(path,0)
+if (isequal(file, 0.0) == 1.0) || (isequal(path, 0.0) == 1.0)
     % User cancelled operation
 else
-    set(handles.edit_gaugeA, 'string', [path, file])
+    set(handles.edit_gaugeA, 'string', [path, file], 'fontAngle', 'normal', 'foregroundColor', 'black')
     
     setappdata(0,'panel_browseInput', path)
 end

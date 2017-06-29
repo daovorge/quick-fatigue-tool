@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="982390240" file="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox\Material Manager.prj" location="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox" name="Material Manager" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="1861430680" file="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox\Material Manager.prj" location="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox" name="Material Manager" target="target.mlapps" target-name="Package App">
     <param.appname>Material Manager</param.appname>
     <param.authnamewatermark>Louis Vallance</param.authnamewatermark>
     <param.email>louisvallance@hotmail.co.uk</param.email>
@@ -71,15 +71,15 @@
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\material_manager\MaterialManager.fig</file>
     </fileset.depfun>
     <fileset.resources>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\material_manager\icoR_amplitude.jpg</file>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\material_manager\icoR_calculator.jpg</file>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\material_manager\icoR_delete.jpg</file>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\material_manager\icoR_edit.jpg</file>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\material_manager\icoR_fileOpen.jpg</file>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\material_manager\icoR_help.jpg</file>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\material_manager\icoR_info.jpg</file>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\material_manager\icoR_options.jpg</file>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\material_manager\icoR_warning.jpg</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\common\icoR_amplitude.jpg</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\common\icoR_calculator.jpg</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\common\icoR_delete.jpg</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\common\icoR_edit.jpg</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\common\icoR_fileOpen.jpg</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\common\icoR_help.jpg</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\common\icoR_info.jpg</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\common\icoR_options.jpg</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\common\icoR_warning.jpg</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\material_manager\material.m</file>
     </fileset.resources>
     <fileset.package />

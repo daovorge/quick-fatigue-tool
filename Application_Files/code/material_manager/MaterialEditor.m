@@ -128,9 +128,12 @@ if isappdata(0, 'editMaterial')
     rmappdata(0, 'editMaterial')
     rmappdata(0, 'materialToEdit')
     
+    % Get the local material path
+    localPath = getappdata(0, 'qft_localMaterialDataPath');
+    
     % Get the material properties
     try
-        properties = open(['Data\material\local\', materialToEdit, '.mat']);
+        properties = open([localPath, '\', materialToEdit, '.mat']);
     catch
         if exist(materialToEdit, 'file') == 0.0
             message = sprintf('Unable to open ''%s''.\n\nThe file is either corrupt or no longer exists in the local database.',...
@@ -709,7 +712,7 @@ else
     
     response = questdlg(msg, 'Quick Fatigue Tool');
     
-    if strcmpi(response, 'no') || strcmpi(response, 'cancel') || isempty(response)
+    if (strcmpi(response, 'no') == 1.0) || (strcmpi(response, 'cancel') == 1.0) || (isempty(response) == 1.0)
         return
     end
 end
@@ -749,6 +752,9 @@ elseif isappdata(0, 'multiaxial_gauge_fatigue_skip_material_manager') == 1.0
 elseif isappdata(0, 'uniaxial_strain_life_skip_material_manager') == 1.0
     setappdata(0, 'material_for_uniaxial_strain_life', shortFilename)
 end
+
+% Suppress local material path dialogue
+setappdata(0, 'qft_suppressDataPath', 1.0)
 
 
 % --- Executes on button press in pButton_close.
@@ -1259,6 +1265,9 @@ function pButton_manager_Callback(~, ~, ~)
 answer = questdlg('Unsaved changes will be lost. OK to return to Material Manager?',...
     'Quick Fatigue Tool', 'Yes', 'No', 'No');
 if strcmpi(answer, 'yes')
+    % Suppress local material path dialogue
+    setappdata(0, 'qft_suppressDataPath', 1.0)
+    
     close 'Material Editor'
     MaterialManager
 end
@@ -1287,6 +1296,9 @@ end
 
 % --- Executes on button press in pButton_snData.
 function pButton_snData_Callback(~, ~, handles)
+% Blank the GUI
+blank(handles)
+
 % Define the start path
 if isappdata(0, 'panel_userMaterial_snData') == 1.0
     startPath_snData = getappdata(0, 'panel_userMaterial_snData');
@@ -1297,7 +1309,9 @@ end
 [filename, pathname] = uigetfile({'*.sn', 'S-N Data File';'*.dat', 'Data File'; '*.txt', 'Text File'; '*.*', 'All Files'}, 'Select an S-N Data File', startPath_snData);
 fullpath = [pathname filename];
 
-if isequal(filename, 0.0) || isequal(pathname, 0.0)
+if (isequal(filename, 0.0) == 1.0) || (isequal(pathname, 0.0) == 1.0)
+    % Enable the GUI
+    enable(handles)
     return
 else
     [~, ~, ext] = fileparts(fullpath);
@@ -1310,6 +1324,10 @@ end
 if strcmpi(ext, '.sn') == 0.0 && strcmpi(ext, '.dat') == 0.0 && strcmpi(ext, '.txt') == 0.0
     message = sprintf('"%s" is not a valid file type.', filename);
     errordlg(message, 'Quick Fatigue Tool')
+    
+    % Enable the GUI
+    uiwait
+    enable(handles)
     return
 end
 
@@ -1321,15 +1339,27 @@ try
     response = questdlg('Read data from rows or columns?', 'Quick Fatigue Tool', 'Rows', 'Columns', 'Rows');
     
     if isempty(response)
+        
+        % Enable the GUI
+        uiwait
+        enable(handles)
         return
     end
     
     if strcmpi(response, 'rows') == 1.0
         if (r < 2.0)
             errordlg('At least two rows of data are required', 'Quick Fatigue Tool')
+            
+            % Enable the GUI
+            uiwait
+            enable(handles)
             return
         elseif (c < 2.0)
             errordlg('At least two data points are required', 'Quick Fatigue Tool')
+            
+            % Enable the GUI
+            uiwait
+            enable(handles)
             return
         end
         sets = r - 1.0;
@@ -1344,9 +1374,17 @@ try
             for k = 2.0:length(S)
                 if S(k) > S(k - 1.0)
                     errordlg('S-values must be monotonically decreasing along the row.', 'Quick Fatigue Tool')
+                    
+                    % Enable the GUI
+                    uiwait
+                    enable(handles)
                     return
                 elseif (i == 1.0) && (N(k) < N(k - 1.0))
                     errordlg('N-values must be monotonically increasing along the row.', 'Quick Fatigue Tool')
+                    
+                    % Enable the GUI
+                    uiwait
+                    enable(handles)
                     return
                 end
             end
@@ -1359,9 +1397,17 @@ try
     elseif strcmpi(response, 'columns') == 1.0
         if (c < 2.0)
             errordlg('At least two columns of data are required.', 'Quick Fatigue Tool')
+            
+            % Enable the GUI
+            uiwait
+            enable(handles)
             return
         elseif (r < 2.0)
             errordlg('At least two data points are required.', 'Quick Fatigue Tool')
+            
+            % Enable the GUI
+            uiwait
+            enable(handles)
             return
         end
         sets = c - 1.0;
@@ -1375,9 +1421,17 @@ try
             for k = 2:length(S)
                 if S(k) > S(k - 1.0)
                     errordlg('S-values must be monotonically decreasing along the column.', 'Quick Fatigue Tool')
+                    
+                    % Enable the GUI
+                    uiwait
+                    enable(handles)
                     return
                 elseif (i == 1.0) && (N(k) < N(k - 1.0))
                     errordlg('N-values must be monotonically increasing along the column.', 'Quick Fatigue Tool')
+                    
+                    % Enable the GUI
+                    uiwait
+                    enable(handles)
                     return
                 end
             end
@@ -1391,6 +1445,10 @@ try
 catch
     message = sprintf('Error while reading "%s". Make sure there are the same number of S and N data points.', filename);
     errordlg(message, 'Quick Fatigue Tool')
+    
+    % Enable the GUI
+    uiwait
+    enable(handles)
     return
 end
 
@@ -1407,8 +1465,12 @@ if isempty(r_values) == 0.0
         ln2 = sprintf('S-N datasets: %.0f\n', sets);
         ln3 = sprintf('R-values: %.0f', length(r_values));
         warndlg([ln1, ln2, ln3], 'Quick Fatigue Tool')
+        uiwait
     end
 end
+
+% Enable the GUI
+enable(handles)
 
 set(handles.edit_snData, 'string', 'Selected')
 set(handles.pButton_rmSNData, 'enable', 'on')
@@ -1441,8 +1503,13 @@ end
 
 % --- Executes on button press in pButton_rmSNData.
 function pButton_rmSNData_Callback(~, ~, handles)
+% Blank the GUI
+blank(handles)
+
 answer = questdlg('Remove S-N data?', 'Quick Fatigue Tool', 'Yes', 'No', 'No');
-if strcmpi(answer, 'no') || isempty(answer)
+if (strcmpi(answer, 'no') == 1.0) || (isempty(answer) == 1.0)
+    % Enable the GUI
+    enable(handles)
     return
 end
 
@@ -1454,6 +1521,9 @@ set(handles.edit_snData, 'backgroundColor', [(241/255), (241/255), (241/255)])
 
 rmappdata(gcf, 'S_values')
 rmappdata(gcf, 'N_values')
+
+% Enable the GUI
+enable(handles)
 
 
 % --- Executes on button press in pButton_viewSNData.
@@ -1513,7 +1583,10 @@ set(H, 'visible', 'on');
 
 
 % --- Executes on button press in pButton_snHelp.
-function pButton_snHelp_Callback(~, ~, ~)
+function pButton_snHelp_Callback(~, ~, handles)
+% Blank the GUI
+blank(handles)
+
 ln1 = sprintf('Use Stress-Life (S-N) datapoints for fatigue analysis:\n\n\n');
 ln2 = sprintf('* S-N data is imported from a comma, space or tab separated text file\n\n');
 ln3 = sprintf('* Data can be read from columns or rows\n\n');
@@ -1522,20 +1595,30 @@ ln5 = sprintf('* S-values are specified in subsequent rows/columns\n\n');
 ln6 = sprintf('* Each S-dataset references an S-N curve at a different load ratio\n\n');
 ln7 = sprintf('* Units of stress must be MPa');
 msgbox([ln1, ln2, ln3, ln4, ln5, ln6, ln7], 'S-N Data')
+uiwait
+
+% Enable the GUI
+enable(handles)
 
 
 % --- Executes on button press in pButton_k.
 function pButton_k_Callback(~, ~, handles)
+% Blank the GUI
+blank(handles)
+
 setappdata(0, 'updateKValue', 0)
-if ~isempty(get(handles.edit_uts, 'string'))
+if isempty(get(handles.edit_uts, 'string')) == 0.0
     setappdata(0, 'k_solution_uts', get(handles.edit_uts, 'string'))
 end
 kValueCalculator
 uiwait
-if isappdata(0, 'k_solution') && get(handles.check_nssc, 'value') == 0 && getappdata(0, 'updateKValue') == 1
+if (isappdata(0, 'k_solution') == 1.0) && (get(handles.check_nssc, 'value') == 0.0) && (getappdata(0, 'updateKValue') == 1.0)
     set(handles.edit_nssc, 'string', getappdata(0, 'k_solution'))
     setappdata(0, 'nssc_value', get(handles.edit_nssc, 'string'))
 end
+
+% Enable the GUI
+enable(handles)
 
 
 % --- Executes during object deletion, before destroying properties.
@@ -1580,9 +1663,14 @@ end
 
 % --- Executes on button press in pButton_rValues.
 function pButton_rValues_Callback(hObject, eventdata, handles)
+% Blank the GUI
+blank(handles)
+
 user_rValues = inputdlg('Define R-value list:', 'R-Values', 1.0);
 
 if isempty(user_rValues) == 1.0
+    % Enable the GUI
+    enable(handles)
     return
 end
 
@@ -1593,6 +1681,9 @@ if isempty(r_values) == 1.0 || any(isnan(r_values)) == 1.0
     errordlg('Could not read R-values due to a syntax error.', 'Quick Fatigue Tool')
     uiwait
     pButton_rValues_Callback(hObject, eventdata, handles)
+    
+    % Enable the GUI
+    enable(handles)
     return
 end
 
@@ -1601,6 +1692,9 @@ if all(diff(r_values) > 0.0) == 0.0
     errordlg('R-values must be strictly increasing.', 'Quick Fatigue Tool')
     uiwait
     pButton_rValues_Callback(hObject, eventdata, handles)
+    
+    % Enable the GUI
+    enable(handles)
     return
 end
 
@@ -1609,6 +1703,9 @@ if any(r_values >= 1.0) == 1.0
     errordlg('R-values must less than 1.', 'Quick Fatigue Tool')
     uiwait
     pButton_rValues_Callback(hObject, eventdata, handles)
+    
+    % Enable the GUI
+    enable(handles)
     return
 end
 
@@ -1637,6 +1734,9 @@ set(handles.pButton_viewRValues, 'enable', 'on')
 
 set(handles.edit_rValues, 'backgroundColor', [(204.0/255.0), 1.0, (204.0/255.0)])
 
+% Enable the GUI
+enable(handles)
+
 
 function edit_rValues_Callback(~, ~, ~)
 % hObject    handle to edit_rValues (see GCBO)
@@ -1661,12 +1761,19 @@ end
 
 
 % --- Executes on button press in pButton_rHelp.
-function pButton_rHelp_Callback(~, ~, ~)
+function pButton_rHelp_Callback(~, ~, handles)
+% Blank the GUI
+blank(handles)
+
 ln1 = sprintf('Associate S-N data with multiple load ratios (R-values):\n\n\n');
 ln2 = sprintf('* The number of R-values must be equal to the number of S-N datasets\n\n');
 ln3 = sprintf('* If one S-N dataset is provided, an R-value of -1 will always be assumed\n\n');
 ln4 = sprintf('* R-values are treated in the same order as the S-N data');
 msgbox([ln1, ln2, ln3, ln4], 'R-Values')
+uiwait
+
+% Enable the GUI
+enable(handles)
 
 
 % --- Executes on button press in pButton_rmRValues.
@@ -1770,6 +1877,9 @@ end
 
 % --- Executes on button press in pButton_changeLocation.
 function pButton_changeLocation_Callback(~, ~, handles)
+% Blank the GUI
+blank(handles)
+
 % Define the start path
 if exist(getappdata(0, 'qft_localMaterialDataPath'), 'dir') == 7.0
     startPath_output = [pwd, '/Data/material/local'];
@@ -1779,6 +1889,9 @@ end
 
 % Get the material storage path
 location = uigetdir(startPath_output, 'Select a Storage Directory');
+
+% Enable the GUI
+enable(handles)
 
 if location == 0.0
     return
@@ -1842,6 +1955,86 @@ if isappdata(0, 'b_value') == 1.0
     rmappdata(0, 'b_value')
 end
 
-setappdata(0, 'qft_suppressDataPath', 1.0)
-
 delete(hObject);
+
+function blank(handles)
+set(findall(handles.MaterialEditor, '-property', 'Enable'), 'Enable', 'off')
+
+function enable(handles)
+set(findall(handles.MaterialEditor, '-property', 'Enable'), 'Enable', 'on')
+
+simuliaBlue = getappdata(0, 'simulia_blue');
+
+% General
+if get(handles.check_location, 'value') == 0.0
+    set(handles.edit_location, 'enable', 'inactive')
+    set(handles.edit_location, 'enable', 'off')
+end
+if get(handles.check_cael, 'value') == 0.0
+    set(handles.edit_cael, 'enable', 'inactive', 'backgroundColor', simuliaBlue)
+    set(handles.text_cael_units, 'enable', 'off')
+end
+
+% Mechanical
+if get(handles.check_e, 'value') == 0.0
+    set(handles.edit_e, 'enable', 'off')
+    set(handles.text_e_units, 'enable', 'off')
+end
+if get(handles.check_poisson, 'value') == 0.0
+    set(handles.edit_poisson, 'enable', 'off')
+end
+if get(handles.check_uts, 'value') == 0.0
+    set(handles.edit_uts, 'enable', 'off')
+    set(handles.text_uts_units, 'enable', 'off')
+end
+if get(handles.check_proof, 'value') == 0.0
+    set(handles.edit_proof, 'enable', 'inactive', 'backgroundColor', simuliaBlue)
+    set(handles.text_proof_units, 'enable', 'off')
+end
+
+% Fatigue
+set(handles.edit_snData, 'enable', 'inactive')
+set(handles.edit_rValues, 'enable', 'inactive')
+
+if strncmpi(get(handles.edit_snData, 'string'), 'undefined', 9.0) == 1.0
+    set(handles.pButton_rmSNData, 'enable', 'off')
+    set(handles.pButton_viewSNData, 'enable', 'off')
+end
+if strncmpi(get(handles.edit_rValues, 'string'), 'undefined', 9.0) == 1.0
+    set(handles.pButton_rmRValues, 'enable', 'off')
+    set(handles.pButton_viewRValues, 'enable', 'off')
+end
+if get(handles.check_sf, 'value') == 0.0
+    set(handles.edit_sf, 'enable', 'inactive', 'backgroundColor', simuliaBlue)
+    set(handles.text_sf_units, 'enable', 'off')
+end
+if get(handles.check_b, 'value') == 0.0
+    set(handles.edit_b, 'enable', 'inactive', 'backgroundColor', simuliaBlue)
+end
+if get(handles.check_ef, 'value') == 0.0
+    set(handles.edit_ef, 'enable', 'inactive', 'backgroundColor', simuliaBlue)
+end
+if get(handles.check_c, 'value') == 0.0
+    set(handles.edit_c, 'enable', 'inactive', 'backgroundColor', simuliaBlue)
+end
+
+% Cyclic
+if get(handles.check_kp, 'value') == 0.0
+    set(handles.edit_kp, 'enable', 'inactive', 'backgroundColor', simuliaBlue)
+    set(handles.text_kp_units, 'enable', 'off')
+end
+if get(handles.check_np, 'value') == 0.0
+    set(handles.edit_np, 'enable', 'inactive', 'backgroundColor', simuliaBlue)
+end
+
+% Non-standard
+if get(handles.check_nssc, 'value') == 0.0
+    set(handles.edit_nssc, 'enable', 'inactive', 'backgroundColor', simuliaBlue)
+else
+    set(handles.pButton_k, 'enable', 'off')
+end
+
+% Back button
+if (isappdata(0, 'multiaxial_gauge_fatigue_skip_material_manager') == 1.0) || (isappdata(0, 'uniaxial_strain_life_skip_material_manager') == 1.0)
+    set(handles.pButton_manager, 'enable', 'off')
+end

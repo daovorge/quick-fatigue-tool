@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="2477154876" file="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox\Virtual Strain Gauge.prj" location="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox" name="Virtual Strain Gauge" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="2868549502" file="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox\Virtual Strain Gauge.prj" location="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox" name="Virtual Strain Gauge" target="target.mlapps" target-name="Package App">
     <param.appname>Virtual Strain Gauge</param.appname>
     <param.authnamewatermark>Louis Vallance</param.authnamewatermark>
     <param.email>louisvallance@hotmail.co.uk</param.email>
@@ -46,13 +46,13 @@
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\virtual_gauge\VirtualStrainGauge.fig</file>
     </fileset.depfun>
     <fileset.resources>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\virtual_gauge\gauge_45.png</file>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\virtual_gauge\gauge_60.png</file>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\virtual_gauge\gauge_arbitrary.png</file>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\virtual_gauge\icoR_bulb.jpg</file>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\virtual_gauge\icoR_fileOpen.jpg</file>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\virtual_gauge\icoR_help.jpg</file>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\virtual_gauge\icoR_info.jpg</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\common\gauge_45.png</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\common\gauge_60.png</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\common\gauge_arbitrary.png</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\common\icoR_bulb.jpg</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\common\icoR_fileOpen.jpg</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\common\icoR_help.jpg</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\common\icoR_info.jpg</file>
     </fileset.resources>
     <fileset.package />
     <build-deliverables>
