@@ -1042,7 +1042,7 @@ classdef postProcess < handle
                 numberOfCycles = length(damagePerCycle);
                 
                 if numberOfCycles > 1.0
-                    cumulativeDamage = zeros(1, numberOfCycles);
+                    cumulativeDamage = zeros(1.0, numberOfCycles);
                     for i = 1:numberOfCycles
                         cumulativeDamage(i) = sum(damagePerCycle(1:i));
                     end

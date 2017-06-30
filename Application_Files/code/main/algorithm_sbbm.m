@@ -445,7 +445,6 @@ classdef algorithm_sbbm < handle
             end
             
             %% SAVE THE CUMULATIVE DAMAGE
-            
             setappdata(0, 'cumulativeDamage', cumulativeDamage)
             
             %% SUM CUMULATIVE DAMAGE TO GET TOTAL DAMAGE FOR CURRENT NODE

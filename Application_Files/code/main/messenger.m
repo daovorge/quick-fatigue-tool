@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
-%   Last modified 30-Jun-2017 12:48:35 GMT
+%   Last modified 30-Jun-2017 14:27:55 GMT
 
     %%
 
@@ -2266,7 +2266,10 @@ classdef messenger < handle
                     snKnockDown = group_materialProps.snKnockDown;
 
                     for groups = 1:G
-                        fprintf(fid, '\r\n    <MATERIAL DATA FOR %s [GROUP %.0f]>\r\n', char(groupIDBuffer(groups).material), groups);
+                        materialName = char(groupIDBuffer(groups).material);
+                        [~, materialName, ~] = fileparts(materialName);
+                        
+                        fprintf(fid, '\r\n    <MATERIAL DATA FOR %s [GROUP %.0f]>\r\n', materialName, groups);
                         % S-N Scale
                         if useSN > 0.0
                             fprintf(fid, '    S-N Scale: %.3g\r\n', snScale(groups));
