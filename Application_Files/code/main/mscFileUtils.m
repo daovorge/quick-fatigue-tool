@@ -7,7 +7,7 @@ classdef mscFileUtils < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
-%   Last modified 04-Apr-2017 13:26:59 GMT
+%   Last modified 30-Jun-2017 12:48:35 GMT
     
     %%
     
@@ -326,6 +326,19 @@ classdef mscFileUtils < handle
                     setappdata(0, 'frfEnvelope', mscData_i)
                 end
             end
+        end
+        
+        function [] = checkFRFDiagnosticItems(N)
+            frfDiagnostics = getappdata(0, 'frfDiagnostics');
+            N = linspace(1.0, N, N);
+            
+            for i = 1:length(frfDiagnostics)
+                setappdata(0, 'message_264_item', frfDiagnostics(i))
+                if isempty(find(N == frfDiagnostics(i), 1.0)) == 1.0
+                    messenger.writeMessage(264.0)
+                end
+            end
+            setappdata(0, 'checkUserFRFDIagnosticItems', 1.0)
         end
         
         %% PLOT THE CURRENT CYCLE ON THE USER FRF ENVELOPE

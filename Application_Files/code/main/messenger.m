@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
-%   Last modified 26-Jun-2017 14:12:14 GMT
+%   Last modified 30-Jun-2017 12:48:35 GMT
 
     %%
 
@@ -2092,6 +2092,9 @@ classdef messenger < handle
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Analysis preprocessor completed in %fs', returnType{i}], getappdata(0, 'toc_pre'));
                     case 263.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Analysis postprocessor completed in %fs', returnType{i}], getappdata(0, 'toc_post'));
+					case 264.0
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: User FRF diagnostic item %.0f does not exist in the model', returnType{i}], getappdata(0, 'message_264_item'));
+                        setappdata(0, 'messageFileWarnings', 1.0)
                 end
             end
         end

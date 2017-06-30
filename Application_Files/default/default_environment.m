@@ -13,7 +13,7 @@
 %      2 Environment variables
 %   
 %   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
-%   Last modified 14-Jun-2017 14:41:28 GMT
+%   Last modified 30-Jun-2017 12:48:35 GMT
 
 %% GATE TENSORS
 %{
@@ -306,7 +306,7 @@ setappdata(0, 'frfMinValue', 0.1)
 % OUTPUT DIAGNOSTICS FOR USER FRF DATA
 %{
     []: Disabled
-    n: Item number
+    n: Item numbers
 %}
 setappdata(0, 'frfDiagnostics', [])
 
