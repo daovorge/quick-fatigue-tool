@@ -379,6 +379,8 @@ end
 function pButton_help_Callback(~, ~, handles)
 blank(handles)
 
+messages = sprintf('Specify the directory in which material data is to be stored.\n\n');
+
 if isempty(getappdata(0, 'qft_localMaterialDataPath')) == 1.0
     string = 'suggested';
 else
@@ -392,19 +394,19 @@ if getappdata(0, 'missingDefaultLocalDatabase') == 1.0
     msg4 = sprintf('application has not been renamed or removed, and exists on MATLAB''s ');
     msg5 = sprintf('current search path. In the meantime, an alternativelocal material directory should be specified.\n\n');
     
-    messages = [msg1, msg2, msg3, msg4, msg5];
+    messages = [messages, msg1, msg2, msg3, msg4, msg5];
 elseif get(handles.check_defaultDataDirectory, 'value') == 1.0
     msg1 = sprintf('The %s (default) local material directory is the folder:\n\n', string);
     msg2 = sprintf('''%s''\n\n', get(handles.edit_userDataDirectory, 'string'));
     msg3 = sprintf('If you wish to specify the folder yourself, deselect "Default" ');
     msg4 = sprintf('and manually enter the path to the new folder.\n\n');
     
-    messages = [msg1, msg2, msg3, msg4];
+    messages = [messages, msg1, msg2, msg3, msg4];
 else
     msg1 = sprintf('The %s local material directory is the folder:\n\n', string);
     msg2 = sprintf('''%s''\n\n', get(handles.edit_userDataDirectory, 'string'));
     
-    messages = [msg1, msg2];
+    messages = [messages, msg1, msg2];
 end
 
 msg1 = sprintf('If "Save path" is selected, the local material database path ');
