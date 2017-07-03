@@ -12,7 +12,7 @@ function varargout = LocalMaterialDatabase(varargin)%#ok<*DEFNU>
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
-%   Last modified 28-Jun-2017 14:13:12 GMT
+%   Last modified 03-Jul-2017 13:40:46 GMT
     
     %%
 
@@ -233,7 +233,10 @@ try
     fid = fopen([dataPath, '\qft-local-material.txt'], 'w+');
     fprintf(fid, '%s', dataPath);
     fclose(fid);
-catch
+catch exception
+    msg = sprintf('An exception was encountered while setting the local material path.\n\nMATLAB returned the following error:\n\n%s', exception.message);
+    errordlg(msg, 'Quick Fatigue Tool')
+    uiwait
 end
 
 %{
@@ -243,12 +246,14 @@ end
 if get(handles.check_saveLocalPath, 'value') == 1.0
     try
         material.saveDatabase(dataPath)
-    catch
+    catch exception
+        msg = sprintf('An exception was encountered while saving the local material path.\n\nMATLAB returned the following error:\n\n%s', exception.message);
+        errordlg(msg, 'Quick Fatigue Tool')
+        uiwait
     end
 end
 
 % Close the GUI
-enable(handles)
 close 'Set Local Material Database'
 
 

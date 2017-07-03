@@ -29,7 +29,7 @@ classdef material < handle
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
-%   Last modified 28-Jun-2017 14:13:12 GMT
+%   Last modified 03-Jul-2017 13:40:46 GMT
     
     %%
     
@@ -816,7 +816,8 @@ classdef material < handle
                 fid = fopen([path, '\qft-local-material.txt'], 'w+');
                 fprintf(fid, '%s', path);
                 fclose(fid);
-            catch
+            catch exception
+                fprintf('ERROR: An exception was encountered while setting the local material path.\n\nMATLAB returned the following error: %s\n', exception.message)
             end
             
             %{
@@ -827,7 +828,8 @@ classdef material < handle
             if save == 1.0
                 try
                     material.saveDatabase(path)
-                catch
+                catch exception
+                    fprintf('ERROR: An exception was encountered while saving the local material path.\n\nMATLAB returned the following error: %s\n', exception.message)
                 end
             end
         end
