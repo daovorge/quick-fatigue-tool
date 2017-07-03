@@ -95,13 +95,13 @@ setInitialHelp(handles.edit_gaugeC, 'Strain history file or numerical expression
 
 %% Load the panel state
 if isappdata(0, 'rosette_edit_gaugeA') == 1.0
-    if strcmpi(getappdata(0, 'rosette_edit_gaugeA'), sprintf('Strain history file or numerical expression...')) == 0.0
+    if (strcmpi(getappdata(0, 'rosette_edit_gaugeA'), sprintf('Strain history file or numerical expression...')) == 0.0) && (isempty(getappdata(0, 'rosette_edit_gaugeA')) == 0.0)
         set(handles.edit_gaugeA, 'string', getappdata(0, 'rosette_edit_gaugeA'), 'fontAngle', 'normal', 'foregroundColor', 'black')
     end
-    if strcmpi(getappdata(0, 'rosette_edit_gaugeB'), sprintf('Strain history file or numerical expression...')) == 0.0
+    if (strcmpi(getappdata(0, 'rosette_edit_gaugeB'), sprintf('Strain history file or numerical expression...')) == 0.0) && (isempty(getappdata(0, 'rosette_edit_gaugeB')) == 0.0)
         set(handles.edit_gaugeB, 'string', getappdata(0, 'rosette_edit_gaugeB'), 'fontAngle', 'normal', 'foregroundColor', 'black')
     end
-    if strcmpi(getappdata(0, 'rosette_edit_gaugeC'), sprintf('Strain history file or numerical expression...')) == 0.0
+    if (strcmpi(getappdata(0, 'rosette_edit_gaugeC'), sprintf('Strain history file or numerical expression...')) == 0.0) && (isempty(getappdata(0, 'rosette_edit_gaugeC')) == 0.0)
         set(handles.edit_gaugeC, 'string', getappdata(0, 'rosette_edit_gaugeC'), 'fontAngle', 'normal', 'foregroundColor', 'black')
     end
     

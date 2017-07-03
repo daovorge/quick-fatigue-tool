@@ -18,7 +18,7 @@ function [rfData, epsilon, sigma, error, warning] = css2c(sigma_e, E, kp, np, sc
 %   directly inside CSS2C. This is found to be more reliable.
 %   
 %   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
-%   Last modified 13-Jun-2017 15:59:08 GMT
+%   Last modified 03-Jul-2017 13:40:46 GMT
     
     %%
     
@@ -407,12 +407,6 @@ for i = 3:signalLength
     end
 end
 
-% Remove the leading zero if applicable
-if removeZero == 1.0
-    sigma(1.0) = [];
-    epsilon(1.0) = [];
-end
-
 %% Rainflow cycle count the inelastic histories
 
 % Rainflow cycle count the inelastic stress/strain signals
@@ -442,6 +436,12 @@ end
     6: Max. index
 %}
 rfData = [rfData_s(:, 1:2), rfData_e(:, 1:2), rfData_s(:, 3:4)];
+
+% Remove the leading zero if applicable
+if removeZero == 1.0
+    sigma(1.0) = [];
+    epsilon(1.0) = [];
+end
 
 %% Save the last state of the ALLOWCLOSURE flag
 setappdata(0, 'css_allowClosure', allowClosure)

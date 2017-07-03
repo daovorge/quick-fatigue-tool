@@ -78,7 +78,7 @@ if isappdata(0, 'panel_uniaxialStrainLife_edit_inputFile') == 1.0
     %}
     
     % Input definition
-    if strcmpi(getappdata(0, 'panel_uniaxialStrainLife_edit_inputFile'), sprintf('Load history file or numerical expression...')) == 0.0
+    if (strcmpi(getappdata(0, 'panel_uniaxialStrainLife_edit_inputFile'), sprintf('Load history file or numerical expression...')) == 0.0) && (isempty(getappdata(0, 'panel_uniaxialStrainLife_edit_inputFile')) == 0.0)
         set(handles.edit_inputFile, 'string', getappdata(0, 'panel_uniaxialStrainLife_edit_inputFile'), 'fontAngle', 'normal', 'foregroundColor', 'black')
     end
     

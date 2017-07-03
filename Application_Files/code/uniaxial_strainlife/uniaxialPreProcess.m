@@ -11,7 +11,7 @@ classdef uniaxialPreProcess < handle
 %      A3.6 Uniaxial Strain-Life
 %   
 %   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
-%   Last modified 19-Jun-2017 13:56:11 GMT
+%   Last modified 03-Jul-2017 13:40:46 GMT
     
     %%
     
@@ -766,10 +766,6 @@ classdef uniaxialPreProcess < handle
                 end
             end
             
-            if removeZero == 1.0
-                sigma(1.0) = [];
-            end
-            
             %% Rainflow cycle count the inelastic histories
             
             % Rainflow cycle count the inelastic stress/strain signals
@@ -799,6 +795,11 @@ classdef uniaxialPreProcess < handle
                 6: Max. index
             %}
             rfData = [rfData_s(:, 1:2), rfData_e(:, 1:2), rfData_s(:, 3:4)];
+            
+            % Remove leading zero from stress signal if applicable
+            if removeZero == 1.0
+                sigma(1.0) = [];
+            end
         end
         
         %% Get the fatigue limit stress
