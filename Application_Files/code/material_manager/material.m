@@ -20,6 +20,7 @@ classdef material < handle
 %   MATERIAL.checkDatabase(PATH)
 %   MATERIAL.saveDatabase(PATH)
 %   MATERIAL.searchDatabase()
+%   MATERIAL.resetDatabase()
 %
 %   See also checkDataPath, evaluateMaterial, importMaterial,
 %   kValueCalculator, LocalMaterialDatabase, MaterialEditor,
@@ -960,7 +961,7 @@ classdef material < handle
             %MATERIAL.SEARCHDATABASE    Searches PATHDEF.m for a local
             %   material database entry.
             %
-            %   MATERIAL.SEARCHDATABASE() checks PATHDEF for an
+            %   MATERIAL.SEARCHDATABASE() checks PATHDEF.m for an
             %   existing path to DATA\MATERIAL\LOCAL.
             %
             %   Reference section in Quick Fatigue Tool User Guide
@@ -1009,6 +1010,22 @@ classdef material < handle
             if isempty(localPath) == 0.0
                 localPath(ismember(localPath,'''     ;'', ...')) = [];
             end
+        end
+        
+        %% Remove the local material database
+        function [] = resetDatabase()
+            % Remove the local material path marker file(s) if applicable
+            files = which('qft-local-material.txt', '-ALL');
+            if isempty(files) == 0.0
+                delete(files{:})
+            end
+            
+            % Clear local material path %APPDATA% entry
+            if isappdata(0, 'qft_localMaterialDataPath') == 1.0
+                rmappdata(0, 'qft_localMaterialDataPath')
+            end
+            
+            % Remove any database entries from PATHDEF.m if applicable
         end
     end
 end

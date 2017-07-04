@@ -267,7 +267,7 @@ rosetteTools.blank(handles)
 if isappdata(0, 'panel_browseInput') == 1.0
     startPath_gauge = getappdata(0, 'panel_browseInput');
 else
-    startPath_gauge = pwd;
+    startPath_gauge = [pwd, '\Data\gauge'];
 end
 
 if ispc == 1.0
@@ -279,10 +279,10 @@ else
     [file, path, ~] = uigetfile('*.txt', 'Strain Data for Gauge B');
 end
 
-if isequal(file,0) || isequal(path,0)
+if (isequal(file, 0.0) == 1.0) || (isequal(path, 0.0) == 1.0)
     % User cancelled operation
 else
-    set(handles.edit_gaugeB, 'string', [path, file])
+    set(handles.edit_gaugeB, 'string', [path, file], 'fontAngle', 'normal', 'foregroundColor', 'black')
     
     setappdata(0,'panel_browseInput', path)
 end
@@ -300,7 +300,7 @@ rosetteTools.blank(handles)
 if isappdata(0, 'panel_browseInput') == 1.0
     startPath_gauge = getappdata(0, 'panel_browseInput');
 else
-    startPath_gauge = pwd;
+    startPath_gauge = [pwd, '\Data\gauge'];
 end
 
 if ispc == 1.0
@@ -312,10 +312,10 @@ else
     [file, path, ~] = uigetfile('*.txt', 'Strain Data for Gauge C');
 end
 
-if isequal(file,0) || isequal(path,0)
+if (isequal(file, 0.0) == 1.0) || (isequal(path, 0.0) == 1.0)
     % User cancelled operation
 else
-    set(handles.edit_gaugeC, 'string', [path, file])
+    set(handles.edit_gaugeC, 'string', [path, file], 'fontAngle', 'normal', 'foregroundColor', 'black')
     
     setappdata(0,'panel_browseInput', path)
 end
