@@ -12,7 +12,7 @@ function varargout = LocalMaterialDatabase(varargin)%#ok<*DEFNU>
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
-%   Last modified 03-Jul-2017 13:40:46 GMT
+%   Last modified 05-Jul-2017 10:05:55 GMT
     
     %%
 
@@ -56,7 +56,7 @@ guidata(hObject, handles);
 % Position the figure in the centre of the screen
 movegui(hObject, 'center')
 
-changeDatabase = getappdata(0, 'qft_localMaterialDataPath');
+databaseStatus = getappdata(0, 'qft_localMaterialDataPath');
 
 %% Load icons
 [a,~]=imread('icoR_fileOpen.jpg');
@@ -67,7 +67,7 @@ g=a(1:x:end,1:y:end,:);
 g(g==255)=5.5*255;
 set(handles.pButton_userDataDirectory, 'CData', g);
 
-if isempty(changeDatabase) == 0.0
+if isempty(databaseStatus) == 0.0
     [a,~]=imread('icoR_info.jpg');
     set(handles.text_warning, 'string', 'Change the current local material database.')
 else
@@ -191,12 +191,22 @@ function pButton_userDataDirectory_Callback(~, ~, handles)
 blank(handles)
 
 % Define the start path
-outputDirectory = uigetdir(pwd, 'Output Directory');
+if isappdata(0, 'panel_LocalMaterialDatabasePath') == 1.0
+    startPath = getappdata(0, 'panel_LocalMaterialDatabasePath');
+else
+    startPath = pwd;
+end
 
-if isequal(outputDirectory, 0.0)
+% Define the start path
+outputDirectory = uigetdir(startPath, 'Output Directory');
+
+if isequal(outputDirectory, 0.0) == 1.0
     % User cancelled operation
 else
     set(handles.edit_userDataDirectory, 'string', outputDirectory)
+    
+    % Save the file path
+    setappdata(0, 'panel_LocalMaterialDatabasePath', outputDirectory)
 end
 
 enable(handles)
@@ -205,6 +215,7 @@ enable(handles)
 % --- Executes on button press in pButton_ok.
 function pButton_ok_Callback(~, ~, handles)
 blank(handles)
+pause(1e-6)
 
 % Get the path from the edit box
 dataPath = get(handles.edit_userDataDirectory, 'string');
@@ -240,14 +251,39 @@ catch exception
 end
 
 %{
-    Try to add the local material directory to PATHDEF.m. This is an
+    If the current local material path was written to PATHDEF.m, this
+    should be removed from the file to preserve consistency and neatness.
+
+    Next, try to add the local material directory to PATHDEF.m. This is an
     automatically generated file which contains the saved MATLAB path.
 %}
+if strcmpi(currentPath, [pwd, '\Data\material\local']) == 0.0
+    %{
+        Only attempt to remove the current local material path if it does
+        not appear to already be part of the standard Quick Fatigue Tool
+        path.
+    %}
+    try
+        [~] = material.changeDatabase(currentPath, 'remove');
+    catch exception
+        msg = sprintf('An exception was encountered while removing the current material path from PATHDEF.m.\n\nMATLAB returned the following error:\n\n%s', exception.message);
+        errordlg(msg, 'Quick Fatigue Tool')
+        uiwait
+    end
+end
+
 if get(handles.check_saveLocalPath, 'value') == 1.0
     try
-        material.saveDatabase(dataPath)
+        result = material.changeDatabase(dataPath, 'add');
+        
+        % Warn the user if PATHDEF.m is unreadable
+        if result == -1.0
+            msg = sprintf('ERROR: The string ''%%%% BEGIN ENTRIES %%%%'' could not be found in PATHDEF.m. The file has not been modified.\n');
+            errordlg(msg, 'Quick Fatigue Tool')
+            uiwait
+        end
     catch exception
-        msg = sprintf('An exception was encountered while saving the local material path.\n\nMATLAB returned the following error:\n\n%s', exception.message);
+        msg = sprintf('An exception was encountered while saving the local material path to PATHDEF.m.\n\nMATLAB returned the following error:\n\n%s', exception.message);
         errordlg(msg, 'Quick Fatigue Tool')
         uiwait
     end

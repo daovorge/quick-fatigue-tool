@@ -301,16 +301,16 @@ set(findall(handles.GaugeOrientation, '-property', 'Enable'), 'Enable', 'off')
 function enable(handles)
 set(findall(handles.GaugeOrientation, '-property', 'Enable'), 'Enable', 'on')
 
-if get(handles.rButton_user, 'value') == 1.0
-    set(handles.text_alpha, 'enable', 'on')
-    set(handles.text_beta, 'enable', 'on')
-    set(handles.text_gamma, 'enable', 'on')
-    set(handles.edit_alpha, 'enable', 'on')
-    set(handles.edit_beta, 'enable', 'on')
-    set(handles.edit_gamma, 'enable', 'on')
-    set(handles.text_unitsAlpha, 'enable', 'on')
-    set(handles.text_unitsBeta, 'enable', 'on')
-    set(handles.text_unitsGamma, 'enable', 'on')
+if get(handles.rButton_user, 'value') == 0.0
+    set(handles.text_alpha, 'enable', 'off')
+    set(handles.text_beta, 'enable', 'off')
+    set(handles.text_gamma, 'enable', 'off')
+    set(handles.edit_alpha, 'enable', 'off')
+    set(handles.edit_beta, 'enable', 'off')
+    set(handles.edit_gamma, 'enable', 'off')
+    set(handles.text_unitsAlpha, 'enable', 'off')
+    set(handles.text_unitsBeta, 'enable', 'off')
+    set(handles.text_unitsGamma, 'enable', 'off')
 end
 
 set(handles.pButton_ok, 'enable', 'on')
