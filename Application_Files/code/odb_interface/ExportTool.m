@@ -1267,7 +1267,7 @@ set(findall(handles.ExportTool, '-property', 'Enable'), 'Enable', 'on')
 set(handles.frame_modelInfo, 'enable', 'inactive')
 
 if get(handles.check_resultFile, 'value') == 0.0
-    set(handles.edit_resultFile, 'enable', 'off')
+    set(handles.edit_resultFile, 'enable', 'inactive')
     set(handles.pButton_findResultFile, 'enable', 'off')
 end
 

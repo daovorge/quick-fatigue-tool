@@ -2045,7 +2045,6 @@ simuliaBlue = getappdata(0, 'simulia_blue');
 % General
 if get(handles.check_location, 'value') == 0.0
     set(handles.edit_location, 'enable', 'inactive')
-    set(handles.edit_location, 'enable', 'off')
     set(handles.pButton_changeLocation, 'enable', 'off')
 end
 if get(handles.check_cael, 'value') == 0.0
