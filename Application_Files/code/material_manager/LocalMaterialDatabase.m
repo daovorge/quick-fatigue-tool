@@ -11,8 +11,8 @@ function varargout = LocalMaterialDatabase(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials
 %   
-%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 23-Jun-2017 13:18:41 GMT
+%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
+%   Last modified 05-Jul-2017 10:05:55 GMT
     
     %%
 
@@ -56,7 +56,7 @@ guidata(hObject, handles);
 % Position the figure in the centre of the screen
 movegui(hObject, 'center')
 
-changeDatabase = getappdata(0, 'qft_localMaterialDataPath');
+databaseStatus = getappdata(0, 'qft_localMaterialDataPath');
 
 %% Load icons
 [a,~]=imread('icoR_fileOpen.jpg');
@@ -67,10 +67,9 @@ g=a(1:x:end,1:y:end,:);
 g(g==255)=5.5*255;
 set(handles.pButton_userDataDirectory, 'CData', g);
 
-if isempty(changeDatabase) == 0.0
+if isempty(databaseStatus) == 0.0
     [a,~]=imread('icoR_info.jpg');
     set(handles.text_warning, 'string', 'Change the current local material database.')
-    set(handles.text_currentDatabase, 'string', 'Current local material directory:')
 else
     [a,~]=imread('icoR_warning.jpg');
 end
@@ -92,42 +91,65 @@ set(handles.pButton_help, 'CData', g);
 %% Load the panel state
 if isappdata(0, 'defaultDataPath_check_defaultDataDirectory') == 1.0
     set(handles.check_defaultDataDirectory, 'value', getappdata(0, 'defaultDataPath_check_defaultDataDirectory'))
+    set(handles.check_saveLocalPath, 'value', getappdata(0, 'defaultDataPath_check_saveLocalPath'))
     
     if get(handles.check_defaultDataDirectory, 'value') == 0.0
         set(handles.text_currentDatabase, 'enable', 'on')
         set(handles.edit_userDataDirectory, 'enable', 'on')
+        set(handles.edit_userDataDirectory, 'backgroundColor', 'white')
         set(handles.pButton_userDataDirectory, 'enable', 'on')
     end
 end
 
-%% Check if the default path is available
-if exist([pwd, '\Data\material\local'], 'dir') ~= 7.0
-    set(handles.check_defaultDataDirectory, 'enable', 'off')
-    set(handles.check_defaultDataDirectory, 'value', 0.0)
-    set(handles.check_defaultDataDirectory, 'string', 'Default (currently unavailable)')
-    
-    set(handles.text_currentDatabase, 'enable', 'on')
-    set(handles.edit_userDataDirectory, 'enable', 'on')
-    set(handles.pButton_userDataDirectory, 'enable', 'on')
+%% Set the default path
+defaultLocalPath = material.searchDatabase();
+userLocalPath = getappdata(0, 'qft_localMaterialDataPath');
+
+if (exist([pwd, '\Data\material\local'], 'dir') ~= 7.0) && (isempty(defaultLocalPath) == 1.0)
+    setappdata(0, 'missingDefaultLocalDatabase', 1.0)
+else
+    setappdata(0, 'missingDefaultLocalDatabase', 0.0)
 end
 
-%% Set the default path
-localPath = getappdata(0, 'qft_localMaterialDataPath');
-
-if isempty(localPath) == 0.0
-    set(handles.edit_userDataDirectory, 'string', localPath)
+if isempty(userLocalPath) == 0.0
+    %{
+        The local path is already set. Display this path in the edit box.
+    %}
+    set(handles.edit_userDataDirectory, 'string', userLocalPath)
 elseif exist([pwd, '\Data\material\local'], 'dir') == 7.0
+    %{
+        The local path is not set, but there is a local directory on the
+        current MATLAB path. Add this location to the edit box.
+    %}
     set(handles.edit_userDataDirectory, 'string', [pwd, '\Data\material\local'])
 else
-    set(handles.edit_userDataDirectory, 'string', pwd)
+    %{
+        The local path is not set and there is no local directory on the
+        current MATLAB path. Search PATHDEF for any DATA\MATERIAL\LOCAL
+        folder.
+    %}
+    if isempty(defaultLocalPath) == 0.0
+        % An entry for DATA\MATERIAL\LOCAL was found in PATHDEF
+        set(handles.edit_userDataDirectory, 'string', defaultLocalPath)
+    else
+        %{
+            An entry for DATA\MATERIAL\LOCAL was not found in PATHDEF. Set
+            the edit box to the current working directory and disable the
+            default path checkbox.
+        %}
+        set(handles.edit_userDataDirectory, 'string', pwd)
+        
+        set(handles.check_defaultDataDirectory, 'enable', 'off')
+        set(handles.check_defaultDataDirectory, 'value', 0.0)
+        
+        set(handles.text_currentDatabase, 'enable', 'on')
+        set(handles.edit_userDataDirectory, 'enable', 'on', 'backgroundColor', 'white')
+        set(handles.pButton_userDataDirectory, 'enable', 'on')
+    end
 end
 
 %% Set the current local path
-if get(handles.check_defaultDataDirectory, 'value') == 1.0
-    setappdata(0, 'currentLocalPath', [pwd, '\Data\material\local'])
-else
-    setappdata(0, 'currentLocalPath', get(handles.edit_userDataDirectory, 'string'))
-end
+setappdata(0, 'currentLocalPath', get(handles.edit_userDataDirectory, 'string'))
 
 
 % --- Outputs from this function are returned to the command line.
@@ -169,12 +191,22 @@ function pButton_userDataDirectory_Callback(~, ~, handles)
 blank(handles)
 
 % Define the start path
-outputDirectory = uigetdir(pwd, 'Output Directory');
+if isappdata(0, 'panel_LocalMaterialDatabasePath') == 1.0
+    startPath = getappdata(0, 'panel_LocalMaterialDatabasePath');
+else
+    startPath = pwd;
+end
 
-if isequal(outputDirectory, 0.0)
+% Define the start path
+outputDirectory = uigetdir(startPath, 'Output Directory');
+
+if isequal(outputDirectory, 0.0) == 1.0
     % User cancelled operation
 else
     set(handles.edit_userDataDirectory, 'string', outputDirectory)
+    
+    % Save the file path
+    setappdata(0, 'panel_LocalMaterialDatabasePath', outputDirectory)
 end
 
 enable(handles)
@@ -183,13 +215,12 @@ enable(handles)
 % --- Executes on button press in pButton_ok.
 function pButton_ok_Callback(~, ~, handles)
 blank(handles)
+pause(1e-6)
 
-if get(handles.check_defaultDataDirectory, 'value') == 1.0
-    % The default LOCAL directory is selected
-    dataPath = [pwd, '\Data\material\local'];
-    
-    setappdata(0, 'qft_localMaterialDataPath', dataPath)
-else
+% Get the path from the edit box
+dataPath = get(handles.edit_userDataDirectory, 'string');
+
+if get(handles.check_defaultDataDirectory, 'value') == 0.0
     % A user-defined directory is selected
     dataPath = get(handles.edit_userDataDirectory, 'string');
     
@@ -198,10 +229,9 @@ else
         uiwait
         enable(handles)
         return
-    else
-        setappdata(0, 'qft_localMaterialDataPath', dataPath)
     end
 end
+setappdata(0, 'qft_localMaterialDataPath', dataPath)
 
 % Delete the old marker file if it exists
 currentPath = getappdata(0, 'currentLocalPath');
@@ -209,16 +239,57 @@ if exist([currentPath, '\qft-local-material.txt'], 'file') == 2.0
     delete([currentPath, '\qft-local-material.txt'])
 end
 
-% Write the marker file
+% Write the new marker file
 try
     fid = fopen([dataPath, '\qft-local-material.txt'], 'w+');
     fprintf(fid, '%s', dataPath);
     fclose(fid);
-catch
+catch exception
+    msg = sprintf('An exception was encountered while setting the local material path.\n\nMATLAB returned the following error:\n\n%s', exception.message);
+    errordlg(msg, 'Quick Fatigue Tool')
+    uiwait
+end
+
+%{
+    If the current local material path was written to PATHDEF.m, this
+    should be removed from the file to preserve consistency and neatness.
+
+    Next, try to add the local material directory to PATHDEF.m. This is an
+    automatically generated file which contains the saved MATLAB path.
+%}
+if strcmpi(currentPath, [pwd, '\Data\material\local']) == 0.0
+    %{
+        Only attempt to remove the current local material path if it does
+        not appear to already be part of the standard Quick Fatigue Tool
+        path.
+    %}
+    try
+        [~] = material.changeDatabase(currentPath, 'remove');
+    catch exception
+        msg = sprintf('An exception was encountered while removing the current material path from PATHDEF.m.\n\nMATLAB returned the following error:\n\n%s', exception.message);
+        errordlg(msg, 'Quick Fatigue Tool')
+        uiwait
+    end
+end
+
+if get(handles.check_saveLocalPath, 'value') == 1.0
+    try
+        result = material.changeDatabase(dataPath, 'add');
+        
+        % Warn the user if PATHDEF.m is unreadable
+        if result == -1.0
+            msg = sprintf('ERROR: The string ''%%%% BEGIN ENTRIES %%%%'' could not be found in PATHDEF.m. The file has not been modified.\n');
+            errordlg(msg, 'Quick Fatigue Tool')
+            uiwait
+        end
+    catch exception
+        msg = sprintf('An exception was encountered while saving the local material path to PATHDEF.m.\n\nMATLAB returned the following error:\n\n%s', exception.message);
+        errordlg(msg, 'Quick Fatigue Tool')
+        uiwait
+    end
 end
 
 % Close the GUI
-enable(handles)
 close 'Set Local Material Database'
 
 
@@ -254,9 +325,10 @@ set(findall(handles.LocalMaterialDatabase, '-property', 'Enable'), 'Enable', 'on
 
 if get(handles.check_defaultDataDirectory, 'value') == 1.0
     set(handles.text_currentDatabase, 'enable', 'off')
-    set(handles.edit_userDataDirectory, 'enable', 'off')
+    set(handles.edit_userDataDirectory, 'enable', 'inactive')
+    set(handles.edit_userDataDirectory, 'backgroundColor', [177/255, 206/255, 237/255])
     set(handles.pButton_userDataDirectory, 'enable', 'off')
-elseif strcmpi(get(handles.check_defaultDataDirectory, 'string'), 'Default (currently unavailable)') == 1.0
+elseif getappdata(0, 'missingDefaultLocalDatabase') == 1.0
     set(handles.check_defaultDataDirectory, 'enable', 'off')
 end
 
@@ -272,20 +344,69 @@ setappdata(0, 'qft_suppressDataPath', 1.0)
 
 % Save the panel state
 setappdata(0, 'defaultDataPath_check_defaultDataDirectory', get(handles.check_defaultDataDirectory, 'value'))
+setappdata(0, 'defaultDataPath_check_saveLocalPath', get(handles.check_saveLocalPath, 'value'))
 
 % Hint: delete(hObject) closes the figure
 delete(hObject);
+
+rmappdata(0, 'missingDefaultLocalDatabase')
 
 
 % --- Executes on button press in check_defaultDataDirectory.
 function check_defaultDataDirectory_Callback(hObject, ~, handles)
 if get(hObject, 'value') == 1.0
-    set(handles.text_currentDatabase, 'enable', 'off')
-    set(handles.edit_userDataDirectory, 'enable', 'off')
-    set(handles.pButton_userDataDirectory, 'enable', 'off')
+    % Save the current path string
+    setappdata(0, 'previousLocalPath', get(handles.edit_userDataDirectory, 'string'))
+    
+    % Search PATHDEF for any DATA\MATERIAL\LOCAL folder.
+    defaultLocalPath = material.searchDatabase();
+    
+    if (isempty(defaultLocalPath) == 0.0) || (exist([pwd, '\Data\material\local'], 'dir') == 7.0)
+        % An entry for DATA\MATERIAL\LOCAL was found in PATHDEF
+        setappdata(0, 'missingDefaultLocalDatabase', 0.0)
+        
+        if isempty(defaultLocalPath) == 0.0
+            set(handles.edit_userDataDirectory, 'string', defaultLocalPath)
+        else
+            set(handles.edit_userDataDirectory, 'string', [pwd, '\Data\material\local'])
+        end
+        
+        set(handles.text_currentDatabase, 'enable', 'off')
+        set(handles.edit_userDataDirectory, 'enable', 'inactive')
+        set(handles.edit_userDataDirectory, 'backgroundColor', [177/255, 206/255, 237/255])
+        set(handles.pButton_userDataDirectory, 'enable', 'off')
+    else
+        %{
+            An entry for DATA\MATERIAL\LOCAL was not found in PATHDEF. Set
+            the edit box to the current working directory and disable the
+            default path checkbox.
+        %}
+        setappdata(0, 'missingDefaultLocalDatabase', 1.0)
+        
+        set(handles.check_defaultDataDirectory, 'enable', 'off')
+        set(handles.check_defaultDataDirectory, 'value', 0.0)
+        
+        set(handles.text_currentDatabase, 'enable', 'on')
+        set(handles.edit_userDataDirectory, 'enable', 'on')
+        set(handles.edit_userDataDirectory, 'string', pwd)
+        set(handles.edit_userDataDirectory, 'backgroundColor', 'white')
+        set(handles.pButton_userDataDirectory, 'enable', 'on')
+        
+        blank(handles)
+        errordlg('The default local material directory could not be found', 'Quick Fatigue Tool')
+        uiwait
+        enable(handles)
+    end
 else
+    % Restore the previous path if applicable
+    if isappdata(0, 'previousLocalPath') == 1.0
+        set(handles.edit_userDataDirectory, 'string', getappdata(0, 'previousLocalPath'))
+        rmappdata(0, 'previousLocalPath')
+    end
+    
     set(handles.text_currentDatabase, 'enable', 'on')
     set(handles.edit_userDataDirectory, 'enable', 'on')
+    set(handles.edit_userDataDirectory, 'backgroundColor', 'white')
     set(handles.pButton_userDataDirectory, 'enable', 'on')
 end
 
@@ -294,23 +415,51 @@ end
 function pButton_help_Callback(~, ~, handles)
 blank(handles)
 
-if strcmpi(get(handles.check_defaultDataDirectory, 'enable'), 'off') == 1.0
-    msg1 = sprintf('The default local material directory is currently unavailable because it\n');
-    msg2 = sprintf('does not exist on the MATLAB path.\n\n');
-    msg3 = sprintf('Please ensure that the DATA folder included with the Quick Fatigue Tool\n');
-    msg4 = sprintf('application has not been renamed or removed. In the meantime, an alternative ');
-    msg5 = sprintf('local material directory should be specified.\n\n');
-    msg6 = sprintf('This behaviour is normal when running Material Manager from the App bar\n');
-    msg7 = sprintf('for the first time. Once the default local material path is initially set,\n');
-    msg8 = sprintf('Quick Fatigue Tool will remember your choice.');
-    msgbox([msg1, msg2, msg3, msg4, msg5, msg6, msg7, msg8], 'Quick Fatigue Tool')
+messages = sprintf('Specify the directory in which material data is to be stored.\n\n');
+
+if isempty(getappdata(0, 'qft_localMaterialDataPath')) == 1.0
+    string = 'suggested';
 else
-    msg1 = sprintf('The default local material directory is the folder:\n\n');
-    msg2 = sprintf('''%s\\Data\\material\\local''\n\n', pwd);
-    msg3 = sprintf('If you wish to use another folder, deselect the check box and specify the\n');
-    msg4 = sprintf('path to the new folder.\n');
-    msgbox([msg1, msg2, msg3, msg4], 'Quick Fatigue Tool')
+    string = 'current';
+end
+
+if getappdata(0, 'missingDefaultLocalDatabase') == 1.0
+    msg1 = sprintf('The default local material directory is currently unavailable because it ');
+    msg2 = sprintf('does not exist on the MATLAB path or inside PATHDEF.m.\n\n');
+    msg3 = sprintf('Please ensure that the DATA folder included with the Quick Fatigue Tool ');
+    msg4 = sprintf('application has not been renamed or removed, and exists on MATLAB''s ');
+    msg5 = sprintf('current search path. In the meantime, an alternativelocal material directory should be specified.\n\n');
+    
+    messages = [messages, msg1, msg2, msg3, msg4, msg5];
+elseif get(handles.check_defaultDataDirectory, 'value') == 1.0
+    msg1 = sprintf('The %s (default) local material directory is the folder:\n\n', string);
+    msg2 = sprintf('''%s''\n\n', get(handles.edit_userDataDirectory, 'string'));
+    msg3 = sprintf('If you wish to specify the folder yourself, deselect "Default" ');
+    msg4 = sprintf('and manually enter the path to the new folder.\n\n');
+    
+    messages = [messages, msg1, msg2, msg3, msg4];
+else
+    msg1 = sprintf('The %s local material directory is the folder:\n\n', string);
+    msg2 = sprintf('''%s''\n\n', get(handles.edit_userDataDirectory, 'string'));
+    
+    messages = [messages, msg1, msg2];
+end
+
+msg1 = sprintf('If "Save path" is selected, the local material database path ');
+msg2 = sprintf('will be written to PATHDEF.m so that it is remembered even if the location is ');
+msg3 = sprintf('removed from MATLAB''s current search path. If this option is selected, it is ');
+msg4 = sprintf('strongly recommended that you keep a back-up of this file.');
+messages = [messages, msg1, msg2, msg3, msg4];
+
+if getappdata(0, 'missingDefaultLocalDatabase') == 1.0
+    warndlg(messages, 'Quick Fatigue Tool')
+else
+    msgbox(messages, 'Quick Fatigue Tool')
 end
 
 uiwait
 enable(handles)
+
+
+% --- Executes on button press in check_saveLocalPath.
+function check_saveLocalPath_Callback(~, ~, ~)

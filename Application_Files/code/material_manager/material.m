@@ -1,11 +1,10 @@
 classdef material < handle
 %MATERIAL    QFT class for material data processing.
-%   This class contains methods for pre-analysis processing tasks.
-%   
-%   Functions in MATERIAL are used to replicate the behaviour of the 
+%   This class contains methods for command line functionality of the
 %   Material Manager GUI.
 %
 %   MATERIAL contains the following utility functions:
+%
 %   MATERIAL.manage()
 %   MATERIAL.list()
 %   MATERIAL.import(USERMATERIAL)
@@ -16,8 +15,11 @@ classdef material < handle
 %   MATERIAL.evaluate(MATERIALNAME)
 %   MATERIAL.copy(OLDNAME, NEWNAME)
 %   MATERIAL.query(MATERIALNAME)
-%   MATERIAL.database(PATH)
+%   MATERIAL.database(VARARGIN)
 %   MATERIAL.checkDatabase(PATH)
+%   MATERIAL.changeDatabase(VARARGIN)
+%   MATERIAL.searchDatabase()
+%   MATERIAL.resetDatabase()
 %
 %   See also checkDataPath, evaluateMaterial, importMaterial,
 %   kValueCalculator, LocalMaterialDatabase, MaterialEditor,
@@ -26,8 +28,8 @@ classdef material < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials
 %   
-%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 26-Jun-2017 09:15:32 GMT
+%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
+%   Last modified 05-Jul-2017 12:54:18 GMT
     
     %%
     
@@ -552,7 +554,7 @@ classdef material < handle
             %   with VARARGIN from the local database.
             %
             %   VARARGIN is specified as a series of strings:
-            %   MATERIAL.REMOVE('material-1', 'material-2'..., 'material-3')
+            %   MATERIAL.REMOVE('material-1', 'material-2'..., 'material-n')
             %
             %   Reference section in Quick Fatigue Tool User Guide
             %      5 Materials
@@ -759,11 +761,44 @@ classdef material < handle
         end
         
         %% Set the local database
-        function [] = database(path)
-            %MATERIAL.DATABASE    Change the local material database.
+        function [] = database(varargin)
+            %MATERIAL.DATABASE    Set the local material database.
+            %
+            %   MATERIAL.DATABASE(PATH) sets the local material database
+            %   path to PATH.
+            %
+            %   MATERIAL.DATABASE(PATH, SAVE) sets the local material
+            %   database path to PATH, and writes the value of PATH to
+            %   PATHDEF.m, where SAVE is a flag with a value of 1.0.
             %
             %   Reference section in Quick Fatigue Tool User Guide
             %      5 Materials
+            
+            clc
+            
+            % Initialize result flag
+            result = 0.0;
+            
+            % Process arguments
+            switch nargin
+                case 0.0
+                    fprintf('ERROR: Not enough input arguments.\n')
+                    return
+                case 1.0
+                    path = varargin{1.0};
+                    save = 0.0;
+                case 2.0
+                    path = varargin{1.0};
+                    save = varargin{2.0};
+                    
+                    if (save ~= 0.0) && (save ~= 1.0)
+                        fprintf('ERROR: The SAVE argument must be 0.0 or 1.0.\n')
+                        return
+                    end
+                otherwise
+                    fprintf('ERROR: Too many input arguments.\n')
+                    return
+            end
             
             % Check the input
             if exist(path, 'dir') ~= 7.0
@@ -779,13 +814,49 @@ classdef material < handle
                 delete([currentPath, '\qft-local-material.txt'])
             end
             
-            % Write the marker file
+            % Write the new marker file
             try
                 fid = fopen([path, '\qft-local-material.txt'], 'w+');
                 fprintf(fid, '%s', path);
                 fclose(fid);
-            catch
+            catch exception
+                fprintf('ERROR: An exception was encountered while setting the local material path.\n\nMATLAB returned the following error: %s\n', exception.message)
             end
+            
+            %{
+                If the current local material path was written to PATHDEF.m,
+                this should be removed from the file to preserve
+                consistency and neatness.
+
+                Next, try to add the local material directory to PATHDEF.m.
+                This is an automatically generated file which contains the
+                saved MATLAB path.
+            %}
+            try
+                [~] = material.changeDatabase(currentPath, 'remove');
+            catch exception
+                fprintf('ERROR: An exception was encountered while saving the local material path.\n\nMATLAB returned the following error: %s\n', exception.message)
+            end
+            
+            if save == 1.0
+                try
+                    result = material.changeDatabase(path, 'add');
+                catch exception
+                    fprintf('ERROR: An exception was encountered while saving the local material path.\n\nMATLAB returned the following error: %s\n', exception.message)
+                end
+            end
+            
+            % Set the current local path
+            setappdata(0, 'currentLocalPath', path)
+            
+            % Warn the user if PATHDEF.m is unreadable
+            if result == -1.0
+                fprintf('ERROR: The string ''%%%% BEGIN ENTRIES %%%%'' could not be found in PATHDEF.m. The file has not been modified.\n');
+                return
+            end
+            
+            % List materials in the local database
+            material.list()
         end
         
         %% Check the local database
@@ -793,9 +864,14 @@ classdef material < handle
             %MATERIAL.CHECKDATABASE    Check the local material database.
             %
             %   MATERIAL.CHECKDATABASE() checks if the local material
-            %   datase has been set. If it has not been set, the function
-            %   checks for a marker file in case a previously-defined
+            %   database has been set. If it has not been set, the function
+            %   checks for a marker file in case a previously defined
             %   database is available.
+            %
+            %   [ERROR, LOCALPATH] = MATERIAL.CHECKDATABASE() returns the
+            %   error flag ERROR and the path LOCALPATH of the current
+            %   material database. If the local material database is not
+            %   set, ERROR has a value of 1.0.
             %
             %   Reference section in Quick Fatigue Tool User Guide
             %      5 Materials
@@ -815,18 +891,303 @@ classdef material < handle
                         
                         setappdata(0, 'qft_localMaterialDataPath', localPath)
                     catch
-                        % The local material database is currently undefined
-                        fprintf('ERROR: The local material database is undefined.\n')
-                        fprintf('Please specify the local material database with material.database(PATH).\n')
                         error = 1.0;
-                        return
                     end
                 else
-                    % The local material database is currently undefined
-                    fprintf('ERROR: The local material database is undefined.\n')
-                    fprintf('Please specify the local material database with material.database(PATH).\n')
                     error = 1.0;
+                end
+            end
+            
+            if error == 1.0
+                % The local material database is currently undefined
+                fprintf('ERROR: The local material database is undefined.\n')
+                fprintf('Please specify the local material database with material.database(PATH).\n')
+            end
+        end
+        
+        %% Save the local material database to PATHDEF.m
+        function [result] = changeDatabase(varargin)
+            %MATERIAL.CHANGEDATABASE    Add/remove the local material
+            %   database to/from PATHDEF.m.
+            %
+            %   MATERIAL.CHANGEDATABASE(VARARGIN) checks PATHDEF.m for a
+            %   user-specified directory and adds or removes the directory
+            %   from the file.
+            %
+            %   MATERIAL.CHANGEDATABASE(PATH, 'ADD') checks if PATH is
+            %   already included in PATHDEF.m. If not, the file is
+            %   re-written with this location included.
+            %
+            %   MATERIAL.CHANGEDATABASE(PATH, 'REMOVE') checks if PATH is
+            %   already included in PATHDEF.m. If so, the file is
+            %   re-written with this location removed.
+            %
+            %   RESULT = MATERIAL.CHANGEDATABASE(VARARGIN) returns a status
+            %   flag. A value of 1.0 indicates that PATH was either added
+            %   to, or removed from, PATHDEF.m. A value of 0.0 indicates
+            %   that PATHDEF.m was not modified.
+            %
+            %   WARNING: This function modifies PATHDEF.m, which is an
+            %   automatically generated MATLAB file. The user is strongly
+            %   encouraged to keep a back-up of this file.
+            %
+            %   Reference section in Quick Fatigue Tool User Guide
+            %      5 Materials
+            
+            clc
+            
+            % Process arguments
+            switch nargin
+                case 0.0
+                    fprintf('ERROR: Not enough input arguments.\n')
                     return
+                case 1.0
+                    path = varargin{1.0};
+                    mode = 'add';
+                case 2.0
+                    path = varargin{1.0};
+                    mode = varargin{2.0};
+                    
+                    if strcmpi(mode, 'add') == 0.0 && strcmpi(mode, 'remove') == 0.0
+                        fprintf('ERROR: The MODE argument must be ''ADD'' or ''REMOVE''.\n')
+                        return
+                    end
+                otherwise
+                    fprintf('ERROR: Too many input arguments.\n')
+                    return
+            end
+            
+            % Initialize output
+            result = 0.0;
+            
+            % Remove spaces from PATH
+            pathNS = path;
+            pathNS(ismember(pathNS, ''' ;,.')) = [];
+            
+            % Read data from PATHDEF
+            pathDefFiles = which('pathdef', '-ALL');
+            pathDefFile = pathDefFiles{1.0};
+            
+            % READ FILE
+            fid = fopen(pathDefFile);
+            
+            data = char(fread(fid, 'char')');
+            fclose(fid);
+            
+            data(data == 13.0) = []; % Remove carriage returns
+            
+            % STRSPLIT2
+            f = [0.0, strfind(data, 10.0), length(data) + 1.0];
+            i0 = f(1:end - 1.0) + 1.0;
+            i1 = f(2:end) - 1.0;
+            n = length(f) - 1.0;
+            data2 = cell(n, 1.0);
+            for i=1:n
+                data2{i} = data(i0(i):i1(i));
+            end
+            data = data2;
+            
+            % Remove spaces, colons and elipses from DATA
+            L = length(data);
+            dataNS = cell(L, 1.0);
+            for i = 1:length(data)
+                dataToEdit = data{i};
+                dataToEdit(ismember(dataToEdit, ''' ;,.')) = [];
+                dataNS{i} = dataToEdit;
+            end
+            
+            %{
+                Before writing the local material database path to
+                PATHDEF.m, first parse the current path definition to check
+                if the directory is already on the path
+            %}
+            cellfind = @(string)(@(cell_contents)(strcmp(string, cell_contents)));
+            logical_cells = cellfun(cellfind(pathNS), dataNS);
+            
+            if strcmpi(mode, 'add') == 1.0
+                %{
+                    The function is in ADD mode. If the directory is
+                    already on the path, RETURN. Else, find the INDEX where
+                    the path definitions begin.
+                %}
+                if any(logical_cells) == 1.0
+                    return
+                else
+                    % Open PATHDEF for reading
+                    fid = fopen(pathDefFile, 'r');
+                    
+                    % Find the number of lines until the beginning of the path definition
+                    keepGoing = 1.0;    index = 1.0;
+                    while keepGoing == 1.0
+                        tLine = fgetl(fid);
+                        
+                        if feof(fid) == 1.0
+                            %{
+                                The parser reached the end of the file
+                                without finding the marker line.
+                            %}
+                            result = -1.0;
+                            return
+                        elseif strcmp(tLine, '%%% BEGIN ENTRIES %%%') == 1.0
+                            break
+                        end
+                        
+                        index = index + 1.0;
+                    end
+                    
+                    % Close PATHDEF
+                    fclose(fid);
+                end
+            else
+                %{
+                    The function is in REMOVE mode. Find the INDEX of the
+                    path to be removed.
+                %}
+                if any(logical_cells) == 1.0
+                    index = find(logical_cells == 1.0);
+                else
+                    return
+                end
+            end
+            
+            % Re-open PATHDEF for writing, discard existing contents
+            fid = fopen(pathDefFile, 'wt');
+            
+            % Re-build PATHDEF from DATA
+            if strcmpi(mode, 'add') == 1.0
+                % Insert PATH
+                fprintf(fid, '%s\n', data{1.0:index});
+                fprintf(fid, '     ''%s;'', ...\n', path);
+                fprintf(fid,'%s\n', data{(index + 1.0):end});
+                fclose(fid);
+            else
+                % Omit PATH
+                indexP = 1.0;
+                for i = 1:length(index)
+                    fprintf(fid, '%s\n', data{indexP:index(i) - 1.0});
+                    indexP = index(i) + 1.0;
+                end
+                fprintf(fid,'%s\n', data{(index(end) + 1.0):end});
+                fclose(fid);
+            end
+            
+            %{
+                Since the function did not RETURN, the result is that PATH
+                was either added to, or removed from, PATHDEF.m.
+            %}
+            result = 1.0;
+        end
+        
+        %% Search PATHDEF.m for DATA\MATERIAL\LOCAL
+        function [localPath] = searchDatabase()
+            %MATERIAL.SEARCHDATABASE    Searches PATHDEF.m for a local
+            %   material database entry.
+            %
+            %   MATERIAL.SEARCHDATABASE() searches PATHDEF.m for an
+            %   existing path to DATA\MATERIAL\LOCAL.
+            %
+            %   LOCALPATH = MATERIAL.SEARCHDATABASE() returns the default
+            %   local material database path, if it exists.
+            %
+            %   Reference section in Quick Fatigue Tool User Guide
+            %      5 Materials
+            
+            clc
+            
+            % Initialize output
+            localPath = [];
+            
+            % Read data from PATHDEF
+            pathDefFiles = which('pathdef', '-ALL');
+            pathDefFile = pathDefFiles{1.0};
+            
+            % READ FILE
+            fid = fopen(pathDefFile);
+            
+            data = char(fread(fid, 'char')');
+            fclose(fid);
+            
+            data(data == 13.0) = []; % Remove carriage returns
+            
+            % STRSPLIT2
+            f = [0.0, strfind(data, 10.0), length(data) + 1.0];
+            i0 = f(1:end - 1.0) + 1.0;
+            i1 = f(2:end) - 1.0;
+            n = length(f) - 1.0;
+            data2 = cell(n, 1.0);
+            for i=1:n
+                data2{i} = data(i0(i):i1(i));
+            end
+            data = data2;
+            
+            %{
+                Before writing the local material database path to
+                PATHDEF.m, first parse the current path definition to check
+                if the directory is already on the path
+            %}
+            for i = 1:length(data);
+                localPath = char(data{i});
+                if isempty(strfind(localPath, 'Data\material\local')) == 0.0
+                    break
+                end
+            end
+            
+            if isempty(localPath) == 0.0
+                localPath(ismember(localPath, '''     ;'', ...')) = [];
+            end
+        end
+        
+        %% Remove the local material database
+        function [] = resetDatabase()
+            %MATERIAL.RESETDATABASE    Removes all references to the local
+            %   material directory.
+            %
+            %   MATERIAL.RESETDATABASE() searches for references of the
+            %   local material path in %APPDATA%, marker file(s) and
+            %   PATHDEF.m, and removes these references if they exist.
+            %
+            %   Reference section in Quick Fatigue Tool User Guide
+            %      5 Materials
+            
+            clc
+            
+            % Get the local path if it exists
+            localPath = getappdata(0, 'qft_localMaterialDataPath');
+            files = which('qft-local-material.txt', '-ALL');
+            
+            if (isempty(localPath) == 1.0) && (isempty(files) == 1.0)
+                fprintf('ERROR: No local material database to remove.\n');
+            else
+                % Remove the local material path marker file(s) if applicable
+                if isempty(files) == 0.0
+                    for i = 1:length(files)
+                        %{
+                            Remove any database entries from PATHDEF.m
+                            which point to FILES
+                        %}
+                        [path, ~, ~] = fileparts(files{i});
+                        
+                        if strcmpi(path, [pwd, '\Data\material\local']) == 0.0
+                            [~] = material.changeDatabase(path, 'remove');
+                        end
+                    end
+                    
+                    delete(files{:})
+                end
+                
+                % Clear local material path %APPDATA% entry if applicable
+                if isempty(localPath) == 0.0
+                    rmappdata(0, 'qft_localMaterialDataPath')
+                    
+                    %{
+                        Remove any database entries from PATHDEF.m which
+                        point to LOCALPATH
+                    %}
+                    if strcmpi(localPath, [pwd, '\Data\material\local']) == 0.0
+                        [~] = material.changeDatabase(localPath, 'remove');
+                    end
+                    
+                    fprintf('The following local database path has been removed:\n''%s''\n', localPath);
                 end
             end
         end

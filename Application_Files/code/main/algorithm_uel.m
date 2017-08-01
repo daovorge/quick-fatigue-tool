@@ -13,8 +13,8 @@ classdef algorithm_uel < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.9 Uniaxial Strain-Life
 %   
-%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 13-Jun-2017 15:59:08 GMT
+%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
+%   Last modified 28-Jun-2017 12:35:00 GMT
     
     %%
     
@@ -287,6 +287,14 @@ classdef algorithm_uel < handle
             fid = fopen(dir, 'w+');
             
             % Write the material state to file
+            %{
+                1: Penultimate inelastic strain in history
+                2: Final inelastic strain in history
+                3: Penultimate inelastic stress in history
+                4: Final inelastic stress in history
+                5: Final elastic stress in history
+                6: Flag indicating if loop closure is allowed
+            %}
             fprintf(fid, '%f\t%f\t%f\t%f\t%f\t%.0f', epsilon(end-1.0:end), sigma(end-1.0:end), sigma_e, getappdata(0, 'css_allowClosure'));
             
             % Close the file

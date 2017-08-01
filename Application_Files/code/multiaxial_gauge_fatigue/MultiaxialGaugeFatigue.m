@@ -12,8 +12,8 @@ function varargout = MultiaxialGaugeFatigue(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.2 Multiaxial Gauge Fatigue
 %   
-%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 22-Jun-2017 16:09:40 GMT
+%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
+%   Last modified 05-Jul-2017 08:25:58 GMT
     
     %%
     
@@ -394,7 +394,7 @@ end
         '*.*',  'All Files (*.*)'}, 'Strain Data for 0 Degrees',...
         startPath_gauge);
     
-if isequal(file, 0.0) || isequal(path, 0.0)
+if (isequal(file, 0.0) == 1.0) || (isequal(path, 0.0) == 1.0)
     % User cancelled operation
 else
     set(handles.edit_gauge_0, 'string', [path, file])
@@ -425,7 +425,7 @@ end
         '*.*',  'All Files (*.*)'}, 'Strain Data for 45 Degrees',...
         startPath_gauge);
     
-if isequal(file, 0.0) || isequal(path, 0.0)
+if (isequal(file, 0.0) == 1.0) || (isequal(path, 0.0) == 1.0)
     % User cancelled operation
 else
     set(handles.edit_gauge_45, 'string', [path, file])
@@ -456,7 +456,7 @@ end
         '*.*',  'All Files (*.*)'}, 'Strain Data for 90 Degrees',...
         startPath_gauge);
     
-if isequal(file, 0.0) || isequal(path, 0.0)
+if (isequal(file, 0.0) == 1.0) || (isequal(path, 0.0) == 1.0)
     % User cancelled operation
 else
     set(handles.edit_gauge_90, 'string', [path, file])

@@ -13,7 +13,7 @@ classdef algorithm_sbbm < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.2 Stress-based Brown-Miller
 %   
-%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
 %   Last modified 08-Jun-2017 10:07:12 GMT
     
     %%
@@ -445,7 +445,6 @@ classdef algorithm_sbbm < handle
             end
             
             %% SAVE THE CUMULATIVE DAMAGE
-            
             setappdata(0, 'cumulativeDamage', cumulativeDamage)
             
             %% SUM CUMULATIVE DAMAGE TO GET TOTAL DAMAGE FOR CURRENT NODE

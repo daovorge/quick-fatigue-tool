@@ -11,7 +11,7 @@ function varargout = UniaxialStrainLife(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.6 Uniaxial Strain-Life
 %   
-%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
 %   Last modified 19-Jun-2017 13:56:11 GMT
 
 % Begin initialization code - DO NOT EDIT
@@ -41,6 +41,7 @@ function UniaxialStrainLife_OpeningFcn(hObject, ~, handles, varargin)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to UniaxialStrainLife (see VARARGIN)
+
 movegui(hObject, 'center')
 
 % Clear the command window
@@ -66,6 +67,9 @@ set(handles.pButton_browseInput, 'CData', g);
 set(handles.pButton_browseMaterial, 'CData', g);
 set(handles.pButton_resultsLocation, 'CData', g);
 
+% Set initial help string
+setInitialHelp(handles.edit_inputFile, 'Load history file or numerical expression...')
+
 %% Load the panel state
 if isappdata(0, 'panel_uniaxialStrainLife_edit_inputFile') == 1.0
     %{
@@ -74,7 +78,9 @@ if isappdata(0, 'panel_uniaxialStrainLife_edit_inputFile') == 1.0
     %}
     
     % Input definition
-    set(handles.edit_inputFile, 'string', getappdata(0, 'panel_uniaxialStrainLife_edit_inputFile'))
+    if (strcmpi(getappdata(0, 'panel_uniaxialStrainLife_edit_inputFile'), sprintf('Load history file or numerical expression...')) == 0.0) && (isempty(getappdata(0, 'panel_uniaxialStrainLife_edit_inputFile')) == 0.0)
+        set(handles.edit_inputFile, 'string', getappdata(0, 'panel_uniaxialStrainLife_edit_inputFile'), 'fontAngle', 'normal', 'foregroundColor', 'black')
+    end
     
     set(handles.rButton_stress, 'value', getappdata(0, 'panel_uniaxialStrainLife_rButton_stress'))
     set(handles.rButton_strain, 'value', getappdata(0, 'panel_uniaxialStrainLife_rButton_strain'))
@@ -322,7 +328,7 @@ function pButton_reset_Callback(~, ~, handles)
     modifications
 %}
 % Input definition
-set(handles.edit_inputFile, 'string', '')
+setInitialHelp(handles.edit_inputFile, 'Load history file or numerical expression...')
 
 set(handles.rButton_stress, 'value', 0.0)
 set(handles.rButton_strain, 'value', 1.0)
@@ -397,10 +403,10 @@ end
         '*.*',  'All Files (*.*)'}, uigetFileTitle,...
         startPath_input);
     
-if isequal(file, 0.0) == 1.0 || isequal(path, 0.0) == 1.0
+if (isequal(file, 0.0) == 1.0) || (isequal(path, 0.0) == 1.0)
     % User cancelled operation
 else
-    set(handles.edit_inputFile, 'string', [path, file])
+    set(handles.edit_inputFile, 'string', [path, file], 'fontAngle', 'normal', 'foregroundColor', 'black')
     
     % Save the file path
     setappdata(0, 'panel_uniaxialStrainLife_input_path', path)

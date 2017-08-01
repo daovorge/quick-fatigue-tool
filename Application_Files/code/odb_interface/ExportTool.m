@@ -11,7 +11,7 @@ function varargout = ExportTool(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool User Guide
 %      10.4 The ODB Interface
 %   
-%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
 %   Last modified 22-Jun-2017 16:09:40 GMT
     
     %%
@@ -319,7 +319,7 @@ set(handles.rButton_selectAll, 'value', 0.0)
 
 % --- Executes on button press in pButton_cancel.
 function pButton_cancel_Callback(~, ~, ~)
-close 'Export Tool (ODB Interface)'
+close 'Export Tool (Abaqus ODB Interface)'
 
 % --- Executes on button press in pButton_start.
 function pButton_start_Callback(hObject, eventdata, handles)
@@ -610,8 +610,8 @@ end
 % Open the log file for writing
 fid_debug = fopen(sprintf('%s\\%s.log', resultsDatabasePath, resultsDatabaseName), 'w+');
 clc
-fprintf(fid_debug, 'Quick Fatigue Tool 6.11-00 ODB Interface Log');
-fprintf('Quick Fatigue Tool 6.11-00 ODB Interface Log\n');
+fprintf(fid_debug, 'Quick Fatigue Tool 6.11-01 ODB Interface Log');
+fprintf('Quick Fatigue Tool 6.11-01 ODB Interface Log\n');
 
 % Get the selected position
 userPosition = get(handles.pMenu_elementPosition, 'value');
@@ -785,7 +785,7 @@ if get(handles.check_copyToClipboard, 'value') == 1.0
 end
 
 % Re-enable the GUI
-close 'Export Tool (ODB Interface)'
+close 'Export Tool (Abaqus ODB Interface)'
 
 
 function edit_fieldData_Callback(~, ~, ~)
@@ -1267,7 +1267,7 @@ set(findall(handles.ExportTool, '-property', 'Enable'), 'Enable', 'on')
 set(handles.frame_modelInfo, 'enable', 'inactive')
 
 if get(handles.check_resultFile, 'value') == 0.0
-    set(handles.edit_resultFile, 'enable', 'off')
+    set(handles.edit_resultFile, 'enable', 'inactive')
     set(handles.pButton_findResultFile, 'enable', 'off')
 end
 

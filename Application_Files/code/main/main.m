@@ -10,8 +10,8 @@ function [] = main(flags)
 %
 %   Author contact: louisvallance@hotmail.co.uk
 %
-%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 26-Jun-2017 15:32:30 GMT
+%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
+%   Last modified 05-Jul-2017 12:54:18 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');    tic_pre = tic;
@@ -41,9 +41,9 @@ setappdata(0, 'messageFileNotes', 0.0)
 setappdata(0, 'messageFileWarnings', 0.0)
 
 %% PRINT COMMAND WINDOW HEADER
-fprintf('[NOTICE] Quick Fatigue Tool 6.11-00')
+fprintf('[NOTICE] Quick Fatigue Tool 6.11-01')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2017)')
-fprintf('\n[NOTICE] Last modified 26-Jun-2017 15:32:30 GMT')
+fprintf('\n[NOTICE] Last modified 05-Jul-2017 12:54:18 GMT')
 
 cleanExit = 0.0;
 
@@ -73,7 +73,7 @@ fileName = sprintf('Project/output/%s/%s.sta', jobName, jobName);
 fid_status = fopen(fileName, 'w+');
 setappdata(0, 'fid_status', fid_status)
 c = clock;
-fprintf(fid_status, '[NOTICE] Quick Fatigue Tool 6.11-00\t%s', datestr(datenum(c(1.0), c(2.0), c(3.0), c(4.0), c(5.0), c(6.0))));
+fprintf(fid_status, '[NOTICE] Quick Fatigue Tool 6.11-01\t%s', datestr(datenum(c(1.0), c(2.0), c(3.0), c(4.0), c(5.0), c(6.0))));
 
 fprintf('\n[NOTICE] The job file "%s.m" has been submitted for analysis', jobName)
 fprintf(fid_status, '\n[NOTICE] The job file "%s.m" has been submitted for analysis', jobName);
@@ -333,6 +333,9 @@ end
 
 setappdata(0, 'numberOfNodes', N)
 
+%% CHECK USER FRF DIAGNOSTIC ITEM IDS
+mscFileUtils.checkFRFDiagnosticItems(N)
+
 %% DETERMINE IF THE MODEL IS YIELDING
 preProcess.getPlasticItems(N, algorithm);
 
@@ -452,6 +455,12 @@ if peekAnalysis == 1.0
 end
 
 %% MAIN ANALYSIS
+% Inform the user how many items will be analysed
+messenger.writeMessage(168.0)
+
+% Print a summary of the memory state
+messenger.writeMessage(133.0)
+
 if getappdata(0, 'dataCheck') > 0.0
     %{
         If the job is a data check analysis, abort here. Print the
@@ -495,12 +504,6 @@ groupIDBuffer = getappdata(0, 'groupIDBuffer');
 
 % Set a counter which runs from 1 to the total number of analysis items
 totalCounter = 0.0;
-
-% Inform the user how many items will be analysed
-messenger.writeMessage(168.0)
-
-% Print a summary of the memory state
-messenger.writeMessage(133.0)
 
 % Calculate items at which debug information is to be written
 [debugItems, cacheOverlay] = qftWorkspace.initialize(N, [], jobName, []);

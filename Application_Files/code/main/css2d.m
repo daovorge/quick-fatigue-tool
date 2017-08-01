@@ -16,7 +16,7 @@ function [rfData, epsilon, sigma, error, warning] = css2d(sigma_e, epsilon_pp, s
 %   CSS2D is the same as CSS2C, except that the material state is imported
 %   from a previous analysis defined by CONTINUE_FROM.
 %   
-%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
 %   Last modified 19-Jun-2017 16:12:44 GMT
     
     %%
@@ -64,7 +64,7 @@ if length(sigma_e) > 2.0
     end
 end
 
-%% Add previous elasticstress point to history
+%% Add previous elastic stress point to history
 sigma_e = [0.0, sigma_pe, sigma_e];
 
 %% Initialize analysis variables

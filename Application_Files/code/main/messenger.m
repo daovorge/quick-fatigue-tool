@@ -6,8 +6,8 @@ classdef messenger < handle
 %   MESSENGER is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %
-%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
-%   Last modified 26-Jun-2017 14:12:14 GMT
+%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
+%   Last modified 30-Jun-2017 14:27:55 GMT
 
     %%
 
@@ -2092,6 +2092,9 @@ classdef messenger < handle
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Analysis preprocessor completed in %fs', returnType{i}], getappdata(0, 'toc_pre'));
                     case 263.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Analysis postprocessor completed in %fs', returnType{i}], getappdata(0, 'toc_post'));
+					case 264.0
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: User FRF diagnostic item %.0f does not exist in the model', returnType{i}], getappdata(0, 'message_264_item'));
+                        setappdata(0, 'messageFileWarnings', 1.0)
                 end
             end
         end
@@ -2138,9 +2141,9 @@ classdef messenger < handle
 
             % Write file header
             try
-                fprintf(fid, 'Quick Fatigue Tool 6.11-00 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
+                fprintf(fid, 'Quick Fatigue Tool 6.11-01 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
             catch
-                fprintf(fid, 'Quick Fatigue Tool 6.11-00\r\n');
+                fprintf(fid, 'Quick Fatigue Tool 6.11-01\r\n');
             end
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
             fprintf(fid, 'Last modified 15-Apr-2017 19:34:54 GMT\r\n\r\n');
@@ -2263,7 +2266,10 @@ classdef messenger < handle
                     snKnockDown = group_materialProps.snKnockDown;
 
                     for groups = 1:G
-                        fprintf(fid, '\r\n    <MATERIAL DATA FOR %s [GROUP %.0f]>\r\n', char(groupIDBuffer(groups).material), groups);
+                        materialName = char(groupIDBuffer(groups).material);
+                        [~, materialName, ~] = fileparts(materialName);
+                        
+                        fprintf(fid, '\r\n    <MATERIAL DATA FOR %s [GROUP %.0f]>\r\n', materialName, groups);
                         % S-N Scale
                         if useSN > 0.0
                             fprintf(fid, '    S-N Scale: %.3g\r\n', snScale(groups));

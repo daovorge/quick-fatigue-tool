@@ -10,7 +10,7 @@ classdef rosetteTools < handle
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.3 Rosette Analysis
 %   
-%   Quick Fatigue Tool 6.11-00 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
 %   Last modified 23-Jun-2017 08:19:31 GMT
     
     %%
@@ -70,6 +70,10 @@ classdef rosetteTools < handle
                 errorMessage = 'All three gauges must be specified.';
                 error = 1.0;
                 return
+            elseif get(handles.edit_gaugeA, 'foregroundColor') ==  [0.5, 0.5, 0.5] %#ok<BDSCA>
+                errorMessage = 'All three gauges must be specified.';
+                error = 1.0;
+                return
             end
             
             % Gauge B
@@ -77,10 +81,18 @@ classdef rosetteTools < handle
                 errorMessage = 'All three gauges must be specified.';
                 error = 1.0;
                 return
+            elseif get(handles.edit_gaugeB, 'foregroundColor') ==  [0.5, 0.5, 0.5] %#ok<BDSCA>
+                errorMessage = 'All three gauges must be specified.';
+                error = 1.0;
+                return
             end
             
             % Gauge C
             if isempty(gaugeFileC) == 1.0
+                errorMessage = 'All three gauges must be specified.';
+                error = 1.0;
+                return
+            elseif get(handles.edit_gaugeC, 'foregroundColor') ==  [0.5, 0.5, 0.5] %#ok<BDSCA>
                 errorMessage = 'All three gauges must be specified.';
                 error = 1.0;
                 return
