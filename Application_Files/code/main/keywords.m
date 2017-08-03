@@ -139,7 +139,10 @@ classdef keywords < handle
         end
         
         %% PRINT INPUT FILE READER SUMMARY TO MESSAGE FILE
-        function [] = printSummary()
+        function [error] = printSummary()
+            % Initialize the error flag
+            error = 0.0;
+            
             if isappdata(0, 'jobFromTextFile') == 0.0
                 return
             else
@@ -151,6 +154,12 @@ classdef keywords < handle
             else
                 fid = getappdata(0, 'messageFID');
                 kw_processed = getappdata(0,'kw_processed');
+                
+                if isempty(fid) == 1.0
+                    setappdata(0, 'E143', 1.0)
+                    error = 1.0;
+                    return
+                end
             end
             
             fprintf(fid, '\r\n***INPUT FILE SUMMARY');

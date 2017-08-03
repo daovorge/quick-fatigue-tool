@@ -1332,6 +1332,13 @@ if status == 1.0
         fprintf(fid, '\r\n\r\nError code: E142');
         rmappdata(0, 'E142')
     end
+    if getappdata(0, 'E143') == 1.0
+        fprintf(fid, '\r\n\r\n***ERROR: The input file reader encountered an exception while trying to access the message (.msg) file');
+        fprintf(fid, '\r\n-> This can happen if %%APPDATA%% was not cleared after the previous analysis. Please restart MATLAB and re-run the analysis');
+        fprintf(fid, '\r\n-> If the problem persists, please contact the author for assistance: louisvallance@hotmail.co.uk');
+        fprintf(fid, '\r\n\r\nError code: E143');
+        rmappdata(0, 'E143')
+    end
     
     % Write file footer
     c = clock;

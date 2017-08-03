@@ -95,7 +95,12 @@ messenger.writeMessage(96.0)
 messenger.writeMessage(169.0)
 
 %% PRINT INPUT FILE READER SUMMARY TO MESSAGE FILE
-keywords.printSummary()
+error = keywords.printSummary();
+
+if error == 1.0
+    cleanup(1.0)
+    return
+end
 
 %% CHECK IF RESULTS DIRECTORY WAS SUCCESSFULLY REMOVED
 if getappdata(0, 'warning_026') == 1.0
