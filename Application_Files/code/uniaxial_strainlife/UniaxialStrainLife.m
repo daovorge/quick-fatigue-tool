@@ -244,7 +244,7 @@ if (get(handles.rButton_strain, 'value') == 1.0) && (get(handles.rButton_typeEla
 end
 
 %% Get the fatigue limit of the material
-[fatigueLimitSress, ~] = uniaxialPreProcess.getFatigueLimit(cael, E, Sf, b, Ef, c);
+[fatigueLimitSress, ~] = uniaxialPreProcess.getFatigueLimit(cael, E, kp, np, Sf, b, Ef, c);
 
 %% Get the history length
 L = length(loadHistoryData);
