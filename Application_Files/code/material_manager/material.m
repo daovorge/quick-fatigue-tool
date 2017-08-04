@@ -28,7 +28,7 @@ classdef material < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials
 %   
-%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
 %   Last modified 05-Jul-2017 12:54:18 GMT
     
     %%
