@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="1999287407" file="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox\Material Manager.prj" location="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox" name="Material Manager" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="1598481450" file="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox\Material Manager.prj" location="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox" name="Material Manager" target="target.mlapps" target-name="Package App">
     <param.appname>Material Manager</param.appname>
     <param.authnamewatermark>Louis Vallance</param.authnamewatermark>
     <param.email>louisvallance@hotmail.co.uk</param.email>
@@ -13,7 +13,7 @@
     <param.summary>Store and create material data for fatigue analysis</param.summary>
     <param.description>Material Manager allows the user to access material databases included with Quick Fatiugue Tool. The application also enables the creation of user-defined materials. For guidance on using Material Manager, please refer to Section 5 of the Quick Fatigue Tool User Guide.</param.description>
     <param.screenshot />
-    <param.version>6.11.01</param.version>
+    <param.version>6.11.02</param.version>
     <param.products.name>
       <item>MATLAB</item>
       <item>Signal Processing Toolbox</item>
