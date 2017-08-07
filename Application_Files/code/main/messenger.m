@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 30-Jun-2017 14:27:55 GMT
+%   Last modified 07-Aug-2017 10:22:21 GMT
 
     %%
 
@@ -2095,6 +2095,8 @@ classdef messenger < handle
 					case 264.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: User FRF diagnostic item %.0f does not exist in the model', returnType{i}], getappdata(0, 'message_264_item'));
                         setappdata(0, 'messageFileWarnings', 1.0)
+                    case 265.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Abaqus ODB field output has been exported to ''%s\\Project\\output\\%s\\Data Files''', returnType{i}], pwd, getappdata(0, 'jobName'));
                 end
             end
         end

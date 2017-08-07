@@ -11,7 +11,7 @@ classdef postProcess < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 14-Jun-2017 14:41:28 GMT
+%   Last modified 07-Aug-2017 10:22:21 GMT
     
     %%
     
@@ -2182,6 +2182,9 @@ classdef postProcess < handle
             fprintf('\n[POST] Export complete. Check the log file in Project/output/%s/Data Files for possible messages', getappdata(0, 'jobName'));
             fprintf(fid_status, '\n[POST] Export complete. Check the log file in Project/output/%s/Data Files for possible messages', getappdata(0, 'jobName'));
             fclose(fid_debug);
+            
+            % Update the message file
+            messenger.writeMessage(265.0)
             
             % Delete the Python script from the data directory
             delete(scriptFile)
