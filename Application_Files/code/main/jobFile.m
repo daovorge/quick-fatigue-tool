@@ -6,7 +6,7 @@ classdef jobFile < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 30-Jun-2017 12:48:35 GMT
+%   Last modified 07-Aug-2017 17:52:35 GMT
     
     %%
     
@@ -82,12 +82,17 @@ classdef jobFile < handle
             hfScales = flags{53};  setappdata(0, 'hfScales', hfScales)
             frfEnvelope = flags{54};    setappdata(0, 'frfEnvelope', frfEnvelope)
             
-            %% CHECK FLAGS FOR CONSISTENCY
+            %% DEFAULT FLAGS
             if isempty(jobName) == 1.0
                 fprintf('[ERROR] Job name undefined\n')
                 errordlg('Please specify a name for the analysis job.', 'Quick Fatigue Tool')
                 error = 1.0;
                 return
+            end
+            
+            if (isempty(dataCheck) == 1.0) || (ischar(dataCheck) == 1.0)
+                dataCheck = 0.0;
+                setappdata(0, 'dataCheck', dataCheck)
             end
             
             if (isempty(designLife) == 1.0) || ((ischar(designLife) == 1.0) && (strcmpi(designLife, 'CAEL') == 0.0))
