@@ -8,7 +8,7 @@ classdef preProcess < handle
     %   See also postProcess.
     %
     %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-    %   Last modified 26-Jun-2017 15:32:30 GMT
+    %   Last modified 08-Aug-2017 16:36:15 GMT
     
     %%
     
@@ -2518,6 +2518,7 @@ classdef preProcess < handle
                         messenger.writeMessage(144.0)
                     else
                         items = items_data(:, 1.0);
+                        messenger.writeMessage(266.0)
                     end
                 elseif exist('items', 'file') == 0.0
                     % The file does not exist, so warn the user

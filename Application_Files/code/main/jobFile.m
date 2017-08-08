@@ -6,7 +6,7 @@ classdef jobFile < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 07-Aug-2017 17:52:35 GMT
+%   Last modified 08-Aug-2017 16:36:15 GMT
     
     %%
     
@@ -112,9 +112,16 @@ classdef jobFile < handle
                 setappdata(0, 'analysisGroups', 'DEFAULT')
             end
             
-            if (isempty(items) == 1.0) || ((ischar(items) == 1.0) && (strcmpi(items, 'ALL') == 0.0) && strcmpi(items, 'PEEK') == 0.0 && exist(items, 'file') == 0.0)
+            if isempty(items) == 1.0
                 items = 'ALL';
                 setappdata(0, 'items', 'ALL')
+            elseif ischar(items) == 1.0
+                [~, ~, ext] = fileparts(items);
+                
+                if (isempty(ext) == 1.0) && ((strcmpi(items, 'ALL') == 0.0) && strcmpi(items, 'PEEK') == 0.0)
+                    items = 'ALL';
+                    setappdata(0, 'items', 'ALL')
+                end
             end
             
             if isempty(scale) == 1.0
