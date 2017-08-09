@@ -6,8 +6,10 @@ from operator import itemgetter
 from collections import Counter
 
 # Source ODB:
+odb = openOdb(path='*.odb')
 
 # Get the ODB instnace:
+instance = odb.rootAssembly.instances['PART-1-1']
 
 # Get the number of elements belonging to the part instance:
 N = len(instance.elements)
@@ -175,6 +177,7 @@ uniqueNodes = [list(k) for k, v in uniqueNodes.items() if v == 1]
 uniqueNodes = set(i for j in uniqueNodes for i in j)
 
 # Create a node set from the free element faces:
+nodeSet = odb.rootAssembly.NodeSetFromNodeLabels(name='Node-Surface', nodeLabels=(('PART-1-1', list(uniqueNodes)),))
 
 # Save and close the ODB:
 odb.save()
