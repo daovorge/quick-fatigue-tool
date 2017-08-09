@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 07-Aug-2017 17:52:35 GMT
+%   Last modified 09-Aug-2017 15:15:02 GMT
 
     %%
 
@@ -2093,6 +2093,9 @@ classdef messenger < handle
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Abaqus ODB field output has been exported to ''%s\\Project\\output\\%s\\Data Files''', returnType{i}], pwd, getappdata(0, 'jobName'));
                     case 266.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Hotspots were read from the file ''%s''', returnType{i}], getappdata(0, 'hotspotFile'));
+                    case 267.0
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: The environment variable ''noiseReduction'' is deprecated. Use ''gateTensors'' instead', returnType{i}]);
+                        setappdata(0, 'messageFileWarnings', 1.0)
                 end
             end
         end
@@ -2144,7 +2147,7 @@ classdef messenger < handle
                 fprintf(fid, 'Quick Fatigue Tool 6.11-02\r\n');
             end
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 15-Apr-2017 19:34:54 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 09-Aug-2017 15:15:02 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
