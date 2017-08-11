@@ -8,7 +8,7 @@
 #   louisvallance@hotmail.co.uk
 #
 #   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-#   Last modified 11-Aug-2017 16:36:58 GMT
+#   Last modified 11-Aug-2017 19:17:49 GMT
 
 from odbAccess import *
 import odbAccess
@@ -84,7 +84,7 @@ for instanceNumber in range(nInstances):
 		element = instance.elements[i]
 		
 		# Get the element connectivity data:
-		conn = instance.getElementFromLabel(i + 1).connectivity
+		conn = instance.getElementFromLabel(element.label).connectivity
 		
 		# 3D continuum hexahedron (brick) elements:
 		if ((element.type == 'C3D8') or (element.type == 'C3D8H') or (element.type == 'C3D8I') or (element.type == 'C3D8IH') or (element.type == 'C3D8R') or (element.type == 'C3D8RH') or (element.type == 'C3D8S') or (element.type == 'C3D8HS') or (element.type == 'C3D20') or (element.type == 'C3D20H') or (element.type == 'C3D20R') or (element.type == 'C3D20RH') or (element.type == 'C3D8T') or (element.type == 'C3D8HT') or (element.type == 'C3D8RT') or (element.type == 'C3D8RHT') or (element.type == 'C3D20T') or (element.type == 'C3D20HT') or (element.type == 'C3D20RT') or (element.type == 'C3D20RHT')):
