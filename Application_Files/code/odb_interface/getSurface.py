@@ -388,7 +388,8 @@ for instanceNumber in range(nInstances):
 		
 		for j in range(N):
 			# Get the element connectivity data:
-			conn = instance.getElementFromLabel(j + 1).connectivity
+			element = instance.elements[j]
+			conn = instance.getElementFromLabel(element.label).connectivity
 			
 			# Get the intersection of the connectivity with the surface node list:
 			intersect = [i for i in surfaceNodes if i in conn]
