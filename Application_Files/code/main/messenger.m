@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 09-Aug-2017 15:15:02 GMT
+%   Last modified 16-Aug-2017 09:58:29 GMT
 
     %%
 
@@ -2147,7 +2147,7 @@ classdef messenger < handle
                 fprintf(fid, 'Quick Fatigue Tool 6.11-02\r\n');
             end
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 09-Aug-2017 15:15:02 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 16-Aug-2017 09:58:29 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
