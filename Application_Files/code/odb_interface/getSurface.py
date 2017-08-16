@@ -49,7 +49,7 @@ END USER INPUT
 # Open ODB file:
 odb = openOdb(path = ODB_NAME)
 
-# Analyse all part instance:
+# Analyse all part instances:
 if (PART_INSTANCES.lower() == 'all'):
 	# Initialize indexing variable for part instance names:
 	index = 0
