@@ -8,7 +8,7 @@
 #   louisvallance@hotmail.co.uk
 #
 #   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-#   Last modified 11-Aug-2017 19:17:49 GMT
+#   Last modified 16-Aug-2017 12:42:00 GMT
 
 from odbAccess import *
 import odbAccess
@@ -397,7 +397,7 @@ for instanceNumber in range(nInstances):
 			# Check if there are any intersecting nodes:
 			if (len(intersect) != 0):
                 # Element j lies on the surface, so append the element:
-				surfaceElements.append(j + 1)
+				surfaceElements.append(element.label)
 				
 		# Create the element set:
 		setName = "Element-Surface-%s" % partInstance
