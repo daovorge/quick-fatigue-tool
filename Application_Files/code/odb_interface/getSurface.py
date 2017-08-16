@@ -2,6 +2,17 @@
 #
 #   Find surface elements and nodes from an Abaqus ODB file.
 #
+#	This surface detection algorithm relies on the principle
+#	that, if the set of nodes of element face A does not have
+#	a union with any other element face, then A belongs on
+#	the element free surface.
+#
+#	Since the Abaqus Python APIs do not supply the node face
+#	data for an element, the faces must be constructed manually
+#	depending on the element family. The node ordering and face
+#	numbering information was taken from "Part IV: Elements" of
+#	the Abaqus Analysis User's Guide.
+#
 #   Author contact:
 #
 #   M.Sc. Louis Vallance
