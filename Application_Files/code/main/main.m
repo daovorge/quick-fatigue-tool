@@ -11,7 +11,7 @@ function [] = main(flags)
 %   Author contact: louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 16-Aug-2017 09:58:29 GMT
+%   Last modified 17-Aug-2017 10:05:30 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');    tic_pre = tic;
@@ -43,7 +43,7 @@ setappdata(0, 'messageFileWarnings', 0.0)
 %% PRINT COMMAND WINDOW HEADER
 fprintf('[NOTICE] Quick Fatigue Tool 6.11-02')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2017)')
-fprintf('\n[NOTICE] Last modified 16-Aug-2017 09:58:29 GMT')
+fprintf('\n[NOTICE] Last modified 17-Aug-2017 10:05:30 GMT')
 
 cleanExit = 0.0;
 
@@ -1021,7 +1021,13 @@ end
 
 %% OVERLAY FIELD OUTPUT WITH PREVIOUS JOB IF REQUESTED
 if getappdata(0, 'continueAnalysis') == 1.0
-    overlay.prepare_fields()
+    error = overlay.prepare_fields();
+    
+    if error == 1.0
+        setappdata(0, 'E144', 1.0)
+        cleanup(1.0)
+        return
+    end
 end
 
 %% EXPORT FIELDS TO ODB IF REQUESTED

@@ -6,7 +6,7 @@ function [] = cleanup(status)
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 16-Aug-2017 09:58:29 GMT
+%   Last modified 17-Aug-2017 10:05:30 GMT
     
     %%
     
@@ -72,7 +72,7 @@ if status == 1.0
     % Write file header
     fprintf(fid, 'Quick Fatigue Tool 6.11-02\r\n');
     fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-    fprintf(fid, 'Last modified 16-Aug-2017 09:58:29 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 17-Aug-2017 10:05:30 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');
@@ -1062,7 +1062,7 @@ if status == 1.0
     if getappdata(0, 'E115') == 1.0
         jobName = getappdata(0, 'continueFrom');
         fprintf(fid, '\r\n\r\n***ERROR: The field data from the job ''%s'' could not be located', jobName);
-        fprintf(fid, '\r\n-> To perform the analysis as a continuation from a previous job, the following file must be available:');
+        fprintf(fid, '\r\n-> The following file is required to perform a continuation analysis:');
         fprintf(fid, '\r\n   ''%s\\output\\%s\\Data Files\\f-output-all.dat''', pwd, jobName);
         fprintf(fid, '\r\n-> Field output must be enabled in ''%s'' by setting OUTPUT_FIELD = 1.0', jobName);
         fprintf(fid, '\r\n\r\nError code: E115');
@@ -1338,6 +1338,13 @@ if status == 1.0
         fprintf(fid, '\r\n-> If the problem persists, please contact the author for assistance: louisvallance@hotmail.co.uk');
         fprintf(fid, '\r\n\r\nError code: E143');
         rmappdata(0, 'E143')
+    end
+    if getappdata(0, 'E144') == 1.0
+        fprintf(fid, '\r\n\r\n***ERROR: The field data from the current job could not be appended using CONTINUE_FROM');
+        fprintf(fid, '\r\n-> One or more fields are missing from both field data files');
+        fprintf(fid, '\r\n-> Analysis continuation will not work if the field output files have been modified by the user');
+        fprintf(fid, '\r\n\r\nError code: E144');
+        rmappdata(0, 'E144')
     end
     
     % Write file footer
