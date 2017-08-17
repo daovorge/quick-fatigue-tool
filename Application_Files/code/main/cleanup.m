@@ -6,7 +6,7 @@ function [] = cleanup(status)
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 17-Aug-2017 10:05:30 GMT
+%   Last modified 17-Aug-2017 14:07:28 GMT
     
     %%
     
@@ -72,7 +72,7 @@ if status == 1.0
     % Write file header
     fprintf(fid, 'Quick Fatigue Tool 6.11-02\r\n');
     fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-    fprintf(fid, 'Last modified 17-Aug-2017 10:05:30 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 17-Aug-2017 14:07:28 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');
@@ -1345,6 +1345,12 @@ if status == 1.0
         fprintf(fid, '\r\n-> Analysis continuation will not work if the field output files have been modified by the user');
         fprintf(fid, '\r\n\r\nError code: E144');
         rmappdata(0, 'E144')
+    end
+    if getappdata(0, 'E145') == 1.0
+        fprintf(fid, '\r\n\r\n***ERROR: The field data from the previous job is formatted incorrectly');
+        fprintf(fid, '\r\n-> Analysis continuation will not work if the field output files have been modified by the user');
+        fprintf(fid, '\r\n\r\nError code: E145');
+        rmappdata(0, 'E145')
     end
     
     % Write file footer

@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 17-Aug-2017 10:05:30 GMT
+%   Last modified 17-Aug-2017 14:07:28 GMT
 
     %%
 
@@ -1564,7 +1564,7 @@ classdef messenger < handle
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Load history pre-gating and tensor gating are both active', returnType{i}]);
                         fprintf(fidType(i), ['-> Enabling both gating criteria simultaneously may affect the accuracy of the fatigue results', returnType{i}]);
                     case 184.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: Whenever CONTINUE_FROM is used, field output is automatically written', returnType{i}]);
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Whenever CONTINUE_FROM is used, field output is automatically generated', returnType{i}]);
                         fprintf(fidType(i), ['The following job file option will be ignored:', returnType{i}]);
                         fprintf(fidType(i), ['-> OUTPUT_FIELD', returnType{i}]);
                     case 185.0
@@ -2096,6 +2096,11 @@ classdef messenger < handle
                     case 267.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The environment variable ''noiseReduction'' is deprecated. Use ''gateTensors'' instead', returnType{i}]);
                         setappdata(0, 'messageFileWarnings', 1.0)
+                    case 268.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: When continuing an analysis with the CONTINUE_FROM job file option, the dataset element positions MUST be consistent between each model', returnType{i}]);
+                        fprintf(fidType(i), ['-> Quick Fatigue Tool does not check for this condition before the analysis', returnType{i}]);
+                        fprintf(fidType(i), ['-> e.g. If the datasets used for the first job are UNIQUE NODAL, then the datasets for the second job must also be UNIQUE NODAL', returnType{i}]);
+                        fprintf(fidType(i), ['-> Failure to ensure element position consistency may result in erroneous field data superposition', returnType{i}]);
                 end
             end
         end
@@ -2147,7 +2152,7 @@ classdef messenger < handle
                 fprintf(fid, 'Quick Fatigue Tool 6.11-02\r\n');
             end
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 17-Aug-2017 10:05:30 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 17-Aug-2017 14:07:28 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

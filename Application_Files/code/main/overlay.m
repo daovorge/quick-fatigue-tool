@@ -9,7 +9,7 @@ classdef overlay < handle
 %      4.8 Analysis continuation techniques
 %   
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 17-Aug-2017 10:05:30 GMT
+%   Last modified 17-Aug-2017 14:07:28 GMT
     
     %%
     
@@ -86,6 +86,13 @@ classdef overlay < handle
                 return
             end
             
+            % Count the number of fields
+            if length(previousJobFieldNames) ~= 21.0
+                setappdata(0, 'E145', 1.0)
+                error = 1.0;
+                return
+            end
+            
             % Save the field data from the previous job
             setappdata(0, 'previousJobFieldData', previousJobFieldData(:, 3.0:end))
             
@@ -116,6 +123,9 @@ classdef overlay < handle
             
             % Set flag for analysis continuation
             setappdata(0, 'continueAnalysis', 1.0)
+            
+            % Update the message file
+            messenger.writeMessage(268.0)
         end
         
         %% PREPARE FIELD OVERLAY
