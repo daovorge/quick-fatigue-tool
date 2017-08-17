@@ -160,7 +160,9 @@ classdef material < handle
             end
             
             % List materials in the local database
-            material.list()
+            if error == 0.0
+                material.list()
+            end
         end
         
         %% Fetch material from system database

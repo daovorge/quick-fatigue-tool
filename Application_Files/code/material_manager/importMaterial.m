@@ -1219,9 +1219,9 @@ classdef importMaterial < handle
                 case 0.0
                     fprintf('The material ''%s'' has been imported from the file ''%s''\n', materialName, materialFile)
                 case 1.0
-                    fprintf('WARNING: The material file ''%s'' could not be opened\n', materialFile)
+                    fprintf('ERROR: The material file ''%s'' could not be opened\n', materialFile)
                 case 2.0
-                    fprintf('WARNING: The material file ''%s'' contains no valid material definitions\n', materialFile)
+                    fprintf('ERROR: The material file ''%s'' contains no valid material definitions\n', materialFile)
             end
             
             %{
