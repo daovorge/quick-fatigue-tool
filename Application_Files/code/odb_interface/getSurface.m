@@ -1,3 +1,22 @@
+function [mainID, subID, N, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(mainID, subID, N, Sxx, Syy, Szz, Txy, Tyz, Txz)
+%FOS    QFT function to find surface elements and nodes.
+%   This function uses the ODB file specified by OUTPUT_DATABASE to
+%   determine the elements and nodes which lie on the mesh surface.
+%
+%   GETSURFACE is called when ITEMS='SURFACE'. All non-surface items are
+%   excluded from the analysis.
+%
+%   GETSURFACE is used internally by Quick Fatigue Tool. The user is not
+%   required to run this file.
+%
+%   Reference section in Quick Fatigue Tool User Guide
+%      4.5.3 Custom analysis items
+%
+%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
+%   Last modified 18-Aug-2017 19:07:10 GMT
+
+%%
+
 % Only if ITEMS = 'SURFACE'
 items = getappdata(0, 'items');
 
@@ -30,7 +49,7 @@ else
     numberOfInstances = length(partInstance);
 end
 
-% Get results position 
+% Get results position
 if strcmpi(odbResultPosition, 'element nodal') == 1.0
     odbResultPosition = 'elemental';
 elseif strcmpi(odbResultPosition, 'unique nodal') == 1.0
@@ -82,13 +101,33 @@ if strcmpi(odbResultPosition, 'nodal') == 1.0
     fileName = sprintf('%s\\Application_Files\\code\\odb_interface\\surface_nodes.dat', pwd);
     surfaceNodes = importdata(fileName, ',');
     mainID_surface = str2num(cell2mat(surfaceNodes))'; %#ok<ST2NM>
-    subID_surface = ones(length(mainID_surface), 1.0);
     
     % Delete the node file
     delete(fileName)
     
-    % Arrange the surface main and sub IDs
-else
+    % Update the main IDs
+    intersectingIDs = intersect(mainID_surface, mainID);
+    mainID = mainID(intersectingIDs);
+    subID = subID(intersectingIDs);
+    
+    % Update the tensors
+    Sxx = Sxx(intersectingIDs, :);
+    Syy = Syy(intersectingIDs, :);
+    Szz = Szz(intersectingIDs, :);
+    Txy = Txy(intersectingIDs, :);
+    Tyz = Tyz(intersectingIDs, :);
+    Txz = Txz(intersectingIDs, :);
+    
+    setappdata(0, 'Sxx', Sxx)
+    setappdata(0, 'Syy', Syy)
+    setappdata(0, 'Szz', Szz)
+    setappdata(0, 'Txy', Txy)
+    setappdata(0, 'Tyz', Tyz)
+    setappdata(0, 'Txz', Txz)
+    
+    % Update the number of items
+    N = length(mainID);
+elseif strcmpi(odbResultPosition, 'elemental') == 1.0
     % Get the elements
     fileName = sprintf('%s\\Application_Files\\code\\odb_interface\\surface_elements.dat', pwd);
     surfaceElements = importdata(fileName, ',');
@@ -132,4 +171,60 @@ else
             index = index + 1.0;
         end
     end
+    
+    % Update the main and sub IDs
+    allItems = [mainID, subID];
+    surfaceItems = [mainID_surface, subID_surface];
+    commonItems = ismember(allItems, surfaceItems, 'rows');
+    
+    mainID = mainID(commonItems);
+    subID = subID(commonItems);
+    
+    Sxx = Sxx(commonItems);
+    Syy = Syy(commonItems);
+    Szz = Szz(commonItems);
+    Txy = Txy(commonItems);
+    Tyz = Tyz(commonItems);
+    Txz = Txz(commonItems);
+    
+    setappdata(0, 'Sxx', Sxx)
+    setappdata(0, 'Syy', Syy)
+    setappdata(0, 'Szz', Szz)
+    setappdata(0, 'Txy', Txy)
+    setappdata(0, 'Tyz', Tyz)
+    setappdata(0, 'Txz', Txz)
+    
+    % Update the number of items
+    N = length(mainID);
+else
+    fileName = sprintf('%s\\Application_Files\\code\\odb_interface\\surface_elements.dat', pwd);
+    surfaceElements = importdata(fileName, ',');
+    mainID_surface = str2num(cell2mat(surfaceElements))'; %#ok<ST2NM>
+    
+    % Delete the node file
+    delete(fileName)
+    
+    % Update the main IDs
+    intersectingIDs = intersect(mainID_surface, mainID);
+    mainID = mainID(intersectingIDs);
+    subID = subID(intersectingIDs);
+    
+    % Update the tensors
+    Sxx = Sxx(intersectingIDs, :);
+    Syy = Syy(intersectingIDs, :);
+    Szz = Szz(intersectingIDs, :);
+    Txy = Txy(intersectingIDs, :);
+    Tyz = Tyz(intersectingIDs, :);
+    Txz = Txz(intersectingIDs, :);
+    
+    setappdata(0, 'Sxx', Sxx)
+    setappdata(0, 'Syy', Syy)
+    setappdata(0, 'Szz', Szz)
+    setappdata(0, 'Txy', Txy)
+    setappdata(0, 'Tyz', Tyz)
+    setappdata(0, 'Txz', Txz)
+    
+    % Update the number of items
+    N = length(mainID);
+end
 end

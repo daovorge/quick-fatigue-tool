@@ -223,7 +223,7 @@ if error == 1.0
 end
 
 %% DETECT SURFACE ITAMS IF APPLICABLE
-getSurface
+[mainID, subID, N, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(mainID, subID, N, Sxx, Syy, Szz, Txy, Tyz, Txz);
 
 %% WARN THE USER IF THERE ARE DUPLICATE ITEMS IN THE MODEL
 preProcess.checkDuplicateItems(N, mainID, subID)
