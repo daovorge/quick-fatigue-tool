@@ -85,13 +85,18 @@ if strcmpi(odbResultPosition, 'nodal') == 1.0
     
     % Delete the node file
     delete(fileName)
+    
+    % Arrange the surface main and sub IDs
 else
     fileName = sprintf('%s\\Application_Files\\code\\odb_interface\\surface_nodes.dat', pwd);
     surfaceNodes = importdata(fileName, ',');
-    surfaceNodes = str2num(cell2mat(surfaceNodes)); %#ok<ST2NM>
+    surfaceNodes = cell2mat(surfaceNodes);
     
     % Delete the node file
     delete(fileName)
+    
+    % Arrange the sub (node) IDs
+    m = regexp(surfaceNodes, '), (', 'split');
     
     fileName = sprintf('%s\\Application_Files\\code\\odb_interface\\surface_elements.dat', pwd);
     surfaceElements = importdata(fileName, ',');
