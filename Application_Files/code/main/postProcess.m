@@ -2155,6 +2155,11 @@ classdef postProcess < handle
                                 % Unkown exception
                                 fprintf('\n[POST] ODB Error: The Abaqus API returned the following error:\r\n\r\n%s\r\nResults will not be written to the output database.', message)
                             end
+                            
+                            if getappdata(0, 'autoExport_executionMode') == 1.0
+                                delete(scriptFile)
+                            end
+                            
                             fprintf('\n[ERROR] ODB Interface exited with errors');
                             fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors');
                             return

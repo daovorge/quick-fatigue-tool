@@ -222,6 +222,9 @@ if error == 1.0
     return
 end
 
+%% DETECT SURFACE ITAMS IF APPLICABLE
+getSurface
+
 %% WARN THE USER IF THERE ARE DUPLICATE ITEMS IN THE MODEL
 preProcess.checkDuplicateItems(N, mainID, subID)
 

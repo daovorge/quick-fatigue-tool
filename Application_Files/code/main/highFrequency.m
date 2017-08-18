@@ -894,10 +894,10 @@ classdef highFrequency < handle
                 elementError = 0.0;
                 if isempty(elementType)
                     elementType = 0.0;
-                elseif ~isnumeric(elementType)
+                elseif isnumeric(elementType) == 0.0
                     elementType = 0.0;
-                elseif isnan(elementType) || ~isreal(elementType) || ...
-                        isinf(elementType) || ~isreal(elementType)
+                elseif isnan(elementType) || isreal(elementType) == 0.0 || ...
+                        isinf(elementType) || isreal(elementType) == 0.0
                     elementType = 0.0;
                 end
                 
@@ -982,7 +982,7 @@ classdef highFrequency < handle
             
             %% Filter IDs if user specified individual analysis items
             
-            if strcmpi(items, 'all') == 1.0 || strcmpi(items, 'peek') == 1.0
+            if (strcmpi(items, 'all') == 1.0) || (strcmpi(items, 'peek') == 1.0) || (strcmpi(items, 'surface') == 1.0)
                 items = [];
             elseif isnumeric(items) == 0.0
                 if exist('items', 'file') == 2.0

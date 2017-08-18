@@ -19,7 +19,7 @@
 #   louisvallance@hotmail.co.uk
 #
 #   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-#   Last modified 16-Aug-2017 13:32:18 GMT
+#   Last modified 18-Aug-2017 10:26:46 GMT
 
 import os
 from odbAccess import *
@@ -28,67 +28,34 @@ from abaqusConstants import *
 import string
 from operator import itemgetter
 from collections import Counter
+import sys
 
-"""
-BEGIN USER INPUT
-"""
+N_INSTANCES = int(sys.argv[-1])
+PART_INSTANCES = []
 
-# Abaqus ODB File:
-ODB_NAME = '*.odb'
+for i in range(N_INSTANCES):
+	PART_INSTANCES.append(sys.argv[-(i + 2)])
+	
+ODB_NAME = sys.argv[-4 - N_INSTANCES]
+POSITION = sys.argv[-3 - N_INSTANCES]
+SHELL_FACES = sys.argv[-2 - N_INSTANCES]
 
-# Part instances:
-PART_INSTANCES = 'ALL'
-# Specify individual part instances like this:
-# PART_INSTANCES = ['Instance-1', 'Instance-2',..., 'Instance-n']
-
-# Treat shell surface as shell faces:
-SHELL_FACES = 'NO'
-
-# Create element set(s) from surface nodes:
-ELEMENT_SET = 'NO'
-
-# Write surface element/node sets to ODB:
-SET_TO_ODB = 'YES'
-
-# Write surface node set to text file:
-SET_TO_TEXT = 'YES'
-
-"""
-END USER INPUT
-"""
+#print "ODB Name: %s" % ODB_NAME
+#print "Result position: %s" % POSITION
+#print "Shell faces: %s" % SHELL_FACES
+#print "Part instance: %s" % PART_INSTANCES
+#print "Number of instances: %s" % N_INSTANCES
 
 # Open ODB file:
 odb = openOdb(path = ODB_NAME)
 
-# Analyse all part instances:
-if (PART_INSTANCES.lower() == 'all'):
-	# Initialize indexing variable for part instance names:
-	index = 0
-	
-	# Get number of part instances:
-	nInstances = len(odb.rootAssembly.instances)
-	
-	# Initialize list containing part instance names:
-	PART_INSTANCES = [0 for x in range(nInstances)]
-	
-	# Collect part instance names:
-	for i in range(nInstances):
-		currentInstance = odb.rootAssembly.instances.values()[i].name
-		if (currentInstance != 'ASSEMBLY'):
-			PART_INSTANCES[index] = currentInstance
-			index = index + 1
-		else:
-			nInstances = nInstances - 1
-else:
-	# Get number of part instances:
-	nInstances = len(PART_INSTANCES)
-
-# Initialize part instance list:
-instanceList = []
+# Get number of part instances:
+nInstances = len(PART_INSTANCES)
 
 # Initialize list containing all surface nodes and elements:
-surfaceNodesAll = [[0 for x in range(2)] for y in range(2)]
-surfaceElementsAll = [[0 for x in range(2)] for y in range(2)]
+surfaceNodesAll = [[0 for x in range(2)] for y in range(nInstances)]
+surfaceElementsAll = [[0 for x in range(2)] for y in range(nInstances)]
+surfaceConnectingNodesAll = [[0 for x in range(2)] for y in range(nInstances)]
 
 # Loop over each part instance to find surface:
 for instanceNumber in range(nInstances):
@@ -385,19 +352,6 @@ for instanceNumber in range(nInstances):
 				
 				indexIncrement = 1
 	
-	# Use code template under FALSE if order matters:
-	if False:
-		z1 = [[1, 2, 3], [4, 5, 6], [2, 3, 1], [2, 5, 1]]
-		
-		def test(sublist, list_):
-			for sub in list_:
-				if all(x in sub for x in sublist):
-					return False
-			return True
-		
-		z2 = [x for i, x in enumerate(z1) if test(x, z1[:i] + z1[i+1:])]
-		print(z2)  # This would output [[4, 5, 6], [2, 5, 1]]
-	
 	# Get surface nodes from unique faces:
 	surfaceNodes = Counter([tuple(sorted(x)) for x in faces])
 	surfaceNodes = [list(k) for k, v in surfaceNodes.items() if v == 1]
@@ -405,77 +359,81 @@ for instanceNumber in range(nInstances):
 	# Flatten node set into iterable list:
 	surfaceNodes = list(set(i for j in surfaceNodes for i in j))
 	
-	# Create node/element sets from surface nodes:
-	if (SET_TO_ODB.lower() == 'yes'):
-		
-		# Create node set from surface nodes:
-		setName = "Node-Surface-%s" % partInstance
-		nodeSet = odb.rootAssembly.NodeSetFromNodeLabels(name = setName, nodeLabels = ((partInstance, surfaceNodes),))
-		
-		# Create element set from surface nodes:
-		if (ELEMENT_SET.lower() == 'yes'):
-			surfaceElements = []
-			
-			for j in range(N):
-				# Get element connectivity data:
-				element = instance.elements[j]
-				conn = instance.getElementFromLabel(element.label).connectivity
-				
-				# Get intersection of connectivity with surface node list:
-				intersect = [i for i in surfaceNodes if i in conn]
-				
-				# Check if there are any intersecting nodes:
-				if (len(intersect) != 0):
-					# Element j lies on surface, so append element:
-					surfaceElements.append(element.label)
-					
-			# Create element set:
-			setName = "Element-Surface-%s" % partInstance
-			elementSet = odb.rootAssembly.ElementSetFromElementLabels(name = setName, elementLabels = ((partInstance, surfaceElements),))
-			
-			# Add current node set to global surface node set:
-			surfaceElementsAll[instanceNumber][:] = surfaceElements
-			
-	# Add current part instance name to list:
-	instanceList.append(partInstance)
-	
 	# Add current node set to global surface node set:
 	surfaceNodesAll[instanceNumber][:] = surfaceNodes
 	
-	# Update user via Abaqus/CAE command window:
-	print ("Instance '%s' contains %.0f nodes on the surface") % (partInstance, len(surfaceNodes))
-
-if (SET_TO_ODB.lower() == 'yes'):
-	# Create node set containing entire surface:
-	setName = "Node-Surface-Whole"
-	nodeLabelData = []
-	for i in range(nInstances):
-		nodeLabelData.append([instanceList[i], surfaceNodesAll[i]])
-
-	nodeSet = odb.rootAssembly.NodeSetFromNodeLabels(name = setName, nodeLabels = nodeLabelData)
-
-	# Create element set containing entire surface:
-	if (ELEMENT_SET.lower() == 'yes'):
-		setName = "Element-Surface-Whole"
-		elementLabelData = []
-		for i in range(nInstances):
-			elementLabelData.append([instanceList[i], surfaceElementsAll[i]])
+	# Get surface elements from surface nodes:
+	if (POSITION.lower() == 'elemental') or (POSITION.lower() == 'centroidal'):
+		surfaceElements = []
+		surfaceConnectingNodes = []
+		
+		for j in range(N):
+			# Get element connectivity data:
+			element = instance.elements[j]
+			conn = instance.getElementFromLabel(element.label).connectivity
 			
-		elementSet = odb.rootAssembly.ElementSetFromElementLabels(name = setName, elementLabels = elementLabelData)
-		
+			# Get intersection of connectivity with surface node list:
+			intersect = [i for i in surfaceNodes if i in conn]
+			
+			# Check if there are any intersecting nodes:
+			if (len(intersect) != 0):
+				# Element j lies on surface, so append element:
+				surfaceElements.append(element.label)
+				
+				if (POSITION.lower() == 'elemental'):
+					surfaceConnectingNodes.append(conn)
+					
+		# Add current node set to global surface element set:
+		surfaceElementsAll[instanceNumber][:] = surfaceElements
+		surfaceConnectingNodesAll[instanceNumber][:] = surfaceConnectingNodes
+	
 # Write surface node set to text file:
-if (SET_TO_TEXT.lower() == 'yes'):
-	for i in range(len(surfaceNodesAll) - 1):
-		nodesToFile = surfaceNodesAll[i] + surfaceNodesAll[i + 1]
-		
-	directory = "%s/surface_nodes.dat" % os.path.dirname(os.path.abspath("__file__"))
+if (POSITION.lower() == 'nodal'):
+	if (nInstances == 1):
+		nodesToFile = surfaceNodesAll[0]
+	else:
+		for i in range(len(surfaceNodesAll) - 1):
+			nodesToFile = surfaceNodesAll[i] + surfaceNodesAll[i + 1]
+			
+	directory = "%s/Application_Files/code/odb_interface/surface_nodes.dat" % os.path.dirname(os.path.abspath("__file__"))
 	f = open(directory, 'w+')
 	string = '%s' % nodesToFile
 	f.write(string)
 	f.close()
+elif (POSITION.lower() == 'elemental'):
+	if (nInstances == 1):
+		elementsToFile = surfaceElementsAll[0]
+		nodesToFile = surfaceConnectingNodesAll[0]
+	else:
+		for i in range(len(surfaceElementsAll) - 1):
+			elementsToFile = surfaceElementsAll[i] + surfaceElementsAll[i + 1]
+			nodesToFile = surfaceConnectingNodesAll[i] + surfaceConnectingNodesAll[i + 1]
+			
+	directory = "%s/Application_Files/code/odb_interface/surface_elements.dat" % os.path.dirname(os.path.abspath("__file__"))
+	f = open(directory, 'w+')
+	string = '%s' % elementsToFile
+	f.write(string)
+	f.close()
 	
-# Save and close ODB:
-odb.save()
+	directory = "%s/Application_Files/code/odb_interface/surface_nodes.dat" % os.path.dirname(os.path.abspath("__file__"))
+	f = open(directory, 'w+')
+	string = '%s' % nodesToFile
+	f.write(string)
+	f.close()
+elif (POSITION.lower() == 'centroidal'):
+	if (nInstances == 1):
+		elementsToFile = surfaceElementsAll[0]
+	else:
+		for i in range(len(surfaceElementsAll) - 1):
+			elementsToFile = surfaceElementsAll[i] + surfaceElementsAll[i + 1]
+			
+	directory = "%s/Application_Files/code/odb_interface/surface_elements.dat" % os.path.dirname(os.path.abspath("__file__"))
+	f = open(directory, 'w+')
+	string = '%s' % elementsToFile
+	f.write(string)
+	f.close()
+	
+# Close ODB:
 odb.close()
 
-print "Surface detection complete"
+print "SUCCESS"

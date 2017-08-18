@@ -118,7 +118,7 @@ classdef jobFile < handle
             elseif ischar(items) == 1.0
                 [~, ~, ext] = fileparts(items);
                 
-                if (isempty(ext) == 1.0) && ((strcmpi(items, 'ALL') == 0.0) && strcmpi(items, 'PEEK') == 0.0)
+                if (isempty(ext) == 1.0) && (strcmpi(items, 'ALL') == 0.0 && strcmpi(items, 'PEEK') == 0.0 && strcmpi(items, 'SURFACE') == 0.0)
                     items = 'ALL';
                     setappdata(0, 'items', 'ALL')
                 end
@@ -1791,13 +1791,15 @@ classdef jobFile < handle
             odbResultPosition = getappdata(0, 'odbResultPosition');
             algorithm = getappdata(0, 'algorithm');
             
-            if algorithm == 3.0 || algorithm == 10.0
+            if (algorithm == 3.0) || (algorithm == 10.0)
                 setappdata(0, 'autoExport_uniaxial', 1.0)
+            else
+                setappdata(0, 'autoExport_uniaxial', 0.0)
             end
             
-            if autoExportODB == 1.0 && isempty(outputDatabase) == 0.0
+            if (autoExportODB == 1.0) && (isempty(outputDatabase) == 0.0)
                 % The ODB interface does not support Uniaxial Stress-Life
-                if algorithm == 3.0 || algorithm == 1.0
+                if (algorithm == 3.0) || (algorithm == 10.0)
                     msg = sprintf('Uniaxial analysis methods are not supported by the ODB interface.\n\nResults will not be exported to the output database. OK to continue with job submission?');
                     response = questdlg(msg, 'Quick Fatigue Tool', 'Yes', 'No', 'Yes');
                     if strcmpi('No', response) == 1.0
@@ -1817,7 +1819,7 @@ classdef jobFile < handle
                 end
                 
                 [~, ~, EXT] = fileparts(outputDatabase);
-                switch exist(outputDatabase, 'file')
+                switch exist(outputDatabase, 'file') == 2.0
                     case 0.0
                         if strcmpi(EXT, '.odb') == 1.0
                             msg = sprintf('The output database could not be found:\n\n%s\n\nResults will not be exported to the output database. OK to continue with job submission?', outputDatabase);
