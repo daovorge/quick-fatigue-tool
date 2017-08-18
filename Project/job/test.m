@@ -49,7 +49,7 @@ SN_KNOCK_DOWN = {};
 %% LOADING
 
 % STRESS DATASETS
-DATASET = 'E:\Project_Directories\abaqus\surface\elemental.rpt';
+DATASET = 'E:\Project_Directories\abaqus\surface\nodal.rpt';
 
 % LOAD HISTORIES
 %{
@@ -223,7 +223,7 @@ EXPLICIT_FEA = 0.0;
 
 STEP_NAME = '';
 
-RESULT_POSITION = 'ELEMENT NODAL';
+RESULT_POSITION = 'UNIQUE NODAL';
 
 %% BS 7608 WELD DEFINITION
 

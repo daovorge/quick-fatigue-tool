@@ -81,27 +81,55 @@ end
 if strcmpi(odbResultPosition, 'nodal') == 1.0
     fileName = sprintf('%s\\Application_Files\\code\\odb_interface\\surface_nodes.dat', pwd);
     surfaceNodes = importdata(fileName, ',');
-    surfaceNodes = str2num(cell2mat(surfaceNodes)); %#ok<ST2NM>
+    mainID_surface = str2num(cell2mat(surfaceNodes))'; %#ok<ST2NM>
+    subID_surface = ones(length(mainID_surface), 1.0);
     
     % Delete the node file
     delete(fileName)
     
     % Arrange the surface main and sub IDs
 else
+    % Get the elements
+    fileName = sprintf('%s\\Application_Files\\code\\odb_interface\\surface_elements.dat', pwd);
+    surfaceElements = importdata(fileName, ',');
+    surfaceElements = str2num(cell2mat(surfaceElements)); %#ok<ST2NM>
+    
+    nElements = length(surfaceElements);
+    
+    % Delete the element file
+    delete(fileName)
+    
+    % Get the nodes
     fileName = sprintf('%s\\Application_Files\\code\\odb_interface\\surface_nodes.dat', pwd);
-    surfaceNodes = importdata(fileName, ',');
-    surfaceNodes = cell2mat(surfaceNodes);
+    connectedSurfaceNodes = fileread(fileName);
+    connectedSurfaceNodes = char(connectedSurfaceNodes);
     
     % Delete the node file
     delete(fileName)
     
     % Arrange the sub (node) IDs
-    m = regexp(surfaceNodes, '), (', 'split');
+    subID_surface = str2double(regexp(connectedSurfaceNodes, '\d+', 'match'))';
+    connectivityLengths = regexp(connectedSurfaceNodes, '[^,]*', 'match');
     
-    fileName = sprintf('%s\\Application_Files\\code\\odb_interface\\surface_elements.dat', pwd);
-    surfaceElements = importdata(fileName, ',');
-    surfaceElements = str2num(cell2mat(surfaceElements)); %#ok<ST2NM>
+    nodesPerElement = zeros(1.0, nElements);
+    mainID_surface = zeros(length(subID_surface), 1.0);
     
-    % Delete the element file
-    delete(fileName)
+    index = 1.0;
+    for i = 1:length(connectivityLengths)
+        if isempty(strfind(connectivityLengths{i}, ')')) == 0.0
+            if index == 1.0
+                nodesPerElement(index) = i;
+            else
+                nodesPerElement(index) = (i - sum(nodesPerElement(1:index - 1.0)));
+            end
+            
+            if index == 1.0
+                mainID_surface(index:nodesPerElement(index)) = linspace(surfaceElements(index), surfaceElements(index), nodesPerElement(index));
+            else
+                mainID_surface(1.0 + sum(nodesPerElement(1.0:index - 1.0)):sum(nodesPerElement(1.0:index))) = linspace(surfaceElements(index), surfaceElements(index), nodesPerElement(index));
+            end
+            
+            index = index + 1.0;
+        end
+    end
 end
