@@ -72,6 +72,12 @@ for instanceNumber in range(nInstances):
 	# Initialize indexing variable for element face data:
 	index = 0
 	
+	# Container for existing element types (reset per instance iteration):
+	tetAndHex = [0 for x in range(2)]
+	
+	# Container for existing element orders (reset per instance iteration):
+	linearAndQuad = [0 for x in range(2)]
+	
 	for i in range(N):
 		# Get element object:
 		element = instance.elements[i]
@@ -95,6 +101,8 @@ for instanceNumber in range(nInstances):
 				faces[index + 4][:] = itemgetter(*[2, 6, 7, 3])(conn)
 				faces[index + 5][:] = itemgetter(*[3, 7, 4, 0])(conn)
 				
+				linearAndQuad[0] = 1
+				
 			# Quadratic:
 			else:
 				faces[index + 0][:] = itemgetter(*[0, 1, 2, 3, 8, 9, 10, 11])(conn)
@@ -103,8 +111,11 @@ for instanceNumber in range(nInstances):
 				faces[index + 3][:] = itemgetter(*[1, 5, 6, 2, 17, 13, 18, 9])(conn)
 				faces[index + 4][:] = itemgetter(*[2, 6, 7, 3, 18, 14, 19, 10])(conn)
 				faces[index + 5][:] = itemgetter(*[3, 7, 4, 0, 19, 15, 16, 11])(conn)
+				
+				linearAndQuad[1] = 1
 			
 			indexIncrement = 6
+			tetAndHex[1] = 1
 			
 		# 3D continuum tetrahedral elements:
 		elif ((element.type == 'C3D4') or (element.type == 'C3D4H') or (element.type == 'C3D10') or (element.type == 'C3D10H') or (element.type == 'C3D10HS') or (element.type == 'C3D10M') or (element.type == 'C3D10MH') or (element.type == 'C3D4T') or (element.type == 'C3D10T') or (element.type == 'C3D10HT') or (element.type == 'C3D10MT') or (element.type == 'C3D10MHT')):
@@ -120,14 +131,19 @@ for instanceNumber in range(nInstances):
 				faces[index + 2][:] = itemgetter(*[1, 3, 2])(conn)
 				faces[index + 3][:] = itemgetter(*[2, 3, 0])(conn)
 				
+				linearAndQuad[0] = 1
+				
 			# Quadratic:
 			else:
 				faces[index + 0][:] = itemgetter(*[0, 1, 2, 4, 5, 6])(conn)
 				faces[index + 1][:] = itemgetter(*[0, 3, 1, 7, 8, 4])(conn)
 				faces[index + 2][:] = itemgetter(*[1, 3, 2, 8, 9, 5])(conn)
 				faces[index + 3][:] = itemgetter(*[2, 3, 0, 9, 7, 6])(conn)
+				
+				linearAndQuad[1] = 1
 			
 			indexIncrement = 4
+			tetAndHex[0] = 1
 			
 		# 3D continuum wedge (triangular prism) elements:
 		elif ((element.type == 'C3D6') or (element.type == 'C3D6H') or (element.type == 'C3D15') or (element.type == 'C3D15H')):
@@ -144,6 +160,8 @@ for instanceNumber in range(nInstances):
 				faces[index + 3][:] = itemgetter(*[1, 4, 5, 2])(conn)
 				faces[index + 4][:] = itemgetter(*[2, 5, 3, 0])(conn)
 				
+				linearAndQuad[0] = 1
+				
 			# Quadratic:
 			else:
 				faces[index + 0][:] = itemgetter(*[0, 1, 2, 6, 7, 8])(conn)
@@ -151,6 +169,8 @@ for instanceNumber in range(nInstances):
 				faces[index + 2][:] = itemgetter(*[0, 3, 4, 1, 12, 9, 13, 6])(conn)
 				faces[index + 3][:] = itemgetter(*[1, 4, 5, 2, 13, 10, 14, 7])(conn)
 				faces[index + 4][:] = itemgetter(*[2, 5, 3, 0, 14, 11, 12, 8])(conn)
+				
+				linearAndQuad[1] = 1
 			
 			indexIncrement = 5
 			
@@ -166,6 +186,8 @@ for instanceNumber in range(nInstances):
 			faces[index + 2][:] = itemgetter(*[1, 4, 2])(conn)
 			faces[index + 3][:] = itemgetter(*[2, 4, 3])(conn)
 			faces[index + 4][:] = itemgetter(*[3, 4, 0])(conn)
+			
+			linearAndQuad[0] = 1
 			
 			indexIncrement = 5
 			
@@ -185,11 +207,15 @@ for instanceNumber in range(nInstances):
 					faces[index + 1][:] = itemgetter(*[1, 2])(conn)
 					faces[index + 2][:] = itemgetter(*[2, 0])(conn)
 					
+					linearAndQuad[0] = 1
+					
 				# Quadratic:
 				else:
 					faces[index + 0][:] = itemgetter(*[0, 1, 3])(conn)
 					faces[index + 1][:] = itemgetter(*[1, 2, 4])(conn)
 					faces[index + 2][:] = itemgetter(*[2, 0, 5])(conn)
+					
+					linearAndQuad[1] = 1
 					
 				indexIncrement = 3
 				
@@ -200,9 +226,13 @@ for instanceNumber in range(nInstances):
 				if (len(conn) == 3.0):
 					faces[index + 0][:] = itemgetter(*[0, 1, 2])(conn)
 					
+					linearAndQuad[0] = 1
+					
 				# Quadratic:
 				else:
 					faces[index + 0][:] = itemgetter(*[0, 1, 2, 3, 4, 5])(conn)
+					
+					linearAndQuad[1] = 1
 				
 				indexIncrement = 1
 			
@@ -223,12 +253,16 @@ for instanceNumber in range(nInstances):
 					faces[index + 2][:] = itemgetter(*[2, 3])(conn)
 					faces[index + 3][:] = itemgetter(*[3, 0])(conn)
 					
+					linearAndQuad[0] = 1
+					
 				# Quadratic:
 				else:
 					faces[index + 0][:] = itemgetter(*[0, 1, 4])(conn)
 					faces[index + 1][:] = itemgetter(*[1, 2, 5])(conn)
 					faces[index + 2][:] = itemgetter(*[2, 3, 6])(conn)
 					faces[index + 3][:] = itemgetter(*[3, 0, 7])(conn)
+					
+					linearAndQuad[1] = 1
 					
 				indexIncrement = 4
 				
@@ -239,9 +273,13 @@ for instanceNumber in range(nInstances):
 				if (len(conn) == 4.0):
 					faces[index + 0][:] = itemgetter(*[0, 1, 2, 3])(conn)
 					
+					linearAndQuad[0] = 1
+					
 				# Quadratic:
 				else:
 					faces[index + 0][:] = itemgetter(*[0, 1, 2, 3, 4, 5, 6, 7])(conn)
+					
+					linearAndQuad[1] = 1
 				
 				indexIncrement = 1
 				
@@ -258,6 +296,8 @@ for instanceNumber in range(nInstances):
 			faces[index + 3][:] = itemgetter(*[1, 4, 5, 2])(conn)
 			faces[index + 4][:] = itemgetter(*[2, 5, 3, 0])(conn)
 			
+			linearAndQuad[0] = 1
+			
 			indexIncrement = 5
 			
 		# 3D continuum hexahedral shell elements:
@@ -273,6 +313,8 @@ for instanceNumber in range(nInstances):
 			faces[index + 3][:] = itemgetter(*[1, 5, 6, 2])(conn)
 			faces[index + 4][:] = itemgetter(*[2, 6, 7, 3])(conn)
 			faces[index + 5][:] = itemgetter(*[3, 7, 4, 0])(conn)
+			
+			linearAndQuad[0] = 1
 			
 			indexIncrement = 6
 			
@@ -292,11 +334,15 @@ for instanceNumber in range(nInstances):
 					faces[index + 1][:] = itemgetter(*[1, 2])(conn)
 					faces[index + 2][:] = itemgetter(*[2, 0])(conn)
 					
+					linearAndQuad[0] = 1
+					
 				# Quadratic:
 				else:
 					faces[index + 0][:] = itemgetter(*[0, 1, 3])(conn)
 					faces[index + 1][:] = itemgetter(*[1, 2, 4])(conn)
 					faces[index + 2][:] = itemgetter(*[2, 0, 5])(conn)
+					
+					linearAndQuad[1] = 1
 					
 				indexIncrement = 3
 				
@@ -307,9 +353,13 @@ for instanceNumber in range(nInstances):
 				if (len(conn) == 4.0):
 					faces[index + 0][:] = itemgetter(*[0, 1, 2])(conn)
 					
+					linearAndQuad[0] = 1
+					
 				# Quadratic:
 				else:
 					faces[index + 0][:] = itemgetter(*[0, 1, 2, 3, 4, 5])(conn)
+					
+					linearAndQuad[1] = 1
 				
 				indexIncrement = 1
 			
@@ -330,12 +380,16 @@ for instanceNumber in range(nInstances):
 					faces[index + 2][:] = itemgetter(*[2, 3])(conn)
 					faces[index + 3][:] = itemgetter(*[3, 0])(conn)
 					
+					linearAndQuad[0] = 1
+					
 				# Quadratic:
 				else:
 					faces[index + 0][:] = itemgetter(*[0, 1, 4])(conn)
 					faces[index + 1][:] = itemgetter(*[1, 2, 5])(conn)
 					faces[index + 2][:] = itemgetter(*[2, 3, 6])(conn)
 					faces[index + 3][:] = itemgetter(*[3, 0, 7])(conn)
+					
+					linearAndQuad[1] = 1
 					
 				indexIncrement = 4
 				
@@ -346,9 +400,13 @@ for instanceNumber in range(nInstances):
 				if (len(conn) == 4.0):
 					faces[index + 0][:] = itemgetter(*[0, 1, 2, 3])(conn)
 					
+					linearAndQuad[0] = 1
+					
 				# Quadratic:
 				else:
 					faces[index + 0][:] = itemgetter(*[0, 1, 2, 3, 4, 5, 6, 7])(conn)
+					
+					linearAndQuad[1] = 1
 				
 				indexIncrement = 1
 	
@@ -386,7 +444,15 @@ for instanceNumber in range(nInstances):
 		# Add current node set to global surface element set:
 		surfaceElementsAll[instanceNumber][:] = surfaceElements
 		surfaceConnectingNodesAll[instanceNumber][:] = surfaceConnectingNodes
-	
+		
+	# Check if there is an element shape incompatibility:
+	if (tetAndHex[0] == 1 and tetAndHex[1] == 1):
+		print "'%s' ELEM_INCOMPATIBLE" % partInstance
+		
+	# Check if there is a geometric order incompatibility:
+	if (linearAndQuad[0] == 1 and linearAndQuad[1] == 1):
+		print "'%s' GEOM_INCOMPATIBLE" % partInstance
+		
 # Write surface node set to text file:
 if (POSITION.lower() == 'nodal'):
 	if (nInstances == 1):

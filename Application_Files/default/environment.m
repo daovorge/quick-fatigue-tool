@@ -13,7 +13,7 @@
 %      2 Environment variables
 %   
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 30-Jun-2017 12:48:35 GMT
+%   Last modified 19-Aug-2017 13:05:07 GMT
 
 %% GATE TENSORS
 %{
@@ -47,6 +47,13 @@ setappdata(0, 'numberOfWindows', 2.0)
     1: Always read group data as an FEA subset
 %}
 setappdata(0, 'groupDefinition', 0.0)
+
+%% SURFACE DETECTION
+%{
+    0: Treat shell surface as whole shell
+    1: Treat shell surface as shell faces
+%}
+setappdata(0, 'shellFaces', 0.0)
 
 %% MEAN STRESS CORRECTION
 

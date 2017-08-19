@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 17-Aug-2017 14:07:28 GMT
+%   Last modified 19-Aug-2017 13:05:07 GMT
 
     %%
 
@@ -2101,6 +2101,27 @@ classdef messenger < handle
                         fprintf(fidType(i), ['-> Quick Fatigue Tool does not check for this condition before the analysis', returnType{i}]);
                         fprintf(fidType(i), ['-> e.g. If the datasets used for the first job are UNIQUE NODAL, then the datasets for the second job must also be UNIQUE NODAL', returnType{i}]);
                         fprintf(fidType(i), ['-> Failure to ensure element position consistency may result in erroneous field data superposition', returnType{i}]);
+                    case 269.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Surface detection is not supported for uniaxial analysis methods', returnType{i}]);
+                    case 270.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Surface detection is not supported for integration point stress data', returnType{i}]);
+                    case 271.0
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: The following part instaces contain incompatible element types: %s ', returnType{i}], char(getappdata(0, 'incompatibleInstance')));
+                        fprintf(fidType(i), ['-> Surface detection may include elements and nodes in the subsurface', returnType{i}]);
+                        setappdata(0, 'messageFileWarnings', 1.0)
+                    case 272.0
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: The following part instaces contain incompatible geometric orders: %s ', returnType{i}], char(getappdata(0, 'incompatibleInstance')));
+                        fprintf(fidType(i), ['-> Surface detection may include elements and nodes in the subsurface', returnType{i}]);
+                        setappdata(0, 'messageFileWarnings', 1.0)
+                    case 273.0
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: Surface detection failed on ''%s'' with the following error:', returnType{i}], getappdata(0, 'outputDatabase'));
+                        fprintf(fidType(i), '%s', getappdata(0, 'message_273'));
+                        fprintf(fidType(i), ['-> All items will be analysed', returnType{i}]);
+                        setappdata(0, 'messageFileWarnings', 1.0)
+                    case 274.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Detected %.0f nodes on the model surface', returnType{i}], getappdata(0, 'message_274'));
+                    case 275.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Detected %.0f elements on the model surface', returnType{i}], getappdata(0, 'message_275'));
                 end
             end
         end
@@ -2152,7 +2173,7 @@ classdef messenger < handle
                 fprintf(fid, 'Quick Fatigue Tool 6.11-02\r\n');
             end
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 17-Aug-2017 14:07:28 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 19-Aug-2017 13:05:07 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
