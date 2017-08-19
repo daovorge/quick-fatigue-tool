@@ -18,7 +18,7 @@ function [] = tutorial_intro()
 %      1 Job file options
 %   
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 12-May-2017 15:25:52 GMT
+%   Last modified 19-Aug-2017 15:17:10 GMT
 
 %% JOB
 
@@ -147,11 +147,12 @@ MS_CORRECTION = 2.0;
 % ITEMS TO ANALYSE
 %{
     'ALL': Whole model
+    'SURFACE': ODB element surface
     'PEEK': Item with largest (S1-S3)
     'hotspots_<jobName>.dat': Hotspot region
     n: User-defined list
 %}
-ITEMS = 'ALL';
+ITEMS = 'SURFACE';
 
 %{
     'CAEL': Endurance limit (defined in material)

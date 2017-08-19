@@ -8,7 +8,7 @@ classdef keywords < handle
 %   See also importMaterial, fetchMaterial, job.
 %   
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 04-Aug-2017 10:15:11 GMT
+%   Last modified 19-Aug-2017 15:17:10 GMT
     
     %%
     
@@ -41,7 +41,7 @@ classdef keywords < handle
                 'HF DATASET', 'HF HISTORY', 'HF TIME', 'HF SCALE', 'FATIGUE RESERVE FACTOR'};
             
             % KEYWORD DATA
-            kwData = {'ALL', 3.0, 1.0, 1.0, 1.0, 'CAEL', 0.0, 0.0, {1.0, 'Repeats'},...
+            kwData = {'SURFACE', 3.0, 1.0, 1.0, 1.0, 'CAEL', 0.0, 0.0, {1.0, 'Repeats'},...
                 0.0, 1.0, 0.0, 0.0, 0.0, [], [], 'default.kt', 1.0, 0.0, 'B', 0.0, [],...
                 0.0, [], 'NORMAL', [], [], [], 'PART-1-1', [], [], [], 0.0, {'DEFAULT'}, 0.0,...
                 {}, 0.0, 'ELEMENT NODAL', [], 0.0, [], [], {}, {}, 'Job-1',...

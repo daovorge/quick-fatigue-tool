@@ -318,7 +318,7 @@ for instanceNumber in range(nInstances):
 			
 			indexIncrement = 6
 			
-		# 2D Continuum triangular elements:
+		# 2D continuum triangular elements:
 		elif ((element.type == 'CPE3') or (element.type == 'CPE3H') or (element.type == 'CPE6') or (element.type == 'CPE6H') or (element.type == 'CPE6M') or (element.type == 'CPE6MH') or (element.type == 'CPS3') or (element.type == 'CPS6') or (element.type == 'CPS6M') or (element.type == 'CPEG3') or (element.type == 'CPEG3H') or (element.type == 'CPEG6') or (element.type == 'CPEG6H') or (element.type == 'CPEG6M') or (element.type == 'CPEG6MH')):
 			
 			# Increment INDEX face node variable:

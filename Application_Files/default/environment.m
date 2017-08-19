@@ -51,7 +51,7 @@ setappdata(0, 'groupDefinition', 0.0)
 %% SURFACE DETECTION
 %{
     0: Treat shell surface as whole shell
-    1: Treat shell surface as shell faces
+    1: Treat shell surface as free shell faces
 %}
 setappdata(0, 'shellFaces', 0.0)
 
