@@ -2105,6 +2105,7 @@ classdef messenger < handle
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Surface detection is not supported for uniaxial analysis methods', returnType{i}]);
                     case 270.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Surface detection is not supported for integration point stress data', returnType{i}]);
+                        fprintf(fidType(i), ['-> All items will be analysed', returnType{i}]);
                     case 271.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The following part instaces contain incompatible element types: %s ', returnType{i}], char(getappdata(0, 'incompatibleInstance')));
                         fprintf(fidType(i), ['-> Surface detection may include elements and nodes in the subsurface', returnType{i}]);
