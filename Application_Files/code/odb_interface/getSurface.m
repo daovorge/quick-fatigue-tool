@@ -22,13 +22,21 @@ outputDatabase = getappdata(0, 'outputDatabase');
 partInstance = getappdata(0, 'partInstance');
 odbResultPosition = getappdata(0, 'odbResultPosition');
 
+items = getappdata(0, 'items');
+
 % Check intpus
 if isempty(outputDatabase) == 1.0
+    if strcmpi(items, 'surface') == 1.0
+        setappdata(0, 'items', 'ALL')
+    end
     return
 end
 
 % Only if ITEMS = 'SURFACE'
 if strcmpi(getappdata(0, 'items'), 'surface') == 0.0
+    if strcmpi(items, 'surface') == 1.0
+        setappdata(0, 'items', 'ALL')
+    end
     return
 end
 
@@ -38,6 +46,9 @@ algorithm = getappdata(0, 'algorithm');
 if (algorithm == 3.0) || (algorithm == 1.0)
     % Surface detection is not supported for uniaxial methods
     messenger.writeMessage(269.0)
+    if strcmpi(items, 'surface') == 1.0
+        setappdata(0, 'items', 'ALL')
+    end
     return
 end
 
@@ -60,6 +71,9 @@ elseif strcmpi(odbResultPosition, 'centroid') == 1.0
 else
     % Integration point is not currently supported
     messenger.writeMessage(270.0)
+    if strcmpi(items, 'surface') == 1.0
+        setappdata(0, 'items', 'ALL')
+    end
     return
 end
 
@@ -150,6 +164,9 @@ else
     % Print the message to the message file
     setappdata(0, 'message_273', message)
     messenger.writeMessage(273.0)
+    if strcmpi(items, 'surface') == 1.0
+        setappdata(0, 'items', 'ALL')
+    end
     return
 end
 
@@ -241,12 +258,12 @@ elseif strcmpi(odbResultPosition, 'elemental') == 1.0
     mainID = mainID(commonItems);
     subID = subID(commonItems);
     
-    Sxx = Sxx(commonItems);
-    Syy = Syy(commonItems);
-    Szz = Szz(commonItems);
-    Txy = Txy(commonItems);
-    Tyz = Tyz(commonItems);
-    Txz = Txz(commonItems);
+    Sxx = Sxx(commonItems, :);
+    Syy = Syy(commonItems, :);
+    Szz = Szz(commonItems, :);
+    Txy = Txy(commonItems, :);
+    Tyz = Tyz(commonItems, :);
+    Txz = Txz(commonItems, :);
     
     setappdata(0, 'Sxx', Sxx)
     setappdata(0, 'Syy', Syy)

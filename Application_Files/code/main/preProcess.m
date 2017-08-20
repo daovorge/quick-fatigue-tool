@@ -2480,7 +2480,7 @@ classdef preProcess < handle
             setappdata(0, 'nodeType_master', nodeType)
             
             %% Filter IDs if user specified individual analysis items
-            if (strcmpi(items, 'all') == 1.0) || (strcmpi(items, 'peek') == 1.0) || (strcmpi(items, 'surface') == 1.0)
+            if (strcmpi(items, 'all') == 1.0) || (strcmpi(items, 'maxps') == 1.0) || (strcmpi(items, 'surface') == 1.0)
                 items = [];
             elseif isnumeric(items) == 0.0
                 if exist(items, 'file') == 2.0
@@ -4843,7 +4843,7 @@ classdef preProcess < handle
             peekItem = find(maximumRangePerNode == max(maximumRangePerNode));
             
             %{
-                If there is more than one peek item in the model, save the
+                If there is more than one maxps item in the model, save the
                 values and inform the user
             %}
             nPeekItems = length(peekItem);
@@ -4859,7 +4859,7 @@ classdef preProcess < handle
                 peekItem = peekItem(1.0);
             end
             
-            % Save the value of the peek item
+            % Save the value of the maxps item
             setappdata(0, 'peekItem', peekItem)
             
             % Update the stress tensors
@@ -4904,7 +4904,7 @@ classdef preProcess < handle
             G = getappdata(0, 'numberOfGroups');
             groupIDBuffer = getappdata(0, 'groupIDBuffer');
             
-            % Initialize the variable whih stores the group contaning the PEEK item
+            % Initialize the variable whih stores the group contaning the MAXPS item
             peekGroup = 1.0;
             found = 0.0;
             
@@ -4930,7 +4930,7 @@ classdef preProcess < handle
             setappdata(0, 'peekAnalysis_worstStressRange', maximumRangePerNode(peekItem))
             
             %{
-                If the peek item does not belong to any of the analysis
+                If the MAXPS item does not belong to any of the analysis
                 group, warn the user
             %}
             if found == 0.0
@@ -4944,7 +4944,7 @@ classdef preProcess < handle
             setappdata(0, 'groupIDBuffer', groupIDBuffer)
         end
         
-        %% WRITE PEEK ITEMS TO A SEPARATE FILE
+        %% WRITE MAXPS ITEMS TO A SEPARATE FILE
         function [] = writePeekItems()
             mainIDs = getappdata(0, 'peekItems_mainID');
             subIDs = getappdata(0, 'peekItems_subID');
@@ -4960,11 +4960,11 @@ classdef preProcess < handle
                 mkdir(sprintf('%s/Data Files', root))
             end
             
-            dir = [root, 'Data Files/peek_items.dat'];
+            dir = [root, 'Data Files/maxps_items.dat'];
             
             fid = fopen(dir, 'w+');
             
-            fprintf(fid, 'PEEK_ITEMS\r\n');
+            fprintf(fid, 'MAXPS_ITEMS\r\n');
             fprintf(fid, 'Job:\t%s\r\nLoading:\t%.3g\t%s\r\n', getappdata(0, 'jobName'), getappdata(0, 'loadEqVal'), getappdata(0, 'loadEqUnits'));
             
             fprintf(fid, 'Main ID\tSub ID\tMaximum Principal Stress Range [MPa]\r\n');

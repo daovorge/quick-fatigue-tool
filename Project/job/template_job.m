@@ -17,7 +17,7 @@ function [] = template_job()
 %      1 Job file options
 %   
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 19-Aug-2017 15:17:10 GMT
+%   Last modified 20-Aug-2017 18:25:05 GMT
 
 %% JOB
 
@@ -147,7 +147,7 @@ MS_CORRECTION = 0.0;
 %{
     'ALL': Whole model
     'SURFACE': ODB element surface
-    'PEEK': Item with largest (S1-S3)
+    'MAXPS': Item with largest (S1-S3)
     'hotspots_<jobName>.dat': Hotspot region
     n: User-defined list
 %}

@@ -118,7 +118,7 @@ classdef jobFile < handle
             elseif ischar(items) == 1.0
                 [~, ~, ext] = fileparts(items);
                 
-                if (isempty(ext) == 1.0) && (strcmpi(items, 'ALL') == 0.0 && strcmpi(items, 'PEEK') == 0.0 && strcmpi(items, 'SURFACE') == 0.0)
+                if (isempty(ext) == 1.0) && (strcmpi(items, 'ALL') == 0.0 && strcmpi(items, 'MAXPS') == 0.0 && strcmpi(items, 'SURFACE') == 0.0)
                     items = 'ALL';
                     setappdata(0, 'items', 'ALL')
                 end

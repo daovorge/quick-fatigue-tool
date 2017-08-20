@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 19-Aug-2017 15:17:10 GMT
+%   Last modified 20-Aug-2017 18:25:05 GMT
 
     %%
 
@@ -320,42 +320,48 @@ classdef messenger < handle
                         end
 
                         algorithm = getappdata(0, 'algorithm');
+                        
+                        mainID = getappdata(0, 'mainID');
+                        subID = getappdata(0, 'subID');
+                        
                         if (algorithm ~= 10.0) && (algorithm ~= 3.0)
                             if length(worstItem) > 1.0
                                 if length(worstItem) > 10.0
                                     fprintf(fidType(i), [returnType{i}, '***NOTE: The worst analysis item IDs are:', returnType{i}]);
-                                    fprintf(fidType(i), '-> %.0f, ', worstItem(1.0));
+                                    fprintf(fidType(i), '-> %.0f (%.0f.%.0f), ', worstItem(1.0), mainID(worstItem(1.0)), subID(worstItem(1.0)));
 
                                     for n = 2:8
-                                        fprintf(fidType(i), '%.0f, ', worstItem(n));
+                                        fprintf(fidType(i), '%.0f (%.0f.%.0f), ', worstItem(n), mainID(worstItem(n)), subID(worstItem(n)));
                                     end
 
-                                    fprintf(fidType(i), ['%.0f', returnType{i}], worstItem(10.0));
-
+                                    fprintf(fidType(i), ['%.0f (%.0f.%.0f)', returnType{i}], worstItem(10.0), mainID(worstItem(10.0)), subID(worstItem(10.0)));
                                     fprintf(fidType(i), ['-> (Only the first 10 items are printed)', returnType{i}]);
-                                    fprintf(fidType(i), ['-> These values can be used in conjunction with the ITEMS option in the job', returnType{i}]);
-                                    fprintf(fidType(i), ['   file to re-run the analysis at these locations only', returnType{i}]);
                                 else
                                     fprintf(fidType(i), [returnType{i}, '***NOTE: The worst analysis item IDs are:', returnType{i}]);
-
-                                    fprintf(fidType(i), '-> %.0f, ', worstItem(1.0));
+                                    fprintf(fidType(i), '-> %.0f (%.0f.%.0f), ', worstItem(1.0), mainID(worstItem(1.0)), subID(worstItem(1.0)));
 
                                     for n = 2:(length(worstItem) - 1.0)
-                                        fprintf(fidType(i), '%.0f, ', worstItem(n));
+                                        fprintf(fidType(i), '%.0f (%.0f.%.0f), ', worstItem(n), mainID(worstItem(n)), subID(worstItem(n)));
                                     end
 
-                                    fprintf(fidType(i), ['%.0f', returnType{i}], worstItem(end));
-
-                                    fprintf(fidType(i), ['-> These values can be used in conjunction with the ITEMS option in the job', returnType{i}]);
-                                    fprintf(fidType(i), ['   file to re-run the analysis at these locations only', returnType{i}]);
+                                    fprintf(fidType(i), ['%.0f (%.0f.%.0f)', returnType{i}], worstItem(end), mainID(worstItem(end)), subID(worstItem(end)));
                                 end
 
                                 setappdata(0, 'messageFileNotes', 1.0)
                             else
-                                fprintf(fidType(i), [returnType{i}, '***NOTE: The worst analysis item ID is %.0f', returnType{i}], worstItem);
-                                fprintf(fidType(i), ['-> This value can be used as an argument for the ITEMS option in the job file', returnType{i}]);
+                                fprintf(fidType(i), [returnType{i}, '***NOTE: The worst analysis item ID is %.0f (%.0f.%.0f)', returnType{i}], worstItem, mainID, subID);
+                                
 
                                 setappdata(0, 'messageFileNotes', 1.0)
+                            end
+                            
+                            if strcmpi(getappdata(0, 'items'), 'surface') == 0.0
+                                if length(worstItem) > 1.0
+                                    fprintf(fidType(i), ['-> These values can be used in conjunction with the ITEMS option in the job', returnType{i}]);
+                                    fprintf(fidType(i), ['   file to re-run the analysis at these locations only', returnType{i}]);
+                                else
+                                    fprintf(fidType(i), ['-> This value can be used as an argument for the ITEMS option in the job file', returnType{i}]);
+                                end
                             end
                         end
                     case 19.0
@@ -1457,8 +1463,8 @@ classdef messenger < handle
                         if getappdata(0, 'multiplePeekItems') == 1.0
                             setappdata(0, 'multiplePeekItems', 0.0)
 
-                            fprintf(fidType(i), ['-> This is the first of %.0f items encountered in the model which have the same stress range. Peek items have been written to', returnType{i}], getappdata(0, 'nPeekItems'));
-                            fprintf(fidType(i), ['   ''%s\\Project\\output\\%s\\Data Files\\peek_items.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
+                            fprintf(fidType(i), ['-> This is the first of %.0f items encountered in the model which have the same stress range. MAXPS items have been written to', returnType{i}], getappdata(0, 'nPeekItems'));
+                            fprintf(fidType(i), ['   ''%s\\Project\\output\\%s\\Data Files\\maxps_items.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
                         end
 
                         setappdata(0, 'messageFileNotes', 1.0)
@@ -2174,7 +2180,7 @@ classdef messenger < handle
                 fprintf(fid, 'Quick Fatigue Tool 6.11-02\r\n');
             end
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 19-Aug-2017 15:17:10 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 20-Aug-2017 18:25:05 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
@@ -2637,10 +2643,16 @@ classdef messenger < handle
                 fprintf(fid, '    Design Life: %.3g %s\r\n', getappdata(0, 'dLife'), getappdata(0, 'loadEqUnits'));
                 if algorithm == 3.0 || algorithm == 10.0
                     fprintf(fid, '    Items: N/A\r\n');
-                elseif isempty(items)
+                elseif isempty(items) == 1.0
                     fprintf(fid, '    Items: ALL\r\n');
                 elseif strcmpi(items, 'all') == 1.0
                     fprintf(fid, '    Items: ALL\r\n');
+                elseif strcmpi(items, 'surface') == 1.0
+                    fprintf(fid, '    Items: ELEMENT SURFACE\r\n');
+                elseif strcmpi(items, 'maxps') == 1.0
+                    fprintf(fid, '    Items: MAXPS\r\n');
+                elseif exist(items, 'file') == 2.0
+                    fprintf(fid, '    Items: ''%s''\r\n', items);
                 elseif length(items) > 1.0
                     fprintf(fid, '    Items: %.0f, ', items(1.0));
                     fprintf(fid, '%.0f, ', items(1:end-1));
@@ -2838,6 +2850,12 @@ classdef messenger < handle
                     fprintf(fid, '    Items: ALL\r\n');
                 elseif strcmpi(items, 'all') == 1.0
                     fprintf(fid, '    Items: ALL\r\n');
+                elseif strcmpi(items, 'surface') == 1.0
+                    fprintf(fid, '    Items: ELEMENT SURFACE\r\n');
+                elseif strcmpi(items, 'maxps') == 1.0
+                    fprintf(fid, '    Items: MAXPS\r\n');
+                elseif exist(items, 'file') == 2.0
+                    fprintf(fid, '    Items: ''%s''\r\n', items);
                 elseif length(items) > 1.0
                     fprintf(fid, '    Items: %.0f, ', items(1.0));
                     fprintf(fid, '%.0f, ', items(1:end-1));
@@ -3016,8 +3034,8 @@ classdef messenger < handle
             else
                 for i = 1:G
                     %{
-                        If the analysis is a PEEK analysis, override the value of GROUP to
-                        the group containing the PEEK item
+                        If the analysis is a MAXPS analysis, override the value of GROUP to
+                        the group containing the MAXPS item
                     %}
                     if getappdata(0, 'peekAnalysis') == 1.0
                         i = getappdata(0, 'peekGroup'); %#ok<FXSET>

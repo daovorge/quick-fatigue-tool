@@ -11,7 +11,7 @@ function [] = main(flags)
 %   Author contact: louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 19-Aug-2017 15:17:10 GMT
+%   Last modified 20-Aug-2017 18:25:05 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');    tic_pre = tic;
@@ -43,7 +43,7 @@ setappdata(0, 'messageFileWarnings', 0.0)
 %% PRINT COMMAND WINDOW HEADER
 fprintf('[NOTICE] Quick Fatigue Tool 6.11-02')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2017)')
-fprintf('\n[NOTICE] Last modified 19-Aug-2017 15:17:10 GMT')
+fprintf('\n[NOTICE] Last modified 20-Aug-2017 18:25:05 GMT')
 
 cleanExit = 0.0;
 
@@ -258,7 +258,7 @@ preProcess.getPrincipalStress(N, Sxx, Syy, Szz, Txy, Tyz, Txz, algorithm, 0.0)
 %% GET THE VON MISES STRESS FOR THE LOADING
 if (algorithm == 7.0 && getappdata(0, 'stressInvariantParameter') == 1.0) || algorithm == 9.0 || outputField == 1.0 || outputHistory == 1.0 || outputFigure == 1.0
     vonMises = preProcess.getVonMisesStress(N, Sxx, Syy, Szz, Txy, Tyz, Txz);
-elseif strcmpi(getappdata(0, 'items'), 'peek') == 1.0
+elseif strcmpi(getappdata(0, 'items'), 'maxps') == 1.0
     setappdata(0, 'CalculatedVonMisesStress', 0.0)
 end
 
@@ -268,7 +268,7 @@ if algorithm == 7.0
 end
 
 %% ISOLATE THE LARGEST (S1-S3) ITEM IF APPLICABLE
-if (strcmpi(getappdata(0, 'items'), 'peek') == 1.0) && (N > 1.0)
+if (strcmpi(getappdata(0, 'items'), 'maxps') == 1.0) && (N > 1.0)
     [Sxx, Syy, Szz, Txy, Tyz, Txz, mainID, subID, peekGroup, vonMises, error] = preProcess.peekAtNode(Sxx, Syy, Szz, Txy, Tyz, Txz, mainID, subID);
 
     if error == 1.0
@@ -450,7 +450,7 @@ s1 = getappdata(0, 'S1');
 s2 = getappdata(0, 'S2');
 s3 = getappdata(0, 'S3');
 
-% If PEEK analysis, reset value of G to 1.0
+% If MAXPS analysis, reset value of G to 1.0
 if peekAnalysis == 1.0
     %{
         In order to identify the worst analysis item from the correct
@@ -530,8 +530,8 @@ nasalifeParameter = getappdata(0, 'nasalifeParameter');
 
 for groups = 1:G
     %{
-        If the analysis is a PEEK analysis, override the value of GROUP to
-        the group containing the PEEK item
+        If the analysis is a MAXPS analysis, override the value of GROUP to
+        the group containing the MAXPS item
     %}
     if peekAnalysis == 1.0
         groups = peekGroup; %#ok<FXSET>

@@ -982,7 +982,7 @@ classdef highFrequency < handle
             
             %% Filter IDs if user specified individual analysis items
             
-            if (strcmpi(items, 'all') == 1.0) || (strcmpi(items, 'peek') == 1.0) || (strcmpi(items, 'surface') == 1.0)
+            if (strcmpi(items, 'all') == 1.0) || (strcmpi(items, 'maxps') == 1.0) || (strcmpi(items, 'surface') == 1.0)
                 items = [];
             elseif isnumeric(items) == 0.0
                 if exist('items', 'file') == 2.0

@@ -2506,7 +2506,7 @@ classdef group < handle
         %% GET THE WORST LIFE FOR EACH ANALYSIS GROUP
         function [] = worstLifePerGroup(life, mainID, subID, groupWorstLife, peekAnalysis)
             %{
-                If the analysis was a peek analysis, use the original
+                If the analysis was a MAXPS analysis, use the original
                 number of groups
             %}
             if peekAnalysis == 1.0

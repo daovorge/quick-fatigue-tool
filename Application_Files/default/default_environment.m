@@ -13,7 +13,7 @@
 %      2 Environment variables
 %   
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 19-Aug-2017 13:05:07 GMT
+%   Last modified 20-Aug-2017 18:25:05 GMT
 
 %% GATE TENSORS
 %{

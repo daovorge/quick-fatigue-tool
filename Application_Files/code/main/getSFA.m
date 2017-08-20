@@ -31,8 +31,8 @@ end
 
 for groups = 1:G
     %{
-        If the analysis is a PEEK analysis, override the value of GROUP to
-        the group containing the PEEK item
+        If the analysis is a MAXPS analysis, override the value of GROUP to
+        the group containing the MAXPS item
     %}
     if getappdata(0, 'peekAnalysis') == 1.0
         groups = getappdata(0, 'peekGroup'); %#ok<FXSET>
