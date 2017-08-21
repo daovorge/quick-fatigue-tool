@@ -45,7 +45,6 @@ algorithm = getappdata(0, 'algorithm');
 
 if (algorithm == 3.0) || (algorithm == 1.0)
     % Surface detection is not supported for uniaxial methods
-    messenger.writeMessage(269.0)
     if strcmpi(items, 'surface') == 1.0
         setappdata(0, 'items', 'ALL')
     end

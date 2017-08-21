@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 20-Aug-2017 18:25:05 GMT
+%   Last modified 21-Aug-2017 10:18:25 GMT
 
     %%
 
@@ -24,7 +24,7 @@ classdef messenger < handle
             %}
 
             %{
-                Search for string _AVAILABLE_ to check for unused message IDs
+                Search for string %_AVAILABLE_% to check for unused message IDs
             %}
 
             %% AUXILIARY TASKS
@@ -2108,7 +2108,7 @@ classdef messenger < handle
                         fprintf(fidType(i), ['-> e.g. If the datasets used for the first job are UNIQUE NODAL, then the datasets for the second job must also be UNIQUE NODAL', returnType{i}]);
                         fprintf(fidType(i), ['-> Failure to ensure element position consistency may result in erroneous field data superposition', returnType{i}]);
                     case 269.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: Surface detection is not supported for uniaxial analysis methods', returnType{i}]);
+                        %_AVAILABLE_%
                     case 270.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Surface detection is not supported for integration point stress data', returnType{i}]);
                         fprintf(fidType(i), ['-> All items will be analysed', returnType{i}]);
@@ -2180,7 +2180,7 @@ classdef messenger < handle
                 fprintf(fid, 'Quick Fatigue Tool 6.11-02\r\n');
             end
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 20-Aug-2017 18:25:05 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 21-Aug-2017 10:18:25 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
