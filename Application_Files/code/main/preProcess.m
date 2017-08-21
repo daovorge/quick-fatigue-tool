@@ -8,7 +8,7 @@ classdef preProcess < handle
     %   See also postProcess.
     %
     %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-    %   Last modified 09-Aug-2017 15:15:02 GMT
+    %   Last modified 21-Aug-2017 20:16:00 GMT
     
     %%
     
@@ -2487,7 +2487,7 @@ classdef preProcess < handle
                     setappdata(0, 'hotspotFile', items)
                     
                     % If ITEMS is defined as a file, verify its contents
-                    items_file = importdata(items, '\t', 4.0);
+                    items_file = importdata(items, '\t');
                     if iscell(items_file) == 1.0
                         items_file = cell2mat(items_file);
                         [~, itemCols] = size(items_file);
@@ -2497,9 +2497,11 @@ classdef preProcess < handle
                     
                     if itemCols == 1.0
                         items_data = importdata(items, '\t');
+                        items_header = 'NONE';
                     else
                         try
                             items_data = items_file.data;
+                            items_header = items_file.textdata;
                         catch
                             items_data = 'error';
                         end
@@ -2513,7 +2515,7 @@ classdef preProcess < handle
                         items = [];
                         setappdata(0, 'items', 'ALL')
                         messenger.writeMessage(143.0)
-                    elseif itemCols ~= 4.0 &&  itemCols ~= 1.0
+                    elseif (strcmpi(items_header{1.0}, 'hotspots') == 0.0 && strcmpi(items_header{1.0}, 'surface items') == 0.0) && (itemCols ~= 1.0 || itemCols ~= 4.0)
                         items = [];
                         setappdata(0, 'items', 'ALL')
                         messenger.writeMessage(144.0)

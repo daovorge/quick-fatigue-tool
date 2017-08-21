@@ -51,7 +51,7 @@ setappdata(0, 'groupDefinition', 0.0)
 %% SURFACE DETECTION
 %{
     0: Search dataset elements only
-    1: Search whole part instance
+    1: Search ODB part instance
 %}
 setappdata(0, 'searchRegion', 0.0)
 

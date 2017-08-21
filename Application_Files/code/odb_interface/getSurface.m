@@ -13,7 +13,7 @@ function [mainID, subID, N, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(mainID, s
 %      4.5.3 Custom analysis items
 %
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 19-Aug-2017 13:05:07 GMT
+%   Last modified 21-Aug-2017 20:16:00 GMT
 
 %%
 
@@ -335,6 +335,9 @@ elseif strcmpi(odbResultPosition, 'elemental') == 1.0
     % Update the message file
     setappdata(0, 'message_275', nElements)
     messenger.writeMessage(275.0)
+    
+    % Get intersecting IDs from common items
+    intersectingIDs = find(commonItems == 1.0);
 else
     fileName = sprintf('%s\\Application_Files\\code\\odb_interface\\surface_elements.dat', pwd);
     surfaceElements = importdata(fileName, ',');
@@ -391,4 +394,30 @@ else
     setappdata(0, 'message_275', nElements)
     messenger.writeMessage(275.0)
 end
+
+%% Write surface items to text file
+% Concatenate data
+data = [intersectingIDs'; mainID'; subID']';
+
+% Check that the directory exists
+jobName = getappdata(0, 'jobName');
+root = getappdata(0, 'outputDirectory');
+
+if exist(sprintf('%s/Data Files', root), 'dir') == 0.0
+    mkdir(sprintf('%s/Data Files', root))
+end
+
+% Create the file
+dir = [pwd, sprintf('\\Project\\output\\%s\\Data Files\\', jobName), 'surface_items.dat'];
+fid = fopen(dir, 'w+');
+
+fprintf(fid, 'SURFACE ITEMS\r\n');
+
+fprintf(fid, 'Item #\tMain ID\tSub ID\r\n');
+fprintf(fid, '%.0f\t%.0f\t%.0f\r\n', data');
+
+fclose(fid);
+
+% Inform the user that hotpots have been written to file
+messenger.writeMessage(278.0)
 end

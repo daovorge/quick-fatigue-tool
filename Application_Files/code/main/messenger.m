@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 21-Aug-2017 10:18:25 GMT
+%   Last modified 21-Aug-2017 20:16:00 GMT
 
     %%
 
@@ -2135,6 +2135,8 @@ classdef messenger < handle
                     case 277.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The stress dataset(s) contain no items on the element surface', returnType{i}], getappdata(0, 'message_275'));
                         fprintf(fidType(i), ['-> All items will be analysed', returnType{i}]);
+                    case 278.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Surface items have been written to ''%s\\Project\\output\\%s\\Data Files\\surface_items.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
                 end
             end
         end
@@ -2186,7 +2188,7 @@ classdef messenger < handle
                 fprintf(fid, 'Quick Fatigue Tool 6.11-02\r\n');
             end
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 21-Aug-2017 10:18:25 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 21-Aug-2017 20:16:00 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
