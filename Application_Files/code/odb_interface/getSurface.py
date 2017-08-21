@@ -36,15 +36,18 @@ PART_INSTANCES = []
 for i in range(N_INSTANCES):
 	PART_INSTANCES.append(sys.argv[-(i + 2)])
 	
-ODB_NAME = sys.argv[-4 - N_INSTANCES]
-POSITION = sys.argv[-3 - N_INSTANCES]
+ODB_NAME = sys.argv[-5 - N_INSTANCES]
+POSITION = sys.argv[-4 - N_INSTANCES]
+SEARCH_REGION = sys.argv[-3 - N_INSTANCES]
 SHELL_FACES = sys.argv[-2 - N_INSTANCES]
 
-#print "ODB Name: %s" % ODB_NAME
-#print "Result position: %s" % POSITION
-#print "Shell faces: %s" % SHELL_FACES
-#print "Part instance: %s" % PART_INSTANCES
-#print "Number of instances: %s" % N_INSTANCES
+# Debug output:
+print "ODB Name: %s" % ODB_NAME
+print "Result position: %s" % POSITION
+print "Search region: %s" % SEARCH_REGION
+print "Shell faces: %s" % SHELL_FACES
+print "Part instance: %s" % PART_INSTANCES
+print "Number of instances: %s\n" % N_INSTANCES
 
 # Open ODB file:
 odb = openOdb(path = ODB_NAME)
@@ -57,6 +60,14 @@ surfaceNodesAll = [[0 for x in range(2)] for y in range(nInstances)]
 surfaceElementsAll = [[0 for x in range(2)] for y in range(nInstances)]
 surfaceConnectingNodesAll = [[0 for x in range(2)] for y in range(nInstances)]
 
+# Get the element IDs:
+if (SEARCH_REGION.lower() == 'dataset'):
+	directory = "%s/Application_Files/code/odb_interface/element_ids.dat" % os.path.dirname(os.path.abspath("__file__"))
+	fid = open(directory, 'r')
+	f = fid.read()
+	ELEMENT_ID = f.split(',')
+	fid.close()
+	
 # Loop over each part instance to find surface:
 for instanceNumber in range(nInstances):
 	# Get ODB part instance:
@@ -64,8 +75,11 @@ for instanceNumber in range(nInstances):
 	instance = odb.rootAssembly.instances[partInstance]
 	
 	# Get number of elements belonging to part instance:
-	N = len(instance.elements)
-	
+	if (SEARCH_REGION.lower() == 'dataset'):
+		N = len(ELEMENT_ID)
+	else:
+		N = len(instance.elements)
+		
 	# Initialize list containing all element faces (maximum 8 nodes per element face, 6*N element faces):
 	faces = [[0 for x in range(8)] for y in range(6*N)]
 	
@@ -79,12 +93,17 @@ for instanceNumber in range(nInstances):
 	linearAndQuad = [0 for x in range(2)]
 	
 	for i in range(N):
-		# Get element object:
-		element = instance.elements[i]
-		
-		# Get element connectivity data:
-		conn = instance.getElementFromLabel(element.label).connectivity
-		
+		if (SEARCH_REGION.lower() == 'dataset'):
+			# Get element object:
+			element = instance.getElementFromLabel(int(ELEMENT_ID[i]))
+			# Get element connectivity data:
+			conn = element.connectivity
+		else:
+			# Get element object:
+			element = instance.elements[i]
+			# Get element connectivity data:
+			conn = instance.getElementFromLabel(element.label).connectivity
+			
 		# 3D continuum hexahedron (brick) elements:
 		if ((element.type == 'C3D8') or (element.type == 'C3D8H') or (element.type == 'C3D8I') or (element.type == 'C3D8IH') or (element.type == 'C3D8R') or (element.type == 'C3D8RH') or (element.type == 'C3D8S') or (element.type == 'C3D8HS') or (element.type == 'C3D20') or (element.type == 'C3D20H') or (element.type == 'C3D20R') or (element.type == 'C3D20RH') or (element.type == 'C3D8T') or (element.type == 'C3D8HT') or (element.type == 'C3D8RT') or (element.type == 'C3D8RHT') or (element.type == 'C3D20T') or (element.type == 'C3D20HT') or (element.type == 'C3D20RT') or (element.type == 'C3D20RHT')):
 			
@@ -426,10 +445,17 @@ for instanceNumber in range(nInstances):
 		surfaceConnectingNodes = []
 		
 		for j in range(N):
-			# Get element connectivity data:
-			element = instance.elements[j]
-			conn = instance.getElementFromLabel(element.label).connectivity
-			
+			if (SEARCH_REGION.lower() == 'dataset'):
+				# Get element object:
+				element = instance.getElementFromLabel(int(ELEMENT_ID[j]))
+				# Get element connectivity data:
+				conn = element.connectivity
+			else:
+				# Get element object:
+				element = instance.elements[j]
+				# Get element connectivity data:
+				conn = instance.getElementFromLabel(element.label).connectivity
+				
 			# Get intersection of connectivity with surface node list:
 			intersect = [i for i in surfaceNodes if i in conn]
 			
@@ -502,4 +528,4 @@ elif (POSITION.lower() == 'centroidal'):
 # Close ODB:
 odb.close()
 
-print "SUCCESS"
+print "Outcome: SUCCESS"

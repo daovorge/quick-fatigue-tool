@@ -349,9 +349,8 @@ classdef messenger < handle
 
                                 setappdata(0, 'messageFileNotes', 1.0)
                             else
-                                fprintf(fidType(i), [returnType{i}, '***NOTE: The worst analysis item ID is %.0f (%.0f.%.0f)', returnType{i}], worstItem, mainID, subID);
+                                fprintf(fidType(i), [returnType{i}, '***NOTE: The worst analysis item ID is %.0f (%.0f.%.0f)', returnType{i}], worstItem, mainID(worstItem), subID(worstItem));
                                 
-
                                 setappdata(0, 'messageFileNotes', 1.0)
                             end
                             
@@ -942,7 +941,7 @@ classdef messenger < handle
                         switch getappdata(0, 'warning_061_number')
                             case 1.0
                                 fprintf(fidType(i), [returnType{i}, '***WARNING: ODB Interface ERROR: No matching position labels were found in the model output database. Field data will not be exported', returnType{i}]);
-                                fprintf(fidType(i), ['-> Check the PART_INSTANCE definition in the job file', returnType{i}]);
+                                fprintf(fidType(i), ['-> Check the definitions of OUTPUT_DATABASE and PART_INSTANCE in the job file', returnType{i}]);
                             case 2.0
                                 fprintf(fidType(i), [returnType{i}, '***WARNING: ODB Interface ERROR: An error occurred while retrieving the connectivity matrix. Field data will not be exported', returnType{i}]);
                             case 3.0
@@ -2108,16 +2107,17 @@ classdef messenger < handle
                         fprintf(fidType(i), ['-> e.g. If the datasets used for the first job are UNIQUE NODAL, then the datasets for the second job must also be UNIQUE NODAL', returnType{i}]);
                         fprintf(fidType(i), ['-> Failure to ensure element position consistency may result in erroneous field data superposition', returnType{i}]);
                     case 269.0
-                        %_AVAILABLE_%
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Surface detection did not find any elements or nodes', returnType{i}]);
+                        fprintf(fidType(i), ['-> All items will be analysed', returnType{i}]);
                     case 270.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Surface detection is not supported for integration point stress data', returnType{i}]);
                         fprintf(fidType(i), ['-> All items will be analysed', returnType{i}]);
                     case 271.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: The following part instaces contain incompatible element types: %s ', returnType{i}], char(getappdata(0, 'incompatibleInstance')));
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: The surface detection algorithm found incompatible element types', returnType{i}]);
                         fprintf(fidType(i), ['-> Surface detection may include elements and nodes in the subsurface', returnType{i}]);
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 272.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: The following part instaces contain incompatible geometric orders: %s ', returnType{i}], char(getappdata(0, 'incompatibleInstance')));
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: The surface detection algorithm found incompatible geometric orders', returnType{i}]);
                         fprintf(fidType(i), ['-> Surface detection may include elements and nodes in the subsurface', returnType{i}]);
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 273.0
@@ -2129,6 +2129,12 @@ classdef messenger < handle
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Detected %.0f nodes on the model surface', returnType{i}], getappdata(0, 'message_274'));
                     case 275.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Detected %.0f elements on the model surface', returnType{i}], getappdata(0, 'message_275'));
+                    case 276.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Surface detection cannot be limited to dataset elements for unique nodal stress data', returnType{i}], getappdata(0, 'message_275'));
+                        fprintf(fidType(i), ['-> The whole part instance will be searched', returnType{i}]);
+                    case 277.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The stress dataset(s) contain no items on the element surface', returnType{i}], getappdata(0, 'message_275'));
+                        fprintf(fidType(i), ['-> All items will be analysed', returnType{i}]);
                 end
             end
         end

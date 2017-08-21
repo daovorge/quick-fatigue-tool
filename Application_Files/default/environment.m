@@ -50,6 +50,12 @@ setappdata(0, 'groupDefinition', 0.0)
 
 %% SURFACE DETECTION
 %{
+    0: Search dataset elements only
+    1: Search whole part instance
+%}
+setappdata(0, 'searchRegion', 0.0)
+
+%{
     0: Treat shell surface as whole shell
     1: Treat shell surface as free shell faces
 %}

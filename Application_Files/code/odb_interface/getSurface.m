@@ -62,11 +62,11 @@ end
 
 % Get results position
 if strcmpi(odbResultPosition, 'element nodal') == 1.0
-    odbResultPosition = 'elemental';
+    odbResultPosition = 'ELEMENTAL';
 elseif strcmpi(odbResultPosition, 'unique nodal') == 1.0
-    odbResultPosition = 'nodal';
+    odbResultPosition = 'NODAL';
 elseif strcmpi(odbResultPosition, 'centroid') == 1.0
-    odbResultPosition = 'centroidal';
+    odbResultPosition = 'CENTROIDAL';
 else
     % Integration point is not currently supported
     messenger.writeMessage(270.0)
@@ -76,15 +76,13 @@ else
     return
 end
 
-%% Run the surface detection Python script
-
-% Get the Abaqus command
+%% Get the Abaqus command
 abqCmd = getappdata(0, 'autoExport_abqCmd');
 if isempty(abqCmd) == 1.0
     abqCmd = 'abaqus';
 end
 
-% Format the part instances
+%% Format the part instances
 if iscell(partInstance) == 1.0
     partInstance_i = '';
     for i = 1:numberOfInstances
@@ -97,7 +95,7 @@ if iscell(partInstance) == 1.0
     partInstance = partInstance_i;
 end
 
-% Get the shell surface environment variable
+%% Get the shell surface environment variable
 shell = getappdata(0, 'shellFaces');
 if isnumeric(shell) == 1.0
     if shell ~= 1.0 && shell ~= 0.0
@@ -115,14 +113,56 @@ elseif strcmpi(shell, 'yes') == 0.0 && strcmpi(shell, 'no') == 0.0
     shell = 'NO';
 end
 
+%% Create mainID list if necessary
+searchRegion = getappdata(0, 'searchRegion');
+
+if isnumeric(searchRegion) == 1.0
+    if searchRegion ~= 1.0 && searchRegion ~= 0.0
+        searchRegion = 'DATASET';
+    elseif searchRegion == 1.0
+        searchRegion = 'INSTANCE';
+    else
+        searchRegion = 'DATASET';
+    end
+elseif isempty(searchRegion) == 1.0
+    searchRegion = 'DATASET';
+elseif ischar(searchRegion) == 0.0
+    searchRegion = 'DATASET';
+elseif strcmpi(searchRegion, 'DATASET') == 0.0 && strcmpi(searchRegion, 'INSTANCE') == 0.0
+    searchRegion = 'DATASET';
+end
+
+if (strcmpi(searchRegion, 'dataset') == 1.0) && (strcmpi(odbResultPosition, 'nodal') == 1.0)
+    searchRegion = 'INSTANCE';
+    messenger.writeMessage(276.0)
+elseif strcmpi(searchRegion, 'dataset') == 1.0
+    fileName = [pwd, '/Application_Files/code/odb_interface/element_ids.dat'];
+    fid = fopen(fileName, 'w+');
+    uniqueMainID = unique(mainID);
+    L = length(uniqueMainID);
+    for i = 1:L
+        if i == L
+            fprintf(fid, '%.0f', uniqueMainID(i));
+        else
+            fprintf(fid, '%.0f, ', uniqueMainID(i));
+        end
+    end
+    fclose(fid);
+end
+
+%% Run the script
 % Run script like this:
 % abaqus python getSurface_qft.py -- <odbName> <position> <shell> <instance-1> <instance-n> <n>
 
-% Run the script
-inputString = sprintf('%s python Application_Files\\code\\odb_interface\\getSurface.py -- %s %s %s %s %.0f',...
-    abqCmd, outputDatabase, odbResultPosition, shell, partInstance, numberOfInstances);
+inputString = sprintf('%s python Application_Files\\code\\odb_interface\\getSurface.py -- "%s" %s %s %s %s %.0f',...
+    abqCmd, outputDatabase, odbResultPosition, searchRegion, shell, partInstance, numberOfInstances);
 
 [status, message] = system(inputString);
+
+if strcmpi(searchRegion, 'dataset') == 1.0
+    % Delete the element ID file
+    delete(fileName);
+end
 
 % Check the result of running the script
 if (isempty(strfind(message, 'SUCCESS')) == 0.0) && (status == 0.0)
@@ -130,36 +170,17 @@ if (isempty(strfind(message, 'SUCCESS')) == 0.0) && (status == 0.0)
     
     % Check for element shape incompatibility:
     if isempty(strfind(message, 'ELEM_INCOMPATIBLE')) == 0.0
-        a = regexp(message, '[\''.\'']', 'start');
-        L = 0.5*length(a);
-        index = 1.0;
-        incompatibleInstance = cell(1.0, L);
-        for i = 1:L
-            incompatibleInstance{i} = message(a(index):a(index + 1.0)); 
-            index = index + 2.0;
-        end
-        
         % Write to message file
-        setappdata(0, 'incompatibleInstance', incompatibleInstance)
         messenger.writeMessage(271.0)
     end
     
     % Check for geometric order incompatibility:
     if isempty(strfind(message, 'GEOM_INCOMPATIBLE')) == 0.0
-        a = regexp(message, '[\''.\'']', 'start');
-        L = 0.5*length(a);
-        index = 1.0;
-        incompatibleInstance = cell(1.0, L);
-        for i = 1:L
-            incompatibleInstance{i} = message(a(index):a(index + 1.0)); 
-            index = index + 2.0;
-        end
-        
         % Write to message file
-        setappdata(0, 'incompatibleInstance', incompatibleInstance)
         messenger.writeMessage(272.0)
     end
 else
+    message = [message, sprintf('\nOutcome: FAIL\n')];
     % Print the message to the message file
     setappdata(0, 'message_273', message)
     messenger.writeMessage(273.0)
@@ -178,8 +199,27 @@ if strcmpi(odbResultPosition, 'nodal') == 1.0
     % Delete the node file
     delete(fileName)
     
+    % Check if there are any surface elements/nodes
+    if isempty(surfaceNodes) == 1.0
+        messenger.writeMessage(269.0)
+        if strcmpi(items, 'surface') == 1.0
+            setappdata(0, 'items', 'ALL')
+        end
+        return
+    end
+    
     % Update the main IDs
     intersectingIDs = intersect(mainID_surface, mainID);
+    
+    % Check if any dataset items lie on the surface
+    if isempty(intersectingIDs) == 1.0
+        messenger.writeMessage(277.0)
+        if strcmpi(items, 'surface') == 1.0
+            setappdata(0, 'items', 'ALL')
+        end
+        return
+    end
+    
     mainID = mainID(intersectingIDs);
     subID = subID(intersectingIDs);
     
@@ -223,6 +263,15 @@ elseif strcmpi(odbResultPosition, 'elemental') == 1.0
     % Delete the node file
     delete(fileName)
     
+    % Check if there are any surface elements/nodes
+    if (isempty(surfaceElements) == 1.0) || (isempty(connectedSurfaceNodes) == 1.0)
+        messenger.writeMessage(269.0)
+        if strcmpi(items, 'surface') == 1.0
+            setappdata(0, 'items', 'ALL')
+        end
+        return
+    end
+    
     % Arrange the sub (node) IDs
     subID_surface = str2double(regexp(connectedSurfaceNodes, '\d+', 'match'))';
     connectivityLengths = regexp(connectedSurfaceNodes, '[^,]*', 'match');
@@ -253,6 +302,15 @@ elseif strcmpi(odbResultPosition, 'elemental') == 1.0
     allItems = [mainID, subID];
     surfaceItems = [mainID_surface, subID_surface];
     commonItems = ismember(allItems, surfaceItems, 'rows');
+    
+    % Check if any dataset items lie on the surface
+    if any(commonItems) == 0.0
+        messenger.writeMessage(277.0)
+        if strcmpi(items, 'surface') == 1.0
+            setappdata(0, 'items', 'ALL')
+        end
+        return
+    end
     
     mainID = mainID(commonItems);
     subID = subID(commonItems);
@@ -287,8 +345,27 @@ else
     % Delete the node file
     delete(fileName)
     
+    % Check if there are any surface elements/nodes
+    if isempty(surfaceElements) == 1.0
+        messenger.writeMessage(269.0)
+        if strcmpi(items, 'surface') == 1.0
+            setappdata(0, 'items', 'ALL')
+        end
+        return
+    end
+    
     % Update the main IDs
     intersectingIDs = intersect(mainID_surface, mainID);
+    
+    % Check if any dataset items lie on the surface
+    if isempty(intersectingIDs) == 1.0
+        messenger.writeMessage(277.0)
+        if strcmpi(items, 'surface') == 1.0
+            setappdata(0, 'items', 'ALL')
+        end
+        return
+    end
+    
     mainID = mainID(intersectingIDs);
     subID = subID(intersectingIDs);
     
