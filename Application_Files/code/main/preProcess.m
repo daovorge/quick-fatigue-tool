@@ -4270,8 +4270,10 @@ classdef preProcess < handle
                     mkdir([dir, 'MATLAB Figures'])
                 end
             elseif exist(dir, 'dir') == 7.0
-                % If the output directory already exists, warn user that the directory will
-                % be overwritten
+                %{
+                    If the output directory already exists, warn user that
+                    the directory will be overwritten
+                %}
                 cantRemovePreviousOutput = 0.0;
                 
                 response = questdlg(sprintf('An output directory already exists for job ''%s''.\nOK to overwrite?',...
