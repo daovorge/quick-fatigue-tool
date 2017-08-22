@@ -1,4 +1,4 @@
-function [mainID, subID, N, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(mainID, subID, N, Sxx, Syy, Szz, Txy, Tyz, Txz)
+function [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz)
 %FOS    QFT function to find surface elements and nodes.
 %   This function uses the ODB file specified by OUTPUT_DATABASE to
 %   determine the elements and nodes which lie on the mesh surface.
@@ -13,7 +13,7 @@ function [mainID, subID, N, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(mainID, s
 %      4.5.3 Custom analysis items
 %
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 21-Aug-2017 20:16:00 GMT
+%   Last modified 22-Aug-2017 16:12:56 GMT
 
 %%
 
@@ -22,11 +22,10 @@ outputDatabase = getappdata(0, 'outputDatabase');
 partInstance = getappdata(0, 'partInstance');
 odbResultPosition = getappdata(0, 'odbResultPosition');
 
-items = getappdata(0, 'items');
-
 % Check intpus
 if isempty(outputDatabase) == 1.0
     if strcmpi(items, 'surface') == 1.0
+        items = 'ALL';
         setappdata(0, 'items', 'ALL')
     end
     return
@@ -35,6 +34,7 @@ end
 % Only if ITEMS = 'SURFACE'
 if strcmpi(getappdata(0, 'items'), 'surface') == 0.0
     if strcmpi(items, 'surface') == 1.0
+        items = 'ALL';
         setappdata(0, 'items', 'ALL')
     end
     return
@@ -46,6 +46,7 @@ algorithm = getappdata(0, 'algorithm');
 if (algorithm == 3.0) || (algorithm == 1.0)
     % Surface detection is not supported for uniaxial methods
     if strcmpi(items, 'surface') == 1.0
+        items = 'ALL';
         setappdata(0, 'items', 'ALL')
     end
     return
@@ -71,6 +72,7 @@ else
     % Integration point is not currently supported
     messenger.writeMessage(270.0)
     if strcmpi(items, 'surface') == 1.0
+        items = 'ALL';
         setappdata(0, 'items', 'ALL')
     end
     return
@@ -185,6 +187,7 @@ else
     setappdata(0, 'message_273', message)
     messenger.writeMessage(273.0)
     if strcmpi(items, 'surface') == 1.0
+        items = 'ALL';
         setappdata(0, 'items', 'ALL')
     end
     return
@@ -203,6 +206,7 @@ if strcmpi(odbResultPosition, 'nodal') == 1.0
     if isempty(surfaceNodes) == 1.0
         messenger.writeMessage(269.0)
         if strcmpi(items, 'surface') == 1.0
+            items = 'ALL';
             setappdata(0, 'items', 'ALL')
         end
         return
@@ -215,6 +219,7 @@ if strcmpi(odbResultPosition, 'nodal') == 1.0
     if isempty(intersectingIDs) == 1.0
         messenger.writeMessage(277.0)
         if strcmpi(items, 'surface') == 1.0
+            items = 'ALL';
             setappdata(0, 'items', 'ALL')
         end
         return
@@ -267,6 +272,7 @@ elseif strcmpi(odbResultPosition, 'elemental') == 1.0
     if (isempty(surfaceElements) == 1.0) || (isempty(connectedSurfaceNodes) == 1.0)
         messenger.writeMessage(269.0)
         if strcmpi(items, 'surface') == 1.0
+            items = 'ALL';
             setappdata(0, 'items', 'ALL')
         end
         return
@@ -307,6 +313,7 @@ elseif strcmpi(odbResultPosition, 'elemental') == 1.0
     if any(commonItems) == 0.0
         messenger.writeMessage(277.0)
         if strcmpi(items, 'surface') == 1.0
+            items = 'ALL';
             setappdata(0, 'items', 'ALL')
         end
         return
@@ -352,6 +359,7 @@ else
     if isempty(surfaceElements) == 1.0
         messenger.writeMessage(269.0)
         if strcmpi(items, 'surface') == 1.0
+            items = 'ALL';
             setappdata(0, 'items', 'ALL')
         end
         return
@@ -364,6 +372,7 @@ else
     if isempty(intersectingIDs) == 1.0
         messenger.writeMessage(277.0)
         if strcmpi(items, 'surface') == 1.0
+            items = 'ALL';
             setappdata(0, 'items', 'ALL')
         end
         return

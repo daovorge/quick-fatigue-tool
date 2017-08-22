@@ -11,7 +11,7 @@ function [] = main(flags)
 %   Author contact: louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 21-Aug-2017 20:16:00 GMT
+%   Last modified 22-Aug-2017 16:12:56 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');    tic_pre = tic;
@@ -43,7 +43,7 @@ setappdata(0, 'messageFileWarnings', 0.0)
 %% PRINT COMMAND WINDOW HEADER
 fprintf('[NOTICE] Quick Fatigue Tool 6.11-02')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2017)')
-fprintf('\n[NOTICE] Last modified 21-Aug-2017 20:16:00 GMT')
+fprintf('\n[NOTICE] Last modified 22-Aug-2017 16:12:56 GMT')
 
 cleanExit = 0.0;
 
@@ -223,7 +223,7 @@ if error == 1.0
 end
 
 %% DETECT SURFACE ITAMS IF APPLICABLE
-[mainID, subID, N, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(mainID, subID, N, Sxx, Syy, Szz, Txy, Tyz, Txz);
+[mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz);
 
 %% WARN THE USER IF THERE ARE DUPLICATE ITEMS IN THE MODEL
 preProcess.checkDuplicateItems(N, mainID, subID)
