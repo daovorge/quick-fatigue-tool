@@ -2350,7 +2350,7 @@ classdef preProcess < handle
                 elementType = getappdata(0, 'elementType');
                 if isempty(elementType)
                     elementType = 0.0;
-                elseif ~isnumeric(elementType)
+                elseif isnumeric(elementType) == 0.0
                     elementType = 0.0;
                 elseif isnan(elementType) || ~isreal(elementType) || ...
                         isinf(elementType) || ~isreal(elementType)
