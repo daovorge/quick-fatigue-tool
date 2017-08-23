@@ -18,7 +18,7 @@ function [] = tutorial_intro()
 %      1 Job file options
 %   
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 20-Aug-2017 18:25:05 GMT
+%   Last modified 23-Aug-2017 15:10:40 GMT
 
 %% JOB
 
@@ -58,7 +58,7 @@ DATASET = 'stress_uni.dat';
 %}
 HISTORY = 'history_fully_reversed.dat';
 
-% FEA UNITS
+% DATASET UNITS
 %{
     0: User-defined
     1: Pa
@@ -68,10 +68,10 @@ HISTORY = 'history_fully_reversed.dat';
     5: ksi
     6: Msi
 %}
-UNITS = 3.0;
+UNITS = 'MPa';
 
 %{
-    [Pa] = CONV * [model]
+    [Pa] = CONV * [dataset]
 %}
 CONV = [];
 

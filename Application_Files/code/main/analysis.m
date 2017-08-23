@@ -4,7 +4,7 @@ classdef analysis < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 25-Apr-2017 12:13:25 GMT
+%   Last modified 23-Aug-2017 15:10:40 GMT
     
     %%
     
@@ -660,7 +660,9 @@ classdef analysis < handle
         end
         
         %% Gate the tensors
-        function damageParameter = gateTensors(damageParameter, gateTensors, tensorGate)
+        function [damageParameter] = gateTensors(damageParameter, gateTensors, tensorGate)
+            damageParameterOriginal = damageParameter;
+            
             % Perform peak-valley detection if a user-defined history is being used
             if gateTensors == 1.0
                 % Get gating values from % of max tensor
@@ -697,6 +699,14 @@ classdef analysis < handle
             elseif gateTensors == 2.0
                 % Use Nielsony's method
                 damageParameter = preProcess.sig2ext(damageParameter)';
+            end
+            
+            %{
+                If the peak-picked signal has a length of 1, use the
+                original signal
+            %}
+            if length(damageParameter) < 2.0
+                damageParameter = damageParameterOriginal;
             end
         end
         

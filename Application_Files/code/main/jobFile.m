@@ -6,7 +6,7 @@ classdef jobFile < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 08-Aug-2017 16:36:15 GMT
+%   Last modified 23-Aug-2017 15:10:40 GMT
     
     %%
     
@@ -1588,7 +1588,7 @@ classdef jobFile < handle
                         conversionFactor = 1.0;
                         units = 'MPa';
                     else
-                        conversionFactor = 1.0/(userUnits*1E6);
+                        conversionFactor = 1E6/userUnits;
                         units = 'User-defined';
                     end
                 case 1.0
