@@ -13,7 +13,7 @@ function [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(ma
 %      4.5.3 Custom analysis items
 %
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 22-Aug-2017 16:12:56 GMT
+%   Last modified 24-Aug-2017 12:05:33 GMT
 
 %%
 
@@ -213,7 +213,7 @@ if strcmpi(odbResultPosition, 'nodal') == 1.0
     end
     
     % Update the main IDs
-    intersectingIDs = intersect(mainID_surface, mainID);
+    [intersectingIDs, ~, intersectingIndexes] = intersect(mainID_surface, mainID);
     
     % Check if any dataset items lie on the surface
     if isempty(intersectingIDs) == 1.0
@@ -225,16 +225,16 @@ if strcmpi(odbResultPosition, 'nodal') == 1.0
         return
     end
     
-    mainID = mainID(intersectingIDs);
-    subID = subID(intersectingIDs);
+    mainID = mainID(intersectingIndexes);
+    subID = subID(intersectingIndexes);
     
     % Update the tensors
-    Sxx = Sxx(intersectingIDs, :);
-    Syy = Syy(intersectingIDs, :);
-    Szz = Szz(intersectingIDs, :);
-    Txy = Txy(intersectingIDs, :);
-    Tyz = Tyz(intersectingIDs, :);
-    Txz = Txz(intersectingIDs, :);
+    Sxx = Sxx(intersectingIndexes, :);
+    Syy = Syy(intersectingIndexes, :);
+    Szz = Szz(intersectingIndexes, :);
+    Txy = Txy(intersectingIndexes, :);
+    Tyz = Tyz(intersectingIndexes, :);
+    Txz = Txz(intersectingIndexes, :);
     
     setappdata(0, 'Sxx', Sxx)
     setappdata(0, 'Syy', Syy)
@@ -344,7 +344,7 @@ elseif strcmpi(odbResultPosition, 'elemental') == 1.0
     messenger.writeMessage(275.0)
     
     % Get intersecting IDs from common items
-    intersectingIDs = find(commonItems == 1.0);
+    intersectingIndexes = find(commonItems == 1.0);
 else
     fileName = sprintf('%s\\Application_Files\\code\\odb_interface\\surface_elements.dat', pwd);
     surfaceElements = importdata(fileName, ',');
@@ -366,7 +366,7 @@ else
     end
     
     % Update the main IDs
-    intersectingIDs = intersect(mainID_surface, mainID);
+    [intersectingIDs, ~, intersectingIndexes] = intersect(mainID_surface, mainID);
     
     % Check if any dataset items lie on the surface
     if isempty(intersectingIDs) == 1.0
@@ -378,16 +378,16 @@ else
         return
     end
     
-    mainID = mainID(intersectingIDs);
-    subID = subID(intersectingIDs);
+    mainID = mainID(intersectingIndexes);
+    subID = subID(intersectingIndexes);
     
     % Update the tensors
-    Sxx = Sxx(intersectingIDs, :);
-    Syy = Syy(intersectingIDs, :);
-    Szz = Szz(intersectingIDs, :);
-    Txy = Txy(intersectingIDs, :);
-    Tyz = Tyz(intersectingIDs, :);
-    Txz = Txz(intersectingIDs, :);
+    Sxx = Sxx(intersectingIndexes, :);
+    Syy = Syy(intersectingIndexes, :);
+    Szz = Szz(intersectingIndexes, :);
+    Txy = Txy(intersectingIndexes, :);
+    Tyz = Tyz(intersectingIndexes, :);
+    Txz = Txz(intersectingIndexes, :);
     
     setappdata(0, 'Sxx', Sxx)
     setappdata(0, 'Syy', Syy)
@@ -406,7 +406,7 @@ end
 
 %% Write surface items to text file
 % Concatenate data
-data = [intersectingIDs'; mainID'; subID']';
+data = [intersectingIndexes'; mainID'; subID']';
 
 % Check that the directory exists
 jobName = getappdata(0, 'jobName');

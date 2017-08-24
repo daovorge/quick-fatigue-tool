@@ -2551,7 +2551,7 @@ classdef preProcess < handle
                 itemError = 0.0;
                 
                 for i = 1:numberOfItems
-                    if items(i) > length(mainIDs)
+                    if items(i) > R
                         mainIDs2 = mainIDs';
                         subIDs2 = subIDs';
                         

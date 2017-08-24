@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 24-Aug-2017 08:46:45 GMT
+%   Last modified 24-Aug-2017 12:05:33 GMT
 
     %%
 
@@ -684,10 +684,16 @@ classdef messenger < handle
                         end
                     case 59.0
                         % RPT interface
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: Some user-defined items could not be located in the stress dataset', returnType{i}]);
-                        fprintf(fidType(i), ['-> Check the ITEMS option in the job file. All items will be analysed', returnType{i}]);
-
-                        setappdata(0, 'messageFileWarnings', 1.0)
+                        if getappdata(0, 'suppress_ID59') == 0.0
+                            fprintf(fidType(i), [returnType{i}, '***WARNING: Some user-defined items could not be located in the stress dataset', returnType{i}]);
+                            fprintf(fidType(i), ['-> Check the ITEMS option in the job file. All items will be analysed', returnType{i}]);
+                            
+                            if i == X
+                                setappdata(0, 'suppress_ID59', 1.0)
+                            end
+                            
+                            setappdata(0, 'messageFileWarnings', 1.0)
+                        end
                     case 60.0
                         % Complex values in the load signal
                         fprintf(fidType(i), [returnType{i}, '***WARNING: Parts of the load history contain complex stress values', returnType{i}]);
@@ -2097,7 +2103,13 @@ classdef messenger < handle
                     case 265.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Abaqus ODB field output has been exported to ''%s\\Project\\output\\%s\\Data Files''', returnType{i}], pwd, getappdata(0, 'jobName'));
                     case 266.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: Hotspots were read from the file ''%s''', returnType{i}], getappdata(0, 'hotspotFile'));
+                        if getappdata(0, 'suppress_ID266') == 0.0
+                            fprintf(fidType(i), [returnType{i}, '***NOTE: Hotspots were read from the file ''%s''', returnType{i}], getappdata(0, 'hotspotFile'));
+                            
+                            if i == X
+                                setappdata(0, 'suppress_ID266', 1.0)
+                            end
+                        end
                     case 267.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The environment variable ''noiseReduction'' is deprecated. Use ''gateTensors'' instead', returnType{i}]);
                         setappdata(0, 'messageFileWarnings', 1.0)
@@ -2147,6 +2159,7 @@ classdef messenger < handle
             setappdata(0, 'suppress_ID17', 0.0)
             setappdata(0, 'suppress_ID26', 0.0)
             setappdata(0, 'suppress_ID58', 0.0)
+            setappdata(0, 'suppress_ID59', 0.0)
             setappdata(0, 'suppress_ID62', 0.0)
             setappdata(0, 'suppress_ID63', 0.0)
             setappdata(0, 'suppress_ID67', 0.0)
@@ -2164,6 +2177,7 @@ classdef messenger < handle
             setappdata(0, 'suppress_ID205', 0.0)
             setappdata(0, 'suppress_ID220', 0.0)
             setappdata(0, 'suppress_ID257', 0.0)
+            setappdata(0, 'suppress_ID266', 0.0)
         end
 
         %% WRITE LOG FILE
@@ -2188,7 +2202,7 @@ classdef messenger < handle
                 fprintf(fid, 'Quick Fatigue Tool 6.11-02\r\n');
             end
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 24-Aug-2017 08:46:45 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 24-Aug-2017 12:05:33 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
