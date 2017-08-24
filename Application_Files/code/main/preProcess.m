@@ -8,7 +8,7 @@ classdef preProcess < handle
     %   See also postProcess.
     %
     %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-    %   Last modified 23-Aug-2017 15:10:40 GMT
+    %   Last modified 24-Aug-2017 08:46:45 GMT
     
     %%
     
@@ -1849,12 +1849,14 @@ classdef preProcess < handle
                             
                             if isempty(peaks) || isempty(valleys)
                                 error = true;
-                                if ischar(scales)
-                                    setappdata(0, 'error_log_018', 1.0)
+                                if ischar(scales) == 1.0
+                                    setappdata(0, 'E018', 1.0)
                                     setappdata(0, 'pvDetectionFailFile', scales)
-                                else
-                                    setappdata(0, 'error_log_018', 1.0)
+                                elseif iscell(scales) == 1.0
+                                    setappdata(0, 'E018', 1.0)
                                     setappdata(0, 'pvDetectionFailFile', scales{i})
+                                else
+                                    setappdata(0, 'E146', 1.0)
                                 end
                                 
                                 mainID = -999.0;

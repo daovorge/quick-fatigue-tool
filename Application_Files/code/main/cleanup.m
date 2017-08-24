@@ -6,7 +6,7 @@ function [] = cleanup(status)
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 23-Aug-2017 15:10:40 GMT
+%   Last modified 24-Aug-2017 08:46:45 GMT
     
     %%
     
@@ -72,7 +72,7 @@ if status == 1.0
     % Write file header
     fprintf(fid, 'Quick Fatigue Tool 6.11-02\r\n');
     fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-    fprintf(fid, 'Last modified 23-Aug-2017 15:10:40 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 24-Aug-2017 08:46:45 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');
@@ -406,7 +406,7 @@ if status == 1.0
         fprintf(fid, '\r\n\r\n***ERROR: Peak-valley detection failed while processing ''%s''. You may wish to try the following:', getappdata(0, 'pvDetectionFailFile'));
         fprintf(fid, '\r\n-> Reduce the gating criterion');
         fprintf(fid, '\r\n-> Switch to Nielsony''s Method');
-        fprintf(fid, '\r\n-> Disable time history gating');
+        fprintf(fid, '\r\n-> Disable load history gating');
         
         fprintf(fid, '\r\n\r\nError code: E018');
         rmappdata(0, 'E018')
@@ -1351,6 +1351,15 @@ if status == 1.0
         fprintf(fid, '\r\n-> Analysis continuation will not work if the field output files have been modified by the user');
         fprintf(fid, '\r\n\r\nError code: E145');
         rmappdata(0, 'E145')
+    end
+    if getappdata(0, 'E146') == 1.0
+        fprintf(fid, '\r\n\r\n***ERROR: Peak-valley detection failed while processing a user-defined load history. You may wish to try the following:');
+        fprintf(fid, '\r\n-> Reduce the gating criterion');
+        fprintf(fid, '\r\n-> Switch to Nielsony''s Method');
+        fprintf(fid, '\r\n-> Disable load history gating');
+        
+        fprintf(fid, '\r\n\r\nError code: E146');
+        rmappdata(0, 'E146')
     end
     
     % Write file footer

@@ -672,9 +672,13 @@ classdef analysis < handle
                 
                 [peaks, valleys] = preProcess.peakdet(damageParameter, tensorGate);
                 
-                if isempty(peaks) || isempty(valleys)
+                if (isempty(peaks) == 1.0) || (isempty(valleys) == 1.0)
                     % Use Nielsony's method
                     damageParameter = preProcess.sig2ext(damageParameter)';
+                    
+                    if length(damageParameter) < 2.0
+                        damageParameter = damageParameterOriginal;
+                    end
                     return
                 end
                 
