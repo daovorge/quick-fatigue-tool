@@ -248,7 +248,11 @@ if strcmpi(odbResultPosition, 'nodal') == 1.0
     
     % Update the message file
     setappdata(0, 'message_274', N)
-    messenger.writeMessage(274.0)
+    if length(mainID_surface) == N
+        messenger.writeMessage(280.0)
+    else
+        messenger.writeMessage(274.0)
+    end
 elseif strcmpi(odbResultPosition, 'elemental') == 1.0
     % Get the elements
     fileName = sprintf('%s\\Application_Files\\code\\odb_interface\\surface_elements.dat', pwd);
@@ -341,7 +345,11 @@ elseif strcmpi(odbResultPosition, 'elemental') == 1.0
     
     % Update the message file
     setappdata(0, 'message_275', nElements)
-    messenger.writeMessage(275.0)
+    if length(mainID_surface) == N
+        messenger.writeMessage(279.0)
+    else
+        messenger.writeMessage(275.0)
+    end
     
     % Get intersecting IDs from common items
     intersectingIndexes = find(commonItems == 1.0);
@@ -401,7 +409,11 @@ else
     
     % Update the message file
     setappdata(0, 'message_275', nElements)
-    messenger.writeMessage(275.0)
+    if length(mainID_surface) == N
+        messenger.writeMessage(279.0)
+    else
+        messenger.writeMessage(275.0)
+    end
 end
 
 %% Write surface items to text file

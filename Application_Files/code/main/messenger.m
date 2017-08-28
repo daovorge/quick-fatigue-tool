@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 24-Aug-2017 12:05:33 GMT
+%   Last modified 28-Aug-2017 13:14:00 GMT
 
     %%
 
@@ -1499,7 +1499,15 @@ classdef messenger < handle
                         end
                     case 169.0
                         if isappdata(0, 'message169_environmentFileName') == 1.0
-                            fprintf(fidType(i), [returnType{i}, '***NOTE: Reading settings from local environment file ''%s''', returnType{i}], getappdata(0, 'message169_environmentFileName'));
+                            files = getappdata(0, 'message169_environmentFileName');
+                            
+                            if length(files) > 1.0
+                                fprintf(fidType(i), [returnType{i}, '***NOTE: Reading settings from local environment files:', returnType{i}]);
+                                fprintf(fidType(i), '''%s''\n', files{:});
+                                fprintf(fidType(i), ['(The order of precedence is increasing from top-to-bottom)', returnType{i}]);
+                            else
+                                fprintf(fidType(i), [returnType{i}, '***NOTE: Reading settings from local environment file ''%s''', returnType{i}], files{:});
+                            end
                             fprintf(fidType(i), ['-> Settings in the local environment file supercede those in the global environment file', returnType{i}]);
                             
                             if i == X
@@ -2149,6 +2157,10 @@ classdef messenger < handle
                         fprintf(fidType(i), ['-> All items will be analysed', returnType{i}]);
                     case 278.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Surface items have been written to ''%s\\Project\\output\\%s\\Data Files\\surface_items.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
+                    case 279.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: All %.0f elements lie on the model surface', returnType{i}], getappdata(0, 'message_275'));
+                    case 280.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: All %.0f nodes lie on the model surface', returnType{i}], getappdata(0, 'message_274'));
                 end
             end
         end
@@ -2202,7 +2214,7 @@ classdef messenger < handle
                 fprintf(fid, 'Quick Fatigue Tool 6.11-02\r\n');
             end
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 24-Aug-2017 12:05:33 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 28-Aug-2017 13:14:00 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

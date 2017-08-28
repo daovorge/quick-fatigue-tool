@@ -8,7 +8,7 @@ classdef preProcess < handle
     %   See also postProcess.
     %
     %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-    %   Last modified 24-Aug-2017 08:46:45 GMT
+    %   Last modified 28-Aug-2017 13:14:00 GMT
     
     %%
     
@@ -4782,18 +4782,18 @@ classdef preProcess < handle
                 end
             end
             
-            % Read the local environment file if it exists
-            if exist(sprintf('Project/job/%s_env.m', jobName), 'file') == 2.0
-                try
-                    run(sprintf('%s_env', jobName))
-                    setappdata(0, 'message169_environmentFileName', [pwd, sprintf('\\Project\\job\\%s_env.m', jobName)])
-                catch
-                    % The local environment file could not be read
-                    error = 1.0;
-                    fprintf('ERROR: The local environment file could not be read\n');
-                    fprintf('-> Make sure the job name does not contain spaces or illegal characters\n');
-                    return
-                end
+            %{
+                Read the local environment file if it exists. First check
+                the MATLAB path, then check the JOB firectory
+            %}
+            [local, error, readLocalFiles] = preProcess.checkLocalEnvironment(jobName);
+            
+            if error == 1.0
+                return
+            end
+            
+            if local == 1.0
+                setappdata(0, 'message169_environmentFileName', readLocalFiles)
             end
             
             % Check that the environment is defined
@@ -4827,8 +4827,10 @@ classdef preProcess < handle
                 run('Application_Files/default/environment.m')
                 
                 % Read the local environment file if it exists
-                if exist(sprintf('Project/job/%s_env.m', jobName), 'file') == 2.0
-                    run(sprintf('%s_env', jobName))
+                [local, ~, readLocalFiles] = preProcess.checkLocalEnvironment(jobName);
+                
+                if local == 1.0
+                    setappdata(0, 'message169_environmentFileName', readLocalFiles)
                 end
             end
         end
@@ -5057,6 +5059,56 @@ classdef preProcess < handle
                 
                 setappdata(0, 'message_167_nDuplicateItems', nDuplicateItems)
                 messenger.writeMessage(167.0)
+            end
+        end
+        
+        %% CHECK FOR LOCAL ENVIRONMENT FILES
+        function [flag, error, readLocalFiles] = checkLocalEnvironment(jobName)
+            flag = 0.0;
+            error = 0.0;
+            
+            localEnvFile_abs = sprintf('%s\\Project\\job\\%s_env.m', pwd, jobName);
+            localEnvFile_rel = sprintf('%s_env.m', jobName);
+            localFiles = which(localEnvFile_rel, '-ALL');
+            
+            readLocalFiles = cell(1.0, 1.0);
+            readLocalFileIndex = 1.0;
+            
+            % First check the MATLAB path
+            for i = 1:length(localFiles)
+                if strcmpi(localFiles{i}, localEnvFile_abs) == 0.0
+                    try
+                        run(localFiles{i})
+                        
+                        readLocalFiles{readLocalFileIndex, 1.0} = localFiles{i};
+                        readLocalFileIndex = readLocalFileIndex + 1.0;
+                        
+                        flag = 1.0;
+                    catch
+                        % The local environment file could not be read
+                        error = 1.0;
+                        fprintf('ERROR: The local environment file ''%s'' could not be read\n', localFiles{i});
+                        fprintf('-> Make sure the job name does not contain spaces or illegal characters\n');
+                        return
+                    end
+                end
+            end
+            
+            % Check the JOB directory
+            if any(cell2mat(strfind(localFiles, localEnvFile_abs))) == 1.0
+                try
+                    run(localEnvFile_abs)
+                    
+                    readLocalFiles{readLocalFileIndex, 1.0} = localEnvFile_abs;
+                    
+                    flag = 1.0;
+                catch
+                    % The local environment file could not be read
+                    error = 1.0;
+                    fprintf('ERROR: The local environment file ''%s'' could not be read\n', localEnvFile_abs);
+                    fprintf('-> Make sure the job name does not contain spaces or illegal characters\n');
+                    return
+                end
             end
         end
     end
