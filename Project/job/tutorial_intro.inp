@@ -40,7 +40,7 @@
 **Loading definition
 *HISTORY = [200, -200]
 *SCALE = 1
-*UNITS=MPa
+*UNITS = MPa
 **
 **Analysis definition
 *ALGORITHM = uniaxial stress
