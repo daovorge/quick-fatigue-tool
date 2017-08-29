@@ -9,8 +9,8 @@ function [] = fos(gateTensors, tensorGate, coldItems, algorithm, msCorrection, N
 %   Reference section in Quick Fatigue Tool User Guide
 %      8.3 Factor of Strength
 %   
-%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
-%   Last modified 04-Apr-2017 13:26:59 GMT
+%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
+%   Last modified 16-Aug-2017 09:58:29 GMT
     
     %%
     
@@ -115,8 +115,8 @@ fprintf(fid_status, '\n[POST] Begin FOS analysis');
 %% While the FOS limits are met, re-calculate the life for each node
 for groups = 1:G
     %{
-        If the analysis is a PEEK analysis, override the value of GROUP to
-        the group containing the PEEK item
+        If the analysis is a MAXPS analysis, override the value of GROUP to
+        the group containing the MAXPS item
     %}
     if getappdata(0, 'peekAnalysis') == 1.0
         groups = getappdata(0, 'peekGroup'); %#ok<FXSET>
@@ -241,7 +241,7 @@ for groups = 1:G
             setappdata(0, 'Txzi_FOS', Txzi)
             
             % If necessray, re-calculate the principal stress history
-            if algorithm == 4.0 || algorithm == 6.0 || algorithm == 7.0 || algorithm == 9.0
+            if (algorithm == 4.0) || (algorithm == 6.0) || (algorithm == 7.0) || (algorithm == 3.0)
                 preProcess.getPrincipalStress(1.0, Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, algorithm, 1.0)
                 
                 s1i = getappdata(0, 'S1_FOS');
@@ -252,7 +252,7 @@ for groups = 1:G
             switch algorithm
                 case 3.0 % UNIAXIAL STRAIN-LIFE
                     [~, ~, ~, ~, nodalDamage, nodalDamageParameter, ~, ~] = algorithm_uel.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, L,...
-                        totalCounter, nodalDamage, msCorrection, nodalDamageParameter, gateTensors, tensorGate);
+                        totalCounter, nodalDamage, msCorrection, nodalDamageParameter, gateTensors, tensorGate, s1i, s2i, s3i);
                 case 4.0 % STRESS-BASED BROWN-MILLER
                     [nodalDamageParameter, ~, ~, ~, ~, nodalDamage] = algorithm_sbbm.main(Sxxi, Syyi, Szzi,...
                         Txyi, Tyzi, Txzi, L, step(totalCounter), planePrecision(totalCounter),...

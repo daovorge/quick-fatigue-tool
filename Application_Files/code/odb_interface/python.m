@@ -10,7 +10,7 @@ classdef python < handle
 %   Reference section in Quick Fatigue Tool Appendices
 %      10.4 The ODB Interface
 %   
-%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
 %   Last modified 04-Apr-2017 13:26:59 GMT
     
     %%
@@ -434,7 +434,7 @@ classdef python < handle
                 return
             end
             loadingUnits = char(c{3});
-            stepDescription = ['version 6.11-01; ', job, ', ', loading];
+            stepDescription = ['version 6.11-02; ', job, ', ', loading];
             
             %% Get the requested field data
             fprintf(fid_debug, ' %.0f fields requested', length(requestedFields(requestedFields == true)));
@@ -1063,7 +1063,7 @@ classdef python < handle
             fprintf(fid, '\r\n#   M.Sc. Louis Vallance, AMIMechE');
             fprintf(fid, '\r\n#   louisvallance@hotmail.co.uk');
             fprintf(fid, '\r\n#');
-            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017');
+            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017');
             fprintf(fid, '\r\n#   Last modified 17-Mar-2017 12:54:53 GMT');
             
             % Write Abaqus import header
@@ -1449,14 +1449,10 @@ classdef python < handle
             fprintf(fid, '\r\n#');
             fprintf(fid, '\r\n#   Author contact:');
             fprintf(fid, '\r\n#');
-            fprintf(fid, '\r\n#   M.Sc. Louis Vallance, AMIMechE');
-            fprintf(fid, '\r\n#   Technical Specialist SIMULIA');
-            fprintf(fid, '\r\n#   Office: +43 (1) 22 707 217');
-            fprintf(fid, '\r\n#   Mobile: +43 664 889 092 11');
-            fprintf(fid, '\r\n#   louis.VALLANCE@3ds.com');
-            fprintf(fid, '\r\n#   3DS.com/SIMULIA');
+            fprintf(fid, '\r\n#   M.Sc. Louis Vallance');
+            fprintf(fid, '\r\n#   louisvallance@hotmail.co.uk');
             fprintf(fid, '\r\n#');
-            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017');
+            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017');
             fprintf(fid, '\r\n#   Last modified 17-Mar-2017 12:54:53 GMT');
             
             % Write Abaqus import header
@@ -1681,14 +1677,11 @@ classdef python < handle
             fprintf(fid, '\r\n#');
             fprintf(fid, '\r\n#   Author contact:');
             fprintf(fid, '\r\n#');
-            fprintf(fid, '\r\n#   M.Sc. Louis Vallance, AMIMechE');
+            fprintf(fid, '\r\n#   M.Sc. Louis Vallance');
             fprintf(fid, '\r\n#   Technical Specialist SIMULIA');
-            fprintf(fid, '\r\n#   Office: +43 (1) 22 707 217');
-            fprintf(fid, '\r\n#   Mobile: +43 664 889 092 11');
-            fprintf(fid, '\r\n#   louis.VALLANCE@3ds.com');
-            fprintf(fid, '\r\n#   3DS.com/SIMULIA');
+            fprintf(fid, '\r\n#   louisvallance@hotmail.co.uk');
             fprintf(fid, '\r\n#');
-            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017');
+            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017');
             fprintf(fid, '\r\n#   Last modified 17-Mar-2017 12:54:53 GMT');
             
             % Write Abaqus import header

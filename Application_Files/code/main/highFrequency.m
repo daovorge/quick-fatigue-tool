@@ -6,7 +6,7 @@ classdef highFrequency < handle
 %   HIGHFREQUENCY is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
 %   Last modified 19-Jun-2017 16:18:57 GMT
     
     %%
@@ -894,10 +894,10 @@ classdef highFrequency < handle
                 elementError = 0.0;
                 if isempty(elementType)
                     elementType = 0.0;
-                elseif ~isnumeric(elementType)
+                elseif isnumeric(elementType) == 0.0
                     elementType = 0.0;
-                elseif isnan(elementType) || ~isreal(elementType) || ...
-                        isinf(elementType) || ~isreal(elementType)
+                elseif isnan(elementType) || isreal(elementType) == 0.0 || ...
+                        isinf(elementType) || isreal(elementType) == 0.0
                     elementType = 0.0;
                 end
                 
@@ -982,7 +982,7 @@ classdef highFrequency < handle
             
             %% Filter IDs if user specified individual analysis items
             
-            if strcmpi(items, 'all') == 1.0 || strcmpi(items, 'peek') == 1.0
+            if (strcmpi(items, 'all') == 1.0) || (strcmpi(items, 'maxps') == 1.0) || (strcmpi(items, 'surface') == 1.0)
                 items = [];
             elseif isnumeric(items) == 0.0
                 if exist('items', 'file') == 2.0

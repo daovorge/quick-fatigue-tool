@@ -7,8 +7,8 @@ classdef keywords < handle
 %
 %   See also importMaterial, fetchMaterial, job.
 %   
-%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
-%   Last modified 26-Jun-2017 11:49:37 GMT
+%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
+%   Last modified 19-Aug-2017 15:17:10 GMT
     
     %%
     
@@ -41,7 +41,7 @@ classdef keywords < handle
                 'HF DATASET', 'HF HISTORY', 'HF TIME', 'HF SCALE', 'FATIGUE RESERVE FACTOR'};
             
             % KEYWORD DATA
-            kwData = {'ALL', 3.0, 1.0, 1.0, 1.0, 'CAEL', 0.0, 0.0, {1.0, 'Repeats'},...
+            kwData = {'SURFACE', 3.0, 1.0, 1.0, 1.0, 'CAEL', 0.0, 0.0, {1.0, 'Repeats'},...
                 0.0, 1.0, 0.0, 0.0, 0.0, [], [], 'default.kt', 1.0, 0.0, 'B', 0.0, [],...
                 0.0, [], 'NORMAL', [], [], [], 'PART-1-1', [], [], [], 0.0, {'DEFAULT'}, 0.0,...
                 {}, 0.0, 'ELEMENT NODAL', [], 0.0, [], [], {}, {}, 'Job-1',...
@@ -139,7 +139,10 @@ classdef keywords < handle
         end
         
         %% PRINT INPUT FILE READER SUMMARY TO MESSAGE FILE
-        function [] = printSummary()
+        function [error] = printSummary()
+            % Initialize the error flag
+            error = 0.0;
+            
             if isappdata(0, 'jobFromTextFile') == 0.0
                 return
             else
@@ -151,6 +154,12 @@ classdef keywords < handle
             else
                 fid = getappdata(0, 'messageFID');
                 kw_processed = getappdata(0,'kw_processed');
+                
+                if isempty(fid) == 1.0
+                    setappdata(0, 'E143', 1.0)
+                    error = 1.0;
+                    return
+                end
             end
             
             fprintf(fid, '\r\n***INPUT FILE SUMMARY');

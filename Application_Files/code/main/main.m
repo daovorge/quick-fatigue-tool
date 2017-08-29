@@ -10,8 +10,8 @@ function [] = main(flags)
 %
 %   Author contact: louisvallance@hotmail.co.uk
 %
-%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
-%   Last modified 05-Jul-2017 12:54:18 GMT
+%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
+%   Last modified 29-Aug-2017 16:06:30 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');    tic_pre = tic;
@@ -41,9 +41,9 @@ setappdata(0, 'messageFileNotes', 0.0)
 setappdata(0, 'messageFileWarnings', 0.0)
 
 %% PRINT COMMAND WINDOW HEADER
-fprintf('[NOTICE] Quick Fatigue Tool 6.11-01')
+fprintf('[NOTICE] Quick Fatigue Tool 6.11-02')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2017)')
-fprintf('\n[NOTICE] Last modified 05-Jul-2017 12:54:18 GMT')
+fprintf('\n[NOTICE] Last modified 29-Aug-2017 16:06:30 GMT')
 
 cleanExit = 0.0;
 
@@ -73,7 +73,7 @@ fileName = sprintf('Project/output/%s/%s.sta', jobName, jobName);
 fid_status = fopen(fileName, 'w+');
 setappdata(0, 'fid_status', fid_status)
 c = clock;
-fprintf(fid_status, '[NOTICE] Quick Fatigue Tool 6.11-01\t%s', datestr(datenum(c(1.0), c(2.0), c(3.0), c(4.0), c(5.0), c(6.0))));
+fprintf(fid_status, '[NOTICE] Quick Fatigue Tool 6.11-02\t%s', datestr(datenum(c(1.0), c(2.0), c(3.0), c(4.0), c(5.0), c(6.0))));
 
 fprintf('\n[NOTICE] The job file "%s.m" has been submitted for analysis', jobName)
 fprintf(fid_status, '\n[NOTICE] The job file "%s.m" has been submitted for analysis', jobName);
@@ -95,7 +95,12 @@ messenger.writeMessage(96.0)
 messenger.writeMessage(169.0)
 
 %% PRINT INPUT FILE READER SUMMARY TO MESSAGE FILE
-keywords.printSummary()
+error = keywords.printSummary();
+
+if error == 1.0
+    cleanup(1.0)
+    return
+end
 
 %% CHECK IF RESULTS DIRECTORY WAS SUCCESSFULLY REMOVED
 if getappdata(0, 'warning_026') == 1.0
@@ -217,6 +222,9 @@ if error == 1.0
     return
 end
 
+%% DETECT SURFACE ITAMS IF APPLICABLE
+[mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz);
+
 %% WARN THE USER IF THERE ARE DUPLICATE ITEMS IN THE MODEL
 preProcess.checkDuplicateItems(N, mainID, subID)
 
@@ -250,7 +258,7 @@ preProcess.getPrincipalStress(N, Sxx, Syy, Szz, Txy, Tyz, Txz, algorithm, 0.0)
 %% GET THE VON MISES STRESS FOR THE LOADING
 if (algorithm == 7.0 && getappdata(0, 'stressInvariantParameter') == 1.0) || algorithm == 9.0 || outputField == 1.0 || outputHistory == 1.0 || outputFigure == 1.0
     vonMises = preProcess.getVonMisesStress(N, Sxx, Syy, Szz, Txy, Tyz, Txz);
-elseif strcmpi(getappdata(0, 'items'), 'peek') == 1.0
+elseif strcmpi(getappdata(0, 'items'), 'maxps') == 1.0
     setappdata(0, 'CalculatedVonMisesStress', 0.0)
 end
 
@@ -260,7 +268,7 @@ if algorithm == 7.0
 end
 
 %% ISOLATE THE LARGEST (S1-S3) ITEM IF APPLICABLE
-if (strcmpi(getappdata(0, 'items'), 'peek') == 1.0) && (N > 1.0)
+if (strcmpi(getappdata(0, 'items'), 'maxps') == 1.0) && (N > 1.0)
     [Sxx, Syy, Szz, Txy, Tyz, Txz, mainID, subID, peekGroup, vonMises, error] = preProcess.peekAtNode(Sxx, Syy, Szz, Txy, Tyz, Txz, mainID, subID);
 
     if error == 1.0
@@ -344,7 +352,6 @@ if getappdata(0, 'warning_063') == 1.0
 end
 
 %% INITIALISE THE CP SEARCH PARAMETERS
-
 step = getappdata(0, 'stepSize');
 
 % Check that total number of required steps is an integer
@@ -442,7 +449,7 @@ s1 = getappdata(0, 'S1');
 s2 = getappdata(0, 'S2');
 s3 = getappdata(0, 'S3');
 
-% If PEEK analysis, reset value of G to 1.0
+% If MAXPS analysis, reset value of G to 1.0
 if peekAnalysis == 1.0
     %{
         In order to identify the worst analysis item from the correct
@@ -522,8 +529,8 @@ nasalifeParameter = getappdata(0, 'nasalifeParameter');
 
 for groups = 1:G
     %{
-        If the analysis is a PEEK analysis, override the value of GROUP to
-        the group containing the PEEK item
+        If the analysis is a MAXPS analysis, override the value of GROUP to
+        the group containing the MAXPS item
     %}
     if peekAnalysis == 1.0
         groups = peekGroup; %#ok<FXSET>
@@ -1016,7 +1023,13 @@ end
 
 %% OVERLAY FIELD OUTPUT WITH PREVIOUS JOB IF REQUESTED
 if getappdata(0, 'continueAnalysis') == 1.0
-    overlay.prepare_fields()
+    error = overlay.prepare_fields();
+    
+    if error == 1.0
+        setappdata(0, 'E144', 1.0)
+        cleanup(1.0)
+        return
+    end
 end
 
 %% EXPORT FIELDS TO ODB IF REQUESTED

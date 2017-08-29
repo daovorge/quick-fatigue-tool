@@ -8,7 +8,7 @@ classdef group < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      4.6 Analysis groups
 %   
-%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
 %   Last modified 07-Apr-2017 14:38:24 GMT
     
     %%
@@ -2506,7 +2506,7 @@ classdef group < handle
         %% GET THE WORST LIFE FOR EACH ANALYSIS GROUP
         function [] = worstLifePerGroup(life, mainID, subID, groupWorstLife, peekAnalysis)
             %{
-                If the analysis was a peek analysis, use the original
+                If the analysis was a MAXPS analysis, use the original
                 number of groups
             %}
             if peekAnalysis == 1.0

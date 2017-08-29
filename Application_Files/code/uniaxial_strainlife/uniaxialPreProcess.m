@@ -10,8 +10,8 @@ classdef uniaxialPreProcess < handle
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.6 Uniaxial Strain-Life
 %   
-%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
-%   Last modified 03-Jul-2017 13:40:46 GMT
+%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
+%   Last modified 04-Aug-2017 13:17:05 GMT
     
     %%
     
@@ -803,15 +803,14 @@ classdef uniaxialPreProcess < handle
         end
         
         %% Get the fatigue limit stress
-        function [fatigueLimitSress, fatigueLimitSrain] = getFatigueLimit(cael, E, Sf, b, Ef, c)
+        function [fatigueLimitSress, fatigueLimitSrain] = getFatigueLimit(cael, E, kp, np, Sf, b, Ef, c)
             %{
                 Calculate the fatigue limit of the material based on the
                 strain-life relationship.
             %}
 
             fatigueLimitSrain = (Sf/E)*(cael)^b + Ef*(cael)^c;
-            
-            fatigueLimitSress = E*fatigueLimitSrain;
+            [~, fatigueLimitSress, ~, ~] = uniaxialPreProcess.getInelasticStressFromInelasticStrain(fatigueLimitSrain, E, kp, np);
         end
     end
 end

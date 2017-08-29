@@ -8,7 +8,7 @@ classdef importMaterial < handle
 %   See also checkDataPath, evaluateMaterial, kValueCalculator,
 %   LocalMaterialDatabase, material, MaterialEditor, MaterialManager.
 %   
-%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
 %   Last modified 20-Jun-2017 14:41:51 GMT
     
     %%
@@ -1219,9 +1219,9 @@ classdef importMaterial < handle
                 case 0.0
                     fprintf('The material ''%s'' has been imported from the file ''%s''\n', materialName, materialFile)
                 case 1.0
-                    fprintf('WARNING: The material file ''%s'' could not be opened\n', materialFile)
+                    fprintf('ERROR: The material file ''%s'' could not be opened\n', materialFile)
                 case 2.0
-                    fprintf('WARNING: The material file ''%s'' contains no valid material definitions\n', materialFile)
+                    fprintf('ERROR: The material file ''%s'' contains no valid material definitions\n', materialFile)
             end
             
             %{

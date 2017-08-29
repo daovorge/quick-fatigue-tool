@@ -9,7 +9,7 @@ function [] = frf(algorithm, msCorrection, N, mainID, subID, use_sn)
 %   Reference section in Quick Fatigue Tool User Guide
 %      8.2 Fatigue Reserve Factor
 %   
-%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
 %   Last modified 04-Apr-2017 13:26:59 GMT
     
     %%
@@ -116,8 +116,8 @@ end
 
 for groups = 1:G
     %{
-        If the analysis is a PEEK analysis, override the value of GROUP to
-        the group containing the PEEK item
+        If the analysis is a MAXPS analysis, override the value of GROUP to
+        the group containing the MAXPS item
     %}
     if getappdata(0, 'peekAnalysis') == 1.0
         groups = getappdata(0, 'peekGroup'); %#ok<FXSET>

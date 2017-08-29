@@ -8,8 +8,8 @@ classdef overlay < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      4.8 Analysis continuation techniques
 %   
-%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
-%   Last modified 24-May-2017 14:36:28 GMT
+%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
+%   Last modified 29-Aug-2017 12:08:36 GMT
     
     %%
     
@@ -17,6 +17,7 @@ classdef overlay < handle
         %% CHECK THAT THE PREVIOUS JOB EXISTS
         function [error, outputField] = checkJob(outputField)
             error = 0.0;
+            algorithm = getappdata(0, 'algorithm');
             
             % Set flag for analysis continuation
             setappdata(0, 'continueAnalysis', 0.0)
@@ -86,6 +87,33 @@ classdef overlay < handle
                 return
             end
             
+            % Count the number of fields
+            if length(previousJobFieldNames) ~= 21.0
+                setappdata(0, 'E145', 1.0)
+                error = 1.0;
+                return
+            end
+            
+            % Switching from stres-based to strain-based is not permitted
+            unitsPrevious = previousJobFieldNames(17.0);
+            if (ismember(unitsPrevious, 'WCM (Strain)') == 1.0) && (algorithm ~= 3.0)
+                error = 1.0;
+                setappdata(0, 'E147', 1.0)
+                return
+            elseif (ismember(unitsPrevious, 'WCM (MPa)') == 1.0) && (algorithm == 3.0)
+                error = 1.0;
+                setappdata(0, 'E148', 1.0)
+                return
+            elseif ismember(unitsPrevious, 'WCM (Strain)') == 1.0
+                setappdata(0, 'continueFromUnits', 1.0)
+            elseif ismember(unitsPrevious, 'WCM (MPa)') == 1.0
+                setappdata(0, 'continueFromUnits', 0.0)
+            else
+                error = 1.0;
+                setappdata(0, 'E145', 1.0)
+                return
+            end
+            
             % Save the field data from the previous job
             setappdata(0, 'previousJobFieldData', previousJobFieldData(:, 3.0:end))
             
@@ -116,12 +144,14 @@ classdef overlay < handle
             
             % Set flag for analysis continuation
             setappdata(0, 'continueAnalysis', 1.0)
+            
+            % Update the message file
+            messenger.writeMessage(268.0)
         end
         
         %% PREPARE FIELD OVERLAY
-        function [] = prepare_fields()
+        function [error] = prepare_fields()
             %% GET FIELD DATA FROM PREVIOUS JOB
-            
             % Get the field data from the previous job
             fieldDataPrevious = getappdata(0, 'previousJobFieldData');
             
@@ -155,7 +185,11 @@ classdef overlay < handle
                     Otherwise, the elements will have to be searched for
                     individually
                 %}
-                overlay.fields_simple(fieldDataPrevious, fieldDataCurrent, fieldNamesPrevious, fieldNamesCurrent, mainIDCurrent, subIDCurrent)
+                error = overlay.fields_simple(fieldDataPrevious, fieldDataCurrent, fieldNamesPrevious, fieldNamesCurrent, mainIDCurrent, subIDCurrent);
+                
+                if error == 1.0
+                    return
+                end
             else
                 %% OVERLAY THE FIELDS (GENERAL METHOD)
                 %{
@@ -164,12 +198,16 @@ classdef overlay < handle
                     position labels must be sorted to ensure that field
                     output is matched correctly between each job
                 %}
-                overlay.sort_ids(fieldDataPrevious, fieldDataCurrent, fieldNamesPrevious, fieldNamesCurrent, mainIDCurrent, subIDCurrent, mainIDPrevious, subIDPrevious)
+                error = overlay.sort_ids(fieldDataPrevious, fieldDataCurrent, fieldNamesPrevious, fieldNamesCurrent, mainIDCurrent, subIDCurrent, mainIDPrevious, subIDPrevious);
+                
+                if error == 1.0
+                    return
+                end
             end
         end
         
         %% OVERLAY FIELD WITH THE PREVIOUS JOB (SIMPLE)
-        function [] = fields_simple(fieldDataPrevious, fieldDataCurrent, fieldNamesPrevious, fieldNamesCurrent, mainIDCurrent, subIDCurrent)
+        function [error] = fields_simple(fieldDataPrevious, fieldDataCurrent, fieldNamesPrevious, fieldNamesCurrent, mainIDCurrent, subIDCurrent)
             %% Initialize the defined fields
             %{
                 The format of the overlaid field output file depends on the
@@ -184,6 +222,8 @@ classdef overlay < handle
             fieldNames = 'Main ID\tSub ID';
             fieldLabels = '%.0f\t%.0f';
             units = getappdata(0, 'loadEqUnits');
+            continueFromUnits = getappdata(0, 'continueFromUnits');
+            error = 0.0;
             
             % Field output format string
             f = getappdata(0, 'fieldFormatString');
@@ -199,25 +239,24 @@ classdef overlay < handle
             elseif (isCurrentField == 1.0) && (isPreviousField == 1.0)
                 L = 1.0./((1.0./fieldDataPrevious(:, indexPrevious)) + (1.0./fieldDataCurrent(:, indexCurrent)));
             else
-                L = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
             %% LL
-            if ischar(L) == 0.0
-                LL = log10(L);
-                cael = getappdata(0, 'cael');
-                for i = 1:length(LL)
-                    if LL(i) > log10(0.5*cael)
-                        LL(i) = log10(0.5*cael);
-                    elseif LL(i) < 0.0
-                        LL(i) = 0.0;
-                    end
+            LL = log10(L);
+            cael = getappdata(0, 'cael');
+            for i = 1:length(LL)
+                if LL(i) > log10(0.5*cael)
+                    LL(i) = log10(0.5*cael);
+                elseif LL(i) < 0.0
+                    LL(i) = 0.0;
                 end
-                
-                fields = [fields, L, LL];
-                fieldNames = [fieldNames, sprintf('\tL (%s)\tLL (%s)', units, units)];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s\t%%%s', f, f)];
             end
+            
+            fields = [fields, L, LL];
+            fieldNames = [fieldNames, sprintf('\tL (%s)\tLL (%s)', units, units)];
+            fieldLabels = [fieldLabels, sprintf('\t%%%s\t%%%s', f, f)];
             
             %% D
             [isCurrentField, indexCurrent] = ismember('D', fieldNamesCurrent);
@@ -230,17 +269,16 @@ classdef overlay < handle
             elseif (isCurrentField == 1.0) && (isPreviousField == 1.0)
                 D = fieldDataPrevious(:, indexPrevious) + fieldDataCurrent(:, indexCurrent);
             else
-                D = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
             %% DDL
-            if ischar(D) == 0.0
-                DDL = D*getappdata(0, 'dLife');
-                
-                fields = [fields, D, DDL];
-                fieldNames = [fieldNames, '\tD\tDDL'];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s\t%%%s', f, f)];
-            end
+            DDL = D*getappdata(0, 'dLife');
+            
+            fields = [fields, D, DDL];
+            fieldNames = [fieldNames, '\tD\tDDL'];
+            fieldLabels = [fieldLabels, sprintf('\t%%%s\t%%%s', f, f)];
             
             %% FOS
             [isCurrentField, indexCurrent] = ismember('FOS', fieldNamesCurrent);
@@ -256,14 +294,13 @@ classdef overlay < handle
                 FOS = [FOS_p, fieldDataCurrent(:, indexCurrent)]; % Side-by-side
                 FOS = min(FOS, [], 2.0); % New FOS values
             else
-                FOS = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
-            if ischar(FOS) == 0.0
-                fields = [fields, FOS];
-                fieldNames = [fieldNames, '\tFOS'];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
-            end
+            fields = [fields, FOS];
+            fieldNames = [fieldNames, '\tFOS'];
+            fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% SFA
             [isCurrentField, indexCurrent] = ismember('SFA', fieldNamesCurrent);
@@ -279,14 +316,13 @@ classdef overlay < handle
                 SFA = [SFA_p, fieldDataCurrent(:, indexCurrent)];
                 SFA = min(SFA, [], 2.0);
             else
-                SFA = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
-            if ischar(SFA) == 0.0
-                fields = [fields, SFA];
-                fieldNames = [fieldNames, '\tSFA'];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
-            end
+            fields = [fields, SFA];
+            fieldNames = [fieldNames, '\tSFA'];
+            fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% FRFR
             [isCurrentField, indexCurrent] = ismember('FRFR', fieldNamesCurrent);
@@ -302,14 +338,13 @@ classdef overlay < handle
                 FRFR = [FRFR_p, fieldDataCurrent(:, indexCurrent)];
                 FRFR = min(FRFR, [], 2.0);
             else
-                FRFR = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
-            if ischar(FRFR) == 0.0
-                fields = [fields, FRFR];
-                fieldNames = [fieldNames, '\tFRFR'];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
-            end
+            fields = [fields, FRFR];
+            fieldNames = [fieldNames, '\tFRFR'];
+            fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% FRFH
             [isCurrentField, indexCurrent] = ismember('FRFH', fieldNamesCurrent);
@@ -325,14 +360,13 @@ classdef overlay < handle
                 FRFH = [FRFH_p, fieldDataCurrent(:, indexCurrent)];
                 FRFH = min(FRFH, [], 2.0);
             else
-                FRFH = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
-            if ischar(FRFH) == 0.0
-                fields = [fields, FRFH];
-                fieldNames = [fieldNames, '\tFRFH'];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
-            end
+            fields = [fields, FRFH];
+            fieldNames = [fieldNames, '\tFRFH'];
+            fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% FRFV
             [isCurrentField, indexCurrent] = ismember('FRFV', fieldNamesCurrent);
@@ -348,14 +382,13 @@ classdef overlay < handle
                 FRFV = [FRFV_p, fieldDataCurrent(:, indexCurrent)];
                 FRFV = min(FRFV, [], 2.0);
             else
-                FRFV = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
-            if ischar(FRFV) == 0.0
-                fields = [fields, FRFV];
-                fieldNames = [fieldNames, '\tFRFV'];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
-            end
+            fields = [fields, FRFV];
+            fieldNames = [fieldNames, '\tFRFV'];
+            fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% FRFW
             if (ischar(FRFR) == 0.0) && (ischar(FRFH) == 0.0) && (ischar(FRFV) == 0.0)
@@ -363,14 +396,13 @@ classdef overlay < handle
                 FRFW(FRFW == -1.0) = inf;
                 FRFW = min(FRFW, [], 2.0);
             else
-                FRFW = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
-            if ischar(FRFW) == 0.0
-                fields = [fields, FRFW];
-                fieldNames = [fieldNames, '\tFRFW'];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
-            end
+            fields = [fields, FRFW];
+            fieldNames = [fieldNames, '\tFRFW'];
+            fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% SMAX
             [isCurrentField, indexCurrent] = ismember('SMAX (MPa)', fieldNamesCurrent);
@@ -396,14 +428,13 @@ classdef overlay < handle
                     end
                 end
             else
-                SMAX = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
-            if ischar(SMAX) == 0.0
-                fields = [fields, SMAX];
-                fieldNames = [fieldNames, '\tSMAX (MPa)'];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
-            end
+            fields = [fields, SMAX];
+            fieldNames = [fieldNames, '\tSMAX (MPa)'];
+            fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% SMXP
             [isCurrentField, indexCurrent] = ismember('SMXP', fieldNamesCurrent);
@@ -418,14 +449,13 @@ classdef overlay < handle
                 SMXP = [SMXP_p, fieldDataCurrent(:, indexCurrent)];
                 SMXP = max(SMXP, [], 2.0);
             else
-                SMXP = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
-            if ischar(SMXP) == 0.0
-                fields = [fields, SMXP];
-                fieldNames = [fieldNames, '\tSMXP'];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
-            end
+            fields = [fields, SMXP];
+            fieldNames = [fieldNames, '\tSMXP'];
+            fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% SMXU
             [isCurrentField, indexCurrent] = ismember('SMXU', fieldNamesCurrent);
@@ -440,14 +470,13 @@ classdef overlay < handle
                 SMXU = [SMXU_p, fieldDataCurrent(:, indexCurrent)];
                 SMXU = max(SMXU, [], 2.0);
             else
-                SMXU = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
-            if ischar(SMXU) == 0.0
-                fields = [fields, SMXU];
-                fieldNames = [fieldNames, '\tSMXU'];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
-            end
+            fields = [fields, SMXU];
+            fieldNames = [fieldNames, '\tSMXU'];
+            fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% TRF
             [isCurrentField, indexCurrent] = ismember('TRF', fieldNamesCurrent);
@@ -462,18 +491,23 @@ classdef overlay < handle
                 TRF = [TRF_p, fieldDataCurrent(:, indexCurrent)];
                 TRF = max(TRF, [], 2.0);
             else
-                TRF = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
-            if ischar(TRF) == 0.0
-                fields = [fields, TRF];
-                fieldNames = [fieldNames, '\tTRF'];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
-            end
+            fields = [fields, TRF];
+            fieldNames = [fieldNames, '\tTRF'];
+            fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% WCM
-            [isCurrentField, indexCurrent] = ismember('WCM (MPa)', fieldNamesCurrent);
-            [isPreviousField, indexPrevious] = ismember('WCM (MPa)', fieldNamesPrevious);
+            % Can be stress or strain
+            if continueFromUnits == 0.0
+                [isCurrentField, indexCurrent] = ismember('WCM (MPa)', fieldNamesCurrent);
+                [isPreviousField, indexPrevious] = ismember('WCM (MPa)', fieldNamesPrevious);
+            else
+                [isCurrentField, indexCurrent] = ismember('WCM (Strain)', fieldNamesCurrent);
+                [isPreviousField, indexPrevious] = ismember('WCM (Strain)', fieldNamesPrevious);
+            end
             
             if (isCurrentField == 1.0) && (isPreviousField == 0.0)
                 WCM = fieldDataCurrent(:, indexCurrent);
@@ -484,18 +518,27 @@ classdef overlay < handle
                 WCM = [WCM_p, fieldDataCurrent(:, indexCurrent)];
                 WCM = max(WCM, [], 2.0);
             else
-                WCM = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
-            if ischar(WCM) == 0.0
-                fields = [fields, WCM];
+            fields = [fields, WCM];
+            if continueFromUnits == 0.0
                 fieldNames = [fieldNames, '\tWCM (MPa)'];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
+            else
+                fieldNames = [fieldNames, '\tWCM (Strain)'];
             end
+            fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% WCA
-            [isCurrentField, indexCurrent] = ismember('WCA (MPa)', fieldNamesCurrent);
-            [isPreviousField, indexPrevious] = ismember('WCA (MPa)', fieldNamesPrevious);
+            % Can be stress or strain
+            if continueFromUnits == 0.0
+                [isCurrentField, indexCurrent] = ismember('WCA (MPa)', fieldNamesCurrent);
+                [isPreviousField, indexPrevious] = ismember('WCA (MPa)', fieldNamesPrevious);
+            else
+                [isCurrentField, indexCurrent] = ismember('WCA (Strain)', fieldNamesCurrent);
+                [isPreviousField, indexPrevious] = ismember('WCA (Strain)', fieldNamesPrevious);
+            end
             
             if (isCurrentField == 1.0) && (isPreviousField == 0.0)
                 WCA = fieldDataCurrent(:, indexCurrent);
@@ -506,31 +549,39 @@ classdef overlay < handle
                 WCA = [WCA_p, fieldDataCurrent(:, indexCurrent)];
                 WCA = max(WCA, [], 2.0);
             else
-                WCA = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
-            if ischar(WCA) == 0.0
-                fields = [fields, WCA];
+            fields = [fields, WCA];
+            if continueFromUnits == 0.0
                 fieldNames = [fieldNames, '\tWCA (MPa)'];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
+            else
+                fieldNames = [fieldNames, '\tWCA (Strain)'];
             end
+            fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% WCATAN
             if (ischar(WCM) == 0.0) && (ischar(WCA) == 0.0)
                 WCATAN = atand(WCM./WCA);
             else
-                WCATAN = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
-            if ischar(WCATAN) == 0.0
-                fields = [fields, WCATAN];
-                fieldNames = [fieldNames, '\tWCATAN (Deg)'];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
-            end
+            fields = [fields, WCATAN];
+            fieldNames = [fieldNames, '\tWCATAN (Deg)'];
+            fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% WCDP
-            [isCurrentField, indexCurrent] = ismember('WCDP (MPa)', fieldNamesCurrent);
-            [isPreviousField, indexPrevious] = ismember('WCDP (MPa)', fieldNamesPrevious);
+            % Can be stress or strain
+            if continueFromUnits == 0.0
+                [isCurrentField, indexCurrent] = ismember('WCDP (MPa)', fieldNamesCurrent);
+                [isPreviousField, indexPrevious] = ismember('WCDP (MPa)', fieldNamesPrevious);
+            else
+                [isCurrentField, indexCurrent] = ismember('WCDP (Strain)', fieldNamesCurrent);
+                [isPreviousField, indexPrevious] = ismember('WCDP (Strain)', fieldNamesPrevious);
+            end
             
             if (isCurrentField == 1.0) && (isPreviousField == 0.0)
                 WCDP = fieldDataCurrent(:, indexCurrent);
@@ -541,14 +592,17 @@ classdef overlay < handle
                 WCDP = [WCDP_p, fieldDataCurrent(:, indexCurrent)];
                 WCDP = max(WCDP, [], 2.0);
             else
-                WCDP = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
-            if ischar(WCDP) == 0.0
-                fields = [fields, WCDP];
+            fields = [fields, WCDP];
+            if continueFromUnits == 0.0
                 fieldNames = [fieldNames, '\tWCDP (MPa)'];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
+            else
+                fieldNames = [fieldNames, '\tWCDP (Strain)'];
             end
+            fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% YIELD
             [isCurrentField, indexCurrent] = ismember('YIELD', fieldNamesCurrent);
@@ -563,14 +617,13 @@ classdef overlay < handle
                 YIELD = [YIELD_p, fieldDataCurrent(:, indexCurrent)];
                 YIELD = max(YIELD, [], 2.0);
             else
-                YIELD = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
-            if ischar(YIELD) == 0.0
-                fields = [fields, YIELD];
-                fieldNames = [fieldNames, '\tYIELD'];
-                fieldLabels = [fieldLabels, '\t%.0f'];
-            end
+            fields = [fields, YIELD];
+            fieldNames = [fieldNames, '\tYIELD'];
+            fieldLabels = [fieldLabels, '\t%.0f'];
             
             %% WRITE NEW FIELD DATA
             
@@ -599,7 +652,7 @@ classdef overlay < handle
         end
         
         %% SORT THE FIELD IDS FOR GENERAL OVERLAY
-        function [] = sort_ids(fieldDataPrevious, fieldDataCurrent, fieldNamesPrevious, fieldNamesCurrent, mainIDCurrent, subIDCurrent, mainIDPrevious, subIDPrevious)
+        function [error] = sort_ids(fieldDataPrevious, fieldDataCurrent, fieldNamesPrevious, fieldNamesCurrent, mainIDCurrent, subIDCurrent, mainIDPrevious, subIDPrevious)
             %{
                 The overlay is split between two tasks. First, matching
                 position IDs are located, and field data between these
@@ -612,6 +665,9 @@ classdef overlay < handle
                 be re-ordered prior to the overlay so that matrix addition
                 matches the correct items with each other
             %}
+            
+            % Initialize error flag
+            error = 0.0;
             
             %% Re-build the ID list
             %{
@@ -764,7 +820,11 @@ classdef overlay < handle
                 field output files
             %}
             if isempty(fieldDataA_overlay) == 0.0
-                [fields, fieldNames, fieldLabels] = overlay.fields_general(fieldDataA_overlay, fieldDataB_overlay, fieldNamesA, fieldNamesB);
+                [fields, fieldNames, fieldLabels, error] = overlay.fields_general(fieldDataA_overlay, fieldDataB_overlay, fieldNamesA, fieldNamesB);
+                
+                if error == 1.0
+                    return
+                end
                 
                 %{
                     The relevant field data has been overlaid. Next, append
@@ -825,18 +885,20 @@ classdef overlay < handle
         end
         
         %% OVERLAY FIELD WITH THE PREVIOUS JOB (GENERAL)
-        function [fields, fieldNames, fieldLabels] = fields_general(fieldDataA_overlay, fieldDataB_overlay, fieldNamesA, fieldNamesB)
+        function [fields, fieldNames, fieldLabels, error] = fields_general(fieldDataA_overlay, fieldDataB_overlay, fieldNamesA, fieldNamesB)
             fields = [];
             fieldNames = 'Main ID\tSub ID';
             fieldLabels = '%.0f\t%.0f';
             units = getappdata(0, 'loadEqUnits');
+            continueFromUnits = getappdata(0, 'continueFromUnits');
+            error = 0.0;
             
             % Field output format string
             f = getappdata(0, 'fieldFormatString');
             
             %% L
-            [isAField, indexA] = ismember('L', fieldNamesA);
-            [isBField, indexB] = ismember('L', fieldNamesB);
+            [isAField, indexA] = ismember(sprintf('L (%s)', units), fieldNamesA);
+            [isBField, indexB] = ismember(sprintf('L (%s)', units), fieldNamesB);
             
             if (isAField == 1.0) && (isBField == 0.0)
                 L = fieldDataA_overlay(:, indexA);
@@ -845,25 +907,25 @@ classdef overlay < handle
             elseif (isAField == 1.0) && (isBField == 1.0)
                 L = 1.0./((1.0./fieldDataB_overlay(:, indexB)) + (1.0./fieldDataA_overlay(:, indexA)));
             else
-                L = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
             %% LL
-            if ischar(L) == 0.0
-                LL = log10(L);
-                cael = getappdata(0, 'cael');
-                for i = 1:length(LL)
-                    if LL(i) > log10(0.5*cael)
-                        LL(i) = log10(0.5*cael);
-                    elseif LL(i) < 0.0
-                        LL(i) = 0.0;
-                    end
+            LL = log10(L);
+            cael = getappdata(0, 'cael');
+            for i = 1:length(LL)
+                if LL(i) > log10(0.5*cael)
+                    LL(i) = log10(0.5*cael);
+                elseif LL(i) < 0.0
+                    LL(i) = 0.0;
                 end
-                
-                fields = [fields, L, LL];
-                fieldNames = [fieldNames, sprintf('\tL (%s)\tLL (%s)', units, units)];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s\t%%%s', f, f)];
             end
+            
+            fields = [fields, L, LL];
+            fieldNames = [fieldNames, sprintf('\tL (%s)\tLL (%s)', units, units)];
+            fieldLabels = [fieldLabels, sprintf('\t%%%s\t%%%s', f, f)];
+
             
             %% D
             [isAField, indexA] = ismember('D', fieldNamesA);
@@ -876,17 +938,16 @@ classdef overlay < handle
             elseif (isAField == 1.0) && (isBField == 1.0)
                 D = fieldDataB_overlay(:, indexB) + fieldDataA_overlay(:, indexA);
             else
-                D = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
             %% DDL
-            if ischar(D) == 0.0
-                DDL = D*getappdata(0, 'dLife');
-                
-                fields = [fields, D, DDL];
-                fieldNames = [fieldNames, '\tD\tDDL'];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s\t%%%s', f, f)];
-            end
+            DDL = D*getappdata(0, 'dLife');
+            
+            fields = [fields, D, DDL];
+            fieldNames = [fieldNames, '\tD\tDDL'];
+            fieldLabels = [fieldLabels, sprintf('\t%%%s\t%%%s', f, f)];
             
             %% FOS
             [isAField, indexA] = ismember('FOS', fieldNamesA);
@@ -902,14 +963,13 @@ classdef overlay < handle
                 FOS = [FOS_p, fieldDataA_overlay(:, indexA)]; % Side-by-side
                 FOS = min(FOS, [], 2.0); % New FOS values
             else
-                FOS = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
-            if ischar(FOS) == 0.0
-                fields = [fields, FOS];
-                fieldNames = [fieldNames, '\tFOS'];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
-            end
+            fields = [fields, FOS];
+            fieldNames = [fieldNames, '\tFOS'];
+            fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% SFA
             [isAField, indexA] = ismember('SFA', fieldNamesA);
@@ -925,14 +985,13 @@ classdef overlay < handle
                 SFA = [SFA_p, fieldDataA_overlay(:, indexA)];
                 SFA = min(SFA, [], 2.0);
             else
-                SFA = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
-            if ischar(SFA) == 0.0
-                fields = [fields, SFA];
-                fieldNames = [fieldNames, '\tSFA'];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
-            end
+            fields = [fields, SFA];
+            fieldNames = [fieldNames, '\tSFA'];
+            fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% FRFR
             [isAField, indexA] = ismember('FRFR', fieldNamesA);
@@ -948,14 +1007,13 @@ classdef overlay < handle
                 FRFR = [FRFR_p, fieldDataA_overlay(:, indexA)];
                 FRFR = min(FRFR, [], 2.0);
             else
-                FRFR = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
-            if ischar(FRFR) == 0.0
-                fields = [fields, FRFR];
-                fieldNames = [fieldNames, '\tFRFR'];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
-            end
+            fields = [fields, FRFR];
+            fieldNames = [fieldNames, '\tFRFR'];
+            fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% FRFH
             [isAField, indexA] = ismember('FRFH', fieldNamesA);
@@ -971,14 +1029,13 @@ classdef overlay < handle
                 FRFH = [FRFH_p, fieldDataA_overlay(:, indexA)];
                 FRFH = min(FRFH, [], 2.0);
             else
-                FRFH = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
-            if ischar(FRFH) == 0.0
-                fields = [fields, FRFH];
-                fieldNames = [fieldNames, '\tFRFH'];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
-            end
+            fields = [fields, FRFH];
+            fieldNames = [fieldNames, '\tFRFH'];
+            fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% FRFV
             [isAField, indexA] = ismember('FRFV', fieldNamesA);
@@ -994,14 +1051,13 @@ classdef overlay < handle
                 FRFV = [FRFV_p, fieldDataA_overlay(:, indexA)];
                 FRFV = min(FRFV, [], 2.0);
             else
-                FRFV = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
-            if ischar(FRFV) == 0.0
-                fields = [fields, FRFV];
-                fieldNames = [fieldNames, '\tFRFV'];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
-            end
+            fields = [fields, FRFV];
+            fieldNames = [fieldNames, '\tFRFV'];
+            fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% FRFW
             if (ischar(FRFR) == 0.0) && (ischar(FRFH) == 0.0) && (ischar(FRFV) == 0.0)
@@ -1009,14 +1065,13 @@ classdef overlay < handle
                 FRFW(FRFW == -1.0) = inf;
                 FRFW = min(FRFW, [], 2.0);
             else
-                FRFW = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
-            if ischar(FRFW) == 0.0
-                fields = [fields, FRFW];
-                fieldNames = [fieldNames, '\tFRFW'];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
-            end
+            fields = [fields, FRFW];
+            fieldNames = [fieldNames, '\tFRFW'];
+            fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% SMAX
             [isAField, indexA] = ismember('SMAX (MPa)', fieldNamesA);
@@ -1042,14 +1097,13 @@ classdef overlay < handle
                     end
                 end
             else
-                SMAX = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
-            if ischar(SMAX) == 0.0
-                fields = [fields, SMAX];
-                fieldNames = [fieldNames, '\tSMAX (MPa)'];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
-            end
+            fields = [fields, SMAX];
+            fieldNames = [fieldNames, '\tSMAX (MPa)'];
+            fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% SMXP
             [isAField, indexA] = ismember('SMXP', fieldNamesA);
@@ -1064,14 +1118,13 @@ classdef overlay < handle
                 SMXP = [SMXP_p, fieldDataA_overlay(:, indexA)];
                 SMXP = max(SMXP, [], 2.0);
             else
-                SMXP = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
-            if ischar(SMXP) == 0.0
-                fields = [fields, SMXP];
-                fieldNames = [fieldNames, '\tSMXP'];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
-            end
+            fields = [fields, SMXP];
+            fieldNames = [fieldNames, '\tSMXP'];
+            fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% SMXU
             [isAField, indexA] = ismember('SMXU', fieldNamesA);
@@ -1086,14 +1139,13 @@ classdef overlay < handle
                 SMXU = [SMXU_p, fieldDataA_overlay(:, indexA)];
                 SMXU = max(SMXU, [], 2.0);
             else
-                SMXU = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
-            if ischar(SMXU) == 0.0
-                fields = [fields, SMXU];
-                fieldNames = [fieldNames, '\tSMXU'];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
-            end
+            fields = [fields, SMXU];
+            fieldNames = [fieldNames, '\tSMXU'];
+            fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% TRF
             [isAField, indexA] = ismember('TRF', fieldNamesA);
@@ -1108,18 +1160,23 @@ classdef overlay < handle
                 TRF = [TRF_p, fieldDataA_overlay(:, indexA)];
                 TRF = max(TRF, [], 2.0);
             else
-                TRF = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
-            if ischar(TRF) == 0.0
-                fields = [fields, TRF];
-                fieldNames = [fieldNames, '\tTRF'];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
-            end
+            fields = [fields, TRF];
+            fieldNames = [fieldNames, '\tTRF'];
+            fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% WCM
-            [isAField, indexA] = ismember('WCM (MPa)', fieldNamesA);
-            [isBField, indexB] = ismember('WCM (MPa)', fieldNamesB);
+            % Can be stress or strain
+            if continueFromUnits == 0.0
+                [isAField, indexA] = ismember('WCM (MPa)', fieldNamesA);
+                [isBField, indexB] = ismember('WCM (MPa)', fieldNamesB);
+            else
+                [isAField, indexA] = ismember('WCM (Strain)', fieldNamesA);
+                [isBField, indexB] = ismember('WCM (Strain)', fieldNamesB);
+            end
             
             if (isAField == 1.0) && (isBField == 0.0)
                 WCM = fieldDataA_overlay(:, indexA);
@@ -1130,18 +1187,27 @@ classdef overlay < handle
                 WCM = [WCM_p, fieldDataA_overlay(:, indexA)];
                 WCM = max(WCM, [], 2.0);
             else
-                WCM = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
-            if ischar(WCM) == 0.0
-                fields = [fields, WCM];
+            fields = [fields, WCM];
+            if continueFromUnits == 0.0
                 fieldNames = [fieldNames, '\tWCM (MPa)'];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
+            else
+                fieldNames = [fieldNames, '\tWCM (Strain)'];
             end
+            fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% WCA
-            [isAField, indexA] = ismember('WCA (MPa)', fieldNamesA);
-            [isBField, indexB] = ismember('WCA (MPa)', fieldNamesB);
+            % Can be stress or strain
+            if continueFromUnits == 0.0
+                [isAField, indexA] = ismember('WCA (MPa)', fieldNamesA);
+                [isBField, indexB] = ismember('WCA (MPa)', fieldNamesB);
+            else
+                [isAField, indexA] = ismember('WCA (Strain)', fieldNamesA);
+                [isBField, indexB] = ismember('WCA (Strain)', fieldNamesB);
+            end
             
             if (isAField == 1.0) && (isBField == 0.0)
                 WCA = fieldDataA_overlay(:, indexA);
@@ -1152,31 +1218,39 @@ classdef overlay < handle
                 WCA = [WCA_p, fieldDataA_overlay(:, indexA)];
                 WCA = max(WCA, [], 2.0);
             else
-                WCA = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
-            if ischar(WCA) == 0.0
-                fields = [fields, WCA];
+            fields = [fields, WCA];
+            if continueFromUnits == 0.0
                 fieldNames = [fieldNames, '\tWCA (MPa)'];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
+            else
+                fieldNames = [fieldNames, '\tWCA (Strain)'];
             end
+            fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% WCATAN
             if (ischar(WCM) == 0.0) && (ischar(WCA) == 0.0)
                 WCATAN = atand(WCM./WCA);
             else
-                WCATAN = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
-            if ischar(WCATAN) == 0.0
-                fields = [fields, WCATAN];
-                fieldNames = [fieldNames, '\tWCATAN (Deg)'];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
-            end
+            fields = [fields, WCATAN];
+            fieldNames = [fieldNames, '\tWCATAN (Deg)'];
+            fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% WCDP
-            [isAField, indexA] = ismember('WCDP (MPa)', fieldNamesA);
-            [isBField, indexB] = ismember('WCDP (MPa)', fieldNamesB);
+            % Can be stress or strain
+            if continueFromUnits == 0.0
+                [isAField, indexA] = ismember('WCDP (MPa)', fieldNamesA);
+                [isBField, indexB] = ismember('WCDP (MPa)', fieldNamesB);
+            else
+                [isAField, indexA] = ismember('WCDP (Strain)', fieldNamesA);
+                [isBField, indexB] = ismember('WCDP (Strain)', fieldNamesB);
+            end
             
             if (isAField == 1.0) && (isBField == 0.0)
                 WCDP = fieldDataA_overlay(:, indexA);
@@ -1187,14 +1261,17 @@ classdef overlay < handle
                 WCDP = [WCDP_p, fieldDataA_overlay(:, indexA)];
                 WCDP = max(WCDP, [], 2.0);
             else
-                WCDP = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
-            if ischar(WCDP) == 0.0
-                fields = [fields, WCDP];
+            fields = [fields, WCDP];
+            if continueFromUnits == 0.0
                 fieldNames = [fieldNames, '\tWCDP (MPa)'];
-                fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
+            else
+                fieldNames = [fieldNames, '\tWCDP (Strain)'];
             end
+            fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% YIELD
             [isAField, indexA] = ismember('YIELD', fieldNamesA);
@@ -1209,14 +1286,13 @@ classdef overlay < handle
                 YIELD = [YIELD_p, fieldDataA_overlay(:, indexA)];
                 YIELD = max(YIELD, [], 2.0);
             else
-                YIELD = 'UNDEFINED';
+                error = 1.0;
+                return
             end
             
-            if ischar(YIELD) == 0.0
-                fields = [fields, YIELD];
-                fieldNames = [fieldNames, '\tYIELD'];
-                fieldLabels = [fieldLabels, '\t%.0f'];
-            end
+            fields = [fields, YIELD];
+            fieldNames = [fieldNames, '\tYIELD'];
+            fieldLabels = [fieldLabels, '\t%.0f'];
             
             fieldNames = [fieldNames, '\r\n'];
             fieldLabels = [fieldLabels, '\r\n'];

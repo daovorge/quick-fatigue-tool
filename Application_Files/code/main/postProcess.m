@@ -10,8 +10,8 @@ classdef postProcess < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      10 Output
 %   
-%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
-%   Last modified 14-Jun-2017 14:41:28 GMT
+%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
+%   Last modified 07-Aug-2017 10:22:21 GMT
     
     %%
     
@@ -1654,8 +1654,8 @@ classdef postProcess < handle
             
             for groups = 1:G
                 %{
-                    If the analysis is a PEEK analysis, override the value of GROUP to
-                    the group containing the PEEK item
+                    If the analysis is a MAXPS analysis, override the value of GROUP to
+                    the group containing the MAXPS item
                 %}
                 if getappdata(0, 'peekAnalysis') == 1.0
                     groups = getappdata(0, 'peekGroup'); %#ok<FXSET>
@@ -1979,11 +1979,11 @@ classdef postProcess < handle
             end
             
             if removeCarriageReturn == 1.0
-                fprintf('[POST] Starting Quick Fatigue Tool 6.11-01 ODB Interface');
-                fprintf(fid_status, '\n[POST] Starting Quick Fatigue Tool 6.11-01 ODB Interface');
+                fprintf('[POST] Starting Quick Fatigue Tool 6.11-02 ODB Interface');
+                fprintf(fid_status, '\n[POST] Starting Quick Fatigue Tool 6.11-02 ODB Interface');
             else
-                fprintf('[POST] Quick Fatigue Tool 6.11-01 ODB Interface');
-                fprintf(fid_status, '\n[POST] Quick Fatigue Tool 6.11-01 ODB Interface');
+                fprintf('[POST] Quick Fatigue Tool 6.11-02 ODB Interface');
+                fprintf(fid_status, '\n[POST] Quick Fatigue Tool 6.11-02 ODB Interface');
             end
             
             % Delete the upgrade log file
@@ -1999,7 +1999,7 @@ classdef postProcess < handle
             
             % Open the log file for writing
             fid_debug = fopen([sprintf('Project/output/%s/Data Files/', jobName), resultsDatabaseName, '.log'], 'w+');
-            fprintf(fid_debug, 'Quick Fatigue Tool 6.11-01 ODB Interface Log');
+            fprintf(fid_debug, 'Quick Fatigue Tool 6.11-02 ODB Interface Log');
             
             % Get the selected position
             userPosition = getappdata(0, 'odbResultPosition');
@@ -2155,6 +2155,11 @@ classdef postProcess < handle
                                 % Unkown exception
                                 fprintf('\n[POST] ODB Error: The Abaqus API returned the following error:\r\n\r\n%s\r\nResults will not be written to the output database.', message)
                             end
+                            
+                            if getappdata(0, 'autoExport_executionMode') == 1.0
+                                delete(scriptFile)
+                            end
+                            
                             fprintf('\n[ERROR] ODB Interface exited with errors');
                             fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors');
                             return
@@ -2182,6 +2187,9 @@ classdef postProcess < handle
             fprintf('\n[POST] Export complete. Check the log file in Project/output/%s/Data Files for possible messages', getappdata(0, 'jobName'));
             fprintf(fid_status, '\n[POST] Export complete. Check the log file in Project/output/%s/Data Files for possible messages', getappdata(0, 'jobName'));
             fclose(fid_debug);
+            
+            % Update the message file
+            messenger.writeMessage(265.0)
             
             % Delete the Python script from the data directory
             delete(scriptFile)

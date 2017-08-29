@@ -17,8 +17,8 @@ function [] = tutorial_intro()
 %   Reference section in Quick Fatigue Tool User Settings Reference Guide
 %      1 Job file options
 %   
-%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
-%   Last modified 12-May-2017 15:25:52 GMT
+%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
+%   Last modified 23-Aug-2017 15:10:40 GMT
 
 %% JOB
 
@@ -58,7 +58,7 @@ DATASET = 'stress_uni.dat';
 %}
 HISTORY = 'history_fully_reversed.dat';
 
-% FEA UNITS
+% DATASET UNITS
 %{
     0: User-defined
     1: Pa
@@ -68,10 +68,10 @@ HISTORY = 'history_fully_reversed.dat';
     5: ksi
     6: Msi
 %}
-UNITS = 3.0;
+UNITS = 'MPa';
 
 %{
-    [Pa] = CONV * [model]
+    [Pa] = CONV * [dataset]
 %}
 CONV = [];
 
@@ -147,11 +147,12 @@ MS_CORRECTION = 2.0;
 % ITEMS TO ANALYSE
 %{
     'ALL': Whole model
-    'PEEK': Item with largest (S1-S3)
+    'SURFACE': ODB element surface
+    'MAXPS': Item with largest (S1-S3)
     'hotspots_<jobName>.dat': Hotspot region
     n: User-defined list
 %}
-ITEMS = 'ALL';
+ITEMS = 'SURFACE';
 
 %{
     'CAEL': Endurance limit (defined in material)

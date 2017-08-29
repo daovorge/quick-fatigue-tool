@@ -5,8 +5,8 @@ function [] = cleanup(status)
 %   CLEANUP is used internally by Quick Fatigue Tool. The user
 %   is not required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
-%   Last modified 05-Jul-2017 12:54:18 GMT
+%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
+%   Last modified 29-Aug-2017 16:06:30 GMT
     
     %%
     
@@ -70,9 +70,9 @@ if status == 1.0
     fid = fopen(errLogFile, 'w');
     
     % Write file header
-    fprintf(fid, 'Quick Fatigue Tool 6.11-01\r\n');
+    fprintf(fid, 'Quick Fatigue Tool 6.11-02\r\n');
     fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-    fprintf(fid, 'Last modified 05-Jul-2017 12:54:18 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 29-Aug-2017 16:06:30 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');
@@ -406,7 +406,7 @@ if status == 1.0
         fprintf(fid, '\r\n\r\n***ERROR: Peak-valley detection failed while processing ''%s''. You may wish to try the following:', getappdata(0, 'pvDetectionFailFile'));
         fprintf(fid, '\r\n-> Reduce the gating criterion');
         fprintf(fid, '\r\n-> Switch to Nielsony''s Method');
-        fprintf(fid, '\r\n-> Disable time history gating');
+        fprintf(fid, '\r\n-> Disable load history gating');
         
         fprintf(fid, '\r\n\r\nError code: E018');
         rmappdata(0, 'E018')
@@ -1062,7 +1062,7 @@ if status == 1.0
     if getappdata(0, 'E115') == 1.0
         jobName = getappdata(0, 'continueFrom');
         fprintf(fid, '\r\n\r\n***ERROR: The field data from the job ''%s'' could not be located', jobName);
-        fprintf(fid, '\r\n-> To perform the analysis as a continuation from a previous job, the following file must be available:');
+        fprintf(fid, '\r\n-> The following file is required to perform a continuation analysis:');
         fprintf(fid, '\r\n   ''%s\\output\\%s\\Data Files\\f-output-all.dat''', pwd, jobName);
         fprintf(fid, '\r\n-> Field output must be enabled in ''%s'' by setting OUTPUT_FIELD = 1.0', jobName);
         fprintf(fid, '\r\n\r\nError code: E115');
@@ -1331,6 +1331,50 @@ if status == 1.0
         fprintf(fid, '\r\n-> The Walker gamma parameter must be in the range (0 <= Gamma <= 1)');
         fprintf(fid, '\r\n\r\nError code: E142');
         rmappdata(0, 'E142')
+    end
+    if getappdata(0, 'E143') == 1.0
+        fprintf(fid, '\r\n\r\n***ERROR: The input file reader encountered an exception while trying to access the message (.msg) file');
+        fprintf(fid, '\r\n-> This can happen if %%APPDATA%% was not cleared after the previous analysis. Please restart MATLAB and re-run the analysis');
+        fprintf(fid, '\r\n-> If the problem persists, please contact the author for assistance: louisvallance@hotmail.co.uk');
+        fprintf(fid, '\r\n\r\nError code: E143');
+        rmappdata(0, 'E143')
+    end
+    if getappdata(0, 'E144') == 1.0
+        fprintf(fid, '\r\n\r\n***ERROR: The field data from the current job could not be appended using CONTINUE_FROM');
+        fprintf(fid, '\r\n-> One or more fields are missing from both field data files');
+        fprintf(fid, '\r\n-> Analysis continuation will not work if the field output files have been modified by the user');
+        fprintf(fid, '\r\n\r\nError code: E144');
+        rmappdata(0, 'E144')
+    end
+    if getappdata(0, 'E145') == 1.0
+        fprintf(fid, '\r\n\r\n***ERROR: The field data from the previous job is formatted incorrectly');
+        fprintf(fid, '\r\n-> Analysis continuation will not work if the field output files have been modified by the user');
+        fprintf(fid, '\r\n\r\nError code: E145');
+        rmappdata(0, 'E145')
+    end
+    if getappdata(0, 'E146') == 1.0
+        fprintf(fid, '\r\n\r\n***ERROR: Peak-valley detection failed while processing a user-defined load history. You may wish to try the following:');
+        fprintf(fid, '\r\n-> Reduce the gating criterion');
+        fprintf(fid, '\r\n-> Switch to Nielsony''s Method');
+        fprintf(fid, '\r\n-> Disable load history gating');
+        
+        fprintf(fid, '\r\n\r\nError code: E146');
+        rmappdata(0, 'E146')
+    end
+    if (getappdata(0, 'E147') == 1.0) || (getappdata(0, 'E148') == 1.0)
+        if getappdata(0, 'E147') == 1.0
+            fprintf(fid, '\r\n\r\n***ERROR: The current job uses a stress-based algorithm, but the previous job is strain-based');
+            fprintf(fid, '\r\n-> Changing from a strain-based to a stress-based algorithm with CONTINUE_FROM is not permitted');
+            
+            fprintf(fid, '\r\n\r\nError code: E147');
+            rmappdata(0, 'E147')
+        else
+            fprintf(fid, '\r\n\r\n***ERROR: The current job uses a strain-based algorithm, but the previous job is stress-based');
+            fprintf(fid, '\r\n-> Changing from a stress-based to a strain-based algorithm with CONTINUE_FROM is not permitted');
+            
+            fprintf(fid, '\r\n\r\nError code: E148');
+            rmappdata(0, 'E148')
+        end
     end
     
     % Write file footer

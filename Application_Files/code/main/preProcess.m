@@ -7,8 +7,8 @@ classdef preProcess < handle
     %
     %   See also postProcess.
     %
-    %   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
-    %   Last modified 26-Jun-2017 15:32:30 GMT
+    %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
+    %   Last modified 29-Aug-2017 16:06:30 GMT
     
     %%
     
@@ -1833,6 +1833,7 @@ classdef preProcess < handle
                     
                     % Perform noise reduction if applicable
                     if getappdata(0, 'noiseReduction') == 1.0
+                        messenger.writeMessage(267.0)
                         scale = filter(nCoefficient, 1.0, scale);
                     end
                     
@@ -1848,12 +1849,14 @@ classdef preProcess < handle
                             
                             if isempty(peaks) || isempty(valleys)
                                 error = true;
-                                if ischar(scales)
-                                    setappdata(0, 'error_log_018', 1.0)
+                                if ischar(scales) == 1.0
+                                    setappdata(0, 'E018', 1.0)
                                     setappdata(0, 'pvDetectionFailFile', scales)
-                                else
-                                    setappdata(0, 'error_log_018', 1.0)
+                                elseif iscell(scales) == 1.0
+                                    setappdata(0, 'E018', 1.0)
                                     setappdata(0, 'pvDetectionFailFile', scales{i})
+                                else
+                                    setappdata(0, 'E146', 1.0)
                                 end
                                 
                                 mainID = -999.0;
@@ -2349,7 +2352,7 @@ classdef preProcess < handle
                 elementType = getappdata(0, 'elementType');
                 if isempty(elementType)
                     elementType = 0.0;
-                elseif ~isnumeric(elementType)
+                elseif isnumeric(elementType) == 0.0
                     elementType = 0.0;
                 elseif isnan(elementType) || ~isreal(elementType) || ...
                         isinf(elementType) || ~isreal(elementType)
@@ -2479,14 +2482,14 @@ classdef preProcess < handle
             setappdata(0, 'nodeType_master', nodeType)
             
             %% Filter IDs if user specified individual analysis items
-            if strcmpi(items, 'all') == 1.0 || strcmpi(items, 'peek') == 1.0
+            if (strcmpi(items, 'all') == 1.0) || (strcmpi(items, 'maxps') == 1.0) || (strcmpi(items, 'surface') == 1.0)
                 items = [];
             elseif isnumeric(items) == 0.0
                 if exist(items, 'file') == 2.0
                     setappdata(0, 'hotspotFile', items)
                     
                     % If ITEMS is defined as a file, verify its contents
-                    items_file = importdata(items, '\t', 4.0);
+                    items_file = importdata(items, '\t');
                     if iscell(items_file) == 1.0
                         items_file = cell2mat(items_file);
                         [~, itemCols] = size(items_file);
@@ -2496,9 +2499,11 @@ classdef preProcess < handle
                     
                     if itemCols == 1.0
                         items_data = importdata(items, '\t');
+                        items_header = 'NONE';
                     else
                         try
                             items_data = items_file.data;
+                            items_header = items_file.textdata;
                         catch
                             items_data = 'error';
                         end
@@ -2512,12 +2517,13 @@ classdef preProcess < handle
                         items = [];
                         setappdata(0, 'items', 'ALL')
                         messenger.writeMessage(143.0)
-                    elseif itemCols ~= 4.0 &&  itemCols ~= 1.0
+                    elseif (strcmpi(items_header{1.0}, 'hotspots') == 0.0 && strcmpi(items_header{1.0}, 'surface items') == 0.0) && (itemCols ~= 1.0 || itemCols ~= 4.0)
                         items = [];
                         setappdata(0, 'items', 'ALL')
                         messenger.writeMessage(144.0)
                     else
                         items = items_data(:, 1.0);
+                        messenger.writeMessage(266.0)
                     end
                 elseif exist('items', 'file') == 0.0
                     % The file does not exist, so warn the user
@@ -2545,7 +2551,7 @@ classdef preProcess < handle
                 itemError = 0.0;
                 
                 for i = 1:numberOfItems
-                    if items(i) > length(mainIDs)
+                    if items(i) > R
                         mainIDs2 = mainIDs';
                         subIDs2 = subIDs';
                         
@@ -3330,6 +3336,9 @@ classdef preProcess < handle
                 G = getappdata(0, 'numberOfGroups');
             end
             
+            % Get the Eigensolver
+            eigenSolver = getappdata(0, 'eigensolver');
+            
             % Get the group ID buffer
             groupIDBuffer = getappdata(0, 'groupIDBuffer');
             
@@ -3350,6 +3359,16 @@ classdef preProcess < handle
             
             totalCounter = 0.0;
             
+            % Test REPMAT()
+            if eigenSolver == 2.0
+                try
+                    repmat(eye([3.0, 3.0]), 1.0, 1.0, 2.0);
+                catch
+                    setappdata(0, 'eigensolver', 1.0)
+                    eigenSolver = 1.0;
+                end
+            end
+            
             for groups = 1:G
                 if (strcmpi(groupIDBuffer(1.0).name, 'default') == 1.0) || (isFosIteration == 1.0)
                     % There is one, default group
@@ -3359,7 +3378,7 @@ classdef preProcess < handle
                     [N, groupIDs] = group.switchProperties(groups, groupIDBuffer(groups));
                 end
                 
-                if getappdata(0, 'eigensolver') == 1.0
+                if eigenSolver == 1.0
                     %% OLD METHOD
                     for i = 1:N
                         totalCounter = totalCounter + 1.0;
@@ -4268,8 +4287,10 @@ classdef preProcess < handle
                     mkdir([dir, 'MATLAB Figures'])
                 end
             elseif exist(dir, 'dir') == 7.0
-                % If the output directory already exists, warn user that the directory will
-                % be overwritten
+                %{
+                    If the output directory already exists, warn user that
+                    the directory will be overwritten
+                %}
                 cantRemovePreviousOutput = 0.0;
                 
                 response = questdlg(sprintf('An output directory already exists for job ''%s''.\nOK to overwrite?',...
@@ -4501,6 +4522,7 @@ classdef preProcess < handle
             
             % Perform noise reduction is applicable
             if getappdata(0, 'noiseReduction') == 1.0
+                messenger.writeMessage(267.0)
                 nWindows = getappdata(0, 'numberOfWindows');
                 nCoefficient = ones(1, nWindows)/nWindows;
                 scale = filter(nCoefficient, 1, scale);
@@ -4773,18 +4795,18 @@ classdef preProcess < handle
                 end
             end
             
-            % Read the local environment file if it exists
-            if exist(sprintf('Project/job/%s_env.m', jobName), 'file') == 2.0
-                try
-                    run(sprintf('%s_env', jobName))
-                    setappdata(0, 'message169_environmentFileName', [pwd, sprintf('\\Project\\job\\%s_env.m', jobName)])
-                catch
-                    % The local environment file could not be read
-                    error = 1.0;
-                    fprintf('ERROR: The local environment file could not be read\n');
-                    fprintf('-> Make sure the job name does not contain spaces or illegal characters\n');
-                    return
-                end
+            %{
+                Read the local environment file if it exists. First check
+                the MATLAB path, then check the JOB firectory
+            %}
+            [local, error, readLocalFiles] = preProcess.checkLocalEnvironment(jobName);
+            
+            if error == 1.0
+                return
+            end
+            
+            if local == 1.0
+                setappdata(0, 'message169_environmentFileName', readLocalFiles)
             end
             
             % Check that the environment is defined
@@ -4818,8 +4840,10 @@ classdef preProcess < handle
                 run('Application_Files/default/environment.m')
                 
                 % Read the local environment file if it exists
-                if exist(sprintf('Project/job/%s_env.m', jobName), 'file') == 2.0
-                    run(sprintf('%s_env', jobName))
+                [local, ~, readLocalFiles] = preProcess.checkLocalEnvironment(jobName);
+                
+                if local == 1.0
+                    setappdata(0, 'message169_environmentFileName', readLocalFiles)
                 end
             end
         end
@@ -4840,7 +4864,7 @@ classdef preProcess < handle
             peekItem = find(maximumRangePerNode == max(maximumRangePerNode));
             
             %{
-                If there is more than one peek item in the model, save the
+                If there is more than one maxps item in the model, save the
                 values and inform the user
             %}
             nPeekItems = length(peekItem);
@@ -4856,7 +4880,7 @@ classdef preProcess < handle
                 peekItem = peekItem(1.0);
             end
             
-            % Save the value of the peek item
+            % Save the value of the maxps item
             setappdata(0, 'peekItem', peekItem)
             
             % Update the stress tensors
@@ -4901,7 +4925,7 @@ classdef preProcess < handle
             G = getappdata(0, 'numberOfGroups');
             groupIDBuffer = getappdata(0, 'groupIDBuffer');
             
-            % Initialize the variable whih stores the group contaning the PEEK item
+            % Initialize the variable whih stores the group contaning the MAXPS item
             peekGroup = 1.0;
             found = 0.0;
             
@@ -4927,7 +4951,7 @@ classdef preProcess < handle
             setappdata(0, 'peekAnalysis_worstStressRange', maximumRangePerNode(peekItem))
             
             %{
-                If the peek item does not belong to any of the analysis
+                If the MAXPS item does not belong to any of the analysis
                 group, warn the user
             %}
             if found == 0.0
@@ -4941,7 +4965,7 @@ classdef preProcess < handle
             setappdata(0, 'groupIDBuffer', groupIDBuffer)
         end
         
-        %% WRITE PEEK ITEMS TO A SEPARATE FILE
+        %% WRITE MAXPS ITEMS TO A SEPARATE FILE
         function [] = writePeekItems()
             mainIDs = getappdata(0, 'peekItems_mainID');
             subIDs = getappdata(0, 'peekItems_subID');
@@ -4957,11 +4981,11 @@ classdef preProcess < handle
                 mkdir(sprintf('%s/Data Files', root))
             end
             
-            dir = [root, 'Data Files/peek_items.dat'];
+            dir = [root, 'Data Files/maxps_items.dat'];
             
             fid = fopen(dir, 'w+');
             
-            fprintf(fid, 'PEEK_ITEMS\r\n');
+            fprintf(fid, 'MAXPS_ITEMS\r\n');
             fprintf(fid, 'Job:\t%s\r\nLoading:\t%.3g\t%s\r\n', getappdata(0, 'jobName'), getappdata(0, 'loadEqVal'), getappdata(0, 'loadEqUnits'));
             
             fprintf(fid, 'Main ID\tSub ID\tMaximum Principal Stress Range [MPa]\r\n');
@@ -5048,6 +5072,56 @@ classdef preProcess < handle
                 
                 setappdata(0, 'message_167_nDuplicateItems', nDuplicateItems)
                 messenger.writeMessage(167.0)
+            end
+        end
+        
+        %% CHECK FOR LOCAL ENVIRONMENT FILES
+        function [flag, error, readLocalFiles] = checkLocalEnvironment(jobName)
+            flag = 0.0;
+            error = 0.0;
+            
+            localEnvFile_abs = sprintf('%s\\Project\\job\\%s_env.m', pwd, jobName);
+            localEnvFile_rel = sprintf('%s_env.m', jobName);
+            localFiles = which(localEnvFile_rel, '-ALL');
+            
+            readLocalFiles = cell(1.0, 1.0);
+            readLocalFileIndex = 1.0;
+            
+            % First check the MATLAB path
+            for i = 1:length(localFiles)
+                if strcmpi(localFiles{i}, localEnvFile_abs) == 0.0
+                    try
+                        run(localFiles{i})
+                        
+                        readLocalFiles{readLocalFileIndex, 1.0} = localFiles{i};
+                        readLocalFileIndex = readLocalFileIndex + 1.0;
+                        
+                        flag = 1.0;
+                    catch
+                        % The local environment file could not be read
+                        error = 1.0;
+                        fprintf('ERROR: The local environment file ''%s'' could not be read\n', localFiles{i});
+                        fprintf('-> Make sure the job name does not contain spaces or illegal characters\n');
+                        return
+                    end
+                end
+            end
+            
+            % Check the JOB directory
+            if any(cell2mat(strfind(localFiles, localEnvFile_abs))) == 1.0
+                try
+                    run(localEnvFile_abs)
+                    
+                    readLocalFiles{readLocalFileIndex, 1.0} = localEnvFile_abs;
+                    
+                    flag = 1.0;
+                catch
+                    % The local environment file could not be read
+                    error = 1.0;
+                    fprintf('ERROR: The local environment file ''%s'' could not be read\n', localEnvFile_abs);
+                    fprintf('-> Make sure the job name does not contain spaces or illegal characters\n');
+                    return
+                end
             end
         end
     end

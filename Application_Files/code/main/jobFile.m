@@ -5,8 +5,8 @@ classdef jobFile < handle
 %   JOBFILE is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-01 Copyright Louis Vallance 2017
-%   Last modified 30-Jun-2017 12:48:35 GMT
+%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
+%   Last modified 23-Aug-2017 15:10:40 GMT
     
     %%
     
@@ -82,12 +82,17 @@ classdef jobFile < handle
             hfScales = flags{53};  setappdata(0, 'hfScales', hfScales)
             frfEnvelope = flags{54};    setappdata(0, 'frfEnvelope', frfEnvelope)
             
-            %% CHECK FLAGS FOR CONSISTENCY
+            %% DEFAULT FLAGS
             if isempty(jobName) == 1.0
                 fprintf('[ERROR] Job name undefined\n')
                 errordlg('Please specify a name for the analysis job.', 'Quick Fatigue Tool')
                 error = 1.0;
                 return
+            end
+            
+            if (isempty(dataCheck) == 1.0) || (ischar(dataCheck) == 1.0)
+                dataCheck = 0.0;
+                setappdata(0, 'dataCheck', dataCheck)
             end
             
             if (isempty(designLife) == 1.0) || ((ischar(designLife) == 1.0) && (strcmpi(designLife, 'CAEL') == 0.0))
@@ -107,9 +112,16 @@ classdef jobFile < handle
                 setappdata(0, 'analysisGroups', 'DEFAULT')
             end
             
-            if (isempty(items) == 1.0) || ((ischar(items) == 1.0) && (strcmpi(items, 'ALL') == 0.0) && strcmpi(items, 'PEEK') == 0.0 && exist(items, 'file') == 0.0)
+            if isempty(items) == 1.0
                 items = 'ALL';
                 setappdata(0, 'items', 'ALL')
+            elseif ischar(items) == 1.0
+                [~, ~, ext] = fileparts(items);
+                
+                if (isempty(ext) == 1.0) && (strcmpi(items, 'ALL') == 0.0 && strcmpi(items, 'MAXPS') == 0.0 && strcmpi(items, 'SURFACE') == 0.0)
+                    items = 'ALL';
+                    setappdata(0, 'items', 'ALL')
+                end
             end
             
             if isempty(scale) == 1.0
@@ -1576,7 +1588,7 @@ classdef jobFile < handle
                         conversionFactor = 1.0;
                         units = 'MPa';
                     else
-                        conversionFactor = 1.0/(userUnits*1E6);
+                        conversionFactor = 1E6/userUnits;
                         units = 'User-defined';
                     end
                 case 1.0
@@ -1779,13 +1791,15 @@ classdef jobFile < handle
             odbResultPosition = getappdata(0, 'odbResultPosition');
             algorithm = getappdata(0, 'algorithm');
             
-            if algorithm == 3.0 || algorithm == 10.0
+            if (algorithm == 3.0) || (algorithm == 10.0)
                 setappdata(0, 'autoExport_uniaxial', 1.0)
+            else
+                setappdata(0, 'autoExport_uniaxial', 0.0)
             end
             
-            if autoExportODB == 1.0 && isempty(outputDatabase) == 0.0
+            if (autoExportODB == 1.0) && (isempty(outputDatabase) == 0.0)
                 % The ODB interface does not support Uniaxial Stress-Life
-                if algorithm == 3.0 || algorithm == 1.0
+                if (algorithm == 3.0) || (algorithm == 10.0)
                     msg = sprintf('Uniaxial analysis methods are not supported by the ODB interface.\n\nResults will not be exported to the output database. OK to continue with job submission?');
                     response = questdlg(msg, 'Quick Fatigue Tool', 'Yes', 'No', 'Yes');
                     if strcmpi('No', response) == 1.0
@@ -1805,7 +1819,7 @@ classdef jobFile < handle
                 end
                 
                 [~, ~, EXT] = fileparts(outputDatabase);
-                switch exist(outputDatabase, 'file')
+                switch exist(outputDatabase, 'file') == 2.0
                     case 0.0
                         if strcmpi(EXT, '.odb') == 1.0
                             msg = sprintf('The output database could not be found:\n\n%s\n\nResults will not be exported to the output database. OK to continue with job submission?', outputDatabase);
