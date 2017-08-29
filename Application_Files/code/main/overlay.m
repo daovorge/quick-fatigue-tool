@@ -9,7 +9,7 @@ classdef overlay < handle
 %      4.8 Analysis continuation techniques
 %   
 %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 17-Aug-2017 14:07:28 GMT
+%   Last modified 29-Aug-2017 12:08:36 GMT
     
     %%
     
@@ -17,6 +17,7 @@ classdef overlay < handle
         %% CHECK THAT THE PREVIOUS JOB EXISTS
         function [error, outputField] = checkJob(outputField)
             error = 0.0;
+            algorithm = getappdata(0, 'algorithm');
             
             % Set flag for analysis continuation
             setappdata(0, 'continueAnalysis', 0.0)
@@ -90,6 +91,26 @@ classdef overlay < handle
             if length(previousJobFieldNames) ~= 21.0
                 setappdata(0, 'E145', 1.0)
                 error = 1.0;
+                return
+            end
+            
+            % Switching from stres-based to strain-based is not permitted
+            unitsPrevious = previousJobFieldNames(17.0);
+            if (ismember(unitsPrevious, 'WCM (Strain)') == 1.0) && (algorithm ~= 3.0)
+                error = 1.0;
+                setappdata(0, 'E147', 1.0)
+                return
+            elseif (ismember(unitsPrevious, 'WCM (MPa)') == 1.0) && (algorithm == 3.0)
+                error = 1.0;
+                setappdata(0, 'E148', 1.0)
+                return
+            elseif ismember(unitsPrevious, 'WCM (Strain)') == 1.0
+                setappdata(0, 'continueFromUnits', 1.0)
+            elseif ismember(unitsPrevious, 'WCM (MPa)') == 1.0
+                setappdata(0, 'continueFromUnits', 0.0)
+            else
+                error = 1.0;
+                setappdata(0, 'E145', 1.0)
                 return
             end
             
@@ -201,6 +222,7 @@ classdef overlay < handle
             fieldNames = 'Main ID\tSub ID';
             fieldLabels = '%.0f\t%.0f';
             units = getappdata(0, 'loadEqUnits');
+            continueFromUnits = getappdata(0, 'continueFromUnits');
             error = 0.0;
             
             % Field output format string
@@ -478,8 +500,14 @@ classdef overlay < handle
             fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% WCM
-            [isCurrentField, indexCurrent] = ismember('WCM (MPa)', fieldNamesCurrent);
-            [isPreviousField, indexPrevious] = ismember('WCM (MPa)', fieldNamesPrevious);
+            % Can be stress or strain
+            if continueFromUnits == 0.0
+                [isCurrentField, indexCurrent] = ismember('WCM (MPa)', fieldNamesCurrent);
+                [isPreviousField, indexPrevious] = ismember('WCM (MPa)', fieldNamesPrevious);
+            else
+                [isCurrentField, indexCurrent] = ismember('WCM (Strain)', fieldNamesCurrent);
+                [isPreviousField, indexPrevious] = ismember('WCM (Strain)', fieldNamesPrevious);
+            end
             
             if (isCurrentField == 1.0) && (isPreviousField == 0.0)
                 WCM = fieldDataCurrent(:, indexCurrent);
@@ -495,12 +523,22 @@ classdef overlay < handle
             end
             
             fields = [fields, WCM];
-            fieldNames = [fieldNames, '\tWCM (MPa)'];
+            if continueFromUnits == 0.0
+                fieldNames = [fieldNames, '\tWCM (MPa)'];
+            else
+                fieldNames = [fieldNames, '\tWCM (Strain)'];
+            end
             fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% WCA
-            [isCurrentField, indexCurrent] = ismember('WCA (MPa)', fieldNamesCurrent);
-            [isPreviousField, indexPrevious] = ismember('WCA (MPa)', fieldNamesPrevious);
+            % Can be stress or strain
+            if continueFromUnits == 0.0
+                [isCurrentField, indexCurrent] = ismember('WCA (MPa)', fieldNamesCurrent);
+                [isPreviousField, indexPrevious] = ismember('WCA (MPa)', fieldNamesPrevious);
+            else
+                [isCurrentField, indexCurrent] = ismember('WCA (Strain)', fieldNamesCurrent);
+                [isPreviousField, indexPrevious] = ismember('WCA (Strain)', fieldNamesPrevious);
+            end
             
             if (isCurrentField == 1.0) && (isPreviousField == 0.0)
                 WCA = fieldDataCurrent(:, indexCurrent);
@@ -516,7 +554,11 @@ classdef overlay < handle
             end
             
             fields = [fields, WCA];
-            fieldNames = [fieldNames, '\tWCA (MPa)'];
+            if continueFromUnits == 0.0
+                fieldNames = [fieldNames, '\tWCA (MPa)'];
+            else
+                fieldNames = [fieldNames, '\tWCA (Strain)'];
+            end
             fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% WCATAN
@@ -532,8 +574,14 @@ classdef overlay < handle
             fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% WCDP
-            [isCurrentField, indexCurrent] = ismember('WCDP (MPa)', fieldNamesCurrent);
-            [isPreviousField, indexPrevious] = ismember('WCDP (MPa)', fieldNamesPrevious);
+            % Can be stress or strain
+            if continueFromUnits == 0.0
+                [isCurrentField, indexCurrent] = ismember('WCDP (MPa)', fieldNamesCurrent);
+                [isPreviousField, indexPrevious] = ismember('WCDP (MPa)', fieldNamesPrevious);
+            else
+                [isCurrentField, indexCurrent] = ismember('WCDP (Strain)', fieldNamesCurrent);
+                [isPreviousField, indexPrevious] = ismember('WCDP (Strain)', fieldNamesPrevious);
+            end
             
             if (isCurrentField == 1.0) && (isPreviousField == 0.0)
                 WCDP = fieldDataCurrent(:, indexCurrent);
@@ -549,7 +597,11 @@ classdef overlay < handle
             end
             
             fields = [fields, WCDP];
-            fieldNames = [fieldNames, '\tWCDP (MPa)'];
+            if continueFromUnits == 0.0
+                fieldNames = [fieldNames, '\tWCDP (MPa)'];
+            else
+                fieldNames = [fieldNames, '\tWCDP (Strain)'];
+            end
             fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% YIELD
@@ -838,6 +890,7 @@ classdef overlay < handle
             fieldNames = 'Main ID\tSub ID';
             fieldLabels = '%.0f\t%.0f';
             units = getappdata(0, 'loadEqUnits');
+            continueFromUnits = getappdata(0, 'continueFromUnits');
             error = 0.0;
             
             % Field output format string
@@ -1116,8 +1169,14 @@ classdef overlay < handle
             fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% WCM
-            [isAField, indexA] = ismember('WCM (MPa)', fieldNamesA);
-            [isBField, indexB] = ismember('WCM (MPa)', fieldNamesB);
+            % Can be stress or strain
+            if continueFromUnits == 0.0
+                [isAField, indexA] = ismember('WCM (MPa)', fieldNamesA);
+                [isBField, indexB] = ismember('WCM (MPa)', fieldNamesB);
+            else
+                [isAField, indexA] = ismember('WCM (Strain)', fieldNamesA);
+                [isBField, indexB] = ismember('WCM (Strain)', fieldNamesB);
+            end
             
             if (isAField == 1.0) && (isBField == 0.0)
                 WCM = fieldDataA_overlay(:, indexA);
@@ -1133,12 +1192,22 @@ classdef overlay < handle
             end
             
             fields = [fields, WCM];
-            fieldNames = [fieldNames, '\tWCM (MPa)'];
+            if continueFromUnits == 0.0
+                fieldNames = [fieldNames, '\tWCM (MPa)'];
+            else
+                fieldNames = [fieldNames, '\tWCM (Strain)'];
+            end
             fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% WCA
-            [isAField, indexA] = ismember('WCA (MPa)', fieldNamesA);
-            [isBField, indexB] = ismember('WCA (MPa)', fieldNamesB);
+            % Can be stress or strain
+            if continueFromUnits == 0.0
+                [isAField, indexA] = ismember('WCA (MPa)', fieldNamesA);
+                [isBField, indexB] = ismember('WCA (MPa)', fieldNamesB);
+            else
+                [isAField, indexA] = ismember('WCA (Strain)', fieldNamesA);
+                [isBField, indexB] = ismember('WCA (Strain)', fieldNamesB);
+            end
             
             if (isAField == 1.0) && (isBField == 0.0)
                 WCA = fieldDataA_overlay(:, indexA);
@@ -1154,7 +1223,11 @@ classdef overlay < handle
             end
             
             fields = [fields, WCA];
-            fieldNames = [fieldNames, '\tWCA (MPa)'];
+            if continueFromUnits == 0.0
+                fieldNames = [fieldNames, '\tWCA (MPa)'];
+            else
+                fieldNames = [fieldNames, '\tWCA (Strain)'];
+            end
             fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% WCATAN
@@ -1170,8 +1243,14 @@ classdef overlay < handle
             fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% WCDP
-            [isAField, indexA] = ismember('WCDP (MPa)', fieldNamesA);
-            [isBField, indexB] = ismember('WCDP (MPa)', fieldNamesB);
+            % Can be stress or strain
+            if continueFromUnits == 0.0
+                [isAField, indexA] = ismember('WCDP (MPa)', fieldNamesA);
+                [isBField, indexB] = ismember('WCDP (MPa)', fieldNamesB);
+            else
+                [isAField, indexA] = ismember('WCDP (Strain)', fieldNamesA);
+                [isBField, indexB] = ismember('WCDP (Strain)', fieldNamesB);
+            end
             
             if (isAField == 1.0) && (isBField == 0.0)
                 WCDP = fieldDataA_overlay(:, indexA);
@@ -1187,7 +1266,11 @@ classdef overlay < handle
             end
             
             fields = [fields, WCDP];
-            fieldNames = [fieldNames, '\tWCDP (MPa)'];
+            if continueFromUnits == 0.0
+                fieldNames = [fieldNames, '\tWCDP (MPa)'];
+            else
+                fieldNames = [fieldNames, '\tWCDP (Strain)'];
+            end
             fieldLabels = [fieldLabels, sprintf('\t%%%s', f)];
             
             %% YIELD
