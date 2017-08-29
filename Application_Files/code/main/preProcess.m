@@ -8,7 +8,7 @@ classdef preProcess < handle
     %   See also postProcess.
     %
     %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-    %   Last modified 28-Aug-2017 13:14:00 GMT
+    %   Last modified 29-Aug-2017 16:06:30 GMT
     
     %%
     
@@ -3336,6 +3336,9 @@ classdef preProcess < handle
                 G = getappdata(0, 'numberOfGroups');
             end
             
+            % Get the Eigensolver
+            eigenSolver = getappdata(0, 'eigensolver');
+            
             % Get the group ID buffer
             groupIDBuffer = getappdata(0, 'groupIDBuffer');
             
@@ -3356,6 +3359,16 @@ classdef preProcess < handle
             
             totalCounter = 0.0;
             
+            % Test REPMAT()
+            if eigenSolver == 2.0
+                try
+                    repmat(eye([3.0, 3.0]), 1.0, 1.0, 2.0);
+                catch
+                    setappdata(0, 'eigensolver', 1.0)
+                    eigenSolver = 1.0;
+                end
+            end
+            
             for groups = 1:G
                 if (strcmpi(groupIDBuffer(1.0).name, 'default') == 1.0) || (isFosIteration == 1.0)
                     % There is one, default group
@@ -3365,7 +3378,7 @@ classdef preProcess < handle
                     [N, groupIDs] = group.switchProperties(groups, groupIDBuffer(groups));
                 end
                 
-                if getappdata(0, 'eigensolver') == 1.0
+                if eigenSolver == 1.0
                     %% OLD METHOD
                     for i = 1:N
                         totalCounter = totalCounter + 1.0;
