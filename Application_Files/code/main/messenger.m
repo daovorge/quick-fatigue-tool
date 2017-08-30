@@ -2093,7 +2093,7 @@ classdef messenger < handle
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 260.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The Uniaxial Strain-Life algorithm has been used in a continuation analysis, but the material state file from the previous job could not be found', returnType{i}]);
-                        fprintf(fidType(i), ['-> Any accumulated plasticity from the prvious analysis will be reset to zero, and the current elastic stress history will be treated as a new loading event', returnType{i}]);
+                        fprintf(fidType(i), ['-> Any accumulated plasticity from the previous analysis will be reset to zero, and the current elastic stress history will be treated as a new loading event', returnType{i}]);
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 261.0

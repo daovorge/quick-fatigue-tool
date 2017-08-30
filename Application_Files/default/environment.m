@@ -13,7 +13,7 @@
 %      2 Environment variables
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 20-Aug-2017 18:25:05 GMT
+%   Last modified 30-Aug-2017 15:40:20 GMT
 
 %% GATE TENSORS
 %{
@@ -165,6 +165,15 @@ setappdata(0, 'cpShearStress', 1.0)
     3: Take sign from Mohr cirlce space
 %}
 setappdata(0, 'signConvention', 1.0)
+
+%% ALGORITHM SETTINGS FOR UNIAXIAL STRAIN-LIFE
+
+% ANALYSIS CONTINUATION
+%{
+    0: Reset stress-strain configuration
+    1: Import stress-strain configuration
+%}
+setappdata(0, 'importMaterialState', 1.0)
 
 %% ALGORITHM SETTINGS FOR STRESS-BASED BROWN-MILLER
 

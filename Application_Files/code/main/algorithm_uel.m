@@ -35,6 +35,7 @@ classdef algorithm_uel < handle
             E = getappdata(0, 'E');
             kp = getappdata(0, 'kp');
             np = getappdata(0, 'np');
+            import = getappdata(0, 'importMaterialState');
             
             % Get the residual stress
             residual = getappdata(0, 'residualStress');
@@ -48,7 +49,7 @@ classdef algorithm_uel < handle
                 damageParameter_stress = analysis.gateTensors(damageParameter_stress, gateTensors, tensorGate);
             end
             
-            if getappdata(0, 'continueAnalysis') == 1.0
+            if (getappdata(0, 'continueAnalysis') == 1.0) && (import > 0.0)
                 %{
                     The job is a continuation of a previous analysis. Begin
                     the plasticity correction from the last point of the
