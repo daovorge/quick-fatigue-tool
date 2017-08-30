@@ -12,7 +12,7 @@ function varargout = UniaxialStrainLife(varargin)%#ok<*DEFNU>
 %      A3.6 Uniaxial Strain-Life
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 19-Jun-2017 13:56:11 GMT
+%   Last modified 30-Aug-2017 10:22:14 GMT
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
