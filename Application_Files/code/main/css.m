@@ -35,7 +35,7 @@ function [trueStrain, trueStress, signal2] = css(signal, E, K, n)
 %   hysteresis loop, the material response reverts to the previous history
 %   point.
 
-%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
 %   Last modified 24-Jul-2015 10:43:07 GMT
 
 %% Convert to strain units:

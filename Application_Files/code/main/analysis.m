@@ -3,7 +3,7 @@ classdef analysis < handle
 %   ANALYSIS is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
 %   Last modified 23-Aug-2017 15:10:40 GMT
     
     %%

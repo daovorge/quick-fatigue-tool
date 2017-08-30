@@ -12,7 +12,7 @@
 %   Reference section in Quick Fatigue Tool User Settings Reference Guide
 %      2 Environment variables
 %   
-%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
 %   Last modified 20-Aug-2017 18:25:05 GMT
 
 %% GATE TENSORS
