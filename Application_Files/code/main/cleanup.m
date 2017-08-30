@@ -6,7 +6,7 @@ function [] = cleanup(status)
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 30-Aug-2017 15:40:20 GMT
+%   Last modified 30-Aug-2017 18:00:59 GMT
     
     %%
     
@@ -72,7 +72,7 @@ if status == 1.0
     % Write file header
     fprintf(fid, 'Quick Fatigue Tool 6.11-03\r\n');
     fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-    fprintf(fid, 'Last modified 30-Aug-2017 15:40:20 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 30-Aug-2017 18:00:59 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');
@@ -1375,6 +1375,20 @@ if status == 1.0
             fprintf(fid, '\r\n\r\nError code: E148');
             rmappdata(0, 'E148')
         end
+    end
+    if getappdata(0, 'E149') == 1.0
+        fprintf(fid, '\r\n\r\n***ERROR: There is no fatigue in the uniaxial loading');
+        
+        fprintf(fid, '\r\n\r\nError code: E149');
+        rmappdata(0, 'E149')
+    end
+    if getappdata(0, 'E150') == 1.0
+        fprintf(fid, '\r\n\r\n***ERROR: After applying the plasticity correction, there is only one point in the load history');
+        fprintf(fid, '\r\n-> Please check the load history for issues');
+        fprintf(fid, '\r\n-> If the problem persists, please contact the author for assistance: louisvallance@hotmail.co.uk');
+        
+        fprintf(fid, '\r\n\r\nError code: E150');
+        rmappdata(0, 'E150')
     end
     
     % Write file footer

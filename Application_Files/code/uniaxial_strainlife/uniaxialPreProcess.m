@@ -11,7 +11,7 @@ classdef uniaxialPreProcess < handle
 %      A3.6 Uniaxial Strain-Life
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 30-Aug-2017 10:22:14 GMT
+%   Last modified 30-Aug-2017 18:00:59 GMT
     
     %%
     
@@ -121,6 +121,15 @@ classdef uniaxialPreProcess < handle
             % If the load history is Nx1, convert it to 1xN
             if R > 1.0
                 loadHistoryData = loadHistoryData';
+            end
+            
+            % Check for fatigue
+            if length(unique(loadHistoryData)) == 1.0
+                errorMessage = sprintf('Error while processing %s.\n\nThere is no fatigue in the load history.', errorString);
+                errordlg(errorMessage, 'Quick Fatigue Tool')
+                uiwait
+                error = 1.0;
+                return
             end
         end
         

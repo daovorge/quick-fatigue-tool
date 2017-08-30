@@ -6,7 +6,7 @@ classdef jobFile < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 23-Aug-2017 15:10:40 GMT
+%   Last modified 30-Aug-2017 18:00:59 GMT
     
     %%
     
@@ -1677,7 +1677,7 @@ classdef jobFile < handle
             setappdata(0, 'incorrectItemList', 0.0)
             
             % If using Uniaxial Stress-Life, no scale & combine is necessary
-            if algorithm == 10.0 || algorithm == 3.0
+            if (algorithm == 10.0) || (algorithm == 3.0)
                 [Sxx, Syy, Szz, Txy, Tyz, Txz, mainID, subID, error, oldSignal] = preProcess.uniaxialRead(history, gateHistories, historyGate, scale, offset);
             else
                 [Sxx, Syy, Szz, Txy, Tyz, Txz, mainID, subID, error] = preProcess.scalecombine(dataset, history, items, gateHistories, historyGate, scale, offset, elementType);
@@ -1767,6 +1767,13 @@ classdef jobFile < handle
                 if error == 1.0
                     return
                 end
+            end
+            
+            %% CHECK FOR FATIGUE IN THE LOADING
+            error = jobFile.checkFatigue(Sxx, algorithm);
+            
+            if error == 1.0
+                return
             end
         end
         
@@ -2173,6 +2180,24 @@ classdef jobFile < handle
                 group_materialProps = getappdata(0, 'group_materialProps');
                 group_materialProps(groups).goodmanLimitStress = goodmanMeanStressLimit(groups);
                 setappdata(0, 'group_materialProps', group_materialProps)
+            end
+        end
+        
+        %% Check the loading for fatigue
+        function [error] = checkFatigue(S11, algorithm)
+            % Initilize the error flag
+            error = 0.0;
+            
+            if (algorithm == 3.0) || (algorithm == 10.0)
+                % A uniaxial method is being used
+                if length(unique(S11)) == 1.0
+                    % There is no fatigue
+                    error = 1.0;
+                    setappdata(0, 'E149', 1.0)
+                    return
+                end
+            else
+                return
             end
         end
     end

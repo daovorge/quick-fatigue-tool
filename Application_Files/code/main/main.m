@@ -11,7 +11,7 @@ function [] = main(flags)
 %   Author contact: louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 30-Aug-2017 15:40:20 GMT
+%   Last modified 30-Aug-2017 18:00:59 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');    tic_pre = tic;
@@ -43,7 +43,7 @@ setappdata(0, 'messageFileWarnings', 0.0)
 %% PRINT COMMAND WINDOW HEADER
 fprintf('[NOTICE] Quick Fatigue Tool 6.11-03')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2017)')
-fprintf('\n[NOTICE] Last modified 30-Aug-2017 15:40:20 GMT')
+fprintf('\n[NOTICE] Last modified 30-Aug-2017 18:00:59 GMT')
 
 cleanExit = 0.0;
 
@@ -610,10 +610,17 @@ for groups = 1:G
 
         switch algorithm
             case 3.0 % UNIAXIAL STRAIN-LIFE
-                [nodalAmplitudes, nodalAmplitudes_strain, nodalPairs, nodalPairs_strain, nodalDamage, nodalDamageParameter, damageParameter, damageParameter_strain]...
+                [nodalAmplitudes, nodalAmplitudes_strain, nodalPairs,...
+                    nodalPairs_strain, nodalDamage, nodalDamageParameter,...
+                    damageParameter, damageParameter_strain, error]...
                     = algorithm_uel.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, signalLength,...
                     totalCounter, nodalDamage, msCorrection, nodalDamageParameter,...
                     gateTensors, tensorGate, s1i, s2i, s3i);
+                
+                if error == 1.0
+                    cleanup(1.0)
+                    return
+                end
             case 4.0 % STRESS-BASED BROWN-MILLER
                 [nodalDamageParameter, nodalAmplitudes, nodalPairs,...
                     nodalPhiC, nodalThetaC, nodalDamage, maxPhiCurve] =...

@@ -21,7 +21,7 @@ classdef algorithm_uel < handle
     methods(Static = true)
         %% ENTRY FUNCTION
         function [nodalAmplitudes_stress, nodalAmplitudes_strain, nodalPairs_stress, nodalPairs_strain, nodalDamage,...
-                nodalDamageParameter, damageParameter_stress, damageParameter_strain] = main(Sxx, ~, ~, ~, ~, ~,...
+                nodalDamageParameter, damageParameter_stress, damageParameter_strain, error] = main(Sxx, ~, ~, ~, ~, ~,...
                 signalLength, node, nodalDamage, msCorrection,...
                 nodalDamageParameter, gateTensors, tensorGate, S1, S2, S3)
             
@@ -36,6 +36,9 @@ classdef algorithm_uel < handle
             kp = getappdata(0, 'kp');
             np = getappdata(0, 'np');
             import = getappdata(0, 'importMaterialState');
+            
+            % Error flag
+            error = 0.0;
             
             % Get the residual stress
             residual = getappdata(0, 'residualStress');
@@ -57,10 +60,10 @@ classdef algorithm_uel < handle
                 %}
                 
                 % Check if there is a meterial state file
-                [epsilon_pp, sigma_pp, sigma_pe, allowClosure, error, mmfe] = algorithm_uel.readMaterialState();
+                [epsilon_pp, sigma_pp, sigma_pe, allowClosure, materialError, mmfe] = algorithm_uel.readMaterialState();
                 
                 % Convert elastic stress into inelastic stress-strain
-                if error == 1.0
+                if materialError == 1.0
                     [rfData, damageParameter_strain, damageParameter_stress, ~, ~, mmfe] = css2c(damageParameter_stress, E, kp, np, 1.0);
                 else
                     [rfData, damageParameter_strain, damageParameter_stress, ~, ~] = css2d(damageParameter_stress, epsilon_pp, sigma_pp, sigma_pe, allowClosure, E, kp, np, 1.0, mmfe);
@@ -68,6 +71,17 @@ classdef algorithm_uel < handle
             else
                 % Convert elastic stress into inelastic stress-strain
                 [rfData, damageParameter_strain, damageParameter_stress, ~, ~, mmfe] = css2c(damageParameter_stress, E, kp, np, 1.0);
+            end
+            
+            %% Check the length of the damage parameter
+            if length(damageParameter_strain) == 1.0 || length(damageParameter_stress) == 1.0
+                setappdata(0, 'E150', 1.0)
+                nodalAmplitudes_stress = [];
+                nodalAmplitudes_strain = [];
+                nodalPairs_stress = [];
+                nodalPairs_strain = [];
+                error = 1.0;
+                return
             end
             
             %% Write the last stress-strain point to file
