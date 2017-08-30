@@ -6,7 +6,7 @@ function [] = cleanup(status)
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 30-Aug-2017 09:25:47 GMT
+%   Last modified 30-Aug-2017 09:56:00 GMT
     
     %%
     
@@ -72,7 +72,7 @@ if status == 1.0
     % Write file header
     fprintf(fid, 'Quick Fatigue Tool 6.11-03\r\n');
     fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-    fprintf(fid, 'Last modified 30-Aug-2017 09:25:47 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 30-Aug-2017 09:56:00 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');
@@ -1361,7 +1361,7 @@ if status == 1.0
         fprintf(fid, '\r\n\r\nError code: E146');
         rmappdata(0, 'E146')
     end
-    if (getappdata(0, 'E147') == 1.0) || (getappdata(0, 'E148') == 1.0)
+    if (isappdata(0, 'E147') == 1.0) || (isappdata(0, 'E148') == 1.0)
         if getappdata(0, 'E147') == 1.0
             fprintf(fid, '\r\n\r\n***ERROR: The current job uses a stress-based algorithm, but the previous job is strain-based');
             fprintf(fid, '\r\n-> Changing from a strain-based to a stress-based algorithm with CONTINUE_FROM is not permitted');
