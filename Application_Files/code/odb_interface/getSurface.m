@@ -13,7 +13,7 @@ function [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(ma
 %      4.5.3 Custom analysis items
 %
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 24-Aug-2017 12:05:33 GMT
+%   Last modified 30-Aug-2017 09:25:47 GMT
 
 %%
 
@@ -53,6 +53,9 @@ if (algorithm == 3.0) || (algorithm == 1.0)
 end
 
 %% Collect additional information
+
+% Get the number of items before surface detection
+N0 = N;
 
 % Get the number of part instances
 if ischar(partInstance) == 1.0
@@ -248,7 +251,7 @@ if strcmpi(odbResultPosition, 'nodal') == 1.0
     
     % Update the message file
     setappdata(0, 'message_274', N)
-    if length(mainID_surface) == N
+    if length(mainID_surface) == N0
         messenger.writeMessage(280.0)
     else
         messenger.writeMessage(274.0)
@@ -345,7 +348,7 @@ elseif strcmpi(odbResultPosition, 'elemental') == 1.0
     
     % Update the message file
     setappdata(0, 'message_275', nElements)
-    if length(mainID_surface) == N
+    if length(mainID_surface) == N0
         messenger.writeMessage(279.0)
     else
         messenger.writeMessage(275.0)
@@ -409,7 +412,7 @@ else
     
     % Update the message file
     setappdata(0, 'message_275', nElements)
-    if length(mainID_surface) == N
+    if length(mainID_surface) == N0
         messenger.writeMessage(279.0)
     else
         messenger.writeMessage(275.0)
