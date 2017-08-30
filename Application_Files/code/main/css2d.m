@@ -1,4 +1,4 @@
-function [rfData, epsilon, sigma, error, warning] = css2d(sigma_e, epsilon_pp, sigma_pp, sigma_pe, allowClosure, E, kp, np, scf)
+function [rfData, epsilon, sigma, error, warning] = css2d(sigma_e, epsilon_pp, sigma_pp, sigma_pe, allowClosure, E, kp, np, scf, matMemFirstExcursion)
 %CSS2D    QFT function to calculate nonlinear elastic stress-strain.
 %   This function calculates the nonlinear elastic stress and strain from
 %   an elastic stress tensor.
@@ -17,7 +17,7 @@ function [rfData, epsilon, sigma, error, warning] = css2d(sigma_e, epsilon_pp, s
 %   from a previous analysis defined by CONTINUE_FROM.
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 19-Jun-2017 16:12:44 GMT
+%   Last modified 30-Aug-2017 15:40:20 GMT
     
     %%
     
@@ -65,7 +65,7 @@ if length(sigma_e) > 2.0
 end
 
 %% Add previous elastic stress point to history
-sigma_e = [0.0, sigma_pe, sigma_e];
+sigma_e = [0.0, sigma_pe(end), sigma_e];
 
 %% Initialize analysis variables
 precision = 1e3;
@@ -83,8 +83,8 @@ sigma = zeros(1.0, signalLength);
 sigma_e = sigma_e.*scf;
 
 %% Add previous inelastic strain point to history
-epsilon(1.0:2.0) = epsilon_pp;
-sigma(1.0:2.0) = sigma_pp;
+epsilon(1.0:3.0) = epsilon_pp;
+sigma(1.0:3.0) = sigma_pp;
 
 %% Calculate the cyclic stage
 %{
@@ -94,9 +94,15 @@ sigma(1.0:2.0) = sigma_pp;
     in the strain history
 %}
 
-currentStressRange = abs(sigma_e(3.0) - sigma_e(2.0));
+currentStressRange = abs(sigma_pe(end) - sigma_pe(end-1.0));
 
-stressRangeBuffer = currentStressRange;
+if length(sigma_pe) < 3.0
+    stressRangeBuffer = [sigma_pe(1.0), currentStressRange];
+else
+    stressRangeBuffer = [abs(sigma_pe(end-1.0) - sigma_pe(end-2.0)), currentStressRange];
+end
+
+ratchetStress = 0.0;
 
 for i = 3:signalLength
     %{
@@ -106,7 +112,7 @@ for i = 3:signalLength
     %}
     previousStressRange = currentStressRange;
     currentStressRange = abs(sigma_e(i) - sigma_e(i - 1.0));
-    stressRangeBuffer(i - 1.0) = currentStressRange;
+    stressRangeBuffer(i) = currentStressRange;
     
     % Record the direciton of the current excursion
     if sigma_e(i) - sigma_e(i - 1.0) > 0.0
@@ -131,7 +137,7 @@ for i = 3:signalLength
         range is in the opposite direction to the previous
         strain range
     %}
-    if (currentStressRange > previousStressRange) && (i > 3.0) && (allowClosure == 1.0)
+    if (currentStressRange > previousStressRange) && (i > 2.0) && (allowClosure == 1.0)
         %%
         %{
             A cycle has been closed
@@ -160,12 +166,16 @@ for i = 3:signalLength
         
         %{
             The stress is calculated from the curve two
-            excursions ago. The current strain range is the
+            excursions ago. The current stress range is the
             strain range from this excursion, plus the
             additional strain range beyond the current cycle
             closure point
         %}
-        stressRange = stressRangeBuffer(i - 3.0) + stressRangeBeyondClosure;
+        if matMemFirstExcursion == 1.0
+            stressRange = stressRangeBuffer(1.0) + stressRangeBeyondClosure + ratchetStress;
+        else
+            stressRange = stressRangeBuffer(i - 2.0) + stressRangeBeyondClosure;
+        end
         
         if currentDirection == -1.0
             trueStrainCurve = linspace(1e-12, -overshoot*(stressRange/E), precision);
@@ -179,28 +189,57 @@ for i = 3:signalLength
             the first excursion in the loading, the monotonic
             stress-strain curve must be used instead
         %}
-        Nb = (stressRange^2)./(E.*trueStrainCurve);
-        f = real((Nb./E) + 2.0.*(Nb./(2.0*kp)).^(1.0/np) - trueStrainCurve);
+        if matMemFirstExcursion == 1.0
+            ratchetStress = ratchetStress + stressRangeBeyondClosure;
+            
+            Nb = (stressRange^2.0)./(E.*trueStrainCurve);
+            f = real((Nb./E) + (Nb./kp).^(1.0/np) - trueStrainCurve);
+        else
+            Nb = (stressRange^2)./(E.*trueStrainCurve);
+            f = real((Nb./E) + 2.0.*(Nb./(2.0*kp)).^(1.0/np) - trueStrainCurve);
+        end
         
         % Solve for the strain range
         strainRange = interp1(f, trueStrainCurve, 0.0, method, 'extrap');
-        epsilon(i) = epsilon(i - 3.0) + strainRange;
+        
+        if matMemFirstExcursion == 1.0
+            epsilon(i + 1.0) = epsilon(1.0) + strainRange;
+        else
+            epsilon(i + 1.0) = epsilon(i - 2.0) + strainRange;
+        end
         
         % Solve for the stress range
-        currentStrainRange = abs(epsilon(i) - epsilon(i - 1.0));
+        if matMemFirstExcursion == 1.0
+            currentStrainRange = epsilon(i + 1.0);
+        else
+            currentStrainRange = abs(epsilon(i + 1.0) - epsilon(i));
+        end
         
         trueStressCurve = linspace(0.0, currentStrainRange*E, precision);
-        trueStrainCurve = real((trueStressCurve./E) + 2.0.*(trueStressCurve./(2.0*kp)).^(1.0/np));
+        
+        if matMemFirstExcursion == 1.0
+            trueStrainCurve = real((trueStressCurve./E) + (trueStressCurve./(kp)).^(1.0/np));
+        else
+            trueStrainCurve = real((trueStressCurve./E) + 2.0.*(trueStressCurve./(2.0*kp)).^(1.0/np));
+        end
         
         if all(trueStrainCurve == 0.0) == 1.0
             sigma(i) = sigma(i - 1.0);
         else
             stressRange = interp1(trueStrainCurve, trueStressCurve, currentStrainRange, method, 'extrap');
             
-            if currentDirection == -1.0
-                sigma(i) = sigma(i - 3.0) - stressRange;
+            if matMemFirstExcursion == 1.0
+                if currentDirection == -1.0
+                    sigma(i + 1.0) = sigma(1.0) - stressRange;
+                else
+                    sigma(i + 1.0) = sigma(1.0) + stressRange;
+                end
             else
-                sigma(i) = sigma(i - 3.0) + stressRange;
+                if currentDirection == -1.0
+                    sigma(i + 1.0) = sigma(i - 2.0) - stressRange;
+                else
+                    sigma(i + 1.0) = sigma(i - 2.0) + stressRange;
+                end
             end
         end
     elseif ((currentStressRange == 2.0*previousStressRange) && (i == 3.0)) || ((currentStressRange == previousStressRange) && (allowClosure == 1.0))
@@ -217,8 +256,15 @@ for i = 3:signalLength
             equal to the stress range of the previous cyclic excursion. The
             current stress and strain is equal to the previous point
         %}
-        epsilon(i) = epsilon(i - 2.0);
-        sigma(i) = sigma(i - 2.0);
+        if i == 3.0
+            % i == 3.0
+            epsilon(i + 1.0) = -epsilon(i - 1.0);
+            sigma(i + 1.0) = -sigma(i - 1.0);
+        else
+            % i > 3.0
+            epsilon(i + 1.0) = epsilon(i - 1.0);
+            sigma(i + 1.0) = sigma(i - 1.0);
+        end
     else
         %%
         %{
@@ -248,10 +294,10 @@ for i = 3:signalLength
         % Solve for the strain range
         strainRange = interp1(f, trueStrainCurve, 0.0, method, 'extrap');
         
-        epsilon(i) = epsilon(i - 1.0) + strainRange;
+        epsilon(i + 1.0) = epsilon(i) + strainRange;
         
         % Solve for the stress range
-        currentStrainRange = abs(epsilon(i) - epsilon(i - 1.0));
+        currentStrainRange = abs(epsilon(i + 1.0) - epsilon(i));
         trueStressCurve = linspace(0.0, currentStrainRange*E, precision);
         
         trueStrainCurve = real((trueStressCurve./E) + 2.0.*(trueStressCurve./(2.0*kp)).^(1.0/np));
@@ -264,16 +310,16 @@ for i = 3:signalLength
         stressRange = interp1(trueStrainCurve, trueStressCurve, currentStrainRange, method, 'extrap');
         
         if currentDirection == -1.0
-            sigma(i) = sigma(i - 1.0) - stressRange;
+            sigma(i + 1.0) = sigma(i) - stressRange;
         else
-            sigma(i) = sigma(i - 1.0) + stressRange;
+            sigma(i + 1.0) = sigma(i) + stressRange;
         end
     end
 end
 
 %% Append the material state to the beginning of the history
-sigma = sigma(3.0:end);
-epsilon = epsilon(3.0:end);
+sigma = sigma(4.0:end);
+epsilon = epsilon(4.0:end);
 
 %% Rainflow cycle count the inelastic histories
 

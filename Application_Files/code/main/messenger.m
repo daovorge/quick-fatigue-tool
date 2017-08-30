@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 30-Aug-2017 09:56:00 GMT
+%   Last modified 30-Aug-2017 15:40:20 GMT
 
     %%
 
@@ -2122,10 +2122,19 @@ classdef messenger < handle
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The environment variable ''noiseReduction'' is deprecated. Use ''gateTensors'' instead', returnType{i}]);
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 268.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: When continuing an analysis with the CONTINUE_FROM job file option, the dataset element positions MUST be consistent between each model', returnType{i}]);
-                        fprintf(fidType(i), ['-> Quick Fatigue Tool does not check for this condition before the analysis', returnType{i}]);
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: When continuing an analysis with the CONTINUE_FROM job file option, the user should be aware of the following:', returnType{i}]);
+                        fprintf(fidType(i), ['DATASET POSITION', returnType{i}]);
+                        fprintf(fidType(i), ['-> Quick Fatigue Tool does not compare the dataset positions between each job before the analysis', returnType{i}]);
                         fprintf(fidType(i), ['-> e.g. If the datasets used for the first job are UNIQUE NODAL, then the datasets for the second job must also be UNIQUE NODAL', returnType{i}]);
                         fprintf(fidType(i), ['-> Failure to ensure element position consistency may result in erroneous field data superposition', returnType{i}]);
+                        fprintf(fidType(i), ['LOAD TRANSITIONS', returnType{i}]);
+                        fprintf(fidType(i), ['-> Load transitions are not supported between jobs. Rainflow cycle counting may miss cycles which span both load histories', returnType{i}]);
+                        
+                        if getappdata(0, 'modifyEnduranceLimit') == 1.0
+                            fprintf(fidType(i), ['ENDURANCE LIMIT', returnType{i}]);
+                            fprintf(fidType(i), ['-> Endurance limit modification is enabled for the current job, but analyses which use CONTINUE_FROM ignore this setting', returnType{i}]);
+                            fprintf(fidType(i), ['-> If the first job contains damaging cycles and the second job contains cycles below the endurance limit, fatigue damage may not be calculated for the small cycles', returnType{i}]);
+                        end
                     case 269.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Surface detection did not find any elements or nodes', returnType{i}]);
                         fprintf(fidType(i), ['-> All items will be analysed', returnType{i}]);
@@ -2214,7 +2223,7 @@ classdef messenger < handle
                 fprintf(fid, 'Quick Fatigue Tool 6.11-03\r\n');
             end
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 30-Aug-2017 09:56:00 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 30-Aug-2017 15:40:20 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

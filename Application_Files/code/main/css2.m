@@ -251,7 +251,7 @@ for i = 3:signalLength
         
         %{
             The stress is calculated from the curve two
-            excursions ago. The current strain range is the
+            excursions ago. The current stress range is the
             strain range from this excursion, plus the
             additional strain range beyond the current cycle
             closure point
