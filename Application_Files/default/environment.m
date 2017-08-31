@@ -29,7 +29,7 @@ setappdata(0, 'tensorGate', 5.0)
 %% PRE-GATE LOAD HISTORIES
 %{
     0: Off
-    1: Pre-gate load histories (as % of max tensor)
+    1: Pre-gate load histories (as % gate)
     2: Pre-gate load histories (Nielsony's method)
 %}
 setappdata(0, 'gateHistories', 0.0)
