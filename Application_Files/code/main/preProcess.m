@@ -62,7 +62,7 @@ classdef preProcess < handle
                     if exist([localPath, '\', material], 'file') == 2.0
                         %{
                             The material exists on the path containing the
-                            marker file. Use this file.
+                            marker file. Use this file
                         %}
                         material = [localPath, '\', material];
                     end
@@ -75,7 +75,7 @@ classdef preProcess < handle
                     if exist([pwd, '/Data/material/local/', material], 'file') == 2.0 
                         %{
                             The material exists on the default local path.
-                            Use this file.
+                            Use this file
                         %}
                         material = [pwd, '/Data/material/local/', material];
                     end
@@ -87,7 +87,7 @@ classdef preProcess < handle
                     if exist([localPath, '\', material], 'file') == 2.0
                         %{
                             The material exists on the user-defined local
-                            material path. Use this file.
+                            material path. Use this file
                         %}
                         material = [localPath, '\', material];
                     end
