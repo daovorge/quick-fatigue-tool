@@ -8,7 +8,7 @@ classdef preProcess < handle
     %   See also postProcess.
     %
     %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-    %   Last modified 01-Sep-2017 20:42:00 GMT
+    %   Last modified 29-Aug-2017 16:06:30 GMT
     
     %%
     
@@ -58,39 +58,18 @@ classdef preProcess < handle
                         marker text file, so try this location first
                     %}
                     [localPath, ~, ~] = fileparts(which('qft-local-material.txt'));
-                    
-                    if exist([localPath, '\', material], 'file') == 2.0
-                        %{
-                            The material exists on the path containing the
-                            marker file. Use this file.
-                        %}
-                        material = [localPath, '\', material];
-                    end
+                    material = [localPath, '\', material];
                 elseif isempty(localPath) == 1.0
                     %{
                         The local material path is not set and there is no
                         marker file. Try using the default local path
                         DATA\MATERIAL\LOCAL instead
                     %}
-                    if exist([pwd, '/Data/material/local/', material], 'file') == 2.0 
-                        %{
-                            The material exists on the default local path.
-                            Use this file.
-                        %}
-                        material = [pwd, '/Data/material/local/', material];
+                    if exist(['Data/material/local/', material], 'file') == 2.0                
+                        material = ['Data/material/local/', material];
                     end
                 else
-                    %{
-                        The local path is set. Check if the material exists
-                        in this location.
-                    %}
-                    if exist([localPath, '\', material], 'file') == 2.0
-                        %{
-                            The material exists on the user-defined local
-                            material path. Use this file.
-                        %}
-                        material = [localPath, '\', material];
-                    end
+                    material = [localPath, '\', material];
                 end
             end
             
