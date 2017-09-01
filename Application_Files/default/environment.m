@@ -162,7 +162,7 @@ setappdata(0, 'cpShearStress', 1.0)
 %{
     1: Take sign from hydrostatic stress
     2: Take sign from largest principal stress
-    3: Take sign from Mohr cirlce space
+    3: Take sign from Mohr's circle
 %}
 setappdata(0, 'signConvention', 1.0)
 
