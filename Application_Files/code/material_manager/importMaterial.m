@@ -9,7 +9,7 @@ classdef importMaterial < handle
 %   LocalMaterialDatabase, material, MaterialEditor, MaterialManager.
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 20-Jun-2017 14:41:51 GMT
+%   Last modified 02-Sep-2017 19:02:40 GMT
     
     %%
     

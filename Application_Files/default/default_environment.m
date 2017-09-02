@@ -13,7 +13,7 @@
 %      2 Environment variables
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 30-Aug-2017 15:40:20 GMT
+%   Last modified 02-Sep-2017 19:02:40 GMT
 
 %% GATE TENSORS
 %{
@@ -390,6 +390,7 @@ setappdata(0, 'figure_LH', 1.0)
     'jpg' = JPEG
 %}
 setappdata(0, 'figureFormat', 'fig')
+setappdata(0, 'figureVisibility', 'off')
 
 % DATA FILES
 setappdata(0, 'file_F_OUTPUT_ALL', 1.0)

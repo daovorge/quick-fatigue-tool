@@ -29,7 +29,7 @@ classdef material < handle
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 05-Jul-2017 12:54:18 GMT
+%   Last modified 02-Sep-2017 19:02:40 GMT
     
     %%
     
@@ -819,7 +819,6 @@ classdef material < handle
             % Write the new marker file
             try
                 fid = fopen([path, '\qft-local-material.txt'], 'w+');
-                fprintf(fid, '%s', path);
                 fclose(fid);
             catch exception
                 fprintf('ERROR: An exception was encountered while setting the local material path.\n\nMATLAB returned the following error: %s\n', exception.message)

@@ -11,7 +11,7 @@ classdef postProcess < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 07-Aug-2017 10:22:21 GMT
+%   Last modified 02-Sep-2017 19:02:40 GMT
     
     %%
     
@@ -419,6 +419,9 @@ classdef postProcess < handle
             
             L = getappdata(0, 'signalLength');
             
+            % Figure visibility
+            figureVisibility = getappdata(0, 'figureVisibility');
+            
             %% Get the worst cycle mean stress and stress amplitude (WCM and WCA)
 
             %% ANHD (Worst cycle Haigh diagram)
@@ -428,7 +431,7 @@ classdef postProcess < handle
                     WCA = getappdata(0, 'WCA');
                     WCM = getappdata(0, 'WCM');
                     
-                    f1 = figure('visible', 'off');
+                    f1 = figure('visible', figureVisibility);
                     subplot(1.0, 2.0, 1.0)
                     scatter(WCM, WCA, 40, 'MarkerEdgeColor', [0 0.5 0.5],...
                         'MarkerFaceColor', [0 0.7 0.7], 'LineWidth', 1.5)
@@ -552,7 +555,7 @@ classdef postProcess < handle
                         N = getappdata(0, 'n_values');
                         
                         % Get the current figure handle
-                        f2 = figure('visible', 'off');
+                        f2 = figure('visible', figureVisibility);
                         
                         loglog(N, S, '-', 'LineWidth', lineWidth, 'Color', midnightBlue);   hold on
                         
@@ -596,7 +599,7 @@ classdef postProcess < handle
             setappdata(0, 'WNVM', vonMises)
                 
             if  getappdata(0, 'figure_VM') == 1.0 && outputFigure == 1.0
-                f3 = figure('visible', 'off');
+                f3 = figure('visible', figureVisibility);
                 
                 plot(vonMises, '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
                 
@@ -639,7 +642,7 @@ classdef postProcess < handle
             setappdata(0, 'WNPS3', s3)
             
             if getappdata(0, 'figure_PS') == 1.0 && outputFigure == 1.0
-                f4 = figure('visible', 'off');
+                f4 = figure('visible', figureVisibility);
                 subplot(3.0, 1.0, 1.0)
                 plot(s1, '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
 
@@ -729,7 +732,7 @@ classdef postProcess < handle
                     msg = sprintf('CN, Maximum normal stress history on critical plane for item %.0f.%.0f', mainID, subID);
                 end
                     
-                f5 = figure('visible', 'off');
+                f5 = figure('visible', figureVisibility);
                 subplot(2.0, 1.0, 1.0)
                 plot(normalOnCP, '-', 'LineWidth', lineWidth, 'Color', fireBrick)
                 
@@ -831,7 +834,7 @@ classdef postProcess < handle
                 setappdata(0, 'DPT', damageParameter)
                 
                 if outputFigure == 1.0 && getappdata(0, 'figure_DPP') == 1.0
-                    f6 = figure('visible', 'off');
+                    f6 = figure('visible', figureVisibility);
                     
                     % Smooth the data
                     if length(damageParameter) > 9.0 && range(damageParameter) ~= 0.0 && smoothness > 1.0 && smoothness > 0.0
@@ -871,7 +874,7 @@ classdef postProcess < handle
                 setappdata(0, 'DT', damage)
                 
                 if outputFigure == 1.0 && getappdata(0, 'figure_DP') == 1.0
-                    f7 = figure('visible', 'off');
+                    f7 = figure('visible', figureVisibility);
                     
                     % Smooth the data
                     if length(damage) > 9.0 && range(damage) ~= 0.0 && smoothness > 0.0
@@ -916,7 +919,7 @@ classdef postProcess < handle
                 setappdata(0, 'LT', lifeTheta)
                 
                 if outputFigure == 1.0 && getappdata(0, 'figure_LP') == 1.0
-                    f8 = figure('visible', 'off');
+                    f8 = figure('visible', figureVisibility);
                     
                     % Smooth the data
                     if length(lifeTheta) > 9.0 && range(lifeTheta) ~= 0.0 && smoothness > 0.0
@@ -956,7 +959,7 @@ classdef postProcess < handle
                 if outputFigure == 1.0
                     if getappdata(0, 'figure_CPS') == 1.0
                         %% SHEAR STRESS VS THETA
-                        f9 = figure('visible', 'off');
+                        f9 = figure('visible', figureVisibility);
                         
                         shearStress = getappdata(0, 'shear_cp');
                         
@@ -1068,7 +1071,7 @@ classdef postProcess < handle
                         
                         cumulativeDamage = cumulativeDamage/max(cumulativeDamage);
                         
-                        f10 = figure('visible', 'off');
+                        f10 = figure('visible', figureVisibility);
                         plot(cumulativeDamage, '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
                         
                         if crossing ~= -999.0
@@ -1106,7 +1109,7 @@ classdef postProcess < handle
             %% RHIST RAINFLOW HISTOGRAM OF CYCLES
             
             if outputFigure == 1.0 && outputField == 1.0 && getappdata(0, 'figure_RHIST') == 1.0
-                f11 = figure('visible', 'off');
+                f11 = figure('visible', figureVisibility);
                 rhistData = [Sm'; 2.*amplitudes]';
                 nBins = getappdata(0, 'numberOfBins');
                 hist3(rhistData, [nBins, nBins])
@@ -1137,7 +1140,7 @@ classdef postProcess < handle
             %% RC RANGE vs CYCLES
             
             if outputFigure == 1.0 && outputField == 1.0 && getappdata(0, 'figure_RC') == 1.0
-                f12 = figure('visible', 'off');
+                f12 = figure('visible', figureVisibility);
                 msg = sprintf('RC, Stress range distribution for item %.0f.%.0f', mainID, subID);
                 title(msg, 'FontSize', fontTitle)
                 rhistData = [Sm'; 2.0*amplitudes]';
@@ -1177,7 +1180,7 @@ classdef postProcess < handle
                     (getappdata(0, 'gateHistories') == 1.0) || (getappdata(0, 'gateHistories') == 2.0)) ||...
                     getappdata(0, 'gateTensors') == 1.0 || getappdata(0, 'gateTensors') == 2.0)
                 
-                f13 = figure('visible', 'off');
+                f13 = figure('visible', figureVisibility);
                 oldSignal = getappdata(0, 'SIGOriginalSignal');
                 
                 subplot(2, 1, 1)
@@ -1229,7 +1232,7 @@ classdef postProcess < handle
                     postProcess.makeVisible([dir, '.fig'])
                 end
             elseif (outputFigure == 1.0 && algorithm == 10.0 && getappdata(0, 'figure_SIG') == 1.0)
-                f12 = figure('visible', 'off');
+                f12 = figure('visible', figureVisibility);
                 oldSignal = getappdata(0, 'SIGOriginalSignal');
                 
                 plot(oldSignal, '-', 'LineWidth', lineWidth, 'Color', midnightBlue);   hold on
@@ -1268,7 +1271,7 @@ classdef postProcess < handle
                 Tyz = getappdata(0, 'worstNodeTyz');
                 Txz = getappdata(0, 'worstNodeTxz');
                 
-                f12 = figure('visible', 'off');
+                f12 = figure('visible', figureVisibility);
                 
                 subplot(3.0, 2.0, 1.0)
                 plot(Sxx, '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
