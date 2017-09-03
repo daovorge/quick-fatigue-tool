@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 03-Sep-2017 10:19:27 GMT
+%   Last modified 03-Sep-2017 13:23:50 GMT
 
     %%
 
@@ -1491,6 +1491,8 @@ classdef messenger < handle
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 168.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: There are %.0f points in the load history', returnType{i}], getappdata(0, 'signalLength'));
+                        
                         N = getappdata(0, 'numberOfNodes') - getappdata(0, 'nodalEliminationRemovedItems');
                         fprintf(fidType(i), [returnType{i}, '***NOTE: There are %.0f items in the model (%.0f will be analysed)', returnType{i}], getappdata(0, 'message168_N'), N);
 
@@ -2224,7 +2226,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n', version);
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 03-Sep-2017 10:19:27 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 03-Sep-2017 13:23:50 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
