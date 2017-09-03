@@ -9,7 +9,7 @@ classdef importMaterial < handle
 %   LocalMaterialDatabase, material, MaterialEditor, MaterialManager.
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 02-Sep-2017 19:02:40 GMT
+%   Last modified 03-Sep-2017 10:19:27 GMT
     
     %%
     
@@ -110,6 +110,22 @@ classdef importMaterial < handle
             % If the file could not be opened, RETURN
             if fid == -1.0
                 error = 1.0;
+                % Print the import summary
+                if isappdata(0, 'materialManagerImport') == 1.0
+                    importMaterial.printSummary(keywordWarnings, materialName, materialFile, kwStrSp, error)
+                    rmappdata(0, 'materialManagerImport')
+                end
+                return
+            end
+            
+            % Check for *END MATERIAL definition
+            text = fileread(materialFile);
+            text(ismember(text,' ')) = [];
+            text = lower(text);
+            flag = strfind(text, '*endmaterial');
+            
+            if isempty(flag) == 1.0
+                error = 3.0;
                 % Print the import summary
                 if isappdata(0, 'materialManagerImport') == 1.0
                     importMaterial.printSummary(keywordWarnings, materialName, materialFile, kwStrSp, error)
@@ -1222,6 +1238,8 @@ classdef importMaterial < handle
                     fprintf('ERROR: The material file ''%s'' could not be opened\n', materialFile)
                 case 2.0
                     fprintf('ERROR: The material file ''%s'' contains no valid material definitions\n', materialFile)
+                case 3.0
+                    fprintf('ERROR: The material file ''%s'' is missing *END MATERIAL. This must be included at the end of the file\n', materialFile)
             end
             
             %{

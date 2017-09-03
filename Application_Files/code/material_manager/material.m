@@ -133,7 +133,7 @@ classdef material < handle
             
             [error, material_properties, materialName, ~, ~] = importMaterial.processFile(userMaterial, -1.0); %#ok<ASGLU>
             
-            if exist([localPath, '\', materialName, '.mat'], 'file') == 2.0
+            if (exist([localPath, '\', materialName, '.mat'], 'file') == 2.0) && (error == 0.0)
                 % User is attempting to overwrite an existing material
                 response = questdlg(sprintf('The material ''%s'' already exists in the local database. Do you wish to overwrite the material?', materialName), 'Quick Fatigue Tool', 'Overwrite', 'Keep file', 'Cancel', 'Overwrite');
                 
