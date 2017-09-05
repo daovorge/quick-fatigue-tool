@@ -21,7 +21,7 @@
     1: Gate tensors (as % of max tensor)
     2: Gate tensors (Nielsony's method)
 %}
-setappdata(0, 'gateTensors', 2.0)
+setappdata(0, 'gateTensors', 1.0)
 
 % GATE VALUE (%)
 setappdata(0, 'tensorGate', 5.0)
