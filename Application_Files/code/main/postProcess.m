@@ -11,7 +11,7 @@ classdef postProcess < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 02-Sep-2017 19:02:40 GMT
+%   Last modified 07-Sep-2017 16:09:04 GMT
     
     %%
     
@@ -1931,7 +1931,7 @@ classdef postProcess < handle
                         end
                         
                         % If the yield criterion was enabled
-                        if getappdata(0, 'yieldCriterion') == 1.0
+                        if (getappdata(0, 'yieldCriterion') == 1.0) || (getappdata(0, 'yieldCriterion') == 2.0)
                             requestedFields(19.0) = 1.0;
                         end
                     end

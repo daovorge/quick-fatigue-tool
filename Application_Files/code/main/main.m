@@ -11,7 +11,7 @@ function [] = main(flags)
 %   Author contact: louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 03-Sep-2017 13:23:50 GMT
+%   Last modified 07-Sep-2017 16:09:04 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');    tic_pre = tic;
@@ -43,7 +43,7 @@ setappdata(0, 'messageFileWarnings', 0.0)
 %% PRINT COMMAND WINDOW HEADER
 fprintf('[NOTICE] Quick Fatigue Tool 6.11-03')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2017)')
-fprintf('\n[NOTICE] Last modified 03-Sep-2017 13:23:50 GMT')
+fprintf('\n[NOTICE] Last modified 07-Sep-2017 16:09:04 GMT')
 
 cleanExit = 0.0;
 
@@ -347,7 +347,7 @@ mscFileUtils.checkFRFDiagnosticItems(N)
 %% DETERMINE IF THE MODEL IS YIELDING
 preProcess.getPlasticItems(N, algorithm);
 
-if getappdata(0, 'warning_063') == 1.0
+if getappdata(0, 'warning_066') == 1.0
     postProcess.writeYieldingItems(jobName, mainID, subID)
 end
 
