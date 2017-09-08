@@ -29,7 +29,7 @@ classdef material < handle
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 02-Sep-2017 19:02:40 GMT
+%   Last modified 08-Sep-2017 134302:48 GMT
     
     %%
     
@@ -149,18 +149,16 @@ classdef material < handle
                     % Rename the original material
                     movefile([localPath, '\', materialName, '.mat'], [localPath, '\', oldMaterial, '.mat'])
                 end
-            end
-            
-            % Save the material
-            try
-                save([localPath, '\', materialName], 'material_properties')
-            catch
-                fprintf('ERROR: Unable to save material ''%s''. Make sure the material save location has read/write access.\n', materialName)
-                return
-            end
-            
-            % List materials in the local database
-            if error == 0.0
+                
+                % Save the material
+                try
+                    save([localPath, '\', materialName], 'material_properties')
+                catch
+                    fprintf('ERROR: Unable to save material ''%s''. Make sure the material save location has read/write access.\n', materialName)
+                    return
+                end
+                
+                % List materials in the local database
                 material.list()
             end
         end
