@@ -13,7 +13,7 @@ function [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(ma
 %      4.5.3 Custom analysis items
 %
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 30-Aug-2017 09:25:47 GMT
+%   Last modified 09-Sep-2017 10:55:31 GMT
 
 %%
 
@@ -92,12 +92,14 @@ if iscell(partInstance) == 1.0
     partInstance_i = '';
     for i = 1:numberOfInstances
         if i == numberOfInstances
-            partInstance_i = [partInstance_i, sprintf('%s', partInstance{i})]; %#ok<AGROW>
+            partInstance_i = [partInstance_i, sprintf('"%s"', partInstance{i})]; %#ok<AGROW>
         else
-            partInstance_i = [partInstance_i, sprintf('%s', partInstance{i}), ' ']; %#ok<AGROW>
+            partInstance_i = [partInstance_i, sprintf('"%s"', partInstance{i}), ' ']; %#ok<AGROW>
         end
     end
     partInstance = partInstance_i;
+else
+    partInstance = sprintf('"%s"', partInstance);
 end
 
 %% Get the shell surface environment variable
@@ -145,19 +147,24 @@ elseif strcmpi(searchRegion, 'dataset') == 1.0
     fid = fopen(fileName, 'w+');
     uniqueMainID = unique(mainID);
     L = length(uniqueMainID);
-    for i = 1:L
-        if i == L
-            fprintf(fid, '%.0f', uniqueMainID(i));
-        else
-            fprintf(fid, '%.0f, ', uniqueMainID(i));
-        end
-    end
+    
+    % OLD AND SLOW METHOD
+    %     for i = 1:L
+    %         if i == L
+    %             fprintf(fid, '%.0f', uniqueMainID(i));
+    %         else
+    %             fprintf(fid, '%.0f, ', uniqueMainID(i));
+    %         end
+    %     end
+    
+    fprintf(fid, '%.0f, ', uniqueMainID(1:L-1));
+    fprintf(fid, '%.0f', uniqueMainID(L));
     fclose(fid);
 end
 
 %% Run the script
 % Run script like this:
-% abaqus python getSurface_qft.py -- <odbName> <position> <shell> <instance-1> <instance-n> <n>
+% abaqus python getSurface_qft.py -- <odbName> <position> <shell> <instance-1>... <instance-n> <n>
 
 inputString = sprintf('%s python Application_Files\\code\\odb_interface\\getSurface.py -- "%s" %s %s %s %s %.0f',...
     abqCmd, outputDatabase, odbResultPosition, searchRegion, shell, partInstance, numberOfInstances);
