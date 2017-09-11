@@ -6,7 +6,7 @@ classdef jobFile < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 11-Sep-2017 16:53:57 GMT
+%   Last modified 11-Sep-2017 21:49:25 GMT
     
     %%
     
@@ -932,7 +932,7 @@ classdef jobFile < handle
             % Check for issues related to R-ratio S-N curves
             setappdata(0, 'nSNDatasets', length(getappdata(0, 'r_values')))
             
-            if useSN == 1.0 && algorithm ~= 8.0
+            if (useSN == 1.0) && (algorithm ~= 8.0) && (algorithm ~= 3.0)
                 for groups = 1:G
                     nSets = group_materialProps(groups).nSNDatasets;
                     rValues = group_materialProps(groups).rValues;

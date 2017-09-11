@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 11-Sep-2017 16:53:57 GMT
+%   Last modified 11-Sep-2017 21:49:25 GMT
 
     %%
 
@@ -884,6 +884,11 @@ classdef messenger < handle
                             fprintf(fidType(i), ['for some cycles fell outside the range of the data provided', returnType{i}]);
                             fprintf(fidType(i), ['-> The fatigue result may be inaccurate for some cycles', returnType{i}]);
                             fprintf(fidType(i), ['-> This problem can be alleviated by providing S-N data over a greater range of R-values', returnType{i}]);
+                            if getappdata(0, 'outputHistory') == 1.0
+                                fprintf(fidType(i), ['-> Check ''h-output-cycle.dat'' to review the calculated load ratios', returnType{i}]);
+                            else
+                                fprintf(fidType(i), ['-> Set OUTPUT_HISTORY=1 and check ''h-output-cycle.dat'' to review the calculated load ratios', returnType{i}]);
+                            end
 
                             if i == X
                                 setappdata(0, 'suppress_ID77', 1.0)
@@ -2233,7 +2238,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n', version);
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 11-Sep-2017 16:53:57 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 11-Sep-2017 21:49:25 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

@@ -10,7 +10,7 @@ classdef postProcess_e < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 02-Sep-2017 19:02:40 GMT
+%   Last modified 11-Sep-2017 21:49:25 GMT
     
     %%
     
@@ -1546,7 +1546,10 @@ classdef postProcess_e < handle
             WCM = getappdata(0, 'WCM');
             WCM_strain = getappdata(0, 'WCM_strain');
             
-            dataA = [mainID'; subID'; WCM; WCM_strain; WCA; WCA_strain]';
+            A = WCA/WCM;
+            R = (1.0 - A)./(1.0 + A);
+            
+            dataA = [mainID'; subID'; WCM; WCM_strain; WCA; WCA_strain; R]';
             
             WNM = getappdata(0, 'meansOnCP');
             WNM_strain = getappdata(0, 'meansOnCP_strain');
@@ -1554,7 +1557,10 @@ classdef postProcess_e < handle
             WNA = getappdata(0, 'amplitudesOnCP');
             WNA_strain = getappdata(0, 'amplitudesOnCP_strain');
             
-            dataB = [C; WNM'; WNM_strain'; WNA; WNA_strain]';
+            A = WNA./WNM';
+            R = (1.0 - A)./(1.0 + A);
+            
+            dataB = [C; WNM'; WNM_strain'; WNA; WNA_strain; R]';
             
             %% Open file for writing:
             
@@ -1571,17 +1577,17 @@ classdef postProcess_e < handle
                     shortLength = lengthA;
                 end
                 
-                fprintf(fid, 'ANHD, WORST CYCLE HISTORIES (ALL ITEMS)\t\t\t\t\t\tHD, ALL CYCLE HISTORIES AT WORST ITEM (%.0f.%.0f)\r\n', worstMainID, worstSubID);
+                fprintf(fid, 'ANHD, WORST CYCLE HISTORIES (ALL ITEMS)\t\t\t\t\t\t\tHD, ALL CYCLE HISTORIES AT WORST ITEM (%.0f.%.0f)\r\n', worstMainID, worstSubID);
                 
                 fprintf(fid, 'Units:\tMPa, Strain\r\n');
                 
-                fprintf(fid, 'Item #\tMean stress\tMean strain\tStress amplitude\tStrain amplitude\t\tCycle #\tMean stress\tMean strain\tStress amplitude\tStrain amplitude\r\n');
-                fprintf(fid, sprintf('%%.0f.%%.0f\t%%%s\t%%%s\t%%%s\t%%%s\t\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\r\n', h, h, h, h, h, h, h, h, h), [dataA(1.0:shortLength, :), dataB(1.0:shortLength, :)]');
+                fprintf(fid, 'Item #\tMean stress\tMean strain\tStress amplitude\tStrain amplitude\tLoad ratio\t\tCycle #\tMean stress\tMean strain\tStress amplitude\tStrain amplitude\tLoad ratio\r\n');
+                fprintf(fid, sprintf('%%.0f.%%.0f\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\t\t%%.0f\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\r\n', h, h, h, h, h, h, h, h, h, h), [dataA(1.0:shortLength, :), dataB(1.0:shortLength, :)]');
                 
                 if lengthA > lengthB
-                    fprintf(fid, sprintf('%%.0f.%%.0f\t%%%s\t%%%s\t%%%s\t%%%s\r\n', h, h, h, h), dataA(shortLength + 1.0:end, :)');
+                    fprintf(fid, sprintf('%%.0f.%%.0f\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\r\n', h, h, h, h), dataA(shortLength + 1.0:end, :)');
                 elseif lengthB > lengthA
-                    fprintf(fid, sprintf('\t\t\t\t\t\t%%.0f\t%%%s\t%%%s\t%%%s\t%%%s\r\n', h, h, h, h), dataB(shortLength + 1.0:end, :)');
+                    fprintf(fid, sprintf('\t\t\t\t\t\t\t%%.0f\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\r\n', h, h, h, h, h), dataB(shortLength + 1.0:end, :)');
                 end
                 
                 fclose(fid);
