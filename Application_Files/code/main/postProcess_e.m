@@ -1546,7 +1546,7 @@ classdef postProcess_e < handle
             WCM = getappdata(0, 'WCM');
             WCM_strain = getappdata(0, 'WCM_strain');
             
-            A = WCA/WCM;
+            A = WCA./WCM;
             R = (1.0 - A)./(1.0 + A);
             
             dataA = [mainID'; subID'; WCM; WCM_strain; WCA; WCA_strain; R]';

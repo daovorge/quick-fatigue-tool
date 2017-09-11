@@ -1432,7 +1432,7 @@ classdef postProcess < handle
             WCA = getappdata(0, 'WCA');
             WCM = getappdata(0, 'WCM');
             
-            A = WCA/WCM;
+            A = WCA./WCM;
             R = (1.0 - A)./(1.0 + A);
             
             dataA = [mainID'; subID'; WCM; WCA; R]';
