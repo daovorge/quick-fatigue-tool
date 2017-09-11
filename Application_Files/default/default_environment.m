@@ -13,7 +13,7 @@
 %      2 Environment variables
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 02-Sep-2017 19:02:40 GMT
+%   Last modified 11-Sep-2017 16:53:57 GMT
 
 %% GATE TENSORS
 %{
@@ -68,7 +68,7 @@ setappdata(0, 'shellFaces', 0.0)
     0: Use standard envelope for Goodman mean stress correction
     1: Use intersection of Buch and Goodman envelopes (if applicable)
 %}
-setappdata(0, 'modifiedGoodman', 0.0)
+setappdata(0, 'modifiedGoodman', 1.0)
 
 % GOODMAN MEAN STRESS LIMIT
 %{

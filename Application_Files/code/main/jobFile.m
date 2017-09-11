@@ -6,7 +6,7 @@ classdef jobFile < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 30-Aug-2017 18:00:59 GMT
+%   Last modified 11-Sep-2017 16:53:57 GMT
     
     %%
     
@@ -950,6 +950,7 @@ classdef jobFile < handle
                             % R-ratio S-N curves are not requested
                             
                             % Note that S-N data will be interpolated to approximate an R = -1 S-N curve
+                            setappdata(0, 'message_25_rValues', rValues)
                             messenger.writeMessage(25.0)
                         end
                     elseif rValues == -1.0

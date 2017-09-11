@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 08-Sep-2017 13:43:48 GMT
+%   Last modified 11-Sep-2017 16:53:57 GMT
 
     %%
 
@@ -407,8 +407,15 @@ classdef messenger < handle
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 25.0
+                        rValues = getappdata(0, 'message_25_rValues');
+                        
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Multiple S-N datasets (Group %.0f) were provided without the R-ratio S-N curve mean stress correction', returnType{i}], getappdata(0, 'message_25_71_72_73_groupNumber'));
-                        fprintf(fidType(i), ['-> The data will be interpolated to approximate the S-N curve at zero mean stress (R = -1)', returnType{i}]);
+                        
+                        if find(rValues == -1.0) == 1.0
+                            fprintf(fidType(i), ['-> The fully-reversed (R = -1) S-N curve will be used for analysis', returnType{i}]);
+                        else
+                            fprintf(fidType(i), ['-> A fully-reversed (R = -1) S-N curve will be found by interpolation and used for analysis', returnType{i}]);
+                        end
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 26.0
@@ -2226,7 +2233,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n', version);
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 08-Sep-2017 13:43:48 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 11-Sep-2017 16:53:57 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
