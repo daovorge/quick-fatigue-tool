@@ -2106,7 +2106,8 @@ end
 
 % Non-standard
 if get(handles.check_nssc, 'value') == 0.0
-    set(handles.edit_nssc, 'enable', 'inactive', 'backgroundColor', simuliaBlue)
+    set(handles.edit_nssc, 'enable', 'inactive', 'backgroundColor', [1.0, 1.0, 1.0])
+    set(handles.edit_nssc, 'backgroundColor', simuliaBlue)
 else
     set(handles.pButton_k, 'enable', 'off')
 end

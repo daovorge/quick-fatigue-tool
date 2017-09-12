@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 11-Sep-2017 21:49:25 GMT
+%   Last modified 12-Sep-2017 08:29:33 GMT
 
     %%
 
@@ -880,15 +880,9 @@ classdef messenger < handle
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 77.0
                         if getappdata(0, 'suppress_ID77') == 0.0
-                            fprintf(fidType(i), [returnType{i}, '***WARNING: During the analysis, the S-N curve had to be linearly extrapolated because the load ratio', returnType{i}]);
-                            fprintf(fidType(i), ['for some cycles fell outside the range of the data provided', returnType{i}]);
-                            fprintf(fidType(i), ['-> The fatigue result may be inaccurate for some cycles', returnType{i}]);
-                            fprintf(fidType(i), ['-> This problem can be alleviated by providing S-N data over a greater range of R-values', returnType{i}]);
-                            if getappdata(0, 'outputHistory') == 1.0
-                                fprintf(fidType(i), ['-> Check ''h-output-cycle.dat'' to review the calculated load ratios', returnType{i}]);
-                            else
-                                fprintf(fidType(i), ['-> Set OUTPUT_HISTORY=1 and check ''h-output-cycle.dat'' to review the calculated load ratios', returnType{i}]);
-                            end
+                            fprintf(fidType(i), [returnType{i}, '***WARNING: The S-N data has been linearly extrapolated because the calculated load ratio (%f) is outside the range of R-values', returnType{i}], getappdata(0, 'message_77_r'));
+                            fprintf(fidType(i), ['-> S-N data should be specified over a greater range of R-values', returnType{i}]);
+                            fprintf(fidType(i), ['-> In order to avoid excessive output, this warning is only printed on the first occurrence of extrapolation', returnType{i}]);
 
                             if i == X
                                 setappdata(0, 'suppress_ID77', 1.0)
@@ -2238,7 +2232,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n', version);
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 11-Sep-2017 21:49:25 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 12-Sep-2017 08:29:33 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

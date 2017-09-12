@@ -238,6 +238,7 @@ elseif msCorrection == 7.0
                 %}
                 suppressMessage78 = 1.0;
                 
+                setappdata(0, 'message_77_r', Ri)
                 messenger.writeMessage(77.0)
                 
                 % Find on which side of the S-N data the Ri curve lies
