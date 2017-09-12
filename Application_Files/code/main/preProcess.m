@@ -1,14 +1,14 @@
 classdef preProcess < handle
-    %PREPROCESS    QFT class for pre-analysis processing.
-    %   This class contains methods for pre-analysis processing tasks.
-    %
-    %   PREPROCESS is used internally by Quick Fatigue Tool. The user is not
-    %   required to run this file.
-    %
-    %   See also postProcess.
-    %
-    %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-    %   Last modified 01-Sep-2017 20:42:00 GMT
+%PREPROCESS    QFT class for pre-analysis processing.
+%   This class contains methods for pre-analysis processing tasks.
+%
+%   PREPROCESS is used internally by Quick Fatigue Tool. The user is not
+%   required to run this file.
+%
+%   See also postProcess.
+%
+%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
+%   Last modified 12-Sep-2017 16:26:18 GMT
     
     %%
     
@@ -2126,6 +2126,7 @@ classdef preProcess < handle
         function [TENSOR, subIDs, mainIDs, error] = readRPT(FILENAME, items)
             error = 0.0;
             setappdata(0, 'nodeType_master', 0.0)
+            TENSOR = [];
             
             %% Open the .rpt file:
             
@@ -2147,7 +2148,6 @@ classdef preProcess < handle
             try
                 cellData = textscan(fid, '%f %f %f %f %f %f %f %f %f %f');
             catch unhandledException
-                TENSOR = [];
                 mainIDs = -999.0;
                 subIDs = -999.0;
                 error = 1.0;
@@ -2248,6 +2248,9 @@ classdef preProcess < handle
             setappdata(0, 'numberOfRegions', region)
             messenger.writeMessage(17.0)
             
+            % Buffer for total number of analysis items in the model
+            R = 0.0;
+            
             for i = 1:region
                 remove = 0.0;
                 
@@ -2317,7 +2320,6 @@ classdef preProcess < handle
                 try
                     fieldData_i = cell2mat(cellData_region_i);
                 catch unhandledException
-                    TENSOR = [];
                     subIDs = -999.0;
                     mainIDs = -999.0;
                     error = 1.0;
@@ -2328,7 +2330,6 @@ classdef preProcess < handle
                 end
                 
                 if isempty(fieldData_i)
-                    TENSOR = [];
                     subIDs = -999.0;
                     mainIDs = -999.0;
                     error = 1.0;
@@ -2336,7 +2337,6 @@ classdef preProcess < handle
                     
                     return
                 elseif any(any(isnan(fieldData_i))) || any(any(isinf(fieldData_i)))
-                    TENSOR = [];
                     subIDs = -999.0;
                     mainIDs = -999.0;
                     error = 1.0;
@@ -2380,7 +2380,7 @@ classdef preProcess < handle
                     elementType = 0.0;
                 end
                 
-                [R, C] = size(fieldData_i);
+                [Ri, C] = size(fieldData_i);
                 switch C
                     case 10.0
                         nodeType = 2.0;
@@ -2397,7 +2397,7 @@ classdef preProcess < handle
                     case 9.0
                         nodeType = 1.0;
                         mainIDs_i = fieldData_i(:, 1.0);
-                        subIDs_i = linspace(1.0, 1.0, R)';
+                        subIDs_i = linspace(1.0, 1.0, Ri)';
                         
                         if getappdata(0, 'shellLocation') == 1.0
                             fieldData_i(:, 3:2:9) = [];
@@ -2412,13 +2412,13 @@ classdef preProcess < handle
                         subIDs_i = fieldData_i(:, 2.0);
                     case 7.0
                         nodeType = 1.0;
-                        subIDs_i = linspace(1.0, 1.0, R)';
+                        subIDs_i = linspace(1.0, 1.0, Ri)';
                         mainIDs_i = fieldData_i(:, 1.0);
                     case 6.0
                         if elementType == 0.0
                             nodeType = 0.0;
-                            subIDs_i = linspace(1.0, 1.0, R)';
-                            mainIDs_i = linspace(1.0, R, R)';
+                            subIDs_i = linspace(1.0, 1.0, Ri)';
+                            mainIDs_i = linspace(1.0, Ri, Ri)';
                         else
                             nodeType = 2.0;
                             mainIDs_i = fieldData_i(:, 1.0);
@@ -2431,14 +2431,14 @@ classdef preProcess < handle
                         messenger.writeMessage(181.0)
                     case 5.0
                         nodeType = 1.0;
-                        subIDs_i = linspace(1.0, 1.0, R)';
+                        subIDs_i = linspace(1.0, 1.0, Ri)';
                         mainIDs_i = fieldData_i(:, 1.0);
                         
                         fieldData_i(:, 6:7) = 0.0;
                     case 4.0
                         nodeType = 0.0;
-                        subIDs_i = linspace(1.0, 1.0, R)';
-                        mainIDs_i = linspace(1.0, R, R)';
+                        subIDs_i = linspace(1.0, 1.0, Ri)';
+                        mainIDs_i = linspace(1.0, Ri, Ri)';
                         
                         fieldData_i(:, 5:6) = 0.0;
                     otherwise
@@ -2446,8 +2446,6 @@ classdef preProcess < handle
                         mainIDs = -999.0;
                         error = 1.0;
                         setappdata(0, 'E031', 1.0)
-                        
-                        TENSOR = [];
                         
                         return
                 end
@@ -2469,14 +2467,15 @@ classdef preProcess < handle
                         error = 1.0;
                         setappdata(0, 'E113', 1.0)
                         
-                        TENSOR = [];
-                        
                         return
                     end
                 end
                 
                 % Record the previous node type
                 previousNodeType = nodeType;
+                
+                % Add the number of items in the region to the total
+                R = R + Ri;
             end
             
             setappdata(0, 'dataLabel', [getappdata(0, 'dataLabel'), C])
@@ -2703,7 +2702,7 @@ classdef preProcess < handle
                     % Scale the channel
                     channel = channel.*loadingScale(i);
                     
-                    if isempty(channel)
+                    if isempty(channel) == 1.0
                         error = true;
                         setappdata(0, 'E015', 1.0)
                         
@@ -4377,6 +4376,7 @@ classdef preProcess < handle
         function [Sxx, Syy, Szz, Txy, Tyz, Txz, mainID, subID, error, oldSignal] = uniaxialRead(scales, gateHistories, historyGate, loadingScale, loadingOffset)
             error = 0.0;
             setappdata(0, 'dataLabel', -999)
+            Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
             
             % Check that the stress history is defined
             if ischar(scales)
@@ -4403,7 +4403,6 @@ classdef preProcess < handle
             end
             
             if error == 1.0
-                Sxx = 0; Syy = 0; Szz = 0; Txy = 0; Tyz = 0; Txz = 0;
                 mainID = -999;
                 subID = -999;
                 oldSignal = -999;
@@ -4486,7 +4485,6 @@ classdef preProcess < handle
                     
                     mainID = -999;
                     subID = -999;
-                    Sxx = 0; Syy = 0; Szz = 0; Txy = 0; Tyz = 0; Txz = 0;
                     oldSignal = -999;
                     return
                 end
@@ -4507,7 +4505,6 @@ classdef preProcess < handle
                 
                 mainID = -999;
                 subID = -999;
-                Sxx = 0; Syy = 0; Szz = 0; Txy = 0; Tyz = 0; Txz = 0;
                 oldSignal = -999;
                 return
             end
@@ -4522,7 +4519,6 @@ classdef preProcess < handle
                 
                 mainID = -999;
                 subID = -999;
-                Sxx = 0; Syy = 0; Szz = 0; Txy = 0; Tyz = 0; Txz = 0;
                 oldSignal = -999;
                 return
             elseif c == 1.0
@@ -4545,7 +4541,7 @@ classdef preProcess < handle
             if getappdata(0, 'noiseReduction') == 1.0
                 messenger.writeMessage(267.0)
                 nWindows = getappdata(0, 'numberOfWindows');
-                nCoefficient = ones(1, nWindows)/nWindows;
+                nCoefficient = ones(1.0, nWindows)/nWindows;
                 scale = filter(nCoefficient, 1, scale);
             end
             
@@ -4571,7 +4567,6 @@ classdef preProcess < handle
                         
                         mainID = -999;
                         subID = -999;
-                        Sxx = 0; Syy = 0; Szz = 0; Txy = 0; Tyz = 0; Txz = 0;
                         return
                     end
                     

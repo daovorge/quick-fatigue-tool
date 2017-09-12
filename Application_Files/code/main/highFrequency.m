@@ -7,7 +7,7 @@ classdef highFrequency < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 19-Jun-2017 16:18:57 GMT
+%   Last modified 12-Sep-2017 16:26:18 GMT
     
     %%
     
@@ -663,6 +663,7 @@ classdef highFrequency < handle
         function [TENSOR, error] = readRPTHF(FILENAME, items)
             
             error = 0.0;
+            TENSOR = [];
             
             %% Open the .rpt file:
             
@@ -670,7 +671,6 @@ classdef highFrequency < handle
             setappdata(0, 'FOPEN_error_file', FILENAME)
             
             if fid == -1.0
-                TENSOR = [];
                 error = 1.0;
                 setappdata(0, 'E026', 1.0)
                 
@@ -682,7 +682,6 @@ classdef highFrequency < handle
             try
                 cellData = textscan(fid, '%f %f %f %f %f %f %f %f %f %f');
             catch
-                TENSOR = [];
                 error = 1.0;
                 setappdata(0, 'E027', 1.0)
                 
@@ -695,7 +694,7 @@ classdef highFrequency < handle
                 hasHeader = false; % There might be no header in the file
             end
             
-            if ~hasHeader
+            if hasHeader == 0.0
                 for i = 1.0:length(cellData)
                     if isempty(cellData{i})
                         hasHeader = true;
@@ -775,6 +774,9 @@ classdef highFrequency < handle
                 cellData_region_i = cellData;
             end
             
+            % Buffer for total number of analysis items in the model
+            R = 0.0;
+            
             for i = 1:region
                 remove = 0.0;
                 
@@ -844,7 +846,6 @@ classdef highFrequency < handle
                 try
                     fieldData_i = cell2mat(cellData_region_i);
                 catch
-                    TENSOR = [];
                     error = 1.0;
                     setappdata(0, 'E028', 1.0)
                     
@@ -852,13 +853,11 @@ classdef highFrequency < handle
                 end
                 
                 if isempty(fieldData_i)
-                    TENSOR = [];
                     error = 1.0;
                     setappdata(0, 'E029', 1.0)
                     
                     return
                 elseif any(any(isnan(fieldData_i))) || any(any(isinf(fieldData_i)))
-                    TENSOR = [];
                     error = 1.0;
                     setappdata(0, 'E030', 1.0)
                     
@@ -901,7 +900,7 @@ classdef highFrequency < handle
                     elementType = 0.0;
                 end
                 
-                [R, C] = size(fieldData_i);
+                [Ri, C] = size(fieldData_i);
                 switch C
                     case 10.0
                         mainIDs_i = fieldData_i(:, 1.0);
@@ -937,7 +936,7 @@ classdef highFrequency < handle
                         X = 2.0;
                     case 6.0
                         if elementType == 0.0
-                            mainIDs_i = linspace(1.0, R, R)';
+                            mainIDs_i = linspace(1.0, Ri, Ri)';
                             X = 1.0;
                         else
                             mainIDs_i = fieldData_i(:, 1.0);
@@ -951,7 +950,7 @@ classdef highFrequency < handle
                         
                         fieldData_i(:, 6:7) = 0.0;
                     case 4.0
-                        mainIDs_i = linspace(1.0, R, R)';
+                        mainIDs_i = linspace(1.0, Ri, Ri)';
                         X = 1.0;
                         
                         fieldData_i(:, 5:6) = 0.0;
@@ -959,14 +958,15 @@ classdef highFrequency < handle
                         error = 1.0;
                         setappdata(0, 'E031', 1.0)
                         
-                        TENSOR = [];
-                        
                         return
                 end
                 
                 % Append the data from the current group to the buffers
                 fieldDataBuffer{i} = fieldData_i;
                 mainIDBuffer{i} = mainIDs_i;
+                
+                % Add the number of items in the region to the total
+                R = R + Ri;
             end
             
             %% Concatenate data buffers
@@ -1070,16 +1070,11 @@ classdef highFrequency < handle
         %% Superimpose the high frequency data onto the loading for a uniaxial signal
         function [Sxx, Syy, Szz, Txy, Tyz, Txz, error] = superimposeUniaxial(lowF, highF, timeLo, timeHi)
             error = 0.0;
+            Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
             
             % High frequency dataset must have a shorter time period
             if timeLo < timeHi
                 error = 1.0;
-                Sxx = 0.0;
-                Syy = 0.0;
-                Szz = 0.0;
-                Txy = 0.0;
-                Tyz = 0.0;
-                Txz = 0.0;
                 
                 setappdata(0, 'E041', 1.0)
                 setappdata(0, 'errTimeLo', timeLo)
