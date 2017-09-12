@@ -11,7 +11,7 @@ classdef postProcess < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 11-Sep-2017 21:49:25 GMT
+%   Last modified 12-Sep-2017 12:02:39 GMT
     
     %%
     
@@ -1434,6 +1434,7 @@ classdef postProcess < handle
             
             A = WCA./WCM;
             R = (1.0 - A)./(1.0 + A);
+            R(isnan(R) == 1.0) = -1.0;
             
             dataA = [mainID'; subID'; WCM; WCA; R]';
             
@@ -1442,6 +1443,7 @@ classdef postProcess < handle
             
             A = WNA./WNM';
             R = (1.0 - A)./(1.0 + A);
+            R(isnan(R) == 1.0) = -1.0;
             
             dataB = [C; WNM'; WNA; R]';
             
