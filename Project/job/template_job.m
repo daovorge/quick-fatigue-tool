@@ -17,7 +17,7 @@ function [] = template_job()
 %      1 Job file options
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 23-Aug-2017 15:10:40 GMT
+%   Last modified 13-Sep-2017 12:34:33 GMT
 
 %% JOB
 
@@ -169,7 +169,7 @@ FACTOR_OF_STRENGTH = 0.0;
     3: Gerber
     <filename>.msc: User-defined
 %}
-FATIGUE_RESERVE_FACTOR = 1.0;
+FATIGUE_RESERVE_FACTOR = 2.0;
 
 % SAVE ITEMS BELOW DESIGN LIFE
 HOTSPOT = 0.0;
