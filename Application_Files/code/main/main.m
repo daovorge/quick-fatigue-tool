@@ -11,7 +11,7 @@ function [] = main(flags)
 %   Author contact: louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 13-Sep-2017 12:34:33 GMT
+%   Last modified 13-Sep-2017 16:10:56 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');    tic_pre = tic;
@@ -43,7 +43,7 @@ setappdata(0, 'messageFileWarnings', 0.0)
 %% PRINT COMMAND WINDOW HEADER
 fprintf('[NOTICE] Quick Fatigue Tool 6.11-03')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2017)')
-fprintf('\n[NOTICE] Last modified 13-Sep-2017 12:34:33 GMT')
+fprintf('\n[NOTICE] Last modified 13-Sep-2017 16:10:56 GMT')
 
 cleanExit = 0.0;
 
@@ -504,7 +504,7 @@ fprintf('\n[NOTICE] See status and message files for details')
 fprintf(fid_status, '\n[NOTICE] Begin fatigue analysis');
 fprintf(fid_status, '\n[NOTICE] See status and message files for details');
 
-fprintf(fid_status, '\r\n\r\nProgress\tLife\tItem\tIncrement\tTime\r\n');
+fprintf(fid_status, '\r\n\r\nProgress    Life         Item                   Increment     Time\r\n');
 
 % Get the group ID buffer
 groupIDBuffer = getappdata(0, 'groupIDBuffer');
