@@ -13,7 +13,7 @@ function [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(ma
 %      4.5.3 Custom analysis items
 %
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 09-Sep-2017 10:55:31 GMT
+%   Last modified 14-Sep-2017 15:33:00 GMT
 
 %%
 
@@ -162,6 +162,35 @@ elseif strcmpi(searchRegion, 'dataset') == 1.0
     fclose(fid);
 end
 
+%% Try to upgrade the ODB
+if getappdata(0, 'autoExport_upgradeODB') == 1.0
+    [~, tempName, ~] = fileparts(outputDatabase);
+    tempName = sprintf('%s\\Project\\output\\%s\\%s', pwd, getappdata(0, 'jobName'), tempName);
+    
+    [status, message] = system(sprintf('%s -upgrade -job "%s" -odb "%s"', abqCmd, tempName, outputDatabase(1.0:end - 4.0)));
+    
+    if status == 1.0
+        % Print the message to the message file
+        setappdata(0, 'message_273', message)
+        messenger.writeMessage(273.0)
+        if strcmpi(items, 'surface') == 1.0
+            items = 'ALL';
+            setappdata(0, 'items', 'ALL')
+        end
+        return
+    end
+    
+    % Delete the upgrade log file
+    delete([tempName, '-upgrade', '.log'])
+    
+    % Remove the lock file if it exists
+    if exist([tempName, '.lck'], 'file') == 2.0
+        delete([resultsDatabasePath, '/', modelDatabaseNameShort, '.lck'])
+    end
+    
+    outputDatabase = [tempName, '.odb'];
+end
+
 %% Run the script
 % Run script like this:
 % abaqus python getSurface_qft.py -- <odbName> <position> <shell> <instance-1>... <instance-n> <n>
@@ -201,6 +230,11 @@ else
         setappdata(0, 'items', 'ALL')
     end
     return
+end
+
+% Delete the temporary ODB file if applicable
+if exist([tempName, '.odb'], 'file') == 2.0
+    delete([tempName, '.odb'])
 end
 
 % Read the output
