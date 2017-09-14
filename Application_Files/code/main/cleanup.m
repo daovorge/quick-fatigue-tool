@@ -54,8 +54,7 @@ if status == 1.0
     	Available error codes: E009, E010, E011
     %}
     
-    % Remove the DATA and MATLAB FIGURES directories if
-    % applicable
+    % Remove the DATA and MATLAB FIGURES directories if applicable
     if exist([dir, 'Data Files'], 'dir') == 7.0
         try
             rmdir([dir, 'Data Files'])
