@@ -7,7 +7,7 @@ classdef highFrequency < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 12-Sep-2017 16:26:18 GMT
+%   Last modified 14-Sep-2017 07:37:07 GMT
     
     %%
     
@@ -971,7 +971,6 @@ classdef highFrequency < handle
             
             %% Concatenate data buffers
             fieldData = cell2mat(fieldDataBuffer');
-            mainIDs = cell2mat(mainIDBuffer');
             
             if elementError == 1.0
                 error = 1.0;
@@ -980,30 +979,62 @@ classdef highFrequency < handle
                 return
             end
             
-            %% Filter IDs if user specified individual analysis items
-            
+            %% Filter IDs if user specified individual analysis items 
             if (strcmpi(items, 'all') == 1.0) || (strcmpi(items, 'maxps') == 1.0) || (strcmpi(items, 'surface') == 1.0)
                 items = [];
             elseif isnumeric(items) == 0.0
-                if exist('items', 'file') == 2.0
-                    % If ITEMS is defined as a file, verify its contents
-                    items = importdata(items, '\t', 4.0);
-                    items = items.data;
-                    [~, itemCols] = size(items);
+                if exist(items, 'file') == 2.0
+                    setappdata(0, 'hotspotFile', items)
                     
-                    if isempty(items) == 1.0
-                        items = [];
-                        setappdata(0, 'items', 'ALL')
-                    elseif itemCols ~= 4.0
-                        items = [];
-                        setappdata(0, 'items', 'ALL')
+                    % If ITEMS is defined as a file, verify its contents
+                    items_file = importdata(items, '\t');
+                    if iscell(items_file) == 1.0
+                        items_file = cell2mat(items_file);
+                        [~, itemCols] = size(items_file);
+                    elseif isstruct(items_file) == 1.0
+                        [~, itemCols] = size(items_file.data);
+                    elseif isnumeric(items_file) == 1.0
+                        [~, itemCols] = size(items_file);
                     else
-                        items = items(:, 1.0);
+                        itemCols = 0.0;
+                    end
+                    
+                    if itemCols == 1.0
+                        items_header = {'NONE'};
+                        items_data = items_file;
+                    else
+                        try
+                            items_data = items_file.data;
+                            items_header = items_file.textdata;
+                        catch
+                            items_data = 'error';
+                        end
+                    end
+                    
+                    if strcmpi(items_data, 'error') == 1.0
+                        items = [];
+                        setappdata(0, 'items', 'ALL')
+                        messenger.writeMessage(144.0)
+                    elseif isempty(items_data) == 1.0
+                        items = [];
+                        setappdata(0, 'items', 'ALL')
+                        messenger.writeMessage(143.0)
+                    elseif (strcmpi(items_header{1.0}, 'hotspots') == 0.0 && strcmpi(items_header{1.0}, 'surface items') == 0.0...
+                            && strcmpi(items_header{1.0}, 'warn_lcf_items') == 0.0&& strcmpi(items_header{1.0}, 'warn_yielding_items') == 0.0...
+                            && strcmpi(items_header{1.0}, 'warn_overflow_items') == 0.0) && (itemCols ~= 1.0 && itemCols ~= 4.0)
+                        items = [];
+                        setappdata(0, 'items', 'ALL')
+                        messenger.writeMessage(144.0)
+                    else
+                        items = items_data(:, 1.0);
+                        messenger.writeMessage(266.0)
                     end
                 elseif exist('items', 'file') == 0.0
-                    % The file does not exist
+                    % The file does not exist, so warn the user
+                    setappdata(0, 'hotspotFile', items)
                     items = [];
                     setappdata(0, 'items', 'ALL')
+                    messenger.writeMessage(145.0)
                 end
             end
             
@@ -1019,35 +1050,16 @@ classdef highFrequency < handle
                 end
                 
                 itemError = 0.0;
-                
-                for i = 1:numberOfItems
-                    if items(i) > length(mainIDs)
-                        messenger.writeMessage(59.0)
-                        
-                        itemError = 1.0;
-                        break
-                    end
-                end
             end
             
             %% Get tensor components:
-            
             if (isempty(items) == 0.0) && (itemError == 0.0)
-                Sxx = zeros(1.0, numberOfItems);
-                Syy = Sxx;
-                Szz = Sxx;
-                Txy = Sxx;
-                Txz = Sxx;
-                Tyz = Sxx;
-                
-                for i = 1:numberOfItems
-                    Sxx(i) = fieldData(items(i), X)';
-                    Syy(i) = fieldData(items(i), X + 1.0)';
-                    Szz(i) = fieldData(items(i), X + 2.0)';
-                    Txy(i) = fieldData(items(i), X + 3.0)';
-                    Txz(i) = fieldData(items(i), X + 4.0)';
-                    Tyz(i) = fieldData(items(i), X + 5.0)';
-                end
+                Sxx = fieldData(items, X)';
+                Syy = fieldData(items, X + 1.0)';
+                Szz = fieldData(items, X + 2.0)';
+                Txy = fieldData(items, X + 3.0)';
+                Txz = fieldData(items, X + 4.0)';
+                Tyz = fieldData(items, X + 5.0)';
             else
                 Sxx = fieldData(:, X)';
                 Syy = fieldData(:, (X + 1.0))';

@@ -11,7 +11,7 @@ classdef postProcess < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 12-Sep-2017 12:02:39 GMT
+%   Last modified 14-Sep-2017 07:37:07 GMT
     
     %%
     
@@ -1578,7 +1578,7 @@ classdef postProcess < handle
             end
             
             % Concatenate data
-            data = [lcfMainIDs; lcfSubIDs; lcfLife]';
+            data = [lcfItems; lcfMainIDs; lcfSubIDs; lcfLife]';
             
             % Print information to file
             
@@ -1595,8 +1595,8 @@ classdef postProcess < handle
             fprintf(fid, 'WARN_LCF_ITEMS\r\n');
             fprintf(fid, 'Job:\t%s\r\nLoading:\t%.3g\t%s\r\n', jobName, getappdata(0, 'loadEqVal'), getappdata(0, 'loadEqUnits'));
             
-            fprintf(fid, 'Main ID\tSub ID\tLife (%s)\r\n', loadEqUnits);
-            fprintf(fid, '%.0f\t%.0f\t%.4e\r\n', data');
+            fprintf(fid, 'Item #\tMain ID\tSub ID\tLife (%s)\r\n', loadEqUnits);
+            fprintf(fid, '%.0f\t%.0f\t%.0f\t%.4e\r\n', data');
             
             fclose(fid);
         end
@@ -1618,7 +1618,7 @@ classdef postProcess < handle
             end
             
             % Concatenate data
-            data = [overflowMainIDs; overflowSubIDs; overflowDamage]';
+            data = [overflowItems; overflowMainIDs; overflowSubIDs; overflowDamage]';
             
             % Print information to file
             
@@ -1635,8 +1635,8 @@ classdef postProcess < handle
             fprintf(fid, 'WARN_OVERFLOW_ITEMS\r\n');
             fprintf(fid, 'Job:\t%s\r\nLoading:\t%.3g\t%s\r\n', jobName, getappdata(0, 'loadEqVal'), getappdata(0, 'loadEqUnits'));
             
-            fprintf(fid, 'Main ID\tSub ID\tDamage\r\n');
-            fprintf(fid, '%.0f\t%.0f\t%.4e\r\n', data');
+            fprintf(fid, 'Item #\tMain ID\tSub ID\tDamage\r\n');
+            fprintf(fid, '%.0f\t%.0f\t%.0f\t%.4e\r\n', data');
             
             fclose(fid);
         end
@@ -1715,7 +1715,7 @@ classdef postProcess < handle
             subIDs = subID(yield);
             
             % Concatenate data
-            data = [mainIDs'; subIDs'; totalStrainEnergy; plasticStrainEnergy]';
+            data = [yield; mainIDs'; subIDs'; totalStrainEnergy; plasticStrainEnergy]';
             
             % Print information to file
             root = getappdata(0, 'outputDirectory');
@@ -1731,8 +1731,8 @@ classdef postProcess < handle
             fprintf(fid, 'WARN_YIELDING_ITEMS\r\n');
             fprintf(fid, 'Job:\t%s\r\nLoading:\t%.3g\t%s\r\n', jobName, getappdata(0, 'loadEqVal'), getappdata(0, 'loadEqUnits'));
             
-            fprintf(fid, 'Main ID\tSub ID\tTSE, Total Strain Energy (mJ)\tPSE, Plastic Strain Energy (mJ)\r\n');
-            fprintf(fid, '%.0f\t%.0f\t%f\t%f\r\n', data');
+            fprintf(fid, 'Item #\tMain ID\tSub ID\tTSE, Total Strain Energy (mJ)\tPSE, Plastic Strain Energy (mJ)\r\n');
+            fprintf(fid, '%.0f\t%.0f\t%.0f\t%f\t%f\r\n', data');
             
             fclose(fid);
         end
@@ -1769,7 +1769,7 @@ classdef postProcess < handle
             fid = fopen(dir, 'w+');
             
             fprintf(fid, 'HOTSPOTS\r\n');
-            fprintf(fid, 'Job:\t%s\r\nDesign Life:\t%.3g\r\n', jobName, designLife);
+            fprintf(fid, 'Job:\t%s\r\n', jobName);
             
             fprintf(fid, 'Item #\tMain ID\tSub ID\tLife (%s)\r\n', loadEqUnits);
             fprintf(fid, '%.0f\t%.0f\t%.0f\t%.4e\r\n', data');

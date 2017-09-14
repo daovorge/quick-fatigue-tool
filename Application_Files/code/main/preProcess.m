@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 12-Sep-2017 16:26:18 GMT
+%   Last modified 14-Sep-2017 07:37:07 GMT
     
     %%
     
@@ -1838,7 +1838,7 @@ classdef preProcess < handle
                     
                     % Check the dimensionality of the history data
                     [r, c] = size(scale);
-                    if r ~= 1.0 && c ~= 1.0
+                    if (r ~= 1.0) && (c ~= 1.0)
                         setappdata(0, 'error_log_020', 1.0)
                         setappdata(0, 'loadHistoryUnableOpen', scales{i})
                         
@@ -1868,7 +1868,7 @@ classdef preProcess < handle
                             
                             [peaks, valleys] = preProcess.peakdet(scale, historyGate(i));
                             
-                            if isempty(peaks) || isempty(valleys)
+                            if (isempty(peaks) == 1.0) || (isempty(valleys) == 1.0)
                                 error = true;
                                 if ischar(scales) == 1.0
                                     setappdata(0, 'E018', 1.0)
@@ -1912,10 +1912,10 @@ classdef preProcess < handle
                     
                     if length(scale) > 2.0
                         %{
-                        If the user defined high frequency datasets, the
-                        history is three datapoints and there is a leading
-                        zero, suppress the warning about the load history
-                        only being 3 points in length
+                            If the user defined high frequency datasets, the
+                            history is three datapoints and there is a leading
+                            zero, suppress the warning about the load history
+                            only being 3 points in length
                         %}
                         originalLength = length(scale);
                         
@@ -1953,7 +1953,7 @@ classdef preProcess < handle
                     % Correct the length of each load history
                     for i = 1.0:L
                         if (maxLength - length(scaleBuffer{i})) ~= 0.0
-                            difference = zeros(1, maxLength - length(scaleBuffer{i}));
+                            difference = zeros(1.0, maxLength - length(scaleBuffer{i}));
                             scaleBuffer{i} = [scaleBuffer{i}, difference];
                         end
                     end
@@ -1961,7 +1961,7 @@ classdef preProcess < handle
                 
                 %% Combine the load histories with the stress definitions
                 for i = 1:L
-                    if multiple == 1.0 || multiple == 3.0
+                    if (multiple == 1.0) || (multiple == 3.0)
                         % Simple loading
                         [channel, subID, mainID, error] = preProcess.readRPT(channels{i}, items);
                     else
@@ -2513,13 +2513,17 @@ classdef preProcess < handle
                     if iscell(items_file) == 1.0
                         items_file = cell2mat(items_file);
                         [~, itemCols] = size(items_file);
-                    else
+                    elseif isstruct(items_file) == 1.0
                         [~, itemCols] = size(items_file.data);
+                    elseif isnumeric(items_file) == 1.0
+                        [~, itemCols] = size(items_file);
+                    else
+                        itemCols = 0.0;
                     end
                     
                     if itemCols == 1.0
-                        items_data = importdata(items, '\t');
-                        items_header = 'NONE';
+                        items_header = {'NONE'};
+                        items_data = items_file;
                     else
                         try
                             items_data = items_file.data;
@@ -2537,7 +2541,9 @@ classdef preProcess < handle
                         items = [];
                         setappdata(0, 'items', 'ALL')
                         messenger.writeMessage(143.0)
-                    elseif (strcmpi(items_header{1.0}, 'hotspots') == 0.0 && strcmpi(items_header{1.0}, 'surface items') == 0.0) && (itemCols ~= 1.0 || itemCols ~= 4.0)
+                    elseif (strcmpi(items_header{1.0}, 'hotspots') == 0.0 && strcmpi(items_header{1.0}, 'surface items') == 0.0...
+                            && strcmpi(items_header{1.0}, 'warn_lcf_items') == 0.0&& strcmpi(items_header{1.0}, 'warn_yielding_items') == 0.0...
+                            && strcmpi(items_header{1.0}, 'warn_overflow_items') == 0.0) && (itemCols ~= 1.0 && itemCols ~= 4.0)
                         items = [];
                         setappdata(0, 'items', 'ALL')
                         messenger.writeMessage(144.0)
@@ -2591,21 +2597,12 @@ classdef preProcess < handle
             
             %% Get tensor components:
             if isempty(items) == 0.0 && itemError == 0.0
-                Sxx = zeros(1.0, numberOfItems);
-                Syy = Sxx;
-                Szz = Sxx;
-                Txy = Sxx;
-                Txz = Sxx;
-                Tyz = Sxx;
-                
-                for i = 1:numberOfItems
-                    Sxx(i) = fieldData(items(i), X)';
-                    Syy(i) = fieldData(items(i), X + 1.0)';
-                    Szz(i) = fieldData(items(i), X + 2.0)';
-                    Txy(i) = fieldData(items(i), X + 3.0)';
-                    Txz(i) = fieldData(items(i), X + 4.0)';
-                    Tyz(i) = fieldData(items(i), X + 5.0)';
-                end
+                Sxx = fieldData(items, X)';
+                Syy = fieldData(items, X + 1.0)';
+                Szz = fieldData(items, X + 2.0)';
+                Txy = fieldData(items, X + 3.0)';
+                Txz = fieldData(items, X + 4.0)';
+                Tyz = fieldData(items, X + 5.0)';
             else
                 Sxx = fieldData(:, X)';
                 Syy = fieldData(:, (X + 1.0))';

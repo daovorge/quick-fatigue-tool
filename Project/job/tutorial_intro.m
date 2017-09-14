@@ -18,7 +18,7 @@ function [] = tutorial_intro()
 %      1 Job file options
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 13-Sep-2017 12:34:33 GMT
+%   Last modified 14-Sep-2017 07:37:07 GMT
 
 %% JOB
 
@@ -140,7 +140,7 @@ ALGORITHM = 4.0;
     6: Gerber
     7: R-ratio S-N curves
     8: None
-    <filename>.msc: User-defined
+    'file-name'.msc: User-defined
 %}
 MS_CORRECTION = 2.0;
 
@@ -149,14 +149,14 @@ MS_CORRECTION = 2.0;
     'ALL': Whole model
     'SURFACE': ODB element surface
     'MAXPS': Item with largest (S1-S3)
-    'hotspots_<jobName>.dat': Hotspot region
-    n: User-defined list
+    'file-name.*': Items defined in text file
+    [k1,..., kn]: 1xn item list
 %}
 ITEMS = 'SURFACE';
 
 %{
     'CAEL': Endurance limit (defined in material)
-    n: Nf (repeats)
+    k: Nf (repeats)
 %}
 DESIGN_LIFE = 'CAEL';
 
@@ -168,7 +168,7 @@ FACTOR_OF_STRENGTH = 0.0;
     1: Goodman (Default)
     2: Goodman B
     3: Gerber
-    <filename>.msc: User-defined
+    'file-name'.msc: User-defined
 %}
 FATIGUE_RESERVE_FACTOR = 2.0;
 
@@ -177,9 +177,9 @@ HOTSPOT = 0.0;
 
 %% SURFACE FINISH / NOTCH EFFECTS
 %{
-    n: Define Kt as a value
-    '<filename>.kt': Select surface finish from list (DATA/KT/*.kt)
-    '<filename>.ktx': Define surface finish as a value (DATA/KT/*.ktx)
+    k: Define Kt as a value
+    'file-name.kt': Select surface finish from list (DATA/KT/*.kt)
+    'file-name.ktx': Define surface finish as a value (DATA/KT/*.ktx)
 %}
 KT_DEF = 'default.kt';
 
