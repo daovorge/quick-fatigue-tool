@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 14-Sep-2017 07:37:07 GMT
+%   Last modified 14-Sep-2017 13:53:31 GMT
     
     %%
     
@@ -1289,18 +1289,15 @@ classdef preProcess < handle
             else
                 x = x(:);
                 if length(v) ~= length(x)
-                    setappdata(0, 'E009', 1.0)
                     return
                 end
             end
             
             if (length(delta(:))) > 1.0
-                setappdata(0, 'E010', 1.0)
                 return
             end
             
             if delta <= 0.0
-                setappdata(0, 'E011', 1.0)
                 return
             end
             
@@ -1769,7 +1766,7 @@ classdef preProcess < handle
                 
                 % Number of windows for noise reduction algorithm
                 nWindows = getappdata(0, 'numberOfWindows');
-                nCoefficient = ones(1, nWindows)/nWindows;
+                nCoefficient = ones(1.0, nWindows)/nWindows;
                 
                 for i = 1.0:L
                     if multiple == 1.0 || multiple == 2.0
@@ -2645,13 +2642,13 @@ classdef preProcess < handle
             if L == nScaleFactors
                 % Dataset/history pairs equal to number of loading scale factors
             elseif L > nScaleFactors
-                messenger.writeMessage(3.0)
+                messenger.writeMessage(281.0)
                 
                 % Dataset/history pairs greater than number of loading scale factors
                 extraScaleFactors = linspace(loadingScale(end), loadingScale(end), (L - nScaleFactors));
                 loadingScale = [loadingScale extraScaleFactors];
             elseif L < nScaleFactors
-                messenger.writeMessage(3.0)
+                messenger.writeMessage(281.0)
                 
                 % Dataset/history pairs less than number of loading scale factors
                 scaleFactorsToDelete = nScaleFactors - L;
@@ -4430,12 +4427,12 @@ classdef preProcess < handle
             if nScaleFactors == 1.0
                 % Dataset/history pairs equal to number of scale factors
             elseif nScaleFactors > 1.0
-                messenger.writeMessage(3.0)
+                messenger.writeMessage(282.0)
                 
                 % Only one scale factor is permitted
                 loadingScale = loadingScale(1.0);
             elseif isempty(nScaleFactors) == 1.0
-                messenger.writeMessage(3.0)
+                messenger.writeMessage(282.0)
                 
                 % No scale factors specified
                 loadingScale = 1.0;
@@ -4447,12 +4444,12 @@ classdef preProcess < handle
             if nOffsetValues == 1.0
                 % Dataset/history pairs equal to number of offest values
             elseif nOffsetValues > 1.0
-                messenger.writeMessage(4.0)
+                messenger.writeMessage(284.0)
                 
                 % Only one offest value is permitted
                 loadingOffset = loadingOffset(1.0);
             elseif isempty(nOffsetValues) == 1.0
-                messenger.writeMessage(4.0)
+                messenger.writeMessage(284.0)
                 
                 % No load offset values specified
                 loadingOffset = 1.0;

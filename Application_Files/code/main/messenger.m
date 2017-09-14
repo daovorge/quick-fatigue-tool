@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 14-Sep-2017 07:37:07 GMT
+%   Last modified 14-Sep-2017 13:53:31 GMT
 
     %%
 
@@ -141,20 +141,17 @@ classdef messenger < handle
                     case 2.0
                         % Scale factors and gating values
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The number of load gating values does not match the number of load histories', returnType{i}]);
-                        fprintf(fidType(i), ['-> Either the last gating value specified will be used for the remainder of the load histories,', returnType{i}]);
-                        fprintf(fidType(i), ['   or excess load gating values will be ignored', returnType{i}]);
+                        fprintf(fidType(i), ['-> Either the last gating value specified will be used for the remainder of the load histories, or excess load gating values will be ignored', returnType{i}]);
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 3.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The number of load scale factors does not match the number of load histories', returnType{i}]);
-                        fprintf(fidType(i), ['-> Either the last load scale factor specified will be used for the remainder of the load histories,', returnType{i}]);
-                        fprintf(fidType(i), ['   or excess load scale factors will be ignored', returnType{i}]);
+                        fprintf(fidType(i), ['-> Either the last load scale factor specified will be used for the remainder of the load histories, or excess load scale factors will be ignored', returnType{i}]);
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 4.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The number of load offset values does not match the number of load histories', returnType{i}]);
-                        fprintf(fidType(i), ['-> Either the last load offest value specified will be used for the remainder of the load histories,', returnType{i}]);
-                        fprintf(fidType(i), ['   or excess load offest values will be ignored', returnType{i}]);
+                        fprintf(fidType(i), ['-> Either the last load offset value specified will be used for the remainder of the load histories, or excess load offset values will be ignored', returnType{i}]);
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 5.0
@@ -164,8 +161,7 @@ classdef messenger < handle
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 6.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The number of load scale factors for the high frequency data does not match the number of load histories', returnType{i}]);
-                        fprintf(fidType(i), ['-> Either the last load scale factor specified will be used for the remainder of the load histories,', returnType{i}]);
-                        fprintf(fidType(i), ['   or excess load scale factors will be ignored', returnType{i}]);
+                        fprintf(fidType(i), ['-> Either the last load scale factor specified will be used for the remainder of the load histories, or excess load scale factors will be ignored', returnType{i}]);
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 7.0
@@ -2178,6 +2174,31 @@ classdef messenger < handle
                         fprintf(fidType(i), [returnType{i}, '***NOTE: All %.0f elements lie on the model surface', returnType{i}], getappdata(0, 'message_275'));
                     case 280.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: All %.0f nodes lie on the model surface', returnType{i}], getappdata(0, 'message_274'));
+                    case 281.0
+                        if getappdata(0, 'message_281_hf') == 1.0
+                            fprintf(fidType(i), [returnType{i}, '***NOTE: In the high frequency loading, the number of load scale factors does not match the number of stress datasets in the sequence', returnType{i}]);
+                            rmappdata(0, 'message_281_hf')
+                        else
+                            fprintf(fidType(i), [returnType{i}, '***NOTE: The number of load scale factors does not match the number of stress datasets in the sequence', returnType{i}]);
+                        end
+                        fprintf(fidType(i), ['-> Either the last load scale factor specified will be used for the remainder of the stress datasets, or excess load scale factors will be ignored', returnType{i}]);
+
+                        setappdata(0, 'messageFileNotes', 1.0)
+                    case 282.0
+                        if getappdata(0, 'message_282_hf') == 1.0
+                            fprintf(fidType(i), [returnType{i}, '***NOTE: In the high frequency loading, more than one load scale factor is specified, but only a single value is allowed for uniaxial loading', returnType{i}]);
+                            rmappdata(0, 'message_282_hf')
+                        else
+                            fprintf(fidType(i), [returnType{i}, '***NOTE: More than one load scale factor is specified, but only a single value is allowed for uniaxial loading', returnType{i}]);
+                        end
+                        fprintf(fidType(i), ['-> Only the first load scale factor will be considered', returnType{i}]);
+
+                        setappdata(0, 'messageFileNotes', 1.0)
+                    case 284.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: More than one load offset value is specified, but only a single value is allowed for uniaxial loading', returnType{i}]);
+                        fprintf(fidType(i), ['-> Only the first load offset value will be considered', returnType{i}]);
+
+                        setappdata(0, 'messageFileNotes', 1.0)
                 end
             end
         end
@@ -2232,7 +2253,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n', version);
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 14-Sep-2017 07:37:07 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 14-Sep-2017 13:53:31 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
@@ -2693,7 +2714,7 @@ classdef messenger < handle
                     end
                 end
                 fprintf(fid, '    Design Life: %.3g %s\r\n', getappdata(0, 'dLife'), getappdata(0, 'loadEqUnits'));
-                if algorithm == 3.0 || algorithm == 10.0
+                if (algorithm == 3.0) || (algorithm == 10.0)
                     fprintf(fid, '    Items: N/A\r\n');
                 elseif isempty(items) == 1.0
                     fprintf(fid, '    Items: ALL\r\n');
@@ -2703,7 +2724,7 @@ classdef messenger < handle
                     fprintf(fid, '    Items: ELEMENT SURFACE\r\n');
                 elseif strcmpi(items, 'maxps') == 1.0
                     fprintf(fid, '    Items: MAXPS\r\n');
-                elseif exist(items, 'file') == 2.0
+                elseif (ischar(items) == 1.0) && (exist(items, 'file') == 2.0)
                     fprintf(fid, '    Items: ''%s''\r\n', items);
                 elseif length(items) > 1.0
                     fprintf(fid, '    Items: %.0f, ', items(1.0));
@@ -2906,7 +2927,7 @@ classdef messenger < handle
                     fprintf(fid, '    Items: ELEMENT SURFACE\r\n');
                 elseif strcmpi(items, 'maxps') == 1.0
                     fprintf(fid, '    Items: MAXPS\r\n');
-                elseif exist(items, 'file') == 2.0
+                elseif (ischar(items) == 1.0) && (exist(items, 'file') == 2.0)
                     fprintf(fid, '    Items: ''%s''\r\n', items);
                 elseif length(items) > 1.0
                     fprintf(fid, '    Items: %.0f, ', items(1.0));

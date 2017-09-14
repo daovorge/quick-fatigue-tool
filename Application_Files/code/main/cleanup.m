@@ -6,7 +6,7 @@ function [] = cleanup(status)
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 14-Sep-2017 07:37:07 GMT
+%   Last modified 14-Sep-2017 13:53:31 GMT
     
     %%
     
@@ -50,6 +50,10 @@ if status == 1.0
     dir = sprintf('Project/output/%s/', job);
     errLogFile = [dir, sprintf('%s.log', job)];
     
+    %{
+    	Available error codes: E009, E010, E011
+    %}
+    
     % Remove the DATA and MATLAB FIGURES directories if
     % applicable
     if exist([dir, 'Data Files'], 'dir') == 7.0
@@ -72,7 +76,7 @@ if status == 1.0
     % Write file header
     fprintf(fid, 'Quick Fatigue Tool 6.11-03\r\n');
     fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-    fprintf(fid, 'Last modified 14-Sep-2017 07:37:07 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 14-Sep-2017 13:53:31 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');
@@ -301,30 +305,6 @@ if status == 1.0
         fprintf(fid, '\r\n-> The coarse increment must be equal to or greater than the fine increment');
         fprintf(fid, '\r\n\r\nError code: E052');
         rmappdata(0, 'E052')
-    end
-    
-    % Issues with the P-V detection algorithm
-    if getappdata(0, 'E009') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: Peak-valley detection failed');
-        fprintf(fid, '\r\n-> The input vectors V and X must have the same length');
-        fprintf(fid, '\r\n-> This exception should have been caught during validation!');
-        fprintf(fid, '\r\n-> Visit http://www.billauer.co.il/peakdet.html for information about this algorithm');
-        fprintf(fid, '\r\n\r\nError code: E009');
-        rmappdata(0, 'E009')
-    elseif getappdata(0, 'E010') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: Peak-valley detection failed');
-        fprintf(fid, '\r\n-> The input argument DELTA must be a scalar');
-        fprintf(fid, '\r\n-> This exception should have been caught during validation!');
-        fprintf(fid, '\r\n-> Visit http://www.billauer.co.il/peakdet.html for information about this algorithm');
-        fprintf(fid, '\r\n\r\nError code: E010');
-        rmappdata(0, 'E010')
-    elseif getappdata(0, 'E011') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: Peak-valley detection failed');
-        fprintf(fid, '\r\n-> The input argument DELTA must be positive');
-        fprintf(fid, '\r\n-> This exception should have been caught during validation!');
-        fprintf(fid, '\r\n-> Visit http://www.billauer.co.il/peakdet.html for information about this algorithm');
-        fprintf(fid, '\r\n\r\nError code: E011');
-        rmappdata(0, 'E011')
     end
     
     % Scale and combine issues

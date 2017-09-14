@@ -7,7 +7,7 @@ classdef highFrequency < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 14-Sep-2017 07:37:07 GMT
+%   Last modified 14-Sep-2017 13:53:31 GMT
     
     %%
     
@@ -71,7 +71,7 @@ classdef highFrequency < handle
                 if isempty(scales) == 1.0
                     error = 1.0;
                     setappdata(0, 'E047', 1.0)
-                elseif exist(['input/', scales], 'file') == 0.0
+                elseif exist(scales, 'file') == 0.0
                     error = 1.0;
                     setappdata(0, 'E036', 1.0)
                     setappdata(0, 'errorMissingScale', scales)
@@ -96,12 +96,14 @@ classdef highFrequency < handle
             if nScaleFactors == 1.0
                 % Dataset/history pairs equal to number of gate values
             elseif nScaleFactors > 1.0
-                messenger.writeMessage(3.0);
+                setappdata(0, 'message_282_hf', 1.0)
+                messenger.writeMessage(282.0);
                 
                 % Only one scale factor is permitted
                 hfScales = hfScales(1.0);
             elseif isempty(nScaleFactors) == 1.0
-                messenger.writeMessage(3.0);
+                setappdata(0, 'message_282_hf', 1.0)
+                messenger.writeMessage(282.0);
                 
                 % No scale factors specified
                 hfScales = 1.0;
@@ -110,7 +112,7 @@ classdef highFrequency < handle
             % Load the history file
             if isnumeric(scales) == 0.0
                 try
-                    scale = dlmread(['input/', scales]);
+                    scale = dlmread(scales);
                 catch unhandledException
                     error = true;
                     setappdata(0, 'E016', 1.0)
@@ -188,14 +190,14 @@ classdef highFrequency < handle
             
             % Make sure the loading and history files exist
             if ischar(channels)
-                if exist(['input/', channels], 'file') == 0.0
+                if exist(channels, 'file') == 0.0
                     error = 1.0;
                     setappdata(0, 'E035', 1.0)
                     setappdata(0, 'errorMissingChannel', channels)
                 end
             else
                 for i = 1:length(channels)
-                    if exist(['input/', channels{i}], 'file') == 0.0
+                    if exist(channels{i}, 'file') == 0.0
                         error = 1.0;
                         setappdata(0, 'E035', 1.0)
                         setappdata(0, 'errorMissingChannel', channels{i})
@@ -209,7 +211,7 @@ classdef highFrequency < handle
                 if isempty(scales) == 1.0
                     error = 1.0;
                     setappdata(0, 'E047', 1.0)
-                elseif exist(['input/', scales], 'file') == 0.0
+                elseif exist(scales, 'file') == 0.0
                     error = 1.0;
                     setappdata(0, 'E036', 1.0)
                     setappdata(0, 'errorMissingScale', scales)
@@ -226,7 +228,7 @@ classdef highFrequency < handle
                     if isempty(scales{i}) == 1.0
                         error = 1.0;
                         setappdata(0, 'E047', 1.0)
-                    elseif (ischar(scales{i}) == 1.0) && (exist(['input/', scales{i}], 'file') == 0.0)
+                    elseif (ischar(scales{i}) == 1.0) && (exist(scales{i}, 'file') == 0.0)
                         % The current load history is defined from a file
                         error = 1.0;
                         setappdata(0, 'E036', 1.0)
@@ -342,7 +344,7 @@ classdef highFrequency < handle
                     if multiple == 1.0 || multiple == 2.0
                         if ischar(scales{i}) == 1.0
                             try
-                                scale = dlmread(['input/', scales{i}]);
+                                scale = dlmread(scales{i});
                             catch unhandledException
                                 error = true;
                                 setappdata(0, 'E016', 1.0)
@@ -363,7 +365,7 @@ classdef highFrequency < handle
                     else
                         if ischar(scales) == 1.0
                             try
-                                scale = dlmread(['input/', scales]);
+                                scale = dlmread(scales);
                             catch unhandledException
                                 error = true;
                                 setappdata(0, 'E016', 1.0)
@@ -581,24 +583,22 @@ classdef highFrequency < handle
             if L == nScaleFactors
                 % Dataset/history pairs equal to number of gate values
             elseif L > nScaleFactors
-                messenger.writeMessage(3.0);
+                setappdata(0, 'message_281_hf', 1.0)
+                messenger.writeMessage(281.0);
                 
                 % Dataset/history pairs greater than number of gate values
                 extraScaleFactors = linspace(hfScales(end), hfScales(end), (L - nScaleFactors));
                 hfScales = [hfScales extraScaleFactors];
             elseif L < nScaleFactors
-                messenger.writeMessage(3.0);
+                setappdata(0, 'message_281_hf', 1.0)
+                messenger.writeMessage(281.0);
                 
                 % Dataset/history pairs less than number of gate values
                 scaleFactorsToDelete = nScaleFactors - L;
                 hfScales(end - (scaleFactorsToDelete - 1) : end) = [];
             end
             
-            
-            try
-                % Make sure data label warning can only be displayed once
-                setappdata(0, 'dataLabel', [])
-                
+            try 
                 for i = 1:L
                     [channel, error] = highFrequency.readRPTHF(channels{i}, items);
                     
@@ -667,7 +667,7 @@ classdef highFrequency < handle
             
             %% Open the .rpt file:
             
-            fid = fopen(['input/', FILENAME], 'r');
+            fid = fopen(FILENAME, 'r');
             setappdata(0, 'FOPEN_error_file', FILENAME)
             
             if fid == -1.0
