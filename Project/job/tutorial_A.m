@@ -19,7 +19,7 @@ function [] = tutorial_A()
 %      1 Job file options
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 14-Sep-2017 07:37:07 GMT
+%   Last modified 15-Sep-2017 07:55:43 GMT
 
 %% JOB
 
@@ -145,7 +145,7 @@ ALGORITHM = 8.0;
 %}
 MS_CORRECTION = 0.0;
 
-% ITEMS TO ANALYSE
+% ANALYSIS REGION
 %{
     'ALL': Whole model
     'SURFACE': ODB element surface
