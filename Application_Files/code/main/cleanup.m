@@ -6,7 +6,7 @@ function [] = cleanup(status)
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 15-Sep-2017 07:55:43 GMT
+%   Last modified 15-Sep-2017 09:54:56 GMT
     
     %%
     
@@ -75,7 +75,7 @@ if status == 1.0
     % Write file header
     fprintf(fid, 'Quick Fatigue Tool 6.11-03\r\n');
     fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-    fprintf(fid, 'Last modified 15-Sep-2017 07:55:43 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 15-Sep-2017 09:54:56 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');
@@ -133,8 +133,7 @@ if status == 1.0
     if getappdata(0, 'E004') == 1.0
         fprintf(fid, '\r\n\r\n***ERROR: There is a syntax error in one or more material properties');
         fprintf(fid, '\r\n-> Check for mistakes in the material editor');
-        fprintf(fid, '\r\n-> Non-numeric properties are not accepted');
-        fprintf(fid, '\r\n-> Mechanical properties must be positive');
+        fprintf(fid, '\r\n-> Non-numeric values are not accepted');
         fprintf(fid, '\r\n\r\nError code: E004');
         rmappdata(0, 'E004')
     end
