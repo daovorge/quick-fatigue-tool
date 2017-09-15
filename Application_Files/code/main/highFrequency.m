@@ -7,7 +7,7 @@ classdef highFrequency < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 14-Sep-2017 13:53:31 GMT
+%   Last modified 15-Sep-2017 12:11:48 GMT
     
     %%
     
@@ -1311,7 +1311,7 @@ classdef highFrequency < handle
                 
                 % Create the repeating high frequency data
                 numberOfRepeats = (timeLo/timeHi);
-                highF_final_xx = zeros(1, resampledLength);
+                highF_final_xx = zeros(1.0, resampledLength);
                 highF_final_yy = highF_final_xx;
                 highF_final_zz = highF_final_xx;
                 highF_final_xy = highF_final_xx;
@@ -1373,9 +1373,37 @@ classdef highFrequency < handle
                 
                 % Find the number of points making up the tail
                 index = L + 1.0;
-                while signGi == signG
-                    index = index - 1.0;
-                    signGi = sign(lowF_interp(index) - lowF_interp(index - 1.0));
+                if all(diff(lowF_interp) < 0.0) == 1.0
+                    %{
+                        The entirety of the interpolated load history is a
+                        single tail (sign does not change). The number of
+                        points in the tail is equal to the number of points
+                        in the interpolated load history
+                    %}
+                    signGi = 1.0;
+                    index = 1.0;
+                elseif all(diff(lowF_interp) > 0.0) == 1.0
+                    signGi = -1.0;
+                    index = 1.0;
+                else
+                    while signGi == signG
+                        index = index - 1.0;
+                        
+                        if (index - 1.0) == 0.0
+                            % This condition should already have been caught!
+                            index = 1.0;
+                        else
+                            signGi = sign(lowF_interp(index) - lowF_interp(index - 1.0));
+                        end
+                    end
+                end
+                
+                %{
+                    do not perform the adjustment if the length of the tail
+                    is more that 5% of the total length of the load history
+                %}
+                if (L - (index - 1.0))/L > 0.05
+                    return
                 end
                 
                 % Get the adjustment increment
