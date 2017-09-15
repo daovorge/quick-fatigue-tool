@@ -11,7 +11,7 @@ function [] = main(flags)
 %   Author contact: louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 14-Sep-2017 15:33:00 GMT
+%   Last modified 15-Sep-2017 07:55:43 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');    tic_pre = tic;
@@ -43,7 +43,7 @@ setappdata(0, 'messageFileWarnings', 0.0)
 %% PRINT COMMAND WINDOW HEADER
 fprintf('[NOTICE] Quick Fatigue Tool 6.11-03')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2017)')
-fprintf('\n[NOTICE] Last modified 14-Sep-2017 15:33:00 GMT')
+fprintf('\n[NOTICE] Last modified 15-Sep-2017 07:55:43 GMT')
 
 cleanExit = 0.0;
 
@@ -209,6 +209,7 @@ end
 %% SCALE AND COMBINE THE LOADING
 fprintf('\n[PRE] Processing datasets')
 fprintf(fid_status, '\n[PRE] Processing datasets');
+setappdata(0, 'errorDuringLoading', 1.0)
 
 [scale, offset, repeats, units, N, signalLength, Sxx, Syy, Szz, Txy, Tyz, Txz, mainID,...
     subID, gateHistories, gateTensors, tensorGate, error]...
@@ -221,6 +222,7 @@ if error == 1.0
     cleanup(1.0)
     return
 end
+setappdata(0, 'errorDuringLoading', 0.0)
 
 %% DETECT SURFACE ITAMS IF APPLICABLE
 [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz);

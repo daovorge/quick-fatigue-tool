@@ -6,7 +6,7 @@ function [] = cleanup(status)
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 14-Sep-2017 15:33:00 GMT
+%   Last modified 15-Sep-2017 07:55:43 GMT
     
     %%
     
@@ -75,7 +75,7 @@ if status == 1.0
     % Write file header
     fprintf(fid, 'Quick Fatigue Tool 6.11-03\r\n');
     fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-    fprintf(fid, 'Last modified 14-Sep-2017 15:33:00 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 15-Sep-2017 07:55:43 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');
@@ -322,8 +322,8 @@ if status == 1.0
     
     if getappdata(0, 'E012') == 1.0
         if datasets == histories
-            fprintf(fid, '\r\n\r\n***ERROR: The options DATASET is defined as a cell, but the loading does not appear to be a scale and combine');
-            fprintf(fid, '\r\n-> For a simple (DATASET * HISTORY) loading, specify DATASET as a string');
+            fprintf(fid, '\r\n\r\n***ERROR: The dataset is defined as a cell, but the loading does not appear to be a scale and combine');
+            fprintf(fid, '\r\n-> For a simple loading, specify the dataset as a string');
         else
             fprintf(fid, '\r\n\r\n***ERROR: There are %.0f datasets and %.0f load histories',...
                 datasets, histories);
@@ -331,7 +331,7 @@ if status == 1.0
         end
         
         if datasets == 0.0
-            fprintf(fid, '\r\n-> If the analysis is uniaxial, set ALGORITHM = 3.0 in the job file');
+            fprintf(fid, '\r\n-> If the analysis is uniaxial, set ALGORITHM={3.0 | 10.0} in the job file');
         end
         fprintf(fid, '\r\n\r\nError code: E012');
         rmappdata(0, 'E012')
@@ -348,9 +348,9 @@ if status == 1.0
             fprintf(fid, '\r\n\r\n***ERROR: There are %.0f datasets but only 1 load history', datasets);
         else
             fprintf(fid, '\r\n\r\n***ERROR: A load history was specified without any datasets');
-            fprintf(fid, '\r\n-> If the intended analysis type was uniaxial, set ALGORITHM = 3.0 in the job file');
+            fprintf(fid, '\r\n-> If the intended analysis type was uniaxial, set ALGORITHM={3.0 | 10.0} in the job file');
         end
-        fprintf(fid, '\r\n-> If the loading is a dataset sequence, set HISTORY = [] in the job file');
+        fprintf(fid, '\r\n-> If the loading is a dataset sequence, set HISTORY=[] in the job file');
         fprintf(fid, '\r\n-> For a scale and combine loading, the number of datasets and load histories must be the same');
         fprintf(fid, '\r\n\r\nError code: E014');
         rmappdata(0, 'E014')
@@ -1371,6 +1371,11 @@ if status == 1.0
     end
     
     % Write file footer
+    if getappdata(0, 'errorDuringLoading') == 1.0
+        fprintf(fid, '\r\n\r\nNOTE: Error messages relating to the loading definition may apply to high frequency data');
+        setappdata(0, 'errorDuringLoading', 0.0)
+    end
+    
     c = clock;
     fprintf(fid, '\r\n\r\nQUICK FATIGUE TOOL EXITED WITH AN ERROR (%s)\r\n\r\n', datestr(datenum(c(1), c(2), c(3), c(4), c(5), c(6))));
     fprintf(fid, '========================================================================================');
