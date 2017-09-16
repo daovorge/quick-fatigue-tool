@@ -14,7 +14,7 @@ classdef algorithm_bs7608 < handle
 %      6.6 BS 7608 Fatigue of Welded Steel Joints
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 02-Sep-2017 19:02:40 GMT
+%   Last modified 16-Sep-2017 16:32:58 GMT
     
     %%
     
@@ -1478,27 +1478,19 @@ classdef algorithm_bs7608 < handle
                 numberOfCycles = length(damagePerCycle);
                 
                 if numberOfCycles > 1.0
-                    cumulativeDamage = zeros(1, numberOfCycles);
-                    for i = 1:numberOfCycles
-                        cumulativeDamage(i) = sum(damagePerCycle(1:i));
-                    end
+                    cumulativeDamage = cumsum(damagePerCycle);
                     
                     % If the maximum damage is zero, skip this variable
                     if max(cumulativeDamage) ~= 0.0
-                        % Check whether damage crosses the infinite life
-                        % envelope
+                        % Check whether damage crosses the infinite life envelope
                         crossing = -999.0;
                         cael = 0.5*getappdata(0, 'cael');
-                        if 1/max(cumulativeDamage) < cael
-                            % Search for the point at which finite life
-                            % begins
-                            if 1/cumulativeDamage(1) > cael
-                                for i = 1:length(cumulativeDamage)
-                                    if 1/cumulativeDamage(i) < cael
-                                        crossing = i - 1;
-                                        break
-                                    end
-                                end
+                        if 1.0/max(cumulativeDamage) < cael
+                            % Search for the point at which finite life begins
+                            if 1.0/cumulativeDamage(1.0) > cael
+                                lifeValues = 1.0./cumulativeDamage;
+                                crossing = lifeValues(lifeValues < cael);
+                                crossing = find(lifeValues == crossing(1.0)) - 1.0;
                             end 
                         end
                         

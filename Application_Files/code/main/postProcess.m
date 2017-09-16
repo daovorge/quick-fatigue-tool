@@ -11,7 +11,7 @@ classdef postProcess < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 14-Sep-2017 07:37:07 GMT
+%   Last modified 16-Sep-2017 16:32:58 GMT
     
     %%
     
@@ -433,35 +433,35 @@ classdef postProcess < handle
                     
                     f1 = figure('visible', figureVisibility);
                     subplot(1.0, 2.0, 1.0)
-                    scatter(WCM, WCA, 40, 'MarkerEdgeColor', [0 0.5 0.5],...
-                        'MarkerFaceColor', [0 0.7 0.7], 'LineWidth', 1.5)
+                    scatter(WCM, WCA, 40, 'MarkerEdgeColor', [0.0, 0.5, 0.5],...
+                        'MarkerFaceColor', [0.0, 0.7, 0.7], 'LineWidth', 1.5)
                     
                     hold on
                     if min(WCM) == max(WCM)
                         if max(WCA) == 0.0
-                            plot(linspace(-max(WCM), 0, 2), linspace(max(WCM), 0, 2), '-.k', 'lineWidth', 1.0);
-                            plot(linspace(0, max(WCM), 2), linspace(0, max(WCM), 2), '-.k', 'lineWidth', 1.0);
+                            plot(linspace(-max(WCM), 0.0, 2.0), linspace(max(WCM), 0.0, 2.0), '-.k', 'lineWidth', 1.0);
+                            plot(linspace(0.0, max(WCM), 2.0), linspace(0.0, max(WCM), 2.0), '-.k', 'lineWidth', 1.0);
                         else
-                            plot(linspace(-max(WCA), 0, 2), linspace(max(WCA), 0, 2), '-.k', 'lineWidth', 1.0);
-                            plot(linspace(0, max(WCA), 2), linspace(0, max(WCA), 2), '-.k', 'lineWidth', 1.0);
+                            plot(linspace(-max(WCA), 0.0, 2.0), linspace(max(WCA), 0.0, 2.0), '-.k', 'lineWidth', 1.0);
+                            plot(linspace(0.0, max(WCA), 2.0), linspace(0.0, max(WCA), 2.0), '-.k', 'lineWidth', 1.0);
                         end
                     else
                         if max(WCM) < 0.0
-                            plot(linspace(min(WCM), 0, 2), linspace(-min(WCM), 0, 2), '-.k', 'lineWidth', 1.0);
-                            plot(linspace(0, -min(WCM), 2), linspace(0, -min(WCM), 2), '-.k', 'lineWidth', 1.0);
+                            plot(linspace(min(WCM), 0.0, 2.0), linspace(-min(WCM), 0.0, 2.0), '-.k', 'lineWidth', 1.0);
+                            plot(linspace(0.0, -min(WCM), 2.0), linspace(0.0, -min(WCM), 2.0), '-.k', 'lineWidth', 1.0);
                         elseif max(WCM) == 0.0
-                            plot(linspace(min(WCM), 0, 2), linspace(-min(WCM), 0, 2), '-.k', 'lineWidth', 1.0);
-                            plot(linspace(0, -min(WCM), 2), linspace(0, -min(WCM), 2), '-.k', 'lineWidth', 1.0);
+                            plot(linspace(min(WCM), 0.0, 2.0), linspace(-min(WCM), 0.0, 2.0), '-.k', 'lineWidth', 1.0);
+                            plot(linspace(0.0, -min(WCM), 2.0), linspace(0.0, -min(WCM), 2.0), '-.k', 'lineWidth', 1.0);
                         else
-                            plot(linspace(-max(WCM), 0, 2), linspace(max(WCM), 0, 2), '-.k', 'lineWidth', 1.0);
-                            plot(linspace(0, max(WCM), 2), linspace(0, max(WCM), 2), '-.k', 'lineWidth', 1.0);
+                            plot(linspace(-max(WCM), 0.0, 2.0), linspace(max(WCM), 0.0, 2.0), '-.k', 'lineWidth', 1.0);
+                            plot(linspace(0.0, max(WCM), 2.0), linspace(0.0, max(WCM), 2.0), '-.k', 'lineWidth', 1.0);
                         end
                     end
                     
                     if max(WCA) == 0.0
-                        p2 = line([0, 0], [0, abs(max(WCM))], 'lineWidth', 1.0);
+                        p2 = line([0.0, 0.0], [0.0, abs(max(WCM))], 'lineWidth', 1.0);
                     else
-                        p2 = line([0, 0], [0, max(WCA)], 'lineWidth', 1.0);
+                        p2 = line([0.0, 0.0], [0.0, max(WCA)], 'lineWidth', 1.0);
                     end
                     
                     set(p2, 'Color', 'k', 'lineStyle', '-.')
@@ -1045,28 +1045,20 @@ classdef postProcess < handle
                 numberOfCycles = length(damagePerCycle);
                 
                 if numberOfCycles > 1.0
-                    cumulativeDamage = zeros(1.0, numberOfCycles);
-                    for i = 1:numberOfCycles
-                        cumulativeDamage(i) = sum(damagePerCycle(1:i));
-                    end
+                    cumulativeDamage = cumsum(damagePerCycle);
                     
                     % If the maximum damage is zero, skip this variable
                     if max(cumulativeDamage) ~= 0.0
-                        % Check whether damage crosses the infinite life
-                        % envelope
+                        % Check whether damage crosses the infinite life envelope
                         crossing = -999.0;
                         cael = 0.5*getappdata(0, 'cael');
-                        if 1/max(cumulativeDamage) < cael
-                            % Search for the point at which finite life
-                            % begins
-                            if 1/cumulativeDamage(1) > cael
-                                for i = 1:length(cumulativeDamage)
-                                    if 1/cumulativeDamage(i) < cael
-                                        crossing = i - 1.0;
-                                        break
-                                    end
-                                end
-                            end 
+                        if 1.0/max(cumulativeDamage) < cael
+                            % Search for the point at which finite life begins
+                            if 1.0/cumulativeDamage(1.0) > cael
+                                lifeValues = 1.0./cumulativeDamage;
+                                crossing = lifeValues(lifeValues < cael);
+                                crossing = find(lifeValues == crossing(1.0)) - 1.0;
+                            end
                         end
                         
                         cumulativeDamage = cumulativeDamage/max(cumulativeDamage);
