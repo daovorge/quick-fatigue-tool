@@ -13,7 +13,7 @@ function [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(ma
 %      4.5.3 Custom analysis items
 %
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 18-Sep-2017 12:57:08 GMT
+%   Last modified 18-Sep-2017 15:30:05 GMT
 
 %%
 
@@ -260,7 +260,7 @@ if (isempty(strfind(message, 'SUCCESS')) == 0.0) && (status == 0.0)
         messenger.writeMessage(272.0)
     end
 else
-    message = [message, sprintf('\nOutcome: FAIL\n')];
+    message = [message, sprintf('\nOutcome: SYSTEM() RETURNED STATUS 1 (ERROR)\n')];
     % Print the message to the message file
     setappdata(0, 'message_273', message)
     messenger.writeMessage(273.0)

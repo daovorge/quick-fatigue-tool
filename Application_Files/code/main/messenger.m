@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 18-Sep-2017 12:57:08 GMT
+%   Last modified 18-Sep-2017 15:30:05 GMT
 
     %%
 
@@ -931,42 +931,42 @@ classdef messenger < handle
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 82.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: ODB Interface ERROR: A problem occurred while accessing the field data file ''%s''. Field data will not be exported', returnType{i}], getappdata(0, 'autoExport_fieldDataInacessible'));
+                        fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: A problem occurred while accessing the field data file ''%s''. Field data will not be exported', returnType{i}], getappdata(0, 'autoExport_fieldDataInacessible'));
                         fprintf(fidType(i), ['-> MATLAB error message: %s', returnType{i}], getappdata(0, 'autoExport_fieldDataErrorMessage'));
                         fprintf(fidType(i), ['-> File ID: %.0f', returnType{i}], getappdata(0, 'autoExport_fieldDataFID'));
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 83.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: ODB Interface ERROR: A part instance name must be specified. Field data will not be exported', returnType{i}]);
+                        fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: A part instance name must be specified. Field data will not be exported', returnType{i}]);
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 84.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: ODB Interface ERROR: At least one field must be selected. Field data will not be exported', returnType{i}]);
+                        fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: At least one field must be selected. Field data will not be exported', returnType{i}]);
                         fprintf(fidType(i), ['-> Fields are requested in the environment file (Application_Files\default)', returnType{i}]);
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 85.0
                         switch getappdata(0, 'warning_061_number')
                             case 1.0
-                                fprintf(fidType(i), [returnType{i}, '***WARNING: ODB Interface ERROR: No matching position labels were found in the model output database. Field data will not be exported', returnType{i}]);
+                                fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: No matching position labels were found in the model output database. Field data will not be exported', returnType{i}]);
                                 fprintf(fidType(i), ['-> Check the definitions of OUTPUT_DATABASE and PART_INSTANCE in the job file', returnType{i}]);
                             case 2.0
-                                fprintf(fidType(i), [returnType{i}, '***WARNING: ODB Interface ERROR: An error occurred while retrieving the connectivity matrix. Field data will not be exported', returnType{i}]);
+                                fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: An error occurred while retrieving the connectivity matrix. Field data will not be exported', returnType{i}]);
                             case 3.0
-                                fprintf(fidType(i), [returnType{i}, '***WARNING: ODB Interface ERROR: An error occurred while reading the connectivity matrix. Field data will not be exported', returnType{i}]);
+                                fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: An error occurred while reading the connectivity matrix. Field data will not be exported', returnType{i}]);
                                 fprintf(fidType(i), ['-> Check the PART_INSTANCE definition in the job file', returnType{i}]);
                             case 4.0
-                                fprintf(fidType(i), [returnType{i}, '***WARNING: ODB Interface ERROR: An error occurred while reading the field data file. Field data will not be exported', returnType{i}]);
+                                fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: An error occurred while reading the field data file. Field data will not be exported', returnType{i}]);
                             otherwise
                         end
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 86.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: ODB Interface ERROR: An error occurred while writing field data to the output database. Field data will not be exported', returnType{i}]);
+                        fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: An error occurred while writing field data to the output database. Field data will not be exported', returnType{i}]);
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 87.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: ODB Interface ERROR: Consistent element-node IDs for instance ''%s'' could not', returnType{i}], getappdata(0, 'warning_067_partInstance'));
+                        fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: Consistent element-node IDs for instance ''%s'' could not', returnType{i}], getappdata(0, 'warning_067_partInstance'));
                         fprintf(fidType(i), ['be found between the model output database and the field data (matching node IDs contain zero-valued indices)', returnType{i}]);
                         fprintf(fidType(i), ['-> This can occur when an invalid part instance is specified', returnType{i}]);
                         fprintf(fidType(i), ['-> Field data will not be exported', returnType{i}]);
@@ -1548,10 +1548,10 @@ classdef messenger < handle
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case  179.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: ODB Interface ERROR: No matching element in the field data could be found for element %.0f in the connectivity matrix', returnType{i}], getappdata(0, 'warning_179_problemElement'));
+                        fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: No matching element in the field data could be found for element %.0f in the connectivity matrix', returnType{i}], getappdata(0, 'warning_179_problemElement'));
                         fprintf(fidType(i), ['-> Field data will not be exported', returnType{i}]);
                     case 180.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: ODB Interface WARNING: %.0f elements appear to be collapsed or degenerate (the element nodes are not unique)', returnType{i}], getappdata(0, 'warning_180_numberOfCollapsedElements'));
+                        fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: %.0f elements appear to be collapsed or degenerate (the element nodes are not unique)', returnType{i}], getappdata(0, 'warning_180_numberOfCollapsedElements'));
                         fprintf(fidType(i), ['-> If these elements belong to a crack seam, they should not be used for fatigue analysis', returnType{i}]);
                         fprintf(fidType(i), ['-> If the model does not contain this kind of element, check the field data for errors', returnType{i}]);
                         fprintf(fidType(i), ['-> These elements have been written to ''%s\\Project\\output\\%s\\Data Files\\warn_degenerate_elements.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
@@ -2154,8 +2154,16 @@ classdef messenger < handle
                         fprintf(fidType(i), ['-> Surface detection may include elements and nodes in the subsurface', returnType{i}]);
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 273.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: Surface detection failed on ''%s'' with the following error:', returnType{i}], getappdata(0, 'outputDatabase'));
-                        fprintf(fidType(i), '%s', getappdata(0, 'message_273'));
+                        message = getappdata(0, 'message_273');
+                        
+                        fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: Surface detection failed on ''%s'' with the following error:', returnType{i}], getappdata(0, 'outputDatabase'));
+                        fprintf(fidType(i), '%s', message);
+                        
+                        if isempty(strfind(message, 'The database is from a previous release of Abaqus.')) == 0.0
+                            fprintf(fidType(i), ['-> The installed Abaqus API is from a more recent version of Abaqus than that which was used to generate the model ODB file', returnType{i}]);
+                            fprintf(fidType(i), ['-> Set the environment variables ''autoExport_upgradeODB=1.0'' and ''autoExport_abqCmd=<abaqus-version>'', where <abaqus-version> is the identifier of the Abaqus version to which the ODB file is upgraded', returnType{i}]);
+                        end
+                            
                         fprintf(fidType(i), ['-> All items will be analysed', returnType{i}]);
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 274.0
@@ -2258,7 +2266,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n', version);
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 18-Sep-2017 12:57:08 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 18-Sep-2017 15:30:05 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
