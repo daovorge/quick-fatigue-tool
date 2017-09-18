@@ -7,7 +7,7 @@ classdef highFrequency < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 15-Sep-2017 12:11:48 GMT
+%   Last modified 18-Sep-2017 10:29:58 GMT
     
     %%
     
@@ -1041,9 +1041,8 @@ classdef highFrequency < handle
             if isempty(items) == 0.0
                 % Remove duplicate items
                 items = unique(items);
-                numberOfItems = length(items);
                 
-                if numberOfItems > R
+                if isempty(find(items > R, 1.0)) == 0.0
                     error = 1.0;
                     setappdata(0, 'E033', 1.0)
                     return

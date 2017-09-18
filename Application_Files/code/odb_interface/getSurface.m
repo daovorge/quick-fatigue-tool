@@ -13,9 +13,45 @@ function [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(ma
 %      4.5.3 Custom analysis items
 %
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 14-Sep-2017 15:33:00 GMT
+%   Last modified 18-Sep-2017 12:57:08 GMT
 
 %%
+
+%% Check if a surface definition already exists
+jobName = getappdata(0, 'jobName');
+root = [pwd, '\Data\surfaces'];
+surfaceFile = [root, '\', jobName, '_surface.dat'];
+
+if (strcmpi(items, 'surface') == 1.0) && (exist(surfaceFile, 'file') == 2.0) && (getappdata(0, 'surfaceMode') == 1.0)
+    
+    setappdata(0, 'items', surfaceFile)
+    setappdata(0, 'hotspotFile', surfaceFile)
+    
+    [items, error, mainID, subID, ~] = preProcess.readItemsFile(surfaceFile, length(mainID), mainID, subID, 0.0);
+    
+    if error == 1.0
+        setappdata(0, 'E033', 0.0)
+        messenger.writeMessage(286.0)
+    elseif error == 2.0
+        messenger.writeMessage(287.0)
+        items = 'surface';
+    elseif error == 3.0
+        items = 'all';  setappdata(0, 'items', 'all')
+    else
+        messenger.writeMessage(285.0)
+        
+        Sxx = Sxx(items, :);
+        Syy = Syy(items, :);
+        Szz = Szz(items, :);
+        Txy = Txy(items, :);
+        Txz = Txz(items, :);
+        Tyz = Tyz(items, :);
+        
+        N = length(items);
+        
+        return
+    end
+end
 
 %% Check if surface detection can be used
 outputDatabase = getappdata(0, 'outputDatabase');
@@ -163,6 +199,7 @@ elseif strcmpi(searchRegion, 'dataset') == 1.0
 end
 
 %% Try to upgrade the ODB
+tempName = '';
 if getappdata(0, 'autoExport_upgradeODB') == 1.0
     [~, tempName, ~] = fileparts(outputDatabase);
     tempName = sprintf('%s\\Project\\output\\%s\\%s', pwd, getappdata(0, 'jobName'), tempName);
@@ -188,7 +225,9 @@ if getappdata(0, 'autoExport_upgradeODB') == 1.0
         delete([resultsDatabasePath, '/', modelDatabaseNameShort, '.lck'])
     end
     
-    outputDatabase = [tempName, '.odb'];
+    if isempty(strfind(message, 'NO NEED TO UPGRADE')) == 1.0
+        outputDatabase = [tempName, '.odb'];
+    end
 end
 
 %% Run the script
@@ -465,15 +504,12 @@ end
 data = [intersectingIndexes'; mainID'; subID']';
 
 % Check that the directory exists
-jobName = getappdata(0, 'jobName');
-root = getappdata(0, 'outputDirectory');
-
-if exist(sprintf('%s/Data Files', root), 'dir') == 0.0
-    mkdir(sprintf('%s/Data Files', root))
+if exist(root, 'dir') == 0.0
+    mkdir(root)
 end
 
 % Create the file
-dir = [pwd, sprintf('\\Project\\output\\%s\\Data Files\\', jobName), 'surface_items.dat'];
+dir = [root, sprintf('\\%s_surface.dat', jobName)];
 fid = fopen(dir, 'w+');
 
 fprintf(fid, 'SURFACE ITEMS\r\n');

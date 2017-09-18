@@ -61,6 +61,12 @@ setappdata(0, 'searchRegion', 0.0)
 %}
 setappdata(0, 'shellFaces', 0.0)
 
+%{
+    0: Always read model surface from ODB (default)
+    1: Read model surface from surface definition file
+%}
+setappdata(0, 'surfaceMode', 1.0)
+
 %% MEAN STRESS CORRECTION
 
 % GOODMAN ENVELOPE DEFINITION

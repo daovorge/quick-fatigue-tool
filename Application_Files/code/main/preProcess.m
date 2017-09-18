@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 14-Sep-2017 13:53:31 GMT
+%   Last modified 18-Sep-2017 12:57:08 GMT
     
     %%
     
@@ -1981,7 +1981,7 @@ classdef preProcess < handle
                     [row, col] = size(channel);
                     skip = col - 6.0;
                     if col < 6.0
-                        error = true;
+                        error = 1.0;
                         setappdata(0, 'error_log_019', 1.0)
                         
                         mainID = -999.0;
@@ -1990,7 +1990,7 @@ classdef preProcess < handle
                         return
                     end
                     
-                    if error
+                    if error == 1.0
                         mainID = -999.0;
                         subID = -999.0;
                         Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
@@ -2007,7 +2007,7 @@ classdef preProcess < handle
                         try
                             scaled_channels = zeros(Ls, 6.0, Lc*length(channels));
                         catch unhandledException
-                            error = true;
+                            error = 1.0;
                             setappdata(0, 'E045', 1.0)
                             setappdata(0, 'error_log_045_exceptionMessage', unhandledException.identifier)
                             mainID = -999.0;
@@ -2021,7 +2021,7 @@ classdef preProcess < handle
                     else
                         %% Make sure the current channel has the same number of items as the previous channel
                         if row ~= itemsInPreviousRow
-                            error = true;
+                            error = 1.0;
                             setappdata(0, 'E042', 1.0)
                             mainID = -999.0;
                             subID = -999.0;
@@ -2050,7 +2050,7 @@ classdef preProcess < handle
                 %% Make sure data position is the same for all RPT files
                 dataLabel = getappdata(0, 'dataLabel');
                 if range(dataLabel) ~= 0.0
-                    error = true;
+                    error = 1.0;
                     setappdata(0, 'E021', 1.0)
                     
                     mainID = -999.0;
@@ -2093,7 +2093,7 @@ classdef preProcess < handle
                 end
                 
             catch unhandledException
-                error = true;
+                error = 1.0;
                 setappdata(0, 'E022', 1.0)
                 setappdata(0, 'error_log_022_exceptionMessage', unhandledException.identifier)
                 
@@ -2499,97 +2499,12 @@ classdef preProcess < handle
             setappdata(0, 'nodeType_master', nodeType)
             
             %% Filter IDs if user specified individual analysis items
-            if (strcmpi(items, 'all') == 1.0) || (strcmpi(items, 'maxps') == 1.0) || (strcmpi(items, 'surface') == 1.0)
-                items = [];
-            elseif isnumeric(items) == 0.0
-                if exist(items, 'file') == 2.0
-                    setappdata(0, 'hotspotFile', items)
-                    
-                    % If ITEMS is defined as a file, verify its contents
-                    items_file = importdata(items, '\t');
-                    if iscell(items_file) == 1.0
-                        items_file = cell2mat(items_file);
-                        [~, itemCols] = size(items_file);
-                    elseif isstruct(items_file) == 1.0
-                        [~, itemCols] = size(items_file.data);
-                    elseif isnumeric(items_file) == 1.0
-                        [~, itemCols] = size(items_file);
-                    else
-                        itemCols = 0.0;
-                    end
-                    
-                    if itemCols == 1.0
-                        items_header = {'NONE'};
-                        items_data = items_file;
-                    else
-                        try
-                            items_data = items_file.data;
-                            items_header = items_file.textdata;
-                        catch
-                            items_data = 'error';
-                        end
-                    end
-                    
-                    if strcmpi(items_data, 'error') == 1.0
-                        items = [];
-                        setappdata(0, 'items', 'ALL')
-                        messenger.writeMessage(144.0)
-                    elseif isempty(items_data) == 1.0
-                        items = [];
-                        setappdata(0, 'items', 'ALL')
-                        messenger.writeMessage(143.0)
-                    elseif (strcmpi(items_header{1.0}, 'hotspots') == 0.0 && strcmpi(items_header{1.0}, 'surface items') == 0.0...
-                            && strcmpi(items_header{1.0}, 'warn_lcf_items') == 0.0&& strcmpi(items_header{1.0}, 'warn_yielding_items') == 0.0...
-                            && strcmpi(items_header{1.0}, 'warn_overflow_items') == 0.0) && (itemCols ~= 1.0 && itemCols ~= 4.0)
-                        items = [];
-                        setappdata(0, 'items', 'ALL')
-                        messenger.writeMessage(144.0)
-                    else
-                        items = items_data(:, 1.0);
-                        messenger.writeMessage(266.0)
-                    end
-                elseif exist('items', 'file') == 0.0
-                    % The file does not exist, so warn the user
-                    setappdata(0, 'hotspotFile', items)
-                    items = [];
-                    setappdata(0, 'items', 'ALL')
-                    messenger.writeMessage(145.0)
-                end
-            end
+            [items, error, mainIDs, subIDs, readUserItems] = preProcess.readItemsFile(items, R, mainIDs, subIDs, error);
             
-            if isempty(items) == 0.0
-                % Remove duplicate items
-                items = unique(items);
-                numberOfItems = length(items);
-                
-                if numberOfItems > R
-                    error = 1.0;
-                    setappdata(0, 'E033', 1.0)
-                    return
-                end
-                
-                mainIDs2 = zeros(1.0, numberOfItems);
-                subIDs2 = mainIDs2;
-                
-                itemError = 0.0;
-                
-                for i = 1:numberOfItems
-                    if items(i) > R
-                        mainIDs2 = mainIDs';
-                        subIDs2 = subIDs';
-                        
-                        messenger.writeMessage(59.0)
-                        
-                        itemError = 1.0;
-                        break
-                    end
-                    
-                    mainIDs2(i) = mainIDs(items(i));
-                    subIDs2(i) = subIDs(items(i));
-                end
-                
-                mainIDs = mainIDs2';
-                subIDs = subIDs2';
+            if error == 1.0
+                return
+            elseif readUserItems == 1.0
+                messenger.writeMessage(266.0)
             end
             
             %% Get tensor components:
@@ -2619,7 +2534,6 @@ classdef preProcess < handle
             fclose(fid);
             
             %% For element-nodal or integration point data, check how many items exist in the loading
-            
             if nodeType == 2.0
                 numberOfItems = length(fieldData(:, 1.0));
                 
@@ -5132,6 +5046,108 @@ classdef preProcess < handle
                     fprintf('-> Make sure the job name does not contain spaces or illegal characters\n');
                     return
                 end
+            end
+        end
+        
+        %% READ DATA FILE FOR ITEMS JOB FILE OPTION
+        function [items, error, mainIDs, subIDs, readUserItems] = readItemsFile(items, R, mainIDs, subIDs, error)
+            % error
+            %{
+                1: More items than exist in the model
+                2: Some items don't exist in the model
+                3: Items are formatted incorrectly
+                4: Other
+            %}
+            
+            readUserItems = 0.0;
+            
+            if (strcmpi(items, 'all') == 1.0) || (strcmpi(items, 'maxps') == 1.0) || (strcmpi(items, 'surface') == 1.0)
+                items = [];
+            elseif isnumeric(items) == 0.0
+                if exist(items, 'file') == 2.0
+                    setappdata(0, 'hotspotFile', items)
+                    
+                    % If ITEMS is defined as a file, verify its contents
+                    items_file = importdata(items, '\t');
+                    if iscell(items_file) == 1.0
+                        items_file = cell2mat(items_file);
+                        [~, itemCols] = size(items_file);
+                    elseif isstruct(items_file) == 1.0
+                        [~, itemCols] = size(items_file.data);
+                    elseif isnumeric(items_file) == 1.0
+                        [~, itemCols] = size(items_file);
+                    else
+                        itemCols = 0.0;
+                    end
+                    
+                    if itemCols == 1.0
+                        items_header = {'NONE'};
+                        items_data = items_file;
+                    else
+                        try
+                            items_data = items_file.data;
+                            items_header = items_file.textdata;
+                        catch
+                            items_data = 'error';
+                        end
+                    end
+                    
+                    if strcmpi(items_data, 'error') == 1.0
+                        items = [];
+                        error = 3.0;
+                        setappdata(0, 'items', 'ALL')
+                        messenger.writeMessage(144.0)
+                    elseif isempty(items_data) == 1.0
+                        items = [];
+                        error = 3.0;
+                        setappdata(0, 'items', 'ALL')
+                        messenger.writeMessage(143.0)
+                    elseif (strcmpi(items_header{1.0}, 'hotspots') == 0.0 && strcmpi(items_header{1.0}, 'surface items') == 0.0...
+                            && strcmpi(items_header{1.0}, 'warn_lcf_items') == 0.0&& strcmpi(items_header{1.0}, 'warn_yielding_items') == 0.0...
+                            && strcmpi(items_header{1.0}, 'warn_overflow_items') == 0.0) && (itemCols ~= 1.0 && itemCols ~= 4.0)
+                        items = [];
+                        error = 3.0;
+                        setappdata(0, 'items', 'ALL')
+                        messenger.writeMessage(144.0)
+                    else
+                        items = items_data(:, 1.0);
+                        readUserItems = 1.0;
+                    end
+                elseif exist('items', 'file') == 0.0
+                    % The file does not exist, so warn the user
+                    setappdata(0, 'hotspotFile', items)
+                    items = [];
+                    error = 4.0;
+                    setappdata(0, 'items', 'ALL')
+                    messenger.writeMessage(145.0)
+                end
+            end
+            
+            if isempty(items) == 0.0
+                % Remove duplicate items
+                items = unique(items);
+                numberOfItems = length(items);
+                
+                if numberOfItems > R
+                    error = 1.0;
+                    setappdata(0, 'E033', 1.0)
+                    return
+                end
+                
+                if isempty(find(items > R, 1.0)) == 0.0
+                    mainIDs2 = mainIDs';
+                    subIDs2 = subIDs';
+                    
+                    messenger.writeMessage(59.0)
+                    
+                    error = 2.0;
+                else
+                    mainIDs2 = mainIDs(items);
+                    subIDs2 = subIDs(items);
+                end
+                
+                mainIDs = mainIDs2;
+                subIDs = subIDs2;
             end
         end
     end
