@@ -17,7 +17,7 @@ function [] = default_job()
 %      1 Job file options
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 15-Sep-2017 07:55:43 GMT
+%   Last modified 19-Sep-2017 18:21:43 GMT
 
 %% JOB
 
@@ -145,7 +145,7 @@ MS_CORRECTION = 0.0;
 
 % ANALYSIS REGION
 %{
-    'ALL': Whole model
+    'ALL': Whole model (default)
     'SURFACE': ODB element surface
     'MAXPS': Item with largest (S1-S3)
     'file-name.*': Items defined in text file
