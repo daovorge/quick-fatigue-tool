@@ -13,8 +13,8 @@ classdef algorithm_bs7608 < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.6 BS 7608 Fatigue of Welded Steel Joints
 %   
-%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 14-Jun-2017 14:41:28 GMT
+%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
+%   Last modified 16-Sep-2017 16:32:58 GMT
     
     %%
     
@@ -1044,6 +1044,9 @@ classdef algorithm_bs7608 < handle
             XTickPartition = getappdata(0, 'XTickPartition');
             gridLines = getappdata(0, 'gridLines');
             
+            % Figure visibility
+            figureVisibility = getappdata(0, 'figureVisibility');
+            
             %% VM (von Mises stress at worst item)
             worstItem = getappdata(0, 'worstItem');
             
@@ -1056,7 +1059,7 @@ classdef algorithm_bs7608 < handle
             
             if  getappdata(0, 'figure_VM') == 1.0 && outputFigure == 1.0
                 if outputFigure == 1.0
-                    f3 = figure('visible', 'off');
+                    f3 = figure('visible', figureVisibility);
                     
                     plot(vm, '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
                     
@@ -1098,7 +1101,7 @@ classdef algorithm_bs7608 < handle
             setappdata(0, 'WNPS3', s3)
             
             if getappdata(0, 'figure_PS') == 1.0 && outputFigure == 1.0
-                f4 = figure('visible', 'off');
+                f4 = figure('visible', figureVisibility);
                 subplot(3, 1, 1)
                 plot(s1, '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
 
@@ -1176,7 +1179,7 @@ classdef algorithm_bs7608 < handle
             if getappdata(0, 'figure_CNS') == 1.0 && outputFigure == 1.0
                 normalOnCP = getappdata(0, 'CN');
                 
-                f7 = figure('visible', 'off');
+                f7 = figure('visible', figureVisibility);
                 subplot(2, 1, 1)
                 plot(normalOnCP, '-', 'LineWidth', lineWidth, 'Color', fireBrick)
 
@@ -1264,7 +1267,7 @@ classdef algorithm_bs7608 < handle
             thetaOnCP = getappdata(0, 'thetaOnCP');
             
             if outputFigure == 1.0 && getappdata(0, 'figure_DPP') == 1.0
-                f6 = figure('visible', 'off');
+                f6 = figure('visible', figureVisibility);
                 
                 % Smooth the data
                 if length(damageParameter) > 9.0 && range(damageParameter) ~= 0.0 && smoothness > 0.0
@@ -1305,7 +1308,7 @@ classdef algorithm_bs7608 < handle
             setappdata(0, 'DT', damage)
             
             if outputFigure == 1.0 && getappdata(0, 'figure_DP') == 1.0
-                f7 = figure('visible', 'off');
+                f7 = figure('visible', figureVisibility);
                 
                 % Smooth the data
                 if length(damage) > 9.0 && range(damage) ~= 0.0 && smoothness > 0.0
@@ -1350,7 +1353,7 @@ classdef algorithm_bs7608 < handle
             setappdata(0, 'LT', lifeTheta)
             
             if outputFigure == 1.0 && getappdata(0, 'figure_LP') == 1.0
-                f8 = figure('visible', 'off');
+                f8 = figure('visible', figureVisibility);
                 
                 % Smooth the data
                 if length(lifeTheta) > 9.0 && any(isinf(lifeTheta)) == 0.0 && range(lifeTheta) ~= 0.0 && smoothness > 0.0
@@ -1390,7 +1393,7 @@ classdef algorithm_bs7608 < handle
             if outputFigure == 1.0
                 if getappdata(0, 'figure_CPS') == 1.0
                     %% SHEAR STRESS VS THETA
-                    f9 = figure('visible', 'off');
+                    f9 = figure('visible', figureVisibility);
                     
                     shearStress = getappdata(0, 'shear_cp');
                     
@@ -1475,33 +1478,25 @@ classdef algorithm_bs7608 < handle
                 numberOfCycles = length(damagePerCycle);
                 
                 if numberOfCycles > 1.0
-                    cumulativeDamage = zeros(1, numberOfCycles);
-                    for i = 1:numberOfCycles
-                        cumulativeDamage(i) = sum(damagePerCycle(1:i));
-                    end
+                    cumulativeDamage = cumsum(damagePerCycle);
                     
                     % If the maximum damage is zero, skip this variable
                     if max(cumulativeDamage) ~= 0.0
-                        % Check whether damage crosses the infinite life
-                        % envelope
+                        % Check whether damage crosses the infinite life envelope
                         crossing = -999.0;
                         cael = 0.5*getappdata(0, 'cael');
-                        if 1/max(cumulativeDamage) < cael
-                            % Search for the point at which finite life
-                            % begins
-                            if 1/cumulativeDamage(1) > cael
-                                for i = 1:length(cumulativeDamage)
-                                    if 1/cumulativeDamage(i) < cael
-                                        crossing = i - 1;
-                                        break
-                                    end
-                                end
+                        if 1.0/max(cumulativeDamage) < cael
+                            % Search for the point at which finite life begins
+                            if 1.0/cumulativeDamage(1.0) > cael
+                                lifeValues = 1.0./cumulativeDamage;
+                                crossing = lifeValues(lifeValues < cael);
+                                crossing = find(lifeValues == crossing(1.0)) - 1.0;
                             end 
                         end
                         
                         cumulativeDamage = cumulativeDamage/max(cumulativeDamage);
                         
-                        f11 = figure('visible', 'off');
+                        f11 = figure('visible', figureVisibility);
                         plot(cumulativeDamage, '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
                         
                         if crossing ~= -999.0
@@ -1541,7 +1536,7 @@ classdef algorithm_bs7608 < handle
             %% RHIST RAINFLOW HISTOGRAM OF CYCLES
             
             if outputFigure == 1.0 && outputField == 1.0 && getappdata(0, 'figure_RHIST') == 1.0
-                f12 = figure('visible', 'off');
+                f12 = figure('visible', figureVisibility);
                 rhistData = [Sm'; 2.*amplitudes]';
                 nBins = getappdata(0, 'numberOfBins');
                 hist3(rhistData, [nBins, nBins])
@@ -1570,7 +1565,7 @@ classdef algorithm_bs7608 < handle
             %% RC RANGE vs CYCLES
             
             if outputFigure == 1.0 && outputField == 1.0 && getappdata(0, 'figure_RC') == 1.0
-                f13 = figure('visible', 'off');
+                f13 = figure('visible', figureVisibility);
                 rhistData = [Sm'; 2*amplitudes]';
                 [h, bins] = hist3(rhistData, [nBins, nBins]);
                 
@@ -1606,7 +1601,7 @@ classdef algorithm_bs7608 < handle
                 Tyz = getappdata(0, 'worstNodeTyz');
                 Txz = getappdata(0, 'worstNodeTxz');
                 
-                f12 = figure('visible', 'off');
+                f12 = figure('visible', figureVisibility);
                 
                 subplot(3, 2, 1)
                 plot(Sxx, '-', 'LineWidth', lineWidth, 'Color', midnightBlue)

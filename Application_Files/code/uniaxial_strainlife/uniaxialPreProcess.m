@@ -10,8 +10,8 @@ classdef uniaxialPreProcess < handle
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.6 Uniaxial Strain-Life
 %   
-%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 04-Aug-2017 13:17:05 GMT
+%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
+%   Last modified 30-Aug-2017 18:00:59 GMT
     
     %%
     
@@ -44,41 +44,45 @@ classdef uniaxialPreProcess < handle
                 array. Before trying to search for the file, see if the
                 input can be evaluated as an array
             %}
+            errorString = sprintf('input: ''%s''', loadHistoryPath);
+            fileOrNum = 0.0;
             if (strcmpi(loadHistoryPath(1.0), '[') == 1.0) && (isnumeric(str2num(loadHistoryPath)) == 1.0) %#ok<ST2NM>
                 loadHistoryData = str2num(loadHistoryPath); %#ok<ST2NM>
                 
                 if isempty(loadHistoryData) == 1.0
-                    errorMessage = sprintf('Error while processing input: ''%s''.\n\nThe expression could not be evaluated.', loadHistoryPath);
+                    errorMessage = sprintf('Error while processing numerical input.\n\nThe expression could not be evaluated.');
                     errordlg(errorMessage, 'Quick Fatigue Tool')
                     uiwait
                     error = 1.0;
                 end
-                return
+                
+                fileOrNum = 1.0;
+                errorString = sprintf('numerical input');
             end
             
             %% Check if the input is a file
-            if exist(loadHistoryPath, 'file') == 0.0
+            if (exist(loadHistoryPath, 'file') == 0.0) && (fileOrNum == 0.0)
                 errorMessage = sprintf('Error while processing input: ''%s''.\n\nThe expression is not a valid file path or a numerical array.', loadHistoryPath);
                 errordlg(errorMessage, 'Quick Fatigue Tool')
                 uiwait
                 error = 1.0;
                 return
-            end
-            
-            %% Check if the file can be read
-            try
-                loadHistoryData = dlmread(loadHistoryPath);
-            catch
-                errorMessage = sprintf('Error while processing input: ''%s''.\n\nThe file could not be read.', loadHistoryPath);
-                errordlg(errorMessage, 'Quick Fatigue Tool')
-                uiwait
-                error = 1.0;
-                return
+            elseif fileOrNum == 0.0
+                %% Check if the file can be read
+                try
+                    loadHistoryData = dlmread(loadHistoryPath);
+                catch
+                    errorMessage = sprintf('Error while processing input: ''%s''.\n\nThe file could not be read.', loadHistoryPath);
+                    errordlg(errorMessage, 'Quick Fatigue Tool')
+                    uiwait
+                    error = 1.0;
+                    return
+                end
             end
             
             %% Check for non-numeric data in each file
             if (any(any(isinf(loadHistoryData))) == 1.0) || (any(any(isnan(loadHistoryData))) == 1.0) || (any(any(isreal(loadHistoryData))) == 0.0)
-                errorMessage = sprintf('Error while processing input: ''%s''.\n\nSome of the data has inf, NaN or complex values.', loadHistoryPath);
+                errorMessage = sprintf('Error while processing %s.\n\nSome of the data has inf, NaN or complex values.', errorString);
                 errordlg(errorMessage, 'Quick Fatigue Tool')
                 uiwait
                 error = 1.0;
@@ -89,7 +93,7 @@ classdef uniaxialPreProcess < handle
             %{
                 The load history data must be either a 1xN or an Nx1 vector
             %}
-            errorMessage1 = sprintf('Error while processing input: ''%s''.\n\n', loadHistoryPath);
+            errorMessage1 = sprintf('Error while processing %s.\n\n', errorString);
             
             [R, C] = size(loadHistoryData);
             if (R == 1.0) && (C == 1.0)
@@ -117,6 +121,15 @@ classdef uniaxialPreProcess < handle
             % If the load history is Nx1, convert it to 1xN
             if R > 1.0
                 loadHistoryData = loadHistoryData';
+            end
+            
+            % Check for fatigue
+            if length(unique(loadHistoryData)) == 1.0
+                errorMessage = sprintf('Error while processing %s.\n\nThere is no fatigue in the load history.', errorString);
+                errordlg(errorMessage, 'Quick Fatigue Tool')
+                uiwait
+                error = 1.0;
+                return
             end
         end
         

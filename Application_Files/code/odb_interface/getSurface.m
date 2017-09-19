@@ -12,13 +12,50 @@ function [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(ma
 %   Reference section in Quick Fatigue Tool User Guide
 %      4.5.3 Custom analysis items
 %
-%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 24-Aug-2017 12:05:33 GMT
+%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
+%   Last modified 19-Sep-2017 14:58:20 GMT
 
 %%
 
-%% Check if surface detection can be used
+%% Check if a surface definition already exists
 outputDatabase = getappdata(0, 'outputDatabase');
+[~, name, ~] = fileparts(outputDatabase);
+root = [pwd, '\Data\surfaces'];
+surfaceFile = [root, '\', name, '_surface.dat'];
+
+if (strcmpi(items, 'surface') == 1.0) && (exist(surfaceFile, 'file') == 2.0) && (getappdata(0, 'surfaceMode') == 1.0)
+    
+    setappdata(0, 'items', surfaceFile)
+    setappdata(0, 'hotspotFile', surfaceFile)
+    
+    [items, error, mainID, subID, ~] = preProcess.readItemsFile(surfaceFile, length(mainID), mainID, subID, 0.0);
+    
+    if error == 1.0
+        setappdata(0, 'E033', 0.0)
+        messenger.writeMessage(286.0)
+    elseif error == 2.0
+        messenger.writeMessage(287.0)
+        items = 'surface';  setappdata(0, 'itemsFile', 'SURFACE')
+    elseif error == 3.0
+        items = 'all';  setappdata(0, 'items', 'all')
+    else
+        setappdata(0, 'itemsFile', 'SURFACE')
+        messenger.writeMessage(285.0)
+        
+        Sxx = Sxx(items, :);
+        Syy = Syy(items, :);
+        Szz = Szz(items, :);
+        Txy = Txy(items, :);
+        Txz = Txz(items, :);
+        Tyz = Tyz(items, :);
+        
+        N = length(items);
+        
+        return
+    end
+end
+
+%% Check if surface detection can be used
 partInstance = getappdata(0, 'partInstance');
 odbResultPosition = getappdata(0, 'odbResultPosition');
 
@@ -53,6 +90,9 @@ if (algorithm == 3.0) || (algorithm == 1.0)
 end
 
 %% Collect additional information
+
+% Get the number of items before surface detection
+N0 = N;
 
 % Get the number of part instances
 if ischar(partInstance) == 1.0
@@ -89,12 +129,14 @@ if iscell(partInstance) == 1.0
     partInstance_i = '';
     for i = 1:numberOfInstances
         if i == numberOfInstances
-            partInstance_i = [partInstance_i, sprintf('%s', partInstance{i})]; %#ok<AGROW>
+            partInstance_i = [partInstance_i, sprintf('"%s"', partInstance{i})]; %#ok<AGROW>
         else
-            partInstance_i = [partInstance_i, sprintf('%s', partInstance{i}), ' ']; %#ok<AGROW>
+            partInstance_i = [partInstance_i, sprintf('"%s"', partInstance{i}), ' ']; %#ok<AGROW>
         end
     end
     partInstance = partInstance_i;
+else
+    partInstance = sprintf('"%s"', partInstance);
 end
 
 %% Get the shell surface environment variable
@@ -142,19 +184,56 @@ elseif strcmpi(searchRegion, 'dataset') == 1.0
     fid = fopen(fileName, 'w+');
     uniqueMainID = unique(mainID);
     L = length(uniqueMainID);
-    for i = 1:L
-        if i == L
-            fprintf(fid, '%.0f', uniqueMainID(i));
-        else
-            fprintf(fid, '%.0f, ', uniqueMainID(i));
-        end
-    end
+    
+    % OLD AND SLOW METHOD
+    %     for i = 1:L
+    %         if i == L
+    %             fprintf(fid, '%.0f', uniqueMainID(i));
+    %         else
+    %             fprintf(fid, '%.0f, ', uniqueMainID(i));
+    %         end
+    %     end
+    
+    fprintf(fid, '%.0f, ', uniqueMainID(1:L-1));
+    fprintf(fid, '%.0f', uniqueMainID(L));
     fclose(fid);
+end
+
+%% Try to upgrade the ODB
+tempName = '';
+if getappdata(0, 'autoExport_upgradeODB') == 1.0
+    [~, tempName, ~] = fileparts(outputDatabase);
+    tempName = sprintf('%s\\Project\\output\\%s\\%s', pwd, getappdata(0, 'jobName'), tempName);
+    
+    [status, message] = system(sprintf('%s -upgrade -job "%s" -odb "%s"', abqCmd, tempName, outputDatabase(1.0:end - 4.0)));
+    
+    if status == 1.0
+        % Print the message to the message file
+        setappdata(0, 'message_273', message)
+        messenger.writeMessage(273.0)
+        if strcmpi(items, 'surface') == 1.0
+            items = 'ALL';
+            setappdata(0, 'items', 'ALL')
+        end
+        return
+    end
+    
+    % Delete the upgrade log file
+    delete([tempName, '-upgrade', '.log'])
+    
+    % Remove the lock file if it exists
+    if exist([tempName, '.lck'], 'file') == 2.0
+        delete([resultsDatabasePath, '/', modelDatabaseNameShort, '.lck'])
+    end
+    
+    if isempty(strfind(message, 'NO NEED TO UPGRADE')) == 1.0
+        outputDatabase = [tempName, '.odb'];
+    end
 end
 
 %% Run the script
 % Run script like this:
-% abaqus python getSurface_qft.py -- <odbName> <position> <shell> <instance-1> <instance-n> <n>
+% abaqus python getSurface_qft.py -- <odbName> <position> <shell> <instance-1>... <instance-n> <n>
 
 inputString = sprintf('%s python Application_Files\\code\\odb_interface\\getSurface.py -- "%s" %s %s %s %s %.0f',...
     abqCmd, outputDatabase, odbResultPosition, searchRegion, shell, partInstance, numberOfInstances);
@@ -182,7 +261,7 @@ if (isempty(strfind(message, 'SUCCESS')) == 0.0) && (status == 0.0)
         messenger.writeMessage(272.0)
     end
 else
-    message = [message, sprintf('\nOutcome: FAIL\n')];
+    message = [message, sprintf('\nOutcome: SYSTEM() RETURNED STATUS 1 (ERROR)\n')];
     % Print the message to the message file
     setappdata(0, 'message_273', message)
     messenger.writeMessage(273.0)
@@ -191,6 +270,11 @@ else
         setappdata(0, 'items', 'ALL')
     end
     return
+end
+
+% Delete the temporary ODB file if applicable
+if exist([tempName, '.odb'], 'file') == 2.0
+    delete([tempName, '.odb'])
 end
 
 % Read the output
@@ -248,7 +332,7 @@ if strcmpi(odbResultPosition, 'nodal') == 1.0
     
     % Update the message file
     setappdata(0, 'message_274', N)
-    if length(mainID_surface) == N
+    if length(mainID_surface) == N0
         messenger.writeMessage(280.0)
     else
         messenger.writeMessage(274.0)
@@ -345,7 +429,7 @@ elseif strcmpi(odbResultPosition, 'elemental') == 1.0
     
     % Update the message file
     setappdata(0, 'message_275', nElements)
-    if length(mainID_surface) == N
+    if length(mainID_surface) == N0
         messenger.writeMessage(279.0)
     else
         messenger.writeMessage(275.0)
@@ -409,27 +493,27 @@ else
     
     % Update the message file
     setappdata(0, 'message_275', nElements)
-    if length(mainID_surface) == N
+    if length(mainID_surface) == N0
         messenger.writeMessage(279.0)
     else
         messenger.writeMessage(275.0)
     end
 end
 
+setappdata(0, 'itemsFile', 'SURFACE')
+
 %% Write surface items to text file
 % Concatenate data
 data = [intersectingIndexes'; mainID'; subID']';
 
 % Check that the directory exists
-jobName = getappdata(0, 'jobName');
-root = getappdata(0, 'outputDirectory');
-
-if exist(sprintf('%s/Data Files', root), 'dir') == 0.0
-    mkdir(sprintf('%s/Data Files', root))
+if exist(root, 'dir') == 0.0
+    mkdir(root)
 end
 
 % Create the file
-dir = [pwd, sprintf('\\Project\\output\\%s\\Data Files\\', jobName), 'surface_items.dat'];
+[~, name, ~] = fileparts(outputDatabase);
+dir = [root, sprintf('\\%s_surface.dat', name)];
 fid = fopen(dir, 'w+');
 
 fprintf(fid, 'SURFACE ITEMS\r\n');
@@ -440,5 +524,6 @@ fprintf(fid, '%.0f\t%.0f\t%.0f\r\n', data');
 fclose(fid);
 
 % Inform the user that hotpots have been written to file
+setappdata(0, 'message_278_name', name)
 messenger.writeMessage(278.0)
 end

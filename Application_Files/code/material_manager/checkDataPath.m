@@ -10,8 +10,8 @@ function [] = checkDataPath()
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials
 %   
-%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 23-Jun-2017 13:18:41 GMT
+%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
+%   Last modified 02-Sep-2017 19:02:40 GMT
     
     %%
 
@@ -51,7 +51,6 @@ else
     if exist([localPath, '\qft-local-material.txt'], 'file') ~= 2.0
         % Write the marker file
         fid = fopen([localPath, '\qft-local-material.txt'], 'w+');
-        fprintf(fid, '%s', localPath);
         fclose(fid);
     end
 end

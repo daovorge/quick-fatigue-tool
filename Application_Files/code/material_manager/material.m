@@ -28,8 +28,8 @@ classdef material < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials
 %   
-%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 05-Jul-2017 12:54:18 GMT
+%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
+%   Last modified 08-Sep-2017 134302:48 GMT
     
     %%
     
@@ -133,7 +133,7 @@ classdef material < handle
             
             [error, material_properties, materialName, ~, ~] = importMaterial.processFile(userMaterial, -1.0); %#ok<ASGLU>
             
-            if exist([localPath, '\', materialName, '.mat'], 'file') == 2.0
+            if (exist([localPath, '\', materialName, '.mat'], 'file') == 2.0) && (error == 0.0)
                 % User is attempting to overwrite an existing material
                 response = questdlg(sprintf('The material ''%s'' already exists in the local database. Do you wish to overwrite the material?', materialName), 'Quick Fatigue Tool', 'Overwrite', 'Keep file', 'Cancel', 'Overwrite');
                 
@@ -149,18 +149,16 @@ classdef material < handle
                     % Rename the original material
                     movefile([localPath, '\', materialName, '.mat'], [localPath, '\', oldMaterial, '.mat'])
                 end
-            end
-            
-            % Save the material
-            try
-                save([localPath, '\', materialName], 'material_properties')
-            catch
-                fprintf('ERROR: Unable to save material ''%s''. Make sure the material save location has read/write access.\n', materialName)
-                return
-            end
-            
-            % List materials in the local database
-            if error == 0.0
+                
+                % Save the material
+                try
+                    save([localPath, '\', materialName], 'material_properties')
+                catch
+                    fprintf('ERROR: Unable to save material ''%s''. Make sure the material save location has read/write access.\n', materialName)
+                    return
+                end
+                
+                % List materials in the local database
                 material.list()
             end
         end
@@ -819,7 +817,6 @@ classdef material < handle
             % Write the new marker file
             try
                 fid = fopen([path, '\qft-local-material.txt'], 'w+');
-                fprintf(fid, '%s', path);
                 fclose(fid);
             catch exception
                 fprintf('ERROR: An exception was encountered while setting the local material path.\n\nMATLAB returned the following error: %s\n', exception.message)

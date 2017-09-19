@@ -12,8 +12,8 @@
 %   Reference section in Quick Fatigue Tool User Settings Reference Guide
 %      2 Environment variables
 %   
-%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 20-Aug-2017 18:25:05 GMT
+%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
+%   Last modified 18-Sep-2017 17:44:24 GMT
 
 %% GATE TENSORS
 %{
@@ -21,7 +21,7 @@
     1: Gate tensors (as % of max tensor)
     2: Gate tensors (Nielsony's method)
 %}
-setappdata(0, 'gateTensors', 2.0)
+setappdata(0, 'gateTensors', 1.0)
 
 % GATE VALUE (%)
 setappdata(0, 'tensorGate', 5.0)
@@ -29,7 +29,7 @@ setappdata(0, 'tensorGate', 5.0)
 %% PRE-GATE LOAD HISTORIES
 %{
     0: Off
-    1: Pre-gate load histories (as % of max tensor)
+    1: Pre-gate load histories (as % gate)
     2: Pre-gate load histories (Nielsony's method)
 %}
 setappdata(0, 'gateHistories', 0.0)
@@ -61,6 +61,12 @@ setappdata(0, 'searchRegion', 0.0)
 %}
 setappdata(0, 'shellFaces', 0.0)
 
+%{
+    0: Always read model surface from ODB (default)
+    1: Read model surface from surface definition file
+%}
+setappdata(0, 'surfaceMode', 1.0)
+
 %% MEAN STRESS CORRECTION
 
 % GOODMAN ENVELOPE DEFINITION
@@ -68,7 +74,7 @@ setappdata(0, 'shellFaces', 0.0)
     0: Use standard envelope for Goodman mean stress correction
     1: Use intersection of Buch and Goodman envelopes (if applicable)
 %}
-setappdata(0, 'modifiedGoodman', 0.0)
+setappdata(0, 'modifiedGoodman', 1.0)
 
 % GOODMAN MEAN STRESS LIMIT
 %{
@@ -162,9 +168,18 @@ setappdata(0, 'cpShearStress', 1.0)
 %{
     1: Take sign from hydrostatic stress
     2: Take sign from largest principal stress
-    3: Take sign from Mohr cirlce space
+    3: Take sign from Mohr's circle
 %}
 setappdata(0, 'signConvention', 1.0)
+
+%% ALGORITHM SETTINGS FOR UNIAXIAL STRAIN-LIFE
+
+% ANALYSIS CONTINUATION
+%{
+    0: Reset stress-strain configuration
+    1: Import stress-strain configuration
+%}
+setappdata(0, 'importMaterialState', 1.0)
 
 %% ALGORITHM SETTINGS FOR STRESS-BASED BROWN-MILLER
 
@@ -381,6 +396,7 @@ setappdata(0, 'figure_LH', 1.0)
     'jpg' = JPEG
 %}
 setappdata(0, 'figureFormat', 'fig')
+setappdata(0, 'figureVisibility', 'off')
 
 % DATA FILES
 setappdata(0, 'file_F_OUTPUT_ALL', 1.0)

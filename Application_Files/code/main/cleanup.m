@@ -5,8 +5,8 @@ function [] = cleanup(status)
 %   CLEANUP is used internally by Quick Fatigue Tool. The user
 %   is not required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 29-Aug-2017 16:06:30 GMT
+%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
+%   Last modified 19-Sep-2017 14:58:20 GMT
     
     %%
     
@@ -50,8 +50,11 @@ if status == 1.0
     dir = sprintf('Project/output/%s/', job);
     errLogFile = [dir, sprintf('%s.log', job)];
     
-    % Remove the DATA and MATLAB FIGURES directories if
-    % applicable
+    %{
+    	Available error codes: E009, E010, E011
+    %}
+    
+    % Remove the DATA and MATLAB FIGURES directories if applicable
     if exist([dir, 'Data Files'], 'dir') == 7.0
         try
             rmdir([dir, 'Data Files'])
@@ -70,9 +73,9 @@ if status == 1.0
     fid = fopen(errLogFile, 'w');
     
     % Write file header
-    fprintf(fid, 'Quick Fatigue Tool 6.11-02\r\n');
+    fprintf(fid, 'Quick Fatigue Tool 6.11-03\r\n');
     fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-    fprintf(fid, 'Last modified 29-Aug-2017 16:06:30 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 19-Sep-2017 14:58:20 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');
@@ -130,8 +133,7 @@ if status == 1.0
     if getappdata(0, 'E004') == 1.0
         fprintf(fid, '\r\n\r\n***ERROR: There is a syntax error in one or more material properties');
         fprintf(fid, '\r\n-> Check for mistakes in the material editor');
-        fprintf(fid, '\r\n-> Non-numeric properties are not accepted');
-        fprintf(fid, '\r\n-> Mechanical properties must be positive');
+        fprintf(fid, '\r\n-> Non-numeric values are not accepted');
         fprintf(fid, '\r\n\r\nError code: E004');
         rmappdata(0, 'E004')
     end
@@ -303,30 +305,6 @@ if status == 1.0
         rmappdata(0, 'E052')
     end
     
-    % Issues with the P-V detection algorithm
-    if getappdata(0, 'E009') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: Peak-valley detection failed');
-        fprintf(fid, '\r\n-> The input vectors V and X must have the same length');
-        fprintf(fid, '\r\n-> This exception should have been caught during validation!');
-        fprintf(fid, '\r\n-> Visit http://www.billauer.co.il/peakdet.html for information about this algorithm');
-        fprintf(fid, '\r\n\r\nError code: E009');
-        rmappdata(0, 'E009')
-    elseif getappdata(0, 'E010') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: Peak-valley detection failed');
-        fprintf(fid, '\r\n-> The input argument DELTA must be a scalar');
-        fprintf(fid, '\r\n-> This exception should have been caught during validation!');
-        fprintf(fid, '\r\n-> Visit http://www.billauer.co.il/peakdet.html for information about this algorithm');
-        fprintf(fid, '\r\n\r\nError code: E010');
-        rmappdata(0, 'E010')
-    elseif getappdata(0, 'E011') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: Peak-valley detection failed');
-        fprintf(fid, '\r\n-> The input argument DELTA must be positive');
-        fprintf(fid, '\r\n-> This exception should have been caught during validation!');
-        fprintf(fid, '\r\n-> Visit http://www.billauer.co.il/peakdet.html for information about this algorithm');
-        fprintf(fid, '\r\n\r\nError code: E011');
-        rmappdata(0, 'E011')
-    end
-    
     % Scale and combine issues
     datasets = getappdata(0, 'dataset');
     if ischar(datasets) == 1.0
@@ -343,8 +321,8 @@ if status == 1.0
     
     if getappdata(0, 'E012') == 1.0
         if datasets == histories
-            fprintf(fid, '\r\n\r\n***ERROR: The options DATASET is defined as a cell, but the loading does not appear to be a scale and combine');
-            fprintf(fid, '\r\n-> For a simple (DATASET * HISTORY) loading, specify DATASET as a string');
+            fprintf(fid, '\r\n\r\n***ERROR: The dataset is defined as a cell, but the loading does not appear to be a scale and combine');
+            fprintf(fid, '\r\n-> For a simple loading, specify the dataset as a string');
         else
             fprintf(fid, '\r\n\r\n***ERROR: There are %.0f datasets and %.0f load histories',...
                 datasets, histories);
@@ -352,7 +330,7 @@ if status == 1.0
         end
         
         if datasets == 0.0
-            fprintf(fid, '\r\n-> If the analysis is uniaxial, set ALGORITHM = 3.0 in the job file');
+            fprintf(fid, '\r\n-> If the analysis is uniaxial, set ALGORITHM={3.0 | 10.0} in the job file');
         end
         fprintf(fid, '\r\n\r\nError code: E012');
         rmappdata(0, 'E012')
@@ -369,9 +347,9 @@ if status == 1.0
             fprintf(fid, '\r\n\r\n***ERROR: There are %.0f datasets but only 1 load history', datasets);
         else
             fprintf(fid, '\r\n\r\n***ERROR: A load history was specified without any datasets');
-            fprintf(fid, '\r\n-> If the intended analysis type was uniaxial, set ALGORITHM = 3.0 in the job file');
+            fprintf(fid, '\r\n-> If the intended analysis type was uniaxial, set ALGORITHM={3.0 | 10.0} in the job file');
         end
-        fprintf(fid, '\r\n-> If the loading is a dataset sequence, set HISTORY = [] in the job file');
+        fprintf(fid, '\r\n-> If the loading is a dataset sequence, set HISTORY=[] in the job file');
         fprintf(fid, '\r\n-> For a scale and combine loading, the number of datasets and load histories must be the same');
         fprintf(fid, '\r\n\r\nError code: E014');
         rmappdata(0, 'E014')
@@ -1376,8 +1354,27 @@ if status == 1.0
             rmappdata(0, 'E148')
         end
     end
+    if getappdata(0, 'E149') == 1.0
+        fprintf(fid, '\r\n\r\n***ERROR: There is no fatigue in the uniaxial loading');
+        
+        fprintf(fid, '\r\n\r\nError code: E149');
+        rmappdata(0, 'E149')
+    end
+    if getappdata(0, 'E150') == 1.0
+        fprintf(fid, '\r\n\r\n***ERROR: After applying the plasticity correction, there is only one point in the load history');
+        fprintf(fid, '\r\n-> Please check the load history for issues');
+        fprintf(fid, '\r\n-> If the problem persists, please contact the author for assistance: louisvallance@hotmail.co.uk');
+        
+        fprintf(fid, '\r\n\r\nError code: E150');
+        rmappdata(0, 'E150')
+    end
     
     % Write file footer
+    if getappdata(0, 'errorDuringLoading') == 1.0
+        fprintf(fid, '\r\n\r\nNOTE: Error messages relating to the loading definition may apply to high frequency data');
+        setappdata(0, 'errorDuringLoading', 0.0)
+    end
+    
     c = clock;
     fprintf(fid, '\r\n\r\nQUICK FATIGUE TOOL EXITED WITH AN ERROR (%s)\r\n\r\n', datestr(datenum(c(1), c(2), c(3), c(4), c(5), c(6))));
     fprintf(fid, '========================================================================================');

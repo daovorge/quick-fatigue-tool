@@ -1,14 +1,14 @@
 classdef preProcess < handle
-    %PREPROCESS    QFT class for pre-analysis processing.
-    %   This class contains methods for pre-analysis processing tasks.
-    %
-    %   PREPROCESS is used internally by Quick Fatigue Tool. The user is not
-    %   required to run this file.
-    %
-    %   See also postProcess.
-    %
-    %   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-    %   Last modified 29-Aug-2017 16:06:30 GMT
+%PREPROCESS    QFT class for pre-analysis processing.
+%   This class contains methods for pre-analysis processing tasks.
+%
+%   PREPROCESS is used internally by Quick Fatigue Tool. The user is not
+%   required to run this file.
+%
+%   See also postProcess.
+%
+%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
+%   Last modified 19-Sep-2017 14:07:49 GMT
     
     %%
     
@@ -58,18 +58,39 @@ classdef preProcess < handle
                         marker text file, so try this location first
                     %}
                     [localPath, ~, ~] = fileparts(which('qft-local-material.txt'));
-                    material = [localPath, '\', material];
+                    
+                    if exist([localPath, '\', material], 'file') == 2.0
+                        %{
+                            The material exists on the path containing the
+                            marker file. Use this file
+                        %}
+                        material = [localPath, '\', material];
+                    end
                 elseif isempty(localPath) == 1.0
                     %{
                         The local material path is not set and there is no
                         marker file. Try using the default local path
                         DATA\MATERIAL\LOCAL instead
                     %}
-                    if exist(['Data/material/local/', material], 'file') == 2.0                
-                        material = ['Data/material/local/', material];
+                    if exist([pwd, '/Data/material/local/', material], 'file') == 2.0 
+                        %{
+                            The material exists on the default local path.
+                            Use this file
+                        %}
+                        material = [pwd, '/Data/material/local/', material];
                     end
                 else
-                    material = [localPath, '\', material];
+                    %{
+                        The local path is set. Check if the material exists
+                        in this location.
+                    %}
+                    if exist([localPath, '\', material], 'file') == 2.0
+                        %{
+                            The material exists on the user-defined local
+                            material path. Use this file
+                        %}
+                        material = [localPath, '\', material];
+                    end
                 end
             end
             
@@ -1268,18 +1289,15 @@ classdef preProcess < handle
             else
                 x = x(:);
                 if length(v) ~= length(x)
-                    setappdata(0, 'E009', 1.0)
                     return
                 end
             end
             
             if (length(delta(:))) > 1.0
-                setappdata(0, 'E010', 1.0)
                 return
             end
             
             if delta <= 0.0
-                setappdata(0, 'E011', 1.0)
                 return
             end
             
@@ -1611,9 +1629,23 @@ classdef preProcess < handle
             end
             
             %% Make sure there are the same number of channels as scales:
-            
             error = false;
-            if (ischar(scales) == 0.0) && (ischar(channels) == 0.0)
+            if (isnumeric(scales) == 1.0) && (iscell(channels) == 1.0)
+                % A single scale is defined, but the channels appear to have multiple definitions
+                if length(channels) == 1.0
+                    messenger.writeMessage(29.0)
+                else
+                    Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
+                    mainID = -999.0;
+                    subID = -999.0;
+                    
+                    error = true;
+                    setappdata(0, 'E014', 1.0)
+                    return
+                end
+                
+                multiple = 3.0;
+            elseif (ischar(scales) == 0.0) && (ischar(channels) == 0.0)
                 % Multiple channels and loads appear to be defined
                 if (length(channels) ~= length(scales))
                     Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
@@ -1626,11 +1658,9 @@ classdef preProcess < handle
                 end
                 multiple = 1.0;
             elseif (ischar(scales) == 0.0) && (ischar(channels) == 1.0)
-                % A single channel is defined, but the scales appear to have
-                % multiple definitions
+                % A single channel is defined, but the scales appear to have multiple definitions
                 if isnumeric(scales) == 1.0
-                    % The scales appeared to have multiple definitions because
-                    % they're numeric
+                    % The scales appeared to have multiple definitions because they're numeric
                     multiple = 0.0;
                 elseif length(scales) == 1.0
                     messenger.writeMessage(29.0)
@@ -1646,8 +1676,7 @@ classdef preProcess < handle
                     return
                 end
             elseif (ischar(scales) == 1.0) && (ischar(channels) == 0.0)
-                % A single scale is defined, but the channels appear to have
-                % multiple definitions
+                % A single scale is defined, but the channels appear to have multiple definitions
                 if length(channels) == 1.0
                     messenger.writeMessage(29.0)
                 else
@@ -1748,7 +1777,7 @@ classdef preProcess < handle
                 
                 % Number of windows for noise reduction algorithm
                 nWindows = getappdata(0, 'numberOfWindows');
-                nCoefficient = ones(1, nWindows)/nWindows;
+                nCoefficient = ones(1.0, nWindows)/nWindows;
                 
                 for i = 1.0:L
                     if multiple == 1.0 || multiple == 2.0
@@ -1817,7 +1846,7 @@ classdef preProcess < handle
                     
                     % Check the dimensionality of the history data
                     [r, c] = size(scale);
-                    if r ~= 1.0 && c ~= 1.0
+                    if (r ~= 1.0) && (c ~= 1.0)
                         setappdata(0, 'error_log_020', 1.0)
                         setappdata(0, 'loadHistoryUnableOpen', scales{i})
                         
@@ -1847,7 +1876,7 @@ classdef preProcess < handle
                             
                             [peaks, valleys] = preProcess.peakdet(scale, historyGate(i));
                             
-                            if isempty(peaks) || isempty(valleys)
+                            if (isempty(peaks) == 1.0) || (isempty(valleys) == 1.0)
                                 error = true;
                                 if ischar(scales) == 1.0
                                     setappdata(0, 'E018', 1.0)
@@ -1891,10 +1920,10 @@ classdef preProcess < handle
                     
                     if length(scale) > 2.0
                         %{
-                        If the user defined high frequency datasets, the
-                        history is three datapoints and there is a leading
-                        zero, suppress the warning about the load history
-                        only being 3 points in length
+                            If the user defined high frequency datasets, the
+                            history is three datapoints and there is a leading
+                            zero, suppress the warning about the load history
+                            only being 3 points in length
                         %}
                         originalLength = length(scale);
                         
@@ -1932,7 +1961,7 @@ classdef preProcess < handle
                     % Correct the length of each load history
                     for i = 1.0:L
                         if (maxLength - length(scaleBuffer{i})) ~= 0.0
-                            difference = zeros(1, maxLength - length(scaleBuffer{i}));
+                            difference = zeros(1.0, maxLength - length(scaleBuffer{i}));
                             scaleBuffer{i} = [scaleBuffer{i}, difference];
                         end
                     end
@@ -1940,7 +1969,7 @@ classdef preProcess < handle
                 
                 %% Combine the load histories with the stress definitions
                 for i = 1:L
-                    if multiple == 1.0 || multiple == 3.0
+                    if (multiple == 1.0) || (multiple == 3.0)
                         % Simple loading
                         [channel, subID, mainID, error] = preProcess.readRPT(channels{i}, items);
                     else
@@ -1963,7 +1992,7 @@ classdef preProcess < handle
                     [row, col] = size(channel);
                     skip = col - 6.0;
                     if col < 6.0
-                        error = true;
+                        error = 1.0;
                         setappdata(0, 'error_log_019', 1.0)
                         
                         mainID = -999.0;
@@ -1972,7 +2001,7 @@ classdef preProcess < handle
                         return
                     end
                     
-                    if error
+                    if error == 1.0
                         mainID = -999.0;
                         subID = -999.0;
                         Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
@@ -1989,7 +2018,7 @@ classdef preProcess < handle
                         try
                             scaled_channels = zeros(Ls, 6.0, Lc*length(channels));
                         catch unhandledException
-                            error = true;
+                            error = 1.0;
                             setappdata(0, 'E045', 1.0)
                             setappdata(0, 'error_log_045_exceptionMessage', unhandledException.identifier)
                             mainID = -999.0;
@@ -2003,7 +2032,7 @@ classdef preProcess < handle
                     else
                         %% Make sure the current channel has the same number of items as the previous channel
                         if row ~= itemsInPreviousRow
-                            error = true;
+                            error = 1.0;
                             setappdata(0, 'E042', 1.0)
                             mainID = -999.0;
                             subID = -999.0;
@@ -2032,7 +2061,7 @@ classdef preProcess < handle
                 %% Make sure data position is the same for all RPT files
                 dataLabel = getappdata(0, 'dataLabel');
                 if range(dataLabel) ~= 0.0
-                    error = true;
+                    error = 1.0;
                     setappdata(0, 'E021', 1.0)
                     
                     mainID = -999.0;
@@ -2075,7 +2104,7 @@ classdef preProcess < handle
                 end
                 
             catch unhandledException
-                error = true;
+                error = 1.0;
                 setappdata(0, 'E022', 1.0)
                 setappdata(0, 'error_log_022_exceptionMessage', unhandledException.identifier)
                 
@@ -2105,6 +2134,7 @@ classdef preProcess < handle
         function [TENSOR, subIDs, mainIDs, error] = readRPT(FILENAME, items)
             error = 0.0;
             setappdata(0, 'nodeType_master', 0.0)
+            TENSOR = [];
             
             %% Open the .rpt file:
             
@@ -2126,7 +2156,6 @@ classdef preProcess < handle
             try
                 cellData = textscan(fid, '%f %f %f %f %f %f %f %f %f %f');
             catch unhandledException
-                TENSOR = [];
                 mainIDs = -999.0;
                 subIDs = -999.0;
                 error = 1.0;
@@ -2227,6 +2256,9 @@ classdef preProcess < handle
             setappdata(0, 'numberOfRegions', region)
             messenger.writeMessage(17.0)
             
+            % Buffer for total number of analysis items in the model
+            R = 0.0;
+            
             for i = 1:region
                 remove = 0.0;
                 
@@ -2296,7 +2328,6 @@ classdef preProcess < handle
                 try
                     fieldData_i = cell2mat(cellData_region_i);
                 catch unhandledException
-                    TENSOR = [];
                     subIDs = -999.0;
                     mainIDs = -999.0;
                     error = 1.0;
@@ -2307,7 +2338,6 @@ classdef preProcess < handle
                 end
                 
                 if isempty(fieldData_i)
-                    TENSOR = [];
                     subIDs = -999.0;
                     mainIDs = -999.0;
                     error = 1.0;
@@ -2315,7 +2345,6 @@ classdef preProcess < handle
                     
                     return
                 elseif any(any(isnan(fieldData_i))) || any(any(isinf(fieldData_i)))
-                    TENSOR = [];
                     subIDs = -999.0;
                     mainIDs = -999.0;
                     error = 1.0;
@@ -2359,7 +2388,7 @@ classdef preProcess < handle
                     elementType = 0.0;
                 end
                 
-                [R, C] = size(fieldData_i);
+                [Ri, C] = size(fieldData_i);
                 switch C
                     case 10.0
                         nodeType = 2.0;
@@ -2376,7 +2405,7 @@ classdef preProcess < handle
                     case 9.0
                         nodeType = 1.0;
                         mainIDs_i = fieldData_i(:, 1.0);
-                        subIDs_i = linspace(1.0, 1.0, R)';
+                        subIDs_i = linspace(1.0, 1.0, Ri)';
                         
                         if getappdata(0, 'shellLocation') == 1.0
                             fieldData_i(:, 3:2:9) = [];
@@ -2391,13 +2420,13 @@ classdef preProcess < handle
                         subIDs_i = fieldData_i(:, 2.0);
                     case 7.0
                         nodeType = 1.0;
-                        subIDs_i = linspace(1.0, 1.0, R)';
+                        subIDs_i = linspace(1.0, 1.0, Ri)';
                         mainIDs_i = fieldData_i(:, 1.0);
                     case 6.0
                         if elementType == 0.0
                             nodeType = 0.0;
-                            subIDs_i = linspace(1.0, 1.0, R)';
-                            mainIDs_i = linspace(1.0, R, R)';
+                            subIDs_i = linspace(1.0, 1.0, Ri)';
+                            mainIDs_i = linspace(1.0, Ri, Ri)';
                         else
                             nodeType = 2.0;
                             mainIDs_i = fieldData_i(:, 1.0);
@@ -2410,14 +2439,14 @@ classdef preProcess < handle
                         messenger.writeMessage(181.0)
                     case 5.0
                         nodeType = 1.0;
-                        subIDs_i = linspace(1.0, 1.0, R)';
+                        subIDs_i = linspace(1.0, 1.0, Ri)';
                         mainIDs_i = fieldData_i(:, 1.0);
                         
                         fieldData_i(:, 6:7) = 0.0;
                     case 4.0
                         nodeType = 0.0;
-                        subIDs_i = linspace(1.0, 1.0, R)';
-                        mainIDs_i = linspace(1.0, R, R)';
+                        subIDs_i = linspace(1.0, 1.0, Ri)';
+                        mainIDs_i = linspace(1.0, Ri, Ri)';
                         
                         fieldData_i(:, 5:6) = 0.0;
                     otherwise
@@ -2425,8 +2454,6 @@ classdef preProcess < handle
                         mainIDs = -999.0;
                         error = 1.0;
                         setappdata(0, 'E031', 1.0)
-                        
-                        TENSOR = [];
                         
                         return
                 end
@@ -2448,14 +2475,15 @@ classdef preProcess < handle
                         error = 1.0;
                         setappdata(0, 'E113', 1.0)
                         
-                        TENSOR = [];
-                        
                         return
                     end
                 end
                 
                 % Record the previous node type
                 previousNodeType = nodeType;
+                
+                % Add the number of items in the region to the total
+                R = R + Ri;
             end
             
             setappdata(0, 'dataLabel', [getappdata(0, 'dataLabel'), C])
@@ -2482,110 +2510,22 @@ classdef preProcess < handle
             setappdata(0, 'nodeType_master', nodeType)
             
             %% Filter IDs if user specified individual analysis items
-            if (strcmpi(items, 'all') == 1.0) || (strcmpi(items, 'maxps') == 1.0) || (strcmpi(items, 'surface') == 1.0)
-                items = [];
-            elseif isnumeric(items) == 0.0
-                if exist(items, 'file') == 2.0
-                    setappdata(0, 'hotspotFile', items)
-                    
-                    % If ITEMS is defined as a file, verify its contents
-                    items_file = importdata(items, '\t');
-                    if iscell(items_file) == 1.0
-                        items_file = cell2mat(items_file);
-                        [~, itemCols] = size(items_file);
-                    else
-                        [~, itemCols] = size(items_file.data);
-                    end
-                    
-                    if itemCols == 1.0
-                        items_data = importdata(items, '\t');
-                        items_header = 'NONE';
-                    else
-                        try
-                            items_data = items_file.data;
-                            items_header = items_file.textdata;
-                        catch
-                            items_data = 'error';
-                        end
-                    end
-                    
-                    if strcmpi(items_data, 'error') == 1.0
-                        items = [];
-                        setappdata(0, 'items', 'ALL')
-                        messenger.writeMessage(144.0)
-                    elseif isempty(items_data) == 1.0
-                        items = [];
-                        setappdata(0, 'items', 'ALL')
-                        messenger.writeMessage(143.0)
-                    elseif (strcmpi(items_header{1.0}, 'hotspots') == 0.0 && strcmpi(items_header{1.0}, 'surface items') == 0.0) && (itemCols ~= 1.0 || itemCols ~= 4.0)
-                        items = [];
-                        setappdata(0, 'items', 'ALL')
-                        messenger.writeMessage(144.0)
-                    else
-                        items = items_data(:, 1.0);
-                        messenger.writeMessage(266.0)
-                    end
-                elseif exist('items', 'file') == 0.0
-                    % The file does not exist, so warn the user
-                    setappdata(0, 'hotspotFile', items)
-                    items = [];
-                    setappdata(0, 'items', 'ALL')
-                    messenger.writeMessage(145.0)
-                end
-            end
+            [items, error, mainIDs, subIDs, readUserItems] = preProcess.readItemsFile(items, R, mainIDs, subIDs, error);
             
-            if isempty(items) == 0.0
-                % Remove duplicate items
-                items = unique(items);
-                numberOfItems = length(items);
-                
-                if numberOfItems > R
-                    error = 1.0;
-                    setappdata(0, 'E033', 1.0)
-                    return
-                end
-                
-                mainIDs2 = zeros(1.0, numberOfItems);
-                subIDs2 = mainIDs2;
-                
-                itemError = 0.0;
-                
-                for i = 1:numberOfItems
-                    if items(i) > R
-                        mainIDs2 = mainIDs';
-                        subIDs2 = subIDs';
-                        
-                        messenger.writeMessage(59.0)
-                        
-                        itemError = 1.0;
-                        break
-                    end
-                    
-                    mainIDs2(i) = mainIDs(items(i));
-                    subIDs2(i) = subIDs(items(i));
-                end
-                
-                mainIDs = mainIDs2';
-                subIDs = subIDs2';
+            if error == 1.0
+                return
+            elseif readUserItems == 1.0
+                messenger.writeMessage(266.0)
             end
             
             %% Get tensor components:
-            if isempty(items) == 0.0 && itemError == 0.0
-                Sxx = zeros(1.0, numberOfItems);
-                Syy = Sxx;
-                Szz = Sxx;
-                Txy = Sxx;
-                Txz = Sxx;
-                Tyz = Sxx;
-                
-                for i = 1:numberOfItems
-                    Sxx(i) = fieldData(items(i), X)';
-                    Syy(i) = fieldData(items(i), X + 1.0)';
-                    Szz(i) = fieldData(items(i), X + 2.0)';
-                    Txy(i) = fieldData(items(i), X + 3.0)';
-                    Txz(i) = fieldData(items(i), X + 4.0)';
-                    Tyz(i) = fieldData(items(i), X + 5.0)';
-                end
+            if (isempty(items) == 0.0) && (error == 0.0)
+                Sxx = fieldData(items, X)';
+                Syy = fieldData(items, X + 1.0)';
+                Szz = fieldData(items, X + 2.0)';
+                Txy = fieldData(items, X + 3.0)';
+                Txz = fieldData(items, X + 4.0)';
+                Tyz = fieldData(items, X + 5.0)';
             else
                 Sxx = fieldData(:, X)';
                 Syy = fieldData(:, (X + 1.0))';
@@ -2605,7 +2545,6 @@ classdef preProcess < handle
             fclose(fid);
             
             %% For element-nodal or integration point data, check how many items exist in the loading
-            
             if nodeType == 2.0
                 numberOfItems = length(fieldData(:, 1.0));
                 
@@ -2628,13 +2567,13 @@ classdef preProcess < handle
             if L == nScaleFactors
                 % Dataset/history pairs equal to number of loading scale factors
             elseif L > nScaleFactors
-                messenger.writeMessage(3.0)
+                messenger.writeMessage(281.0)
                 
                 % Dataset/history pairs greater than number of loading scale factors
                 extraScaleFactors = linspace(loadingScale(end), loadingScale(end), (L - nScaleFactors));
                 loadingScale = [loadingScale extraScaleFactors];
             elseif L < nScaleFactors
-                messenger.writeMessage(3.0)
+                messenger.writeMessage(281.0)
                 
                 % Dataset/history pairs less than number of loading scale factors
                 scaleFactorsToDelete = nScaleFactors - L;
@@ -2682,7 +2621,7 @@ classdef preProcess < handle
                     % Scale the channel
                     channel = channel.*loadingScale(i);
                     
-                    if isempty(channel)
+                    if isempty(channel) == 1.0
                         error = true;
                         setappdata(0, 'E015', 1.0)
                         
@@ -4356,6 +4295,7 @@ classdef preProcess < handle
         function [Sxx, Syy, Szz, Txy, Tyz, Txz, mainID, subID, error, oldSignal] = uniaxialRead(scales, gateHistories, historyGate, loadingScale, loadingOffset)
             error = 0.0;
             setappdata(0, 'dataLabel', -999)
+            Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
             
             % Check that the stress history is defined
             if ischar(scales)
@@ -4382,7 +4322,6 @@ classdef preProcess < handle
             end
             
             if error == 1.0
-                Sxx = 0; Syy = 0; Szz = 0; Txy = 0; Tyz = 0; Txz = 0;
                 mainID = -999;
                 subID = -999;
                 oldSignal = -999;
@@ -4413,12 +4352,12 @@ classdef preProcess < handle
             if nScaleFactors == 1.0
                 % Dataset/history pairs equal to number of scale factors
             elseif nScaleFactors > 1.0
-                messenger.writeMessage(3.0)
+                messenger.writeMessage(282.0)
                 
                 % Only one scale factor is permitted
                 loadingScale = loadingScale(1.0);
             elseif isempty(nScaleFactors) == 1.0
-                messenger.writeMessage(3.0)
+                messenger.writeMessage(282.0)
                 
                 % No scale factors specified
                 loadingScale = 1.0;
@@ -4430,12 +4369,12 @@ classdef preProcess < handle
             if nOffsetValues == 1.0
                 % Dataset/history pairs equal to number of offest values
             elseif nOffsetValues > 1.0
-                messenger.writeMessage(4.0)
+                messenger.writeMessage(284.0)
                 
                 % Only one offest value is permitted
                 loadingOffset = loadingOffset(1.0);
             elseif isempty(nOffsetValues) == 1.0
-                messenger.writeMessage(4.0)
+                messenger.writeMessage(284.0)
                 
                 % No load offset values specified
                 loadingOffset = 1.0;
@@ -4465,7 +4404,6 @@ classdef preProcess < handle
                     
                     mainID = -999;
                     subID = -999;
-                    Sxx = 0; Syy = 0; Szz = 0; Txy = 0; Tyz = 0; Txz = 0;
                     oldSignal = -999;
                     return
                 end
@@ -4486,7 +4424,6 @@ classdef preProcess < handle
                 
                 mainID = -999;
                 subID = -999;
-                Sxx = 0; Syy = 0; Szz = 0; Txy = 0; Tyz = 0; Txz = 0;
                 oldSignal = -999;
                 return
             end
@@ -4501,7 +4438,6 @@ classdef preProcess < handle
                 
                 mainID = -999;
                 subID = -999;
-                Sxx = 0; Syy = 0; Szz = 0; Txy = 0; Tyz = 0; Txz = 0;
                 oldSignal = -999;
                 return
             elseif c == 1.0
@@ -4524,7 +4460,7 @@ classdef preProcess < handle
             if getappdata(0, 'noiseReduction') == 1.0
                 messenger.writeMessage(267.0)
                 nWindows = getappdata(0, 'numberOfWindows');
-                nCoefficient = ones(1, nWindows)/nWindows;
+                nCoefficient = ones(1.0, nWindows)/nWindows;
                 scale = filter(nCoefficient, 1, scale);
             end
             
@@ -4550,7 +4486,6 @@ classdef preProcess < handle
                         
                         mainID = -999;
                         subID = -999;
-                        Sxx = 0; Syy = 0; Szz = 0; Txy = 0; Tyz = 0; Txz = 0;
                         return
                     end
                     
@@ -5122,6 +5057,108 @@ classdef preProcess < handle
                     fprintf('-> Make sure the job name does not contain spaces or illegal characters\n');
                     return
                 end
+            end
+        end
+        
+        %% READ DATA FILE FOR ITEMS JOB FILE OPTION
+        function [items, error, mainIDs, subIDs, readUserItems] = readItemsFile(items, R, mainIDs, subIDs, error)
+            % error
+            %{
+                1: More items than exist in the model
+                2: Some items don't exist in the model
+                3: Items are formatted incorrectly
+                4: Other
+            %}
+            
+            readUserItems = 0.0;
+            
+            if (strcmpi(items, 'all') == 1.0) || (strcmpi(items, 'maxps') == 1.0) || (strcmpi(items, 'surface') == 1.0)
+                items = [];
+            elseif isnumeric(items) == 0.0
+                if exist(items, 'file') == 2.0
+                    setappdata(0, 'hotspotFile', items)
+                    
+                    % If ITEMS is defined as a file, verify its contents
+                    items_file = importdata(items, '\t');
+                    if iscell(items_file) == 1.0
+                        items_file = cell2mat(items_file);
+                        [~, itemCols] = size(items_file);
+                    elseif isstruct(items_file) == 1.0
+                        [~, itemCols] = size(items_file.data);
+                    elseif isnumeric(items_file) == 1.0
+                        [~, itemCols] = size(items_file);
+                    else
+                        itemCols = 0.0;
+                    end
+                    
+                    if itemCols == 1.0
+                        items_header = {'NONE'};
+                        items_data = items_file;
+                    else
+                        try
+                            items_data = items_file.data;
+                            items_header = items_file.textdata;
+                        catch
+                            items_data = 'error';
+                        end
+                    end
+                    
+                    if strcmpi(items_data, 'error') == 1.0
+                        items = [];
+                        error = 3.0;
+                        setappdata(0, 'items', 'ALL')
+                        messenger.writeMessage(144.0)
+                    elseif isempty(items_data) == 1.0
+                        items = [];
+                        error = 3.0;
+                        setappdata(0, 'items', 'ALL')
+                        messenger.writeMessage(143.0)
+                    elseif (strcmpi(items_header{1.0}, 'hotspots') == 0.0 && strcmpi(items_header{1.0}, 'surface items') == 0.0...
+                            && strcmpi(items_header{1.0}, 'warn_lcf_items') == 0.0&& strcmpi(items_header{1.0}, 'warn_yielding_items') == 0.0...
+                            && strcmpi(items_header{1.0}, 'warn_overflow_items') == 0.0) && (itemCols ~= 1.0 && itemCols ~= 4.0)
+                        items = [];
+                        error = 3.0;
+                        setappdata(0, 'items', 'ALL')
+                        messenger.writeMessage(144.0)
+                    else
+                        items = items_data(:, 1.0);
+                        readUserItems = 1.0;
+                    end
+                elseif exist('items', 'file') == 0.0
+                    % The file does not exist, so warn the user
+                    setappdata(0, 'hotspotFile', items)
+                    items = [];
+                    error = 4.0;
+                    setappdata(0, 'items', 'ALL')
+                    messenger.writeMessage(145.0)
+                end
+            end
+            
+            if isempty(items) == 0.0
+                % Remove duplicate items
+                items = unique(items);
+                numberOfItems = length(items);
+                
+                if numberOfItems > R
+                    error = 1.0;
+                    setappdata(0, 'E033', 1.0)
+                    return
+                end
+                
+                if isempty(find(items > R, 1.0)) == 0.0
+                    mainIDs2 = mainIDs';
+                    subIDs2 = subIDs';
+                    
+                    messenger.writeMessage(59.0)
+                    
+                    error = 2.0;
+                else
+                    mainIDs2 = mainIDs(items);
+                    subIDs2 = subIDs(items);
+                end
+                
+                mainIDs = mainIDs2;
+                subIDs = subIDs2;
             end
         end
     end

@@ -11,8 +11,8 @@ function varargout = LocalMaterialDatabase(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials
 %   
-%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 05-Jul-2017 10:05:55 GMT
+%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
+%   Last modified 02-Sep-2017 19:02:40 GMT
     
     %%
 
@@ -242,7 +242,6 @@ end
 % Write the new marker file
 try
     fid = fopen([dataPath, '\qft-local-material.txt'], 'w+');
-    fprintf(fid, '%s', dataPath);
     fclose(fid);
 catch exception
     msg = sprintf('An exception was encountered while setting the local material path.\n\nMATLAB returned the following error:\n\n%s', exception.message);

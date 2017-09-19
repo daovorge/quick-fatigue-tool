@@ -6,8 +6,8 @@ classdef highFrequency < handle
 %   HIGHFREQUENCY is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 19-Jun-2017 16:18:57 GMT
+%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
+%   Last modified 19-Sep-2017 14:07:49 GMT
     
     %%
     
@@ -71,7 +71,7 @@ classdef highFrequency < handle
                 if isempty(scales) == 1.0
                     error = 1.0;
                     setappdata(0, 'E047', 1.0)
-                elseif exist(['input/', scales], 'file') == 0.0
+                elseif exist(scales, 'file') == 0.0
                     error = 1.0;
                     setappdata(0, 'E036', 1.0)
                     setappdata(0, 'errorMissingScale', scales)
@@ -96,12 +96,14 @@ classdef highFrequency < handle
             if nScaleFactors == 1.0
                 % Dataset/history pairs equal to number of gate values
             elseif nScaleFactors > 1.0
-                messenger.writeMessage(3.0);
+                setappdata(0, 'message_282_hf', 1.0)
+                messenger.writeMessage(282.0);
                 
                 % Only one scale factor is permitted
                 hfScales = hfScales(1.0);
             elseif isempty(nScaleFactors) == 1.0
-                messenger.writeMessage(3.0);
+                setappdata(0, 'message_282_hf', 1.0)
+                messenger.writeMessage(282.0);
                 
                 % No scale factors specified
                 hfScales = 1.0;
@@ -110,7 +112,7 @@ classdef highFrequency < handle
             % Load the history file
             if isnumeric(scales) == 0.0
                 try
-                    scale = dlmread(['input/', scales]);
+                    scale = dlmread(scales);
                 catch unhandledException
                     error = true;
                     setappdata(0, 'E016', 1.0)
@@ -188,14 +190,14 @@ classdef highFrequency < handle
             
             % Make sure the loading and history files exist
             if ischar(channels)
-                if exist(['input/', channels], 'file') == 0.0
+                if exist(channels, 'file') == 0.0
                     error = 1.0;
                     setappdata(0, 'E035', 1.0)
                     setappdata(0, 'errorMissingChannel', channels)
                 end
             else
                 for i = 1:length(channels)
-                    if exist(['input/', channels{i}], 'file') == 0.0
+                    if exist(channels{i}, 'file') == 0.0
                         error = 1.0;
                         setappdata(0, 'E035', 1.0)
                         setappdata(0, 'errorMissingChannel', channels{i})
@@ -209,7 +211,7 @@ classdef highFrequency < handle
                 if isempty(scales) == 1.0
                     error = 1.0;
                     setappdata(0, 'E047', 1.0)
-                elseif exist(['input/', scales], 'file') == 0.0
+                elseif exist(scales, 'file') == 0.0
                     error = 1.0;
                     setappdata(0, 'E036', 1.0)
                     setappdata(0, 'errorMissingScale', scales)
@@ -226,7 +228,7 @@ classdef highFrequency < handle
                     if isempty(scales{i}) == 1.0
                         error = 1.0;
                         setappdata(0, 'E047', 1.0)
-                    elseif (ischar(scales{i}) == 1.0) && (exist(['input/', scales{i}], 'file') == 0.0)
+                    elseif (ischar(scales{i}) == 1.0) && (exist(scales{i}, 'file') == 0.0)
                         % The current load history is defined from a file
                         error = 1.0;
                         setappdata(0, 'E036', 1.0)
@@ -342,7 +344,7 @@ classdef highFrequency < handle
                     if multiple == 1.0 || multiple == 2.0
                         if ischar(scales{i}) == 1.0
                             try
-                                scale = dlmread(['input/', scales{i}]);
+                                scale = dlmread(scales{i});
                             catch unhandledException
                                 error = true;
                                 setappdata(0, 'E016', 1.0)
@@ -363,7 +365,7 @@ classdef highFrequency < handle
                     else
                         if ischar(scales) == 1.0
                             try
-                                scale = dlmread(['input/', scales]);
+                                scale = dlmread(scales);
                             catch unhandledException
                                 error = true;
                                 setappdata(0, 'E016', 1.0)
@@ -581,24 +583,22 @@ classdef highFrequency < handle
             if L == nScaleFactors
                 % Dataset/history pairs equal to number of gate values
             elseif L > nScaleFactors
-                messenger.writeMessage(3.0);
+                setappdata(0, 'message_281_hf', 1.0)
+                messenger.writeMessage(281.0);
                 
                 % Dataset/history pairs greater than number of gate values
                 extraScaleFactors = linspace(hfScales(end), hfScales(end), (L - nScaleFactors));
                 hfScales = [hfScales extraScaleFactors];
             elseif L < nScaleFactors
-                messenger.writeMessage(3.0);
+                setappdata(0, 'message_281_hf', 1.0)
+                messenger.writeMessage(281.0);
                 
                 % Dataset/history pairs less than number of gate values
                 scaleFactorsToDelete = nScaleFactors - L;
                 hfScales(end - (scaleFactorsToDelete - 1) : end) = [];
             end
             
-            
-            try
-                % Make sure data label warning can only be displayed once
-                setappdata(0, 'dataLabel', [])
-                
+            try 
                 for i = 1:L
                     [channel, error] = highFrequency.readRPTHF(channels{i}, items);
                     
@@ -663,14 +663,14 @@ classdef highFrequency < handle
         function [TENSOR, error] = readRPTHF(FILENAME, items)
             
             error = 0.0;
+            TENSOR = [];
             
             %% Open the .rpt file:
             
-            fid = fopen(['input/', FILENAME], 'r');
+            fid = fopen(FILENAME, 'r');
             setappdata(0, 'FOPEN_error_file', FILENAME)
             
             if fid == -1.0
-                TENSOR = [];
                 error = 1.0;
                 setappdata(0, 'E026', 1.0)
                 
@@ -682,7 +682,6 @@ classdef highFrequency < handle
             try
                 cellData = textscan(fid, '%f %f %f %f %f %f %f %f %f %f');
             catch
-                TENSOR = [];
                 error = 1.0;
                 setappdata(0, 'E027', 1.0)
                 
@@ -695,7 +694,7 @@ classdef highFrequency < handle
                 hasHeader = false; % There might be no header in the file
             end
             
-            if ~hasHeader
+            if hasHeader == 0.0
                 for i = 1.0:length(cellData)
                     if isempty(cellData{i})
                         hasHeader = true;
@@ -775,6 +774,9 @@ classdef highFrequency < handle
                 cellData_region_i = cellData;
             end
             
+            % Buffer for total number of analysis items in the model
+            R = 0.0;
+            
             for i = 1:region
                 remove = 0.0;
                 
@@ -844,7 +846,6 @@ classdef highFrequency < handle
                 try
                     fieldData_i = cell2mat(cellData_region_i);
                 catch
-                    TENSOR = [];
                     error = 1.0;
                     setappdata(0, 'E028', 1.0)
                     
@@ -852,13 +853,11 @@ classdef highFrequency < handle
                 end
                 
                 if isempty(fieldData_i)
-                    TENSOR = [];
                     error = 1.0;
                     setappdata(0, 'E029', 1.0)
                     
                     return
                 elseif any(any(isnan(fieldData_i))) || any(any(isinf(fieldData_i)))
-                    TENSOR = [];
                     error = 1.0;
                     setappdata(0, 'E030', 1.0)
                     
@@ -901,7 +900,7 @@ classdef highFrequency < handle
                     elementType = 0.0;
                 end
                 
-                [R, C] = size(fieldData_i);
+                [Ri, C] = size(fieldData_i);
                 switch C
                     case 10.0
                         mainIDs_i = fieldData_i(:, 1.0);
@@ -937,7 +936,7 @@ classdef highFrequency < handle
                         X = 2.0;
                     case 6.0
                         if elementType == 0.0
-                            mainIDs_i = linspace(1.0, R, R)';
+                            mainIDs_i = linspace(1.0, Ri, Ri)';
                             X = 1.0;
                         else
                             mainIDs_i = fieldData_i(:, 1.0);
@@ -951,7 +950,7 @@ classdef highFrequency < handle
                         
                         fieldData_i(:, 6:7) = 0.0;
                     case 4.0
-                        mainIDs_i = linspace(1.0, R, R)';
+                        mainIDs_i = linspace(1.0, Ri, Ri)';
                         X = 1.0;
                         
                         fieldData_i(:, 5:6) = 0.0;
@@ -959,19 +958,19 @@ classdef highFrequency < handle
                         error = 1.0;
                         setappdata(0, 'E031', 1.0)
                         
-                        TENSOR = [];
-                        
                         return
                 end
                 
                 % Append the data from the current group to the buffers
                 fieldDataBuffer{i} = fieldData_i;
                 mainIDBuffer{i} = mainIDs_i;
+                
+                % Add the number of items in the region to the total
+                R = R + Ri;
             end
             
             %% Concatenate data buffers
             fieldData = cell2mat(fieldDataBuffer');
-            mainIDs = cell2mat(mainIDBuffer');
             
             if elementError == 1.0
                 error = 1.0;
@@ -980,74 +979,88 @@ classdef highFrequency < handle
                 return
             end
             
-            %% Filter IDs if user specified individual analysis items
-            
+            %% Filter IDs if user specified individual analysis items 
             if (strcmpi(items, 'all') == 1.0) || (strcmpi(items, 'maxps') == 1.0) || (strcmpi(items, 'surface') == 1.0)
                 items = [];
             elseif isnumeric(items) == 0.0
-                if exist('items', 'file') == 2.0
-                    % If ITEMS is defined as a file, verify its contents
-                    items = importdata(items, '\t', 4.0);
-                    items = items.data;
-                    [~, itemCols] = size(items);
+                if exist(items, 'file') == 2.0
+                    setappdata(0, 'hotspotFile', items)
                     
-                    if isempty(items) == 1.0
-                        items = [];
-                        setappdata(0, 'items', 'ALL')
-                    elseif itemCols ~= 4.0
-                        items = [];
-                        setappdata(0, 'items', 'ALL')
+                    % If ITEMS is defined as a file, verify its contents
+                    items_file = importdata(items, '\t');
+                    if iscell(items_file) == 1.0
+                        items_file = cell2mat(items_file);
+                        [~, itemCols] = size(items_file);
+                    elseif isstruct(items_file) == 1.0
+                        [~, itemCols] = size(items_file.data);
+                    elseif isnumeric(items_file) == 1.0
+                        [~, itemCols] = size(items_file);
                     else
-                        items = items(:, 1.0);
+                        itemCols = 0.0;
+                    end
+                    
+                    if itemCols == 1.0
+                        items_header = {'NONE'};
+                        items_data = items_file;
+                    else
+                        try
+                            items_data = items_file.data;
+                            items_header = items_file.textdata;
+                        catch
+                            items_data = 'error';
+                        end
+                    end
+                    
+                    if strcmpi(items_data, 'error') == 1.0
+                        items = [];
+                        setappdata(0, 'items', 'ALL')
+                        messenger.writeMessage(144.0)
+                    elseif isempty(items_data) == 1.0
+                        items = [];
+                        setappdata(0, 'items', 'ALL')
+                        messenger.writeMessage(143.0)
+                    elseif (strcmpi(items_header{1.0}, 'hotspots') == 0.0 && strcmpi(items_header{1.0}, 'surface items') == 0.0...
+                            && strcmpi(items_header{1.0}, 'warn_lcf_items') == 0.0&& strcmpi(items_header{1.0}, 'warn_yielding_items') == 0.0...
+                            && strcmpi(items_header{1.0}, 'warn_overflow_items') == 0.0) && (itemCols ~= 1.0 && itemCols ~= 4.0)
+                        items = [];
+                        setappdata(0, 'items', 'ALL')
+                        messenger.writeMessage(144.0)
+                    else
+                        items = items_data(:, 1.0);
+                        messenger.writeMessage(266.0)
                     end
                 elseif exist('items', 'file') == 0.0
-                    % The file does not exist
+                    % The file does not exist, so warn the user
+                    setappdata(0, 'hotspotFile', items)
                     items = [];
                     setappdata(0, 'items', 'ALL')
+                    messenger.writeMessage(145.0)
                 end
             end
             
             if isempty(items) == 0.0
                 % Remove duplicate items
                 items = unique(items);
-                numberOfItems = length(items);
                 
-                if numberOfItems > R
+                if isempty(find(items > R, 1.0)) == 0.0
                     error = 1.0;
                     setappdata(0, 'E033', 1.0)
                     return
                 end
                 
                 itemError = 0.0;
-                
-                for i = 1:numberOfItems
-                    if items(i) > length(mainIDs)
-                        messenger.writeMessage(59.0)
-                        
-                        itemError = 1.0;
-                        break
-                    end
-                end
+            else
+                itemError = 1.0;
             end
             
             %% Get tensor components:
-            
             if (isempty(items) == 0.0) && (itemError == 0.0)
-                Sxx = zeros(1.0, numberOfItems);
-                Syy = Sxx;
-                Szz = Sxx;
-                Txy = Sxx;
-                Txz = Sxx;
-                Tyz = Sxx;
-                
-                for i = 1:numberOfItems
-                    Sxx(i) = fieldData(items(i), X)';
-                    Syy(i) = fieldData(items(i), X + 1.0)';
-                    Szz(i) = fieldData(items(i), X + 2.0)';
-                    Txy(i) = fieldData(items(i), X + 3.0)';
-                    Txz(i) = fieldData(items(i), X + 4.0)';
-                    Tyz(i) = fieldData(items(i), X + 5.0)';
-                end
+                Sxx = fieldData(items, X)';
+                Syy = fieldData(items, X + 1.0)';
+                Szz = fieldData(items, X + 2.0)';
+                Txy = fieldData(items, X + 3.0)';
+                Txz = fieldData(items, X + 4.0)';
+                Tyz = fieldData(items, X + 5.0)';
             else
                 Sxx = fieldData(:, X)';
                 Syy = fieldData(:, (X + 1.0))';
@@ -1070,16 +1083,11 @@ classdef highFrequency < handle
         %% Superimpose the high frequency data onto the loading for a uniaxial signal
         function [Sxx, Syy, Szz, Txy, Tyz, Txz, error] = superimposeUniaxial(lowF, highF, timeLo, timeHi)
             error = 0.0;
+            Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
             
             % High frequency dataset must have a shorter time period
             if timeLo < timeHi
                 error = 1.0;
-                Sxx = 0.0;
-                Syy = 0.0;
-                Szz = 0.0;
-                Txy = 0.0;
-                Tyz = 0.0;
-                Txz = 0.0;
                 
                 setappdata(0, 'E041', 1.0)
                 setappdata(0, 'errTimeLo', timeLo)
@@ -1304,7 +1312,7 @@ classdef highFrequency < handle
                 
                 % Create the repeating high frequency data
                 numberOfRepeats = (timeLo/timeHi);
-                highF_final_xx = zeros(1, resampledLength);
+                highF_final_xx = zeros(1.0, resampledLength);
                 highF_final_yy = highF_final_xx;
                 highF_final_zz = highF_final_xx;
                 highF_final_xy = highF_final_xx;
@@ -1366,9 +1374,37 @@ classdef highFrequency < handle
                 
                 % Find the number of points making up the tail
                 index = L + 1.0;
-                while signGi == signG
-                    index = index - 1.0;
-                    signGi = sign(lowF_interp(index) - lowF_interp(index - 1.0));
+                if all(diff(lowF_interp) < 0.0) == 1.0
+                    %{
+                        The entirety of the interpolated load history is a
+                        single tail (sign does not change). The number of
+                        points in the tail is equal to the number of points
+                        in the interpolated load history
+                    %}
+                    signGi = 1.0;
+                    index = 1.0;
+                elseif all(diff(lowF_interp) > 0.0) == 1.0
+                    signGi = -1.0;
+                    index = 1.0;
+                else
+                    while signGi == signG
+                        index = index - 1.0;
+                        
+                        if (index - 1.0) == 0.0
+                            % This condition should already have been caught!
+                            index = 1.0;
+                        else
+                            signGi = sign(lowF_interp(index) - lowF_interp(index - 1.0));
+                        end
+                    end
+                end
+                
+                %{
+                    do not perform the adjustment if the length of the tail
+                    is more that 5% of the total length of the load history
+                %}
+                if (L - (index - 1.0))/L > 0.05
+                    return
                 end
                 
                 % Get the adjustment increment

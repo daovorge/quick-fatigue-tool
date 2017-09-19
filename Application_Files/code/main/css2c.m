@@ -1,4 +1,4 @@
-function [rfData, epsilon, sigma, error, warning] = css2c(sigma_e, E, kp, np, scf)
+function [rfData, epsilon, sigma, error, warning, matMemFirstExcursion] = css2c(sigma_e, E, kp, np, scf)
 %CSS2C    QFT function to calculate nonlinear elastic stress-strain.
 %   This function calculates the nonlinear elastic stress and strain from
 %   an elastic stress tensor.
@@ -17,8 +17,8 @@ function [rfData, epsilon, sigma, error, warning] = css2c(sigma_e, E, kp, np, sc
 %   performed by RAINFLOW_2(FT) instead of from the hysteresis loops
 %   directly inside CSS2C. This is found to be more reliable.
 %   
-%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 03-Jul-2017 13:40:46 GMT
+%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
+%   Last modified 30-Aug-2017 15:40:20 GMT
     
     %%
     
@@ -199,7 +199,7 @@ for i = 3:signalLength
     
     %{
         The current strain range is smaller than the first
-        cyclic excusrion since the previous cycle closure.
+        cyclic excursion since the previous cycle closure.
         Successive cycle closures cannot assume the path of the
         monotonic excursion
     %}
@@ -256,7 +256,7 @@ for i = 3:signalLength
         
         %{
             The stress is calculated from the curve two
-            excursions ago. The current strain range is the
+            excursions ago. The current stress range is the
             strain range from this excursion, plus the
             additional strain range beyond the current cycle
             closure point

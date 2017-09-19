@@ -6,8 +6,8 @@ classdef messenger < handle
 %   MESSENGER is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %
-%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 29-Aug-2017 16:06:30 GMT
+%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
+%   Last modified 19-Sep-2017 14:58:20 GMT
 
     %%
 
@@ -141,20 +141,17 @@ classdef messenger < handle
                     case 2.0
                         % Scale factors and gating values
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The number of load gating values does not match the number of load histories', returnType{i}]);
-                        fprintf(fidType(i), ['-> Either the last gating value specified will be used for the remainder of the load histories,', returnType{i}]);
-                        fprintf(fidType(i), ['   or excess load gating values will be ignored', returnType{i}]);
+                        fprintf(fidType(i), ['-> Either the last gating value specified will be used for the remainder of the load histories, or excess load gating values will be ignored', returnType{i}]);
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 3.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The number of load scale factors does not match the number of load histories', returnType{i}]);
-                        fprintf(fidType(i), ['-> Either the last load scale factor specified will be used for the remainder of the load histories,', returnType{i}]);
-                        fprintf(fidType(i), ['   or excess load scale factors will be ignored', returnType{i}]);
+                        fprintf(fidType(i), ['-> Either the last load scale factor specified will be used for the remainder of the load histories, or excess load scale factors will be ignored', returnType{i}]);
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 4.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The number of load offset values does not match the number of load histories', returnType{i}]);
-                        fprintf(fidType(i), ['-> Either the last load offest value specified will be used for the remainder of the load histories,', returnType{i}]);
-                        fprintf(fidType(i), ['   or excess load offest values will be ignored', returnType{i}]);
+                        fprintf(fidType(i), ['-> Either the last load offset value specified will be used for the remainder of the load histories, or excess load offset values will be ignored', returnType{i}]);
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 5.0
@@ -164,8 +161,7 @@ classdef messenger < handle
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 6.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The number of load scale factors for the high frequency data does not match the number of load histories', returnType{i}]);
-                        fprintf(fidType(i), ['-> Either the last load scale factor specified will be used for the remainder of the load histories,', returnType{i}]);
-                        fprintf(fidType(i), ['   or excess load scale factors will be ignored', returnType{i}]);
+                        fprintf(fidType(i), ['-> Either the last load scale factor specified will be used for the remainder of the load histories, or excess load scale factors will be ignored', returnType{i}]);
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 7.0
@@ -321,35 +317,32 @@ classdef messenger < handle
 
                         algorithm = getappdata(0, 'algorithm');
                         
-                        mainID = getappdata(0, 'mainID');
-                        subID = getappdata(0, 'subID');
-                        
                         if (algorithm ~= 10.0) && (algorithm ~= 3.0)
                             if length(worstItem) > 1.0
                                 if length(worstItem) > 10.0
                                     fprintf(fidType(i), [returnType{i}, '***NOTE: The worst analysis item IDs are:', returnType{i}]);
-                                    fprintf(fidType(i), '-> %.0f (%.0f.%.0f), ', worstItem(1.0), mainID(worstItem(1.0)), subID(worstItem(1.0)));
+                                    fprintf(fidType(i), '-> %.0f, ', worstItem(1.0));
 
                                     for n = 2:8
-                                        fprintf(fidType(i), '%.0f (%.0f.%.0f), ', worstItem(n), mainID(worstItem(n)), subID(worstItem(n)));
+                                        fprintf(fidType(i), '%.0f, ', worstItem(n));
                                     end
 
-                                    fprintf(fidType(i), ['%.0f (%.0f.%.0f)', returnType{i}], worstItem(10.0), mainID(worstItem(10.0)), subID(worstItem(10.0)));
+                                    fprintf(fidType(i), ['%.0f', returnType{i}], worstItem(10.0));
                                     fprintf(fidType(i), ['-> (Only the first 10 items are printed)', returnType{i}]);
                                 else
                                     fprintf(fidType(i), [returnType{i}, '***NOTE: The worst analysis item IDs are:', returnType{i}]);
-                                    fprintf(fidType(i), '-> %.0f (%.0f.%.0f), ', worstItem(1.0), mainID(worstItem(1.0)), subID(worstItem(1.0)));
+                                    fprintf(fidType(i), '-> %.0f, ', worstItem(1.0));
 
                                     for n = 2:(length(worstItem) - 1.0)
-                                        fprintf(fidType(i), '%.0f (%.0f.%.0f), ', worstItem(n), mainID(worstItem(n)), subID(worstItem(n)));
+                                        fprintf(fidType(i), '%.0f, ', worstItem(n));
                                     end
 
-                                    fprintf(fidType(i), ['%.0f (%.0f.%.0f)', returnType{i}], worstItem(end), mainID(worstItem(end)), subID(worstItem(end)));
+                                    fprintf(fidType(i), ['%.0f', returnType{i}], worstItem(end));
                                 end
 
                                 setappdata(0, 'messageFileNotes', 1.0)
                             else
-                                fprintf(fidType(i), [returnType{i}, '***NOTE: The worst analysis item ID is %.0f (%.0f.%.0f)', returnType{i}], worstItem, mainID(worstItem), subID(worstItem));
+                                fprintf(fidType(i), [returnType{i}, '***NOTE: The worst analysis item ID is %.0f', returnType{i}], worstItem);
                                 
                                 setappdata(0, 'messageFileNotes', 1.0)
                             end
@@ -407,8 +400,15 @@ classdef messenger < handle
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 25.0
+                        rValues = getappdata(0, 'message_25_rValues');
+                        
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Multiple S-N datasets (Group %.0f) were provided without the R-ratio S-N curve mean stress correction', returnType{i}], getappdata(0, 'message_25_71_72_73_groupNumber'));
-                        fprintf(fidType(i), ['-> The data will be interpolated to approximate the S-N curve at zero mean stress (R = -1)', returnType{i}]);
+                        
+                        if find(rValues == -1.0) == 1.0
+                            fprintf(fidType(i), ['-> The fully-reversed (R = -1) S-N curve will be used for analysis', returnType{i}]);
+                        else
+                            fprintf(fidType(i), ['-> A fully-reversed (R = -1) S-N curve will be found by interpolation and used for analysis', returnType{i}]);
+                        end
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 26.0
@@ -873,10 +873,9 @@ classdef messenger < handle
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 77.0
                         if getappdata(0, 'suppress_ID77') == 0.0
-                            fprintf(fidType(i), [returnType{i}, '***WARNING: During the analysis, the S-N curve had to be linearly extrapolated because the load ratio', returnType{i}]);
-                            fprintf(fidType(i), ['for some cycles fell outside the range of the data provided', returnType{i}]);
-                            fprintf(fidType(i), ['-> The fatigue result may be inaccurate for some cycles', returnType{i}]);
-                            fprintf(fidType(i), ['-> This problem can be alleviated by providing S-N data over a greater range of R-values', returnType{i}]);
+                            fprintf(fidType(i), [returnType{i}, '***WARNING: The S-N data has been linearly extrapolated because the calculated load ratio (%f) is outside the range of R-values', returnType{i}], getappdata(0, 'message_77_r'));
+                            fprintf(fidType(i), ['-> S-N data should be specified over a greater range of R-values', returnType{i}]);
+                            fprintf(fidType(i), ['-> In order to avoid excessive output, this warning is only printed on the first occurrence of extrapolation', returnType{i}]);
 
                             if i == X
                                 setappdata(0, 'suppress_ID77', 1.0)
@@ -929,42 +928,42 @@ classdef messenger < handle
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 82.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: ODB Interface ERROR: A problem occurred while accessing the field data file ''%s''. Field data will not be exported', returnType{i}], getappdata(0, 'autoExport_fieldDataInacessible'));
+                        fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: A problem occurred while accessing the field data file ''%s''. Field data will not be exported', returnType{i}], getappdata(0, 'autoExport_fieldDataInacessible'));
                         fprintf(fidType(i), ['-> MATLAB error message: %s', returnType{i}], getappdata(0, 'autoExport_fieldDataErrorMessage'));
                         fprintf(fidType(i), ['-> File ID: %.0f', returnType{i}], getappdata(0, 'autoExport_fieldDataFID'));
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 83.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: ODB Interface ERROR: A part instance name must be specified. Field data will not be exported', returnType{i}]);
+                        fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: A part instance name must be specified. Field data will not be exported', returnType{i}]);
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 84.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: ODB Interface ERROR: At least one field must be selected. Field data will not be exported', returnType{i}]);
+                        fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: At least one field must be selected. Field data will not be exported', returnType{i}]);
                         fprintf(fidType(i), ['-> Fields are requested in the environment file (Application_Files\default)', returnType{i}]);
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 85.0
                         switch getappdata(0, 'warning_061_number')
                             case 1.0
-                                fprintf(fidType(i), [returnType{i}, '***WARNING: ODB Interface ERROR: No matching position labels were found in the model output database. Field data will not be exported', returnType{i}]);
+                                fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: No matching position labels were found in the model output database. Field data will not be exported', returnType{i}]);
                                 fprintf(fidType(i), ['-> Check the definitions of OUTPUT_DATABASE and PART_INSTANCE in the job file', returnType{i}]);
                             case 2.0
-                                fprintf(fidType(i), [returnType{i}, '***WARNING: ODB Interface ERROR: An error occurred while retrieving the connectivity matrix. Field data will not be exported', returnType{i}]);
+                                fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: An error occurred while retrieving the connectivity matrix. Field data will not be exported', returnType{i}]);
                             case 3.0
-                                fprintf(fidType(i), [returnType{i}, '***WARNING: ODB Interface ERROR: An error occurred while reading the connectivity matrix. Field data will not be exported', returnType{i}]);
+                                fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: An error occurred while reading the connectivity matrix. Field data will not be exported', returnType{i}]);
                                 fprintf(fidType(i), ['-> Check the PART_INSTANCE definition in the job file', returnType{i}]);
                             case 4.0
-                                fprintf(fidType(i), [returnType{i}, '***WARNING: ODB Interface ERROR: An error occurred while reading the field data file. Field data will not be exported', returnType{i}]);
+                                fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: An error occurred while reading the field data file. Field data will not be exported', returnType{i}]);
                             otherwise
                         end
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 86.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: ODB Interface ERROR: An error occurred while writing field data to the output database. Field data will not be exported', returnType{i}]);
+                        fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: An error occurred while writing field data to the output database. Field data will not be exported', returnType{i}]);
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 87.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: ODB Interface ERROR: Consistent element-node IDs for instance ''%s'' could not', returnType{i}], getappdata(0, 'warning_067_partInstance'));
+                        fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: Consistent element-node IDs for instance ''%s'' could not', returnType{i}], getappdata(0, 'warning_067_partInstance'));
                         fprintf(fidType(i), ['be found between the model output database and the field data (matching node IDs contain zero-valued indices)', returnType{i}]);
                         fprintf(fidType(i), ['-> This can occur when an invalid part instance is specified', returnType{i}]);
                         fprintf(fidType(i), ['-> Field data will not be exported', returnType{i}]);
@@ -1290,7 +1289,7 @@ classdef messenger < handle
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 143.0
                         if getappdata(0, 'suppress_ID143') == 0.0
-                            fprintf(fidType(i), [returnType{i}, '***WARNING: No hotspots were found in the file ''%s''', returnType{i}], getappdata(0, 'hotspotFile'));
+                            fprintf(fidType(i), [returnType{i}, '***WARNING: No items were found in the item list file ''%s''', returnType{i}], getappdata(0, 'hotspotFile'));
                             fprintf(fidType(i), ['-> All items will be analysed', returnType{i}]);
 
                             setappdata(0, 'messageFileWarnings', 1.0)
@@ -1303,8 +1302,8 @@ classdef messenger < handle
                         end
                     case 144.0
                         if getappdata(0, 'suppress_ID144') == 0.0
-                            fprintf(fidType(i), [returnType{i}, '***WARNING: The hotspot file ''%s'' is formatted incorrectly', returnType{i}], getappdata(0, 'hotspotFile'));
-                            fprintf(fidType(i), ['-> The file must contain either a single column of item IDs, or be a hotspot file generated by a previous analysis', returnType{i}]);
+                            fprintf(fidType(i), [returnType{i}, '***WARNING: The item list file ''%s'' is formatted incorrectly', returnType{i}], getappdata(0, 'hotspotFile'));
+                            fprintf(fidType(i), ['-> The file must either be a single column of item IDs, or an item list file generated by Quick Fatigue Tool', returnType{i}]);
                             fprintf(fidType(i), ['-> All items will be analysed', returnType{i}]);
 
                             setappdata(0, 'messageFileWarnings', 1.0)
@@ -1317,7 +1316,7 @@ classdef messenger < handle
                         end
                     case 145.0
                         if getappdata(0, 'suppress_ID145') == 0.0
-                            fprintf(fidType(i), [returnType{i}, '***WARNING: The hotspot file ''%s'' could not be found', returnType{i}], getappdata(0, 'hotspotFile'));
+                            fprintf(fidType(i), [returnType{i}, '***WARNING: The item list file ''%s'' could not be found', returnType{i}], getappdata(0, 'hotspotFile'));
                             fprintf(fidType(i), ['-> All items will be analysed', returnType{i}]);
 
                             setappdata(0, 'messageFileWarnings', 1.0)
@@ -1491,6 +1490,8 @@ classdef messenger < handle
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 168.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: There are %.0f points in the load history', returnType{i}], getappdata(0, 'signalLength'));
+                        
                         N = getappdata(0, 'numberOfNodes') - getappdata(0, 'nodalEliminationRemovedItems');
                         fprintf(fidType(i), [returnType{i}, '***NOTE: There are %.0f items in the model (%.0f will be analysed)', returnType{i}], getappdata(0, 'message168_N'), N);
 
@@ -1544,10 +1545,10 @@ classdef messenger < handle
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case  179.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: ODB Interface ERROR: No matching element in the field data could be found for element %.0f in the connectivity matrix', returnType{i}], getappdata(0, 'warning_179_problemElement'));
+                        fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: No matching element in the field data could be found for element %.0f in the connectivity matrix', returnType{i}], getappdata(0, 'warning_179_problemElement'));
                         fprintf(fidType(i), ['-> Field data will not be exported', returnType{i}]);
                     case 180.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: ODB Interface WARNING: %.0f elements appear to be collapsed or degenerate (the element nodes are not unique)', returnType{i}], getappdata(0, 'warning_180_numberOfCollapsedElements'));
+                        fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: %.0f elements appear to be collapsed or degenerate (the element nodes are not unique)', returnType{i}], getappdata(0, 'warning_180_numberOfCollapsedElements'));
                         fprintf(fidType(i), ['-> If these elements belong to a crack seam, they should not be used for fatigue analysis', returnType{i}]);
                         fprintf(fidType(i), ['-> If the model does not contain this kind of element, check the field data for errors', returnType{i}]);
                         fprintf(fidType(i), ['-> These elements have been written to ''%s\\Project\\output\\%s\\Data Files\\warn_degenerate_elements.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
@@ -2093,7 +2094,7 @@ classdef messenger < handle
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 260.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The Uniaxial Strain-Life algorithm has been used in a continuation analysis, but the material state file from the previous job could not be found', returnType{i}]);
-                        fprintf(fidType(i), ['-> Any accumulated plasticity from the prvious analysis will be reset to zero, and the current elastic stress history will be treated as a new loading event', returnType{i}]);
+                        fprintf(fidType(i), ['-> Any accumulated plasticity from the previous analysis will be reset to zero, and the current elastic stress history will be treated as a new loading event', returnType{i}]);
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 261.0
@@ -2112,7 +2113,7 @@ classdef messenger < handle
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Abaqus ODB field output has been exported to ''%s\\Project\\output\\%s\\Data Files''', returnType{i}], pwd, getappdata(0, 'jobName'));
                     case 266.0
                         if getappdata(0, 'suppress_ID266') == 0.0
-                            fprintf(fidType(i), [returnType{i}, '***NOTE: Hotspots were read from the file ''%s''', returnType{i}], getappdata(0, 'hotspotFile'));
+                            fprintf(fidType(i), [returnType{i}, '***NOTE: User-defined items were read from the file ''%s''', returnType{i}], getappdata(0, 'hotspotFile'));
                             
                             if i == X
                                 setappdata(0, 'suppress_ID266', 1.0)
@@ -2122,10 +2123,19 @@ classdef messenger < handle
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The environment variable ''noiseReduction'' is deprecated. Use ''gateTensors'' instead', returnType{i}]);
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 268.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: When continuing an analysis with the CONTINUE_FROM job file option, the dataset element positions MUST be consistent between each model', returnType{i}]);
-                        fprintf(fidType(i), ['-> Quick Fatigue Tool does not check for this condition before the analysis', returnType{i}]);
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: When continuing an analysis with the CONTINUE_FROM job file option, the user should be aware of the following:', returnType{i}]);
+                        fprintf(fidType(i), ['DATASET POSITION', returnType{i}]);
+                        fprintf(fidType(i), ['-> Quick Fatigue Tool does not compare the dataset positions between each job before the analysis', returnType{i}]);
                         fprintf(fidType(i), ['-> e.g. If the datasets used for the first job are UNIQUE NODAL, then the datasets for the second job must also be UNIQUE NODAL', returnType{i}]);
                         fprintf(fidType(i), ['-> Failure to ensure element position consistency may result in erroneous field data superposition', returnType{i}]);
+                        fprintf(fidType(i), ['LOAD TRANSITIONS', returnType{i}]);
+                        fprintf(fidType(i), ['-> Load transitions are not supported between jobs. Rainflow cycle counting may miss cycles which span both load histories', returnType{i}]);
+                        
+                        if getappdata(0, 'modifyEnduranceLimit') == 1.0
+                            fprintf(fidType(i), ['ENDURANCE LIMIT', returnType{i}]);
+                            fprintf(fidType(i), ['-> Endurance limit modification is enabled for the current job, but analyses which use CONTINUE_FROM ignore this setting', returnType{i}]);
+                            fprintf(fidType(i), ['-> If the first job contains damaging cycles and the second job contains cycles below the endurance limit, fatigue damage may not be calculated for the small cycles', returnType{i}]);
+                        end
                     case 269.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Surface detection did not find any elements or nodes', returnType{i}]);
                         fprintf(fidType(i), ['-> All items will be analysed', returnType{i}]);
@@ -2141,8 +2151,16 @@ classdef messenger < handle
                         fprintf(fidType(i), ['-> Surface detection may include elements and nodes in the subsurface', returnType{i}]);
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 273.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: Surface detection failed on ''%s'' with the following error:', returnType{i}], getappdata(0, 'outputDatabase'));
-                        fprintf(fidType(i), '%s', getappdata(0, 'message_273'));
+                        message = getappdata(0, 'message_273');
+                        
+                        fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: Surface detection failed on ''%s'' with the following error:', returnType{i}], getappdata(0, 'outputDatabase'));
+                        fprintf(fidType(i), '%s', message);
+                        
+                        if isempty(strfind(message, 'The database is from a previous release of Abaqus.')) == 0.0
+                            fprintf(fidType(i), ['-> The installed Abaqus API is from a more recent version of Abaqus than that which was used to generate the model ODB file', returnType{i}]);
+                            fprintf(fidType(i), ['-> Set the environment variables ''autoExport_upgradeODB=1.0'' and ''autoExport_abqCmd=<abaqus-version>'', where <abaqus-version> is the identifier of the Abaqus version to which the ODB file is upgraded', returnType{i}]);
+                        end
+                            
                         fprintf(fidType(i), ['-> All items will be analysed', returnType{i}]);
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 274.0
@@ -2156,11 +2174,41 @@ classdef messenger < handle
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The stress dataset(s) contain no items on the element surface', returnType{i}], getappdata(0, 'message_275'));
                         fprintf(fidType(i), ['-> All items will be analysed', returnType{i}]);
                     case 278.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: Surface items have been written to ''%s\\Project\\output\\%s\\Data Files\\surface_items.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Surface items have been written to ''%s\\Data\\surfaces\\%s_surface.dat''', returnType{i}], pwd, getappdata(0, 'message_278_name'));
                     case 279.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: All %.0f elements lie on the model surface', returnType{i}], getappdata(0, 'message_275'));
                     case 280.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: All %.0f nodes lie on the model surface', returnType{i}], getappdata(0, 'message_274'));
+                    case 281.0
+                        if getappdata(0, 'message_281_hf') == 1.0
+                            fprintf(fidType(i), [returnType{i}, '***NOTE: In the high frequency loading, the number of load scale factors does not match the number of stress datasets in the sequence', returnType{i}]);
+                            rmappdata(0, 'message_281_hf')
+                        else
+                            fprintf(fidType(i), [returnType{i}, '***NOTE: The number of load scale factors does not match the number of stress datasets in the sequence', returnType{i}]);
+                        end
+                        fprintf(fidType(i), ['-> Either the last load scale factor specified will be used for the remainder of the stress datasets, or excess load scale factors will be ignored', returnType{i}]);
+                    case 282.0
+                        if getappdata(0, 'message_282_hf') == 1.0
+                            fprintf(fidType(i), [returnType{i}, '***NOTE: In the high frequency loading, more than one load scale factor is specified, but only a single value is allowed for uniaxial loading', returnType{i}]);
+                            rmappdata(0, 'message_282_hf')
+                        else
+                            fprintf(fidType(i), [returnType{i}, '***NOTE: More than one load scale factor is specified, but only a single value is allowed for uniaxial loading', returnType{i}]);
+                        end
+                        fprintf(fidType(i), ['-> Only the first load scale factor will be considered', returnType{i}]);
+                    case 284.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: More than one load offset value is specified, but only a single value is allowed for uniaxial loading', returnType{i}]);
+                        fprintf(fidType(i), ['-> Only the first load offset value will be considered', returnType{i}]);
+                    case 285.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The surface definition file ''%s'' will be used to extract the model surface', returnType{i}], getappdata(0, 'hotspotFile'));
+                        fprintf(fidType(i), ['-> The results position in the surface definition must be consistent with the model definition in the job file', returnType{i}]);
+                    case 286.0
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: The surface definition file ''%s'' is invalid', returnType{i}], getappdata(0, 'hotspotFile'));
+                        fprintf(fidType(i), ['-> The number of items in the surface definition is greater than the number of items in the stress dataset', returnType{i}]);
+                        fprintf(fidType(i), ['-> Verify that the results position in the surface definition is consistent with the model definition in the job file', returnType{i}]);
+                        setappdata(0, 'messageFileWarnings', 1.0)
+                    case 287.0
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: Some items in the surface definition file could not be located in the stress dataset', returnType{i}]);
+                        fprintf(fidType(i), ['-> Verify that the results position in the surface definition is consistent with the model definition in the job file', returnType{i}]);
                 end
             end
         end
@@ -2209,12 +2257,13 @@ classdef messenger < handle
 
             % Write file header
             try
-                fprintf(fid, 'Quick Fatigue Tool 6.11-02 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
+                fprintf(fid, 'Quick Fatigue Tool 6.11-03 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
             catch
-                fprintf(fid, 'Quick Fatigue Tool 6.11-02\r\n');
+                fprintf(fid, 'Quick Fatigue Tool 6.11-03\r\n');
             end
+            fprintf(fid, 'MATLAB version %s\r\n', version);
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 29-Aug-2017 16:06:30 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 19-Sep-2017 14:58:20 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
@@ -2675,24 +2724,25 @@ classdef messenger < handle
                     end
                 end
                 fprintf(fid, '    Design Life: %.3g %s\r\n', getappdata(0, 'dLife'), getappdata(0, 'loadEqUnits'));
-                if algorithm == 3.0 || algorithm == 10.0
-                    fprintf(fid, '    Items: N/A\r\n');
+                if (algorithm == 3.0) || (algorithm == 10.0)
+                    fprintf(fid, '    Restrict analysis region to: N/A\r\n');
                 elseif isempty(items) == 1.0
-                    fprintf(fid, '    Items: ALL\r\n');
+                    fprintf(fid, '    Restrict analysis region to: ALL\r\n');
                 elseif strcmpi(items, 'all') == 1.0
-                    fprintf(fid, '    Items: ALL\r\n');
+                    fprintf(fid, '    Restrict analysis region to: ALL\r\n');
                 elseif strcmpi(items, 'surface') == 1.0
-                    fprintf(fid, '    Items: ELEMENT SURFACE\r\n');
+                    fprintf(fid, '    Restrict analysis region to: ELEMENT SURFACE\r\n');
                 elseif strcmpi(items, 'maxps') == 1.0
-                    fprintf(fid, '    Items: MAXPS\r\n');
-                elseif exist(items, 'file') == 2.0
-                    fprintf(fid, '    Items: ''%s''\r\n', items);
+                    fprintf(fid, '    Restrict analysis region to: MAXPS\r\n');
+                elseif strcmpi(getappdata(0, 'itemsFile'), 'surface') == 1.0
+                    fprintf(fid, '    Restrict analysis region to: ELEMENT SURFACE\r\n');
+                    rmappdata(0, 'itemsFile')
                 elseif length(items) > 1.0
-                    fprintf(fid, '    Items: %.0f, ', items(1.0));
+                    fprintf(fid, '    Restrict analysis region to: %.0f, ', items(1.0));
                     fprintf(fid, '%.0f, ', items(1:end-1));
                     fprintf(fid, '%.0f\r\n', items(end));
                 else
-                    fprintf(fid, '    Items: %.0f\r\n', items);
+                    fprintf(fid, '    Restrict analysis region to: %.0f\r\n', items);
                 end
                 if algorithm == 3.0 || algorithm == 8.0 || algorithm == 10.0
                     fprintf(fid, '    Nodal Elimination: N/A\r\n');
@@ -2879,23 +2929,24 @@ classdef messenger < handle
                 fprintf(fid, '    Design Life: %.3g %s\r\n', getappdata(0, 'dLife'), getappdata(0, 'loadEqUnits'));
 
                 if algorithm == 3.0 || algorithm == 10.0
-                    fprintf(fid, '    Items: N/A\r\n');
+                    fprintf(fid, '    Restrict analysis region to: N/A\r\n');
                 elseif isempty(items)
-                    fprintf(fid, '    Items: ALL\r\n');
+                    fprintf(fid, '    Restrict analysis region to: ALL\r\n');
                 elseif strcmpi(items, 'all') == 1.0
-                    fprintf(fid, '    Items: ALL\r\n');
+                    fprintf(fid, '    Restrict analysis region to: ALL\r\n');
                 elseif strcmpi(items, 'surface') == 1.0
-                    fprintf(fid, '    Items: ELEMENT SURFACE\r\n');
+                    fprintf(fid, '    Restrict analysis region to: ELEMENT SURFACE\r\n');
                 elseif strcmpi(items, 'maxps') == 1.0
-                    fprintf(fid, '    Items: MAXPS\r\n');
-                elseif exist(items, 'file') == 2.0
-                    fprintf(fid, '    Items: ''%s''\r\n', items);
+                    fprintf(fid, '    Restrict analysis region to: MAXPS\r\n');
+                elseif strcmpi(getappdata(0, 'itemsFile'), 'surface') == 1.0
+                    fprintf(fid, '    Restrict analysis region to: ELEMENT SURFACE\r\n');
+                    rmappdata(0, 'itemsFile')
                 elseif length(items) > 1.0
-                    fprintf(fid, '    Items: %.0f, ', items(1.0));
+                    fprintf(fid, '    Restrict analysis region to: %.0f, ', items(1.0));
                     fprintf(fid, '%.0f, ', items(1:end-1));
                     fprintf(fid, '%.0f\r\n', items(end));
                 else
-                    fprintf(fid, '    Items: %.0f\r\n', items);
+                    fprintf(fid, '    Restrict analysis region to: %.0f\r\n', items);
                 end
                 if algorithm == 3.0 || algorithm == 8.0 || algorithm == 10.0
                     fprintf(fid, '    Nodal Elimination: N/A\r\n');

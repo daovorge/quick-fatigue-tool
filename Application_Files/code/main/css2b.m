@@ -13,7 +13,7 @@ function [rfData, epsilon, sigma, error] = css2b(sigma_e, E, kp, np)
 %   hysteresis point is assumed to be equal to the previous point. The rest
 %   of CSS2B is the same as CSS2.
 %   
-%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
 %   Last modified 08-Jun-2017 14:19:34 GMT
     
     %%
@@ -258,7 +258,7 @@ for i = 3:signalLength
         
         %{
             The stress is calculated from the curve two
-            excursions ago. The current strain range is the
+            excursions ago. The current stress range is the
             strain range from this excursion, plus the
             additional strain range beyond the current cycle
             closure point

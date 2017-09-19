@@ -11,7 +11,7 @@ function [cumulativeDamage] = interpolate(cumulativeDamage, pairs, msCorrection,
 %   Reference section in Quick Fatigue Tool User Guide
 %      5.4 Using custom stress-life data
 %   
-%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
 %   Last modified 08-Jun-2017 10:05:25 GMT
     
     %%
@@ -238,6 +238,7 @@ elseif msCorrection == 7.0
                 %}
                 suppressMessage78 = 1.0;
                 
+                setappdata(0, 'message_77_r', Ri)
                 messenger.writeMessage(77.0)
                 
                 % Find on which side of the S-N data the Ri curve lies

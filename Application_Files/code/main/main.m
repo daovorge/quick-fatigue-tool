@@ -10,8 +10,8 @@ function [] = main(flags)
 %
 %   Author contact: louisvallance@hotmail.co.uk
 %
-%   Quick Fatigue Tool 6.11-02 Copyright Louis Vallance 2017
-%   Last modified 29-Aug-2017 16:06:30 GMT
+%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
+%   Last modified 19-Sep-2017 14:58:20 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');    tic_pre = tic;
@@ -41,9 +41,9 @@ setappdata(0, 'messageFileNotes', 0.0)
 setappdata(0, 'messageFileWarnings', 0.0)
 
 %% PRINT COMMAND WINDOW HEADER
-fprintf('[NOTICE] Quick Fatigue Tool 6.11-02')
+fprintf('[NOTICE] Quick Fatigue Tool 6.11-03')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2017)')
-fprintf('\n[NOTICE] Last modified 29-Aug-2017 16:06:30 GMT')
+fprintf('\n[NOTICE] Last modified 19-Sep-2017 14:58:20 GMT')
 
 cleanExit = 0.0;
 
@@ -73,9 +73,9 @@ fileName = sprintf('Project/output/%s/%s.sta', jobName, jobName);
 fid_status = fopen(fileName, 'w+');
 setappdata(0, 'fid_status', fid_status)
 c = clock;
-fprintf(fid_status, '[NOTICE] Quick Fatigue Tool 6.11-02\t%s', datestr(datenum(c(1.0), c(2.0), c(3.0), c(4.0), c(5.0), c(6.0))));
+fprintf(fid_status, '[NOTICE] Quick Fatigue Tool 6.11-03\t%s', datestr(datenum(c(1.0), c(2.0), c(3.0), c(4.0), c(5.0), c(6.0))));
 
-fprintf('\n[NOTICE] The job file "%s.m" has been submitted for analysis', jobName)
+fprintf('\n[NOTICE] The job ''%s'' has been submitted for analysis', jobName)
 fprintf(fid_status, '\n[NOTICE] The job file "%s.m" has been submitted for analysis', jobName);
 
 % Advise user is verbose output is not requested
@@ -209,6 +209,7 @@ end
 %% SCALE AND COMBINE THE LOADING
 fprintf('\n[PRE] Processing datasets')
 fprintf(fid_status, '\n[PRE] Processing datasets');
+setappdata(0, 'errorDuringLoading', 1.0)
 
 [scale, offset, repeats, units, N, signalLength, Sxx, Syy, Szz, Txy, Tyz, Txz, mainID,...
     subID, gateHistories, gateTensors, tensorGate, error]...
@@ -221,6 +222,7 @@ if error == 1.0
     cleanup(1.0)
     return
 end
+setappdata(0, 'errorDuringLoading', 0.0)
 
 %% DETECT SURFACE ITAMS IF APPLICABLE
 [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz);
@@ -347,7 +349,7 @@ mscFileUtils.checkFRFDiagnosticItems(N)
 %% DETERMINE IF THE MODEL IS YIELDING
 preProcess.getPlasticItems(N, algorithm);
 
-if getappdata(0, 'warning_063') == 1.0
+if getappdata(0, 'warning_066') == 1.0
     postProcess.writeYieldingItems(jobName, mainID, subID)
 end
 
@@ -504,7 +506,7 @@ fprintf('\n[NOTICE] See status and message files for details')
 fprintf(fid_status, '\n[NOTICE] Begin fatigue analysis');
 fprintf(fid_status, '\n[NOTICE] See status and message files for details');
 
-fprintf(fid_status, '\r\n\r\nProgress\tLife\tItem\tIncrement\tTime\r\n');
+fprintf(fid_status, '\r\n\r\nProgress    Life         Item                   Increment     Time\r\n');
 
 % Get the group ID buffer
 groupIDBuffer = getappdata(0, 'groupIDBuffer');
@@ -610,10 +612,17 @@ for groups = 1:G
 
         switch algorithm
             case 3.0 % UNIAXIAL STRAIN-LIFE
-                [nodalAmplitudes, nodalAmplitudes_strain, nodalPairs, nodalPairs_strain, nodalDamage, nodalDamageParameter, damageParameter, damageParameter_strain]...
+                [nodalAmplitudes, nodalAmplitudes_strain, nodalPairs,...
+                    nodalPairs_strain, nodalDamage, nodalDamageParameter,...
+                    damageParameter, damageParameter_strain, error]...
                     = algorithm_uel.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, signalLength,...
                     totalCounter, nodalDamage, msCorrection, nodalDamageParameter,...
                     gateTensors, tensorGate, s1i, s2i, s3i);
+                
+                if error == 1.0
+                    cleanup(1.0)
+                    return
+                end
             case 4.0 % STRESS-BASED BROWN-MILLER
                 [nodalDamageParameter, nodalAmplitudes, nodalPairs,...
                     nodalPhiC, nodalThetaC, nodalDamage, maxPhiCurve] =...
