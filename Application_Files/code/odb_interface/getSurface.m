@@ -13,7 +13,7 @@ function [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(ma
 %      4.5.3 Custom analysis items
 %
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 18-Sep-2017 15:30:05 GMT
+%   Last modified 19-Sep-2017 14:07:49 GMT
 
 %%
 
@@ -34,10 +34,11 @@ if (strcmpi(items, 'surface') == 1.0) && (exist(surfaceFile, 'file') == 2.0) && 
         messenger.writeMessage(286.0)
     elseif error == 2.0
         messenger.writeMessage(287.0)
-        items = 'surface';
+        items = 'surface';  setappdata(0, 'itemsFile', 'SURFACE')
     elseif error == 3.0
         items = 'all';  setappdata(0, 'items', 'all')
     else
+        setappdata(0, 'itemsFile', 'SURFACE')
         messenger.writeMessage(285.0)
         
         Sxx = Sxx(items, :);
@@ -498,6 +499,8 @@ else
         messenger.writeMessage(275.0)
     end
 end
+
+setappdata(0, 'itemsFile', 'SURFACE')
 
 %% Write surface items to text file
 % Concatenate data

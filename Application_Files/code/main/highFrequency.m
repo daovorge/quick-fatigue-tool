@@ -7,7 +7,7 @@ classdef highFrequency < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 18-Sep-2017 10:29:58 GMT
+%   Last modified 19-Sep-2017 14:07:49 GMT
     
     %%
     
@@ -1049,6 +1049,8 @@ classdef highFrequency < handle
                 end
                 
                 itemError = 0.0;
+            else
+                itemError = 1.0;
             end
             
             %% Get tensor components:

@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 18-Sep-2017 17:44:24 GMT
+%   Last modified 19-Sep-2017 14:07:49 GMT
 
     %%
 
@@ -317,35 +317,32 @@ classdef messenger < handle
 
                         algorithm = getappdata(0, 'algorithm');
                         
-                        mainID = getappdata(0, 'mainID');
-                        subID = getappdata(0, 'subID');
-                        
                         if (algorithm ~= 10.0) && (algorithm ~= 3.0)
                             if length(worstItem) > 1.0
                                 if length(worstItem) > 10.0
                                     fprintf(fidType(i), [returnType{i}, '***NOTE: The worst analysis item IDs are:', returnType{i}]);
-                                    fprintf(fidType(i), '-> %.0f (%.0f.%.0f), ', worstItem(1.0), mainID(worstItem(1.0)), subID(worstItem(1.0)));
+                                    fprintf(fidType(i), '-> %.0f, ', worstItem(1.0));
 
                                     for n = 2:8
-                                        fprintf(fidType(i), '%.0f (%.0f.%.0f), ', worstItem(n), mainID(worstItem(n)), subID(worstItem(n)));
+                                        fprintf(fidType(i), '%.0f, ', worstItem(n));
                                     end
 
-                                    fprintf(fidType(i), ['%.0f (%.0f.%.0f)', returnType{i}], worstItem(10.0), mainID(worstItem(10.0)), subID(worstItem(10.0)));
+                                    fprintf(fidType(i), ['%.0f', returnType{i}], worstItem(10.0));
                                     fprintf(fidType(i), ['-> (Only the first 10 items are printed)', returnType{i}]);
                                 else
                                     fprintf(fidType(i), [returnType{i}, '***NOTE: The worst analysis item IDs are:', returnType{i}]);
-                                    fprintf(fidType(i), '-> %.0f (%.0f.%.0f), ', worstItem(1.0), mainID(worstItem(1.0)), subID(worstItem(1.0)));
+                                    fprintf(fidType(i), '-> %.0f, ', worstItem(1.0));
 
                                     for n = 2:(length(worstItem) - 1.0)
-                                        fprintf(fidType(i), '%.0f (%.0f.%.0f), ', worstItem(n), mainID(worstItem(n)), subID(worstItem(n)));
+                                        fprintf(fidType(i), '%.0f, ', worstItem(n));
                                     end
 
-                                    fprintf(fidType(i), ['%.0f (%.0f.%.0f)', returnType{i}], worstItem(end), mainID(worstItem(end)), subID(worstItem(end)));
+                                    fprintf(fidType(i), ['%.0f', returnType{i}], worstItem(end));
                                 end
 
                                 setappdata(0, 'messageFileNotes', 1.0)
                             else
-                                fprintf(fidType(i), [returnType{i}, '***NOTE: The worst analysis item ID is %.0f (%.0f.%.0f)', returnType{i}], worstItem, mainID(worstItem), subID(worstItem));
+                                fprintf(fidType(i), [returnType{i}, '***NOTE: The worst analysis item ID is %.0f', returnType{i}], worstItem);
                                 
                                 setappdata(0, 'messageFileNotes', 1.0)
                             end
@@ -2266,7 +2263,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n', version);
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 18-Sep-2017 17:44:24 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 19-Sep-2017 14:07:49 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
@@ -2728,23 +2725,24 @@ classdef messenger < handle
                 end
                 fprintf(fid, '    Design Life: %.3g %s\r\n', getappdata(0, 'dLife'), getappdata(0, 'loadEqUnits'));
                 if (algorithm == 3.0) || (algorithm == 10.0)
-                    fprintf(fid, '    Items: N/A\r\n');
+                    fprintf(fid, '    Restrict analysis region to: N/A\r\n');
                 elseif isempty(items) == 1.0
-                    fprintf(fid, '    Items: ALL\r\n');
+                    fprintf(fid, '    Restrict analysis region to: ALL\r\n');
                 elseif strcmpi(items, 'all') == 1.0
-                    fprintf(fid, '    Items: ALL\r\n');
+                    fprintf(fid, '    Restrict analysis region to: ALL\r\n');
                 elseif strcmpi(items, 'surface') == 1.0
-                    fprintf(fid, '    Items: ELEMENT SURFACE\r\n');
+                    fprintf(fid, '    Restrict analysis region to: ELEMENT SURFACE\r\n');
                 elseif strcmpi(items, 'maxps') == 1.0
-                    fprintf(fid, '    Items: MAXPS\r\n');
-                elseif (ischar(items) == 1.0) && (exist(items, 'file') == 2.0)
-                    fprintf(fid, '    Items: ''%s''\r\n', items);
+                    fprintf(fid, '    Restrict analysis region to: MAXPS\r\n');
+                elseif strcmpi(getappdata(0, 'itemsFile'), 'surface') == 1.0
+                    fprintf(fid, '    Restrict analysis region to: ELEMENT SURFACE'\r\n');
+                    rmappdata(0, 'itemsFile')
                 elseif length(items) > 1.0
-                    fprintf(fid, '    Items: %.0f, ', items(1.0));
+                    fprintf(fid, '    Restrict analysis region to: %.0f, ', items(1.0));
                     fprintf(fid, '%.0f, ', items(1:end-1));
                     fprintf(fid, '%.0f\r\n', items(end));
                 else
-                    fprintf(fid, '    Items: %.0f\r\n', items);
+                    fprintf(fid, '    Restrict analysis region to: %.0f\r\n', items);
                 end
                 if algorithm == 3.0 || algorithm == 8.0 || algorithm == 10.0
                     fprintf(fid, '    Nodal Elimination: N/A\r\n');
@@ -2931,23 +2929,24 @@ classdef messenger < handle
                 fprintf(fid, '    Design Life: %.3g %s\r\n', getappdata(0, 'dLife'), getappdata(0, 'loadEqUnits'));
 
                 if algorithm == 3.0 || algorithm == 10.0
-                    fprintf(fid, '    Items: N/A\r\n');
+                    fprintf(fid, '    Restrict analysis region to: N/A\r\n');
                 elseif isempty(items)
-                    fprintf(fid, '    Items: ALL\r\n');
+                    fprintf(fid, '    Restrict analysis region to: ALL\r\n');
                 elseif strcmpi(items, 'all') == 1.0
-                    fprintf(fid, '    Items: ALL\r\n');
+                    fprintf(fid, '    Restrict analysis region to: ALL\r\n');
                 elseif strcmpi(items, 'surface') == 1.0
-                    fprintf(fid, '    Items: ELEMENT SURFACE\r\n');
+                    fprintf(fid, '    Restrict analysis region to: ELEMENT SURFACE\r\n');
                 elseif strcmpi(items, 'maxps') == 1.0
-                    fprintf(fid, '    Items: MAXPS\r\n');
-                elseif (ischar(items) == 1.0) && (exist(items, 'file') == 2.0)
-                    fprintf(fid, '    Items: ''%s''\r\n', items);
+                    fprintf(fid, '    Restrict analysis region to: MAXPS\r\n');
+                elseif strcmpi(getappdata(0, 'itemsFile'), 'surface') == 1.0
+                    fprintf(fid, '    Restrict analysis region to: ELEMENT SURFACE'\r\n');
+                    rmappdata(0, 'itemsFile')
                 elseif length(items) > 1.0
-                    fprintf(fid, '    Items: %.0f, ', items(1.0));
+                    fprintf(fid, '    Restrict analysis region to: %.0f, ', items(1.0));
                     fprintf(fid, '%.0f, ', items(1:end-1));
                     fprintf(fid, '%.0f\r\n', items(end));
                 else
-                    fprintf(fid, '    Items: %.0f\r\n', items);
+                    fprintf(fid, '    Restrict analysis region to: %.0f\r\n', items);
                 end
                 if algorithm == 3.0 || algorithm == 8.0 || algorithm == 10.0
                     fprintf(fid, '    Nodal Elimination: N/A\r\n');

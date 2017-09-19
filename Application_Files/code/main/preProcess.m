@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 18-Sep-2017 17:44:24 GMT
+%   Last modified 19-Sep-2017 14:07:49 GMT
     
     %%
     
@@ -2508,7 +2508,7 @@ classdef preProcess < handle
             end
             
             %% Get tensor components:
-            if isempty(items) == 0.0 && error == 0.0
+            if (isempty(items) == 0.0) && (error == 0.0)
                 Sxx = fieldData(items, X)';
                 Syy = fieldData(items, X + 1.0)';
                 Szz = fieldData(items, X + 2.0)';
