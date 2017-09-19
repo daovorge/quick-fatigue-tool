@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 19-Sep-2017 14:07:49 GMT
+%   Last modified 19-Sep-2017 14:58:20 GMT
 
     %%
 
@@ -2174,7 +2174,7 @@ classdef messenger < handle
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The stress dataset(s) contain no items on the element surface', returnType{i}], getappdata(0, 'message_275'));
                         fprintf(fidType(i), ['-> All items will be analysed', returnType{i}]);
                     case 278.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: Surface items have been written to ''%s\\Project\\output\\%s\\Data Files\\surface_items.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Surface items have been written to ''%s\\Data\\surfaces\\%s_surface.dat''', returnType{i}], pwd, getappdata(0, 'message_278_name'));
                     case 279.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: All %.0f elements lie on the model surface', returnType{i}], getappdata(0, 'message_275'));
                     case 280.0
@@ -2263,7 +2263,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n', version);
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 19-Sep-2017 14:07:49 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 19-Sep-2017 14:58:20 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
@@ -2735,7 +2735,7 @@ classdef messenger < handle
                 elseif strcmpi(items, 'maxps') == 1.0
                     fprintf(fid, '    Restrict analysis region to: MAXPS\r\n');
                 elseif strcmpi(getappdata(0, 'itemsFile'), 'surface') == 1.0
-                    fprintf(fid, '    Restrict analysis region to: ELEMENT SURFACE'\r\n');
+                    fprintf(fid, '    Restrict analysis region to: ELEMENT SURFACE\r\n');
                     rmappdata(0, 'itemsFile')
                 elseif length(items) > 1.0
                     fprintf(fid, '    Restrict analysis region to: %.0f, ', items(1.0));
@@ -2939,7 +2939,7 @@ classdef messenger < handle
                 elseif strcmpi(items, 'maxps') == 1.0
                     fprintf(fid, '    Restrict analysis region to: MAXPS\r\n');
                 elseif strcmpi(getappdata(0, 'itemsFile'), 'surface') == 1.0
-                    fprintf(fid, '    Restrict analysis region to: ELEMENT SURFACE'\r\n');
+                    fprintf(fid, '    Restrict analysis region to: ELEMENT SURFACE\r\n');
                     rmappdata(0, 'itemsFile')
                 elseif length(items) > 1.0
                     fprintf(fid, '    Restrict analysis region to: %.0f, ', items(1.0));

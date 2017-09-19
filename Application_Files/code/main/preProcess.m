@@ -1629,9 +1629,23 @@ classdef preProcess < handle
             end
             
             %% Make sure there are the same number of channels as scales:
-            
             error = false;
-            if (ischar(scales) == 0.0) && (ischar(channels) == 0.0)
+            if (isnumeric(scales) == 1.0) && (iscell(channels) == 1.0)
+                % A single scale is defined, but the channels appear to have multiple definitions
+                if length(channels) == 1.0
+                    messenger.writeMessage(29.0)
+                else
+                    Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
+                    mainID = -999.0;
+                    subID = -999.0;
+                    
+                    error = true;
+                    setappdata(0, 'E014', 1.0)
+                    return
+                end
+                
+                multiple = 3.0;
+            elseif (ischar(scales) == 0.0) && (ischar(channels) == 0.0)
                 % Multiple channels and loads appear to be defined
                 if (length(channels) ~= length(scales))
                     Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
@@ -1644,11 +1658,9 @@ classdef preProcess < handle
                 end
                 multiple = 1.0;
             elseif (ischar(scales) == 0.0) && (ischar(channels) == 1.0)
-                % A single channel is defined, but the scales appear to have
-                % multiple definitions
+                % A single channel is defined, but the scales appear to have multiple definitions
                 if isnumeric(scales) == 1.0
-                    % The scales appeared to have multiple definitions because
-                    % they're numeric
+                    % The scales appeared to have multiple definitions because they're numeric
                     multiple = 0.0;
                 elseif length(scales) == 1.0
                     messenger.writeMessage(29.0)
@@ -1664,8 +1676,7 @@ classdef preProcess < handle
                     return
                 end
             elseif (ischar(scales) == 1.0) && (ischar(channels) == 0.0)
-                % A single scale is defined, but the channels appear to have
-                % multiple definitions
+                % A single scale is defined, but the channels appear to have multiple definitions
                 if length(channels) == 1.0
                     messenger.writeMessage(29.0)
                 else

@@ -13,14 +13,15 @@ function [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(ma
 %      4.5.3 Custom analysis items
 %
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 19-Sep-2017 14:07:49 GMT
+%   Last modified 19-Sep-2017 14:58:20 GMT
 
 %%
 
 %% Check if a surface definition already exists
-jobName = getappdata(0, 'jobName');
+outputDatabase = getappdata(0, 'outputDatabase');
+[~, name, ~] = fileparts(outputDatabase);
 root = [pwd, '\Data\surfaces'];
-surfaceFile = [root, '\', jobName, '_surface.dat'];
+surfaceFile = [root, '\', name, '_surface.dat'];
 
 if (strcmpi(items, 'surface') == 1.0) && (exist(surfaceFile, 'file') == 2.0) && (getappdata(0, 'surfaceMode') == 1.0)
     
@@ -55,7 +56,6 @@ if (strcmpi(items, 'surface') == 1.0) && (exist(surfaceFile, 'file') == 2.0) && 
 end
 
 %% Check if surface detection can be used
-outputDatabase = getappdata(0, 'outputDatabase');
 partInstance = getappdata(0, 'partInstance');
 odbResultPosition = getappdata(0, 'odbResultPosition');
 
@@ -512,7 +512,8 @@ if exist(root, 'dir') == 0.0
 end
 
 % Create the file
-dir = [root, sprintf('\\%s_surface.dat', jobName)];
+[~, name, ~] = fileparts(outputDatabase);
+dir = [root, sprintf('\\%s_surface.dat', name)];
 fid = fopen(dir, 'w+');
 
 fprintf(fid, 'SURFACE ITEMS\r\n');
@@ -523,5 +524,6 @@ fprintf(fid, '%.0f\t%.0f\t%.0f\r\n', data');
 fclose(fid);
 
 % Inform the user that hotpots have been written to file
+setappdata(0, 'message_278_name', name)
 messenger.writeMessage(278.0)
 end
