@@ -5,7 +5,7 @@ classdef jobFile < handle
 %   JOBFILE is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
 %   Last modified 11-Sep-2017 21:49:25 GMT
     
     %%

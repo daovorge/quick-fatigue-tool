@@ -9,7 +9,7 @@ classdef postProcess_e < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      10 Output
 %   
-%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
 %   Last modified 16-Sep-2017 16:32:58 GMT
     
     %%

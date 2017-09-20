@@ -12,7 +12,7 @@ classdef multiaxialPreProcess < handle
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.2 Multiaxial Gauge Fatigue
 %   
-%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
 %   Last modified 09-Jun-2017 11:59:15 GMT
     
     %%

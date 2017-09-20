@@ -8,7 +8,7 @@ classdef importMaterial < handle
 %   See also checkDataPath, evaluateMaterial, kValueCalculator,
 %   LocalMaterialDatabase, material, MaterialEditor, MaterialManager.
 %   
-%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
 %   Last modified 03-Sep-2017 10:19:27 GMT
     
     %%
