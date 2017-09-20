@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 19-Sep-2017 14:07:49 GMT
+%   Last modified 20-Sep-2017 08:32:55 GMT
     
     %%
     
@@ -2020,7 +2020,7 @@ classdef preProcess < handle
                         catch unhandledException
                             error = 1.0;
                             setappdata(0, 'E045', 1.0)
-                            setappdata(0, 'error_log_045_exceptionMessage', unhandledException.identifier)
+                            setappdata(0, 'error_log_045_exceptionMessage', unhandledException)
                             mainID = -999.0;
                             subID = -999.0;
                             Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
@@ -2106,7 +2106,7 @@ classdef preProcess < handle
             catch unhandledException
                 error = 1.0;
                 setappdata(0, 'E022', 1.0)
-                setappdata(0, 'error_log_022_exceptionMessage', unhandledException.identifier)
+                setappdata(0, 'error_log_022_exceptionMessage', unhandledException)
                 
                 mainID = -999.0;
                 subID = -999.0;

@@ -6,7 +6,7 @@ function [] = cleanup(status)
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 19-Sep-2017 18:21:43 GMT
+%   Last modified 20-Sep-2017 08:32:55 GMT
     
     %%
     
@@ -75,7 +75,7 @@ if status == 1.0
     % Write file header
     fprintf(fid, 'Quick Fatigue Tool 6.11-03\r\n');
     fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-    fprintf(fid, 'Last modified 19-Sep-2017 18:21:43 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 20-Sep-2017 08:32:55 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');
@@ -420,25 +420,59 @@ if status == 1.0
         rmappdata(0, 'E021')
     end
     if getappdata(0, 'E022') == 1.0
+        exception = getappdata(0, 'error_log_022_exceptionMessage');
+        
         fprintf(fid, '\r\n\r\n***ERROR: An unhandled exception was encountered while combining the loading data');
-        fprintf(fid, '\r\n-> MException ID: %s', getappdata(0, 'error_log_022_exceptionMessage'));
-        fprintf(fid, '\r\n-> Please contact the developer for further assistance: louisvallance@hotmail.co.uk');
+        
+        % Print the error stack
+        fprintf(fid, '\r\n-> MException ID: %s', exception.identifier);
+        fprintf(fid, '\r\n-> MException Message: %s', exception.message);
+        if isempty(exception.cause) == 0.0
+            fprintf(fid, '\r\n-> MException cause: %s', exception.cause);
+        end
+        fprintf(fid, '\r\n');
+        stack = exception.stack;
+        for i = 1:length(stack)
+            fprintf(fid, '\r\n<Level %.0f>\r\n', i);
+            fprintf(fid, 'File: ''%s''\r\n', stack(i).file);
+            fprintf(fid, 'Name: %s\r\n', stack(i).name);
+            fprintf(fid, 'Line: %.0f\r\n', stack(i).line);
+        end
+        fprintf(fid, '\r\nPLEASE SAVE THIS FILE AND CONTACT THE DEVELOPER FOR FURTHER ASSISTANCE: LOUISVALLANCE@HOTMAIL.CO.UK');
+        
         fprintf(fid, '\r\n\r\nError code: E022');
         rmappdata(0, 'E022')
     end
     if getappdata(0, 'E045') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: An unhandled exception was encountered while scaling a dataset with its respective channel');
-        fprintf(fid, '\r\n-> MException ID: %s', getappdata(0, 'error_log_045_exceptionMessage'));
-        fprintf(fid, '\r\n-> There is not enough memory for analysis. Increase system memory or reduce the size of the model and/or loading');
-        fprintf(fid, '\r\n-> Please contact the developer for further assistance: louisvallance@hotmail.co.uk');
-        [userView, systemView] = memory;
+        exception = getappdata(0, 'error_log_045_exceptionMessage');
         
+        fprintf(fid, '\r\n\r\n***ERROR: An unhandled exception was encountered while scaling a dataset with its respective channel');
+        
+        % Print the error stack
+        fprintf(fid, '\r\n-> MException ID: %s', exception.identifier);
+        fprintf(fid, '\r\n-> MException Message: %s', exception.message);
+        if isempty(exception.cause) == 0.0
+            fprintf(fid, '\r\n-> MException cause: %s', exception.cause);
+        end
+        fprintf(fid, '\r\n');
+        stack = exception.stack;
+        for i = 1:length(stack)
+            fprintf(fid, '\r\n<Level %.0f>\r\n', i);
+            fprintf(fid, 'File: ''%s''\r\n', stack(i).file);
+            fprintf(fid, 'Name: %s\r\n', stack(i).name);
+            fprintf(fid, 'Line: %.0f\r\n', stack(i).line);
+        end
+        
+        fprintf(fid, '\r\n-> THERE IS NOT ENOUGH MEMORY FOR ANALYSIS. INCREASE SYSTEM MEMORY OR REDUCE THE SIZE OF THE MODEL AND/OR LOADING');
+        [userView, systemView] = memory;
         fprintf(fid, '\r\n\r\n***MEMORY INFORMATION');
         fprintf(fid, '\r\n                 Physical memory:');
         fprintf(fid, '\r\n                     Available: %.0f bytes', systemView.PhysicalMemory.Available);
         fprintf(fid, '\r\n                     Total: %.0f bytes', systemView.PhysicalMemory.Total);
         fprintf(fid, '\r\n                 Available memory for data: %.0f bytes', userView.MemAvailableAllArrays);
         fprintf(fid, '\r\n                 Reserved system memory for MATLAB: %.0f bytes', userView.MemUsedMATLAB);
+        
+        fprintf(fid, '\r\nPLEASE SAVE THIS FILE AND CONTACT THE DEVELOPER FOR FURTHER ASSISTANCE: LOUISVALLANCE@HOTMAIL.CO.UK');
         fprintf(fid, '\r\n\r\nError code: E045');
         rmappdata(0, 'E045')
     end
