@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="3028803664" file="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox\Uniaxial Strain-Life.prj" location="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox" name="Uniaxial Strain-Life" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="2223256905" file="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox\Uniaxial Strain-Life.prj" location="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox" name="Uniaxial Strain-Life" target="target.mlapps" target-name="Package App">
     <param.appname>Uniaxial Strain-Life</param.appname>
     <param.authnamewatermark>Louis Vallance</param.authnamewatermark>
     <param.email>louisvallance@hotmail.co.uk</param.email>
@@ -13,7 +13,7 @@
     <param.summary>Calculate fatigue lives from uniaxial stress or strain histories</param.summary>
     <param.description>Uniaxial Strain-Life allows the user to calculate the fatigue life of a stress or strain history. The application enables the selection of mean stress corrections and material data. For guidance on using Uniaxial Strain-Life, please refer to Appendix A3.6 of the Quick Fatigue Tool Appendices.</param.description>
     <param.screenshot />
-    <param.version>6.11.03</param.version>
+    <param.version>6.11.04</param.version>
     <param.products.name>
       <item>MATLAB</item>
       <item>Signal Processing Toolbox</item>
