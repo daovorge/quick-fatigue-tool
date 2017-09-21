@@ -13,7 +13,7 @@
 %      2 Environment variables
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 18-Sep-2017 17:44:24 GMT
+%   Last modified 21-Sep-2017 12:46:54 GMT
 
 %% GATE TENSORS
 %{
@@ -118,15 +118,6 @@ setappdata(0, 'rainflowMode', 1.0)
     2: Top face (SPOS)
 %}
 setappdata(0, 'shellLocation', 1.0)
-
-%% NON-LINEAR MATERIAL PROPERTIES
-%{
-    0: Linear (Hookean) material model
-    1: Nonlinear elastic (Ramberg-Osgood) material model
-%}
-setappdata(0, 'nlMaterial', 0.0)
-setappdata(0, 'cssTolerance', 3e-04)
-setappdata(0, 'cssMaxIterations', 5.5e+06)
 
 %% NODAL ELIMINATION
 %{

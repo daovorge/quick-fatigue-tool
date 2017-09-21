@@ -11,7 +11,7 @@ function [] = main(flags)
 %   Author contact: louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 21-Sep-2017 09:00:05 GMT
+%   Last modified 21-Sep-2017 12:46:54 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');    tic_pre = tic;
@@ -43,7 +43,7 @@ setappdata(0, 'messageFileWarnings', 0.0)
 %% PRINT COMMAND WINDOW HEADER
 fprintf('[NOTICE] Quick Fatigue Tool 6.11-04')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2017)')
-fprintf('\n[NOTICE] Last modified 21-Sep-2017 09:00:05 GMT')
+fprintf('\n[NOTICE] Last modified 21-Sep-2017 12:46:54 GMT')
 
 cleanExit = 0.0;
 
@@ -146,7 +146,7 @@ if cleanExit == 1.0
 end
 
 %% DETERMINE THE ALGORITHM AND MEAN STRESS CORRECTION TO BE USED FOR THE ANALYSIS
-[algorithm, msCorrection, nlMaterial, useSN, error] = jobFile.getAlgorithmAndMSC(algorithm, msCorrection, useSN);
+[algorithm, msCorrection, useSN, error] = jobFile.getAlgorithmAndMSC(algorithm, msCorrection, useSN);
 setappdata(0, 'algorithm', algorithm)
 
 if error == 1.0
@@ -215,7 +215,7 @@ setappdata(0, 'errorDuringLoading', 1.0)
     subID, gateHistories, gateTensors, tensorGate, error]...
     ...
     = jobFile.getLoading(units, scale,...
-    algorithm, msCorrection, nlMaterial, userUnits, hfDataset, hfHistory,...
+    algorithm, msCorrection, userUnits, hfDataset, hfHistory,...
     hfTime, hfScales, items, dataset, history, elementType, offset);
 
 if error == 1.0
@@ -303,7 +303,7 @@ if (algorithm ~= 10.0) && (algorithm ~= 8.0) && (algorithm ~= 3.0)
         fprintf(fid_status, '\n[PRE] Optimizing datasets');
 
         [coldItems, removedItems, hotspotWarning] = preProcess.nodalElimination(algorithm,...
-            nlMaterial, msCorrection, N);
+            msCorrection, N);
 
         setappdata(0, 'separateFieldOutput', 1.0)
         messenger.writeMessage(22.0)
@@ -1067,7 +1067,7 @@ messenger.writeLog(jobName, jobDescription, dataset, material,...
     history, items, units, scale, repeats, useSN, gateHistories, gateTensors,...
     nodalElimination, planePrecision, worstAnalysisItem, thetaOnCP,...
     phiOnCP, outputField, algorithm, nodalDamage, worstMainID, worstSubID,...
-    dir, step, cael, msCorrection, nlMaterial, removedItems,...
+    dir, step, cael, msCorrection, removedItems,...
     hotspotWarning, loadEqVal, loadEqUnits, elementType, offset, analysisTime)
 
 % SAVE WORKSPACE TO FILE

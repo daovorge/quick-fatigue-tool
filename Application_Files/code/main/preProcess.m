@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 20-Sep-2017 08:32:55 GMT
+%   Last modified 21-Sep-2017 12:46:54 GMT
     
     %%
     
@@ -1344,7 +1344,7 @@ classdef preProcess < handle
         
         %% Perform nodal elimination
         function [coldItems, removed, hotspotWarning] = nodalElimination(algorithm,...
-                nlMaterial, msCorrection, items)
+                msCorrection, items)
             
             % Get the number of groups for the analysis
             G = getappdata(0, 'numberOfGroups');
@@ -1399,8 +1399,6 @@ classdef preProcess < handle
                     % Calculate the fatigue limit stress (conditional stress)
                     Sf = getappdata(0, 'Sf');
                     b = getappdata(0, 'b');
-                    kp = getappdata(0, 'kp');
-                    np = getappdata(0, 'np');
                     E = getappdata(0, 'E');
                     
                     if useSN == 1.0
@@ -1428,15 +1426,6 @@ classdef preProcess < handle
                         conditionalStress = Tfs*((2.0*designLife)^b);
                     else % PS, von Mises or NASALIFE
                         conditionalStress = Sf*((2.0*designLife)^b);
-                    end
-                    
-                    % Plasticity correction if necessary
-                    if algorithm ~= 4.0 || msCorrection ~= 1.0
-                        if (nlMaterial == 1.0) && (isempty(kp) == 0.0 && isempty(np) == 0.0)
-                            [~, conditionalStress, ~] = css(conditionalStress, E, kp, np);
-                            conditionalStress(1.0) = [];
-                            conditionalStress = real(conditionalStress);
-                        end
                     end
                 else
                     conditionalStress = getappdata(0, 'fatigueLimit');
@@ -1477,8 +1466,6 @@ classdef preProcess < handle
                         b = getappdata(0, 'b');
                         Ef = getappdata(0, 'Ef');
                         c = getappdata(0, 'c');
-                        kp = getappdata(0, 'kp');
-                        np = getappdata(0, 'np');
                         
                         maxShearXY = max(0.5.*(s1_i - s2_i));
                         maxShearYZ = max(0.5.*(s2_i - s3_i));
@@ -1491,12 +1478,6 @@ classdef preProcess < handle
                             conditionalStress = E*(((1.65*morrowSf)/(E))*(cael)^b + (1.75*Ef)*(cael)^c) - shear;
                         else
                             conditionalStress = ((1.65*morrowSf))*(cael)^b - shear;
-                        end
-                        
-                        if nlMaterial == 1.0 && (~isempty(kp) && ~isempty(np))
-                            [~, conditionalStress, ~] = css(conditionalStress, E, kp, np);
-                            conditionalStress(1.0) = [];
-                            conditionalStress = real(conditionalStress);
                         end
                     elseif (msCorrection < 7.0) && (algorithm ~= 6.0 && algorithm ~= 8.0 && algorithm ~= 9.0)
                         [range_item(totalCounter), ~, ~] = analysis.msc(range_item(totalCounter), [min(s3_i), max(s1_i)], msCorrection, residual);
@@ -3912,7 +3893,7 @@ classdef preProcess < handle
         end
         
         %% Get the fatigue limit stress
-        function [error] = getFatigueLimit(plasticSN, algorithm, msCorrection, nlMaterial)
+        function [error] = getFatigueLimit(plasticSN, algorithm, msCorrection)
             error = 0.0;
             %{
                 Calculate the fatigue limit stress (conditional stress) for
@@ -3985,8 +3966,6 @@ classdef preProcess < handle
                 cael_status = getappdata(0, 'cael_status');
                 Sf = getappdata(0, 'Sf');
                 b = getappdata(0, 'b');
-                kp = getappdata(0, 'kp');
-                np = getappdata(0, 'np');
                 E = getappdata(0, 'E');
                 
                 setappdata(0, 'enduranceLimitGroupNumber', i)
@@ -4040,14 +4019,6 @@ classdef preProcess < handle
                     conditionalStress = Tfs*((cael)^b);
                 else % PS, von Mises or NASALIFE
                     conditionalStress = Sf*((cael)^b);
-                end
-                
-                % Plasticity correction if necessary
-                if algorithm ~= 4.0 || msCorrection ~= 1.0
-                    if nlMaterial == 1.0 && (~isempty(kp) && ~isempty(np))
-                        [~, conditionalStress, ~] = css(conditionalStress, E, kp, np);
-                        conditionalStress(1.0) = []; conditionalStress = real(conditionalStress);
-                    end
                 end
                 
                 setappdata(0, 'fatigueLimit', conditionalStress)

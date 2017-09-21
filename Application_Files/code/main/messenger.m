@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 21-Sep-2017 09:00:05 GMT
+%   Last modified 21-Sep-2017 12:46:54 GMT
 
     %%
 
@@ -251,32 +251,28 @@ classdef messenger < handle
                     case 13.0
                         % K'
                         if getappdata(0, 'kp_status') == 1.0
-                            if getappdata(0, 'nlMaterial') == 1.0
-                                fprintf(fidType(i), [returnType{i}, '***NOTE: The cyclic strain hardening coefficient for material %s (group %.0f) was not specified', returnType{i}], getappdata(0, 'getMaterial_currentMaterial'), getappdata(0, 'getMaterial_currentGroup'));
-
-                                if isempty(getappdata(0, 'kp')) == 0.0
-                                    fprintf(fidType(i), ['-> A derived value of %.4gMPa will be used', returnType{i}], getappdata(0, 'kp'));
-                                else
-                                    fprintf(fidType(i), ['-> A value could not be derived', returnType{i}]);
-                                end
-
-                                setappdata(0, 'messageFileNotes', 1.0)
+                            fprintf(fidType(i), [returnType{i}, '***NOTE: The cyclic strain hardening coefficient for material %s (group %.0f) was not specified', returnType{i}], getappdata(0, 'getMaterial_currentMaterial'), getappdata(0, 'getMaterial_currentGroup'));
+                            
+                            if isempty(getappdata(0, 'kp')) == 0.0
+                                fprintf(fidType(i), ['-> A derived value of %.4gMPa will be used', returnType{i}], getappdata(0, 'kp'));
+                            else
+                                fprintf(fidType(i), ['-> A value could not be derived', returnType{i}]);
                             end
+                            
+                            setappdata(0, 'messageFileNotes', 1.0)
                         end
                     case 14.0
                         % n'
                         if getappdata(0, 'np_status') == 1.0
-                            if getappdata(0, 'nlMaterial') == 1.0
-                                fprintf(fidType(i), [returnType{i}, '***NOTE: The cyclic strain hardening exponent for material %s (group %.0f) was not specified', returnType{i}], getappdata(0, 'getMaterial_currentMaterial'), getappdata(0, 'getMaterial_currentGroup'));
-
-                                if isempty(getappdata(0, 'kp')) == 0.0
-                                    fprintf(fidType(i), ['-> A derived value of %.4g will be used', returnType{i}], getappdata(0, 'np'));
-                                else
-                                    fprintf(fidType(i), [returnType{i}, '-> A value could not be derived', returnType{i}]);
-                                end
-
-                                setappdata(0, 'messageFileNotes', 1.0)
+                            fprintf(fidType(i), [returnType{i}, '***NOTE: The cyclic strain hardening exponent for material %s (group %.0f) was not specified', returnType{i}], getappdata(0, 'getMaterial_currentMaterial'), getappdata(0, 'getMaterial_currentGroup'));
+                            
+                            if isempty(getappdata(0, 'kp')) == 0.0
+                                fprintf(fidType(i), ['-> A derived value of %.4g will be used', returnType{i}], getappdata(0, 'np'));
+                            else
+                                fprintf(fidType(i), [returnType{i}, '-> A value could not be derived', returnType{i}]);
                             end
+                            
+                            setappdata(0, 'messageFileNotes', 1.0)
                         end
                     case 15.0
                         % k
@@ -616,11 +612,7 @@ classdef messenger < handle
                             setappdata(0, 'messageFileWarnings', 1.0)
                         end
                     case 48.0
-                        % Check if nonlinear material data was available
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: In at least one group, nonlinear material data is not available', returnType{i}]);
-                        fprintf(fidType(i), ['-> Elastic (Hookean) material data will be used instead', returnType{i}]);
-
-                        setappdata(0, 'messageFileWarnings', 1.0)
+                        %_AVAILABLE_%
                     case 49.0
                         % Print warning(s) if there is a problem with the mean stress correction
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The Morrow mean stress correction requires a value for the fatigue strength coefficient', returnType{i}]);
@@ -756,7 +748,7 @@ classdef messenger < handle
                                 fprintf(fidType(i), ['-> Cycles at this life are dominated by plasticity', returnType{i}]);
                                 fprintf(fidType(i), ['-> The S-N methodology is not recommended for this analysis', returnType{i}]);
                                 
-                                if any (L < 1e6) && getappdata(0, 'nlMaterial') == 0.0
+                                if any(L < 1e6) == 1.0
                                     fprintf(fidType(i), ['-> Items with lives less than 1e6 %s have been written to ''%s\\Project\\output\\%s\\Data Files\\warn_lcf_items.dat''', returnType{i}], getappdata(0, 'loadEqUnits'), pwd, getappdata(0, 'jobName'));
                                 end
                                 
@@ -767,18 +759,12 @@ classdef messenger < handle
                                 
                                 setappdata(0, 'messageFileWarnings', 1.0)
                             elseif any(L < 1e6)
-                                if getappdata(0, 'nlMaterial') == 0.0
-                                    fprintf(fidType(i), [returnType{i}, '***WARNING: %.0f items have lives less than 1e+06 %s', returnType{i}], length(L (L < 1e6)), getappdata(0, 'loadEqUnits'));
-                                    fprintf(fidType(i), ['-> The S-N methodology is usually intended for high cycle fatigue problems', returnType{i}]);
-                                    fprintf(fidType(i), ['-> Please check the validity of the input data for the analysis application', returnType{i}]);
-                                    fprintf(fidType(i), ['-> These items have been written to ''%s\\Project\\output\\%s\\Data Files\\warn_lcf_items.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
-                                    
-                                    setappdata(0, 'messageFileWarnings', 1.0)
-                                else
-                                    fprintf(fidType(i), [returnType{i}, '***NOTE: After considering plasticity, %.0f items have lives less than 1e6 cycles', returnType{i}], length(L (L < 1e6)));
-                                    
-                                    setappdata(0, 'messageFileNotes', 1.0)
-                                end
+                                fprintf(fidType(i), [returnType{i}, '***WARNING: %.0f items have lives less than 1e+06 %s', returnType{i}], length(L (L < 1e6)), getappdata(0, 'loadEqUnits'));
+                                fprintf(fidType(i), ['-> The S-N methodology is usually intended for high cycle fatigue problems', returnType{i}]);
+                                fprintf(fidType(i), ['-> Please check the validity of the input data for the analysis application', returnType{i}]);
+                                fprintf(fidType(i), ['-> These items have been written to ''%s\\Project\\output\\%s\\Data Files\\warn_lcf_items.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
+                                
+                                setappdata(0, 'messageFileWarnings', 1.0)
                             end
                         end
                         
@@ -2246,7 +2232,7 @@ classdef messenger < handle
                 gateHistories, gateTensors, nodalElimination, planePrecision,...
                 worstAnalysisItem, thetaOnCP, phiOnCP, outputField,...
                 algorithm, nodalDamage, worstMainID, worstSubID, dir,...
-                step, cael, msCorrection, nlMaterial, removed,...
+                step, cael, msCorrection, removed,...
                 hotspotWarning, loadEqVal, loadEqUnits, elementType,...
                 offset, analysisTime)
 
@@ -2263,7 +2249,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n', version);
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 21-Sep-2017 09:00:05 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 21-Sep-2017 12:46:54 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
@@ -2289,12 +2275,7 @@ classdef messenger < handle
                     fprintf(fid, '    Material Model: Linear Elastic (Hookean)\r\n');
                 else
                     fprintf(fid, '    Material: %s\r\n', material(1:end-4));
-
-                    if nlMaterial == 1.0
-                        fprintf(fid, '    Material Model: Nonlinear elastic (Ramberg-Osgood)\r\n');
-                    else
-                        fprintf(fid, '    Material Model: Linear Elastic (Hookean)\r\n');
-                    end
+                    fprintf(fid, '    Material Model: Linear Elastic (Hookean)\r\n');
                 end
 
                 if algorithm == 8.0
@@ -2357,11 +2338,7 @@ classdef messenger < handle
                     fprintf(fid, '    Material: Structural Steel\r\n');
                     fprintf(fid, '    Material Model: Linear Elastic (Hookean)\r\n');
                 else
-                    if nlMaterial == 1.0
-                        fprintf(fid, '    Material Model: Nonlinear elastic (Ramberg-Osgood)\r\n');
-                    else
-                        fprintf(fid, '    Material Model: Linear Elastic (Hookean)\r\n');
-                    end
+                    fprintf(fid, '    Material Model: Linear Elastic (Hookean)\r\n');
                 end
 
                 if algorithm == 8.0

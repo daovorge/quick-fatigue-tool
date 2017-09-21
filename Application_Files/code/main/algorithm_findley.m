@@ -14,7 +14,7 @@ classdef algorithm_findley < handle
 %      6.4 Findley's Method
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 12-May-2017 15:25:52 GMT
+%   Last modified 21-Sep-2017 12:46:54 GMT
     
     %%
     
@@ -271,9 +271,6 @@ classdef algorithm_findley < handle
             
             cumulativeDamage = zeros(1.0, numberOfCycles);
             
-            % Plasticity correction
-            nlMaterial = getappdata(0, 'nlMaterial');
-            
             % Get the endurance limit
             modifyEnduranceLimit = getappdata(0, 'modifyEnduranceLimit');
             ndEndurance = getappdata(0, 'ndEndurance');
@@ -281,30 +278,7 @@ classdef algorithm_findley < handle
             fatigueLimit_original = fatigueLimit;
             enduranceScale = getappdata(0, 'enduranceScaleFactor');
             cyclesToRecover = abs(round(getappdata(0, 'cyclesToRecover')));
-            
-            if nlMaterial == 1.0
-                scaleFactors = zeros(1.0, length(combinations));
-                E = getappdata(0, 'E');
-                kp = getappdata(0, 'kp');
-                np = getappdata(0, 'np');
-                
-                for i = 1:length(combinations)
-                    if combinations(i) == 0.0
-                        continue
-                    else
-                        oldCycle = combinations(i);
-                        
-                        [~, combinations_i, ~] = css(combinations(i), E, kp, np);
-                        combinations_i(1) = []; combinations_i = real(combinations_i);
-                        
-                        combinations(i) = combinations_i;
-                    end
-                    
-                    scaleFactors(i) = combinations_i/oldCycle;
-                end
-            else
-                scaleFactors = ones(1.0, length(combinations));
-            end
+            scaleFactors = ones(1.0, length(combinations));
             
             if use_sn == 1.0 % S-N curve was defined directly
                 [cumulativeDamage] = interpolate(cumulativeDamage, pairs, msCorrection, numberOfCycles, combinations, scaleFactors, 0.0, 0.0);

@@ -14,7 +14,7 @@ classdef algorithm_sbbm < handle
 %      6.2 Stress-based Brown-Miller
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 08-Jun-2017 10:07:12 GMT
+%   Last modified 21-Sep-2017 12:46:54 GMT
     
     %%
     
@@ -230,28 +230,7 @@ classdef algorithm_sbbm < handle
             kp = getappdata(0, 'kp');
             np = getappdata(0, 'np');
             
-            % Plasticity correction
-            nlMaterial = getappdata(0, 'nlMaterial');
-            
-            if nlMaterial == 1.0
-                scaleFactors = zeros(1, length(cycles));
-                for i = 1:length(cycles)
-                    if cycles(i) == 0.0
-                        continue
-                    else
-                        oldCycle = cycles(i);
-                        
-                        [~, cycles_i, ~] = css(cycles(i), E, kp, np);
-                        cycles_i(1) = []; cycles_i = real(cycles_i);
-                        
-                        cycles(i) = cycles_i;
-                    end
-                    
-                    scaleFactors(i) = cycles_i/oldCycle;
-                end
-            else
-                scaleFactors = ones(1.0, length(cycles));
-            end
+            scaleFactors = ones(1.0, length(cycles));
             
             if useSN == 1.0 % S-N curve was defined directly
                 [cumulativeDamage] = interpolate(cumulativeDamage, pairs, msCorrection, numberOfCycles, cycles, scaleFactors, mscWarning, overflowCycles);

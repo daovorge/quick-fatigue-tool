@@ -14,7 +14,7 @@ classdef algorithm_nasa < handle
 %      6.7 NASALIFE
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 12-May-2017 15:25:52 GMT
+%   Last modified 21-Sep-2017 12:46:54 GMT
     
     %%
     
@@ -521,33 +521,8 @@ classdef algorithm_nasa < handle
                 % Correct the amplitude for the effect of mean stress
                 Sa(i) = algorithm_nasa.walker(R, A, Sa(i), nasalifeParameter, gamma);
             end
-            
-            % Plasticity correction
-            nlMaterial = getappdata(0, 'nlMaterial');
-            
-            if nlMaterial == 1.0
-                scaleFactors = zeros(1, length(Sa));
-                E = getappdata(0, 'E');
-                kp = getappdata(0, 'kp');
-                np = getappdata(0, 'np');
-                
-                for i = 1:length(Sa)
-                    if Sa(i) == 0.0
-                        continue
-                    else
-                        oldCycle = Sa(i);
-                        
-                        [~, cycles_i, ~] = css(Sa(i), E, kp, np);
-                        cycles_i(1) = []; cycles_i = real(cycles_i);
-                        
-                        Sa(i) = cycles_i;
-                    end
-                    
-                    scaleFactors(i) = cycles_i/oldCycle;
-                end
-            else
-                scaleFactors = ones(1.0, length(Sa));
-            end
+
+            scaleFactors = ones(1.0, length(Sa));
             
             if useSN == 1.0 % S-N curve was defined directly
                 [cumulativeDamage] = interpolate(cumulativeDamage, pairs, 4.0, numberOfCycles, Sa, scaleFactors, 0.0, 0.0);

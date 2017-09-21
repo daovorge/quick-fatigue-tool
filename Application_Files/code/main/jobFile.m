@@ -6,7 +6,7 @@ classdef jobFile < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 11-Sep-2017 21:49:25 GMT
+%   Last modified 21-Sep-2017 12:46:54 GMT
     
     %%
     
@@ -508,9 +508,8 @@ classdef jobFile < handle
         end
         
         %% DETERMINE THE ALGORITHM AND MEAN STRESS CORRECTION TO BE USED FOR THE ANALYSIS
-        function [algorithm, msCorrection, nlMaterial, useSN, error] = getAlgorithmAndMSC(algorithm, msCorrection, useSN)
+        function [algorithm, msCorrection, useSN, error] = getAlgorithmAndMSC(algorithm, msCorrection, useSN)
             % Initialite output
-            nlMaterial = -1.0;
             error = 0.0;
             
             %% DETERMINE THE ANALYSIS ALGORITHM TO BE USED FOR THE ANALYSIS
@@ -910,14 +909,6 @@ classdef jobFile < handle
                     considered in the analysis
                 %}
                 messenger.writeMessage(175.0)
-            end
-            
-            % Check if nonlinear material data is available
-            nlMaterial = getappdata(0, 'nlMaterial');
-            if nlMaterial == 1.0 && (EWarn == 1.0 || kpWarn == 1.0 || npWarn == 1.0) && algorithm ~= 8.0
-                nlMaterial = 0.0;
-                setappdata(0, 'nlMaterial', 0.0)
-                messenger.writeMessage(48.0)
             end
             
             % If the stress-based Brown-Miller algorithm is being used, check that the modulus of
@@ -1570,7 +1561,7 @@ classdef jobFile < handle
         %% SCALE AND COMBINE THE LOADING
         function [scale, offset, repeats, units, N, signalLength, Sxx, Syy, Szz, Txy, Tyz, Txz, mainID, subID, gateHistories, gateTensors, tensorGate, error] =...
                 getLoading(units, scale, algorithm, msCorrection,...
-                nlMaterial, userUnits, hfDataset, hfHistory, hfTime,...
+                userUnits, hfDataset, hfHistory, hfTime,...
                 hfScales, items, dataset, history, elementType, offset)
             
             N = [];
@@ -1763,7 +1754,7 @@ classdef jobFile < handle
             % Only if BS 7608 is not being used for analysis
             if algorithm ~= 8.0
                 plasticSN = getappdata(0, 'plasticSN');
-                error = preProcess.getFatigueLimit(plasticSN, algorithm, msCorrection, nlMaterial);
+                error = preProcess.getFatigueLimit(plasticSN, algorithm, msCorrection);
                 
                 if error == 1.0
                     return
