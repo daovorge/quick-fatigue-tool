@@ -6,7 +6,7 @@ classdef jobFile < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 21-Sep-2017 12:46:54 GMT
+%   Last modified 21-Sep-2017 14:37:10 GMT
     
     %%
     
@@ -228,6 +228,11 @@ classdef jobFile < handle
                     end
                 end
                 setappdata(0, 'frfEnvelope', frfEnvelope)
+            end
+            
+            if isempty(outputDatabase) == 1.0
+                outputDatabase = '';
+                setappdata(0, 'outputDatabase', outputDatabase)
             end
             
             %% CHECK CERTAIN FLAGS FOR STRING INPUT

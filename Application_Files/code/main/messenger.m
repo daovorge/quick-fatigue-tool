@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 21-Sep-2017 12:46:54 GMT
+%   Last modified 21-Sep-2017 14:37:10 GMT
 
     %%
 
@@ -2249,7 +2249,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n', version);
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 21-Sep-2017 12:46:54 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 21-Sep-2017 14:37:10 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
@@ -3401,8 +3401,13 @@ classdef messenger < handle
                     answer = -1.0;
                 end
             else
-                fprintf('Job %s completed successfully (%s)\n\n',...
-                    jobName, datestr(datenum(c(1), c(2), c(3), c(4), c(5), c(6))))
+                if getappdata(0, 'echoMessagesToCWIN') == 1.0
+                    fprintf('Job %s completed successfully. Scroll up for details. (%s)\n\n',...
+                        jobName, datestr(datenum(c(1), c(2), c(3), c(4), c(5), c(6))))
+                else
+                    fprintf('Job %s completed successfully (%s)\n\n',...
+                        jobName, datestr(datenum(c(1), c(2), c(3), c(4), c(5), c(6))))
+                end
 
                 % Prompt user if they would like to view the analysis log
                 if (ispc == 1.0) && (ismac == 0.0)

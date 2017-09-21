@@ -11,7 +11,7 @@ function [] = main(flags)
 %   Author contact: louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 21-Sep-2017 12:46:54 GMT
+%   Last modified 21-Sep-2017 14:37:10 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');    tic_pre = tic;
@@ -43,7 +43,7 @@ setappdata(0, 'messageFileWarnings', 0.0)
 %% PRINT COMMAND WINDOW HEADER
 fprintf('[NOTICE] Quick Fatigue Tool 6.11-04')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2017)')
-fprintf('\n[NOTICE] Last modified 21-Sep-2017 12:46:54 GMT')
+fprintf('\n[NOTICE] Last modified 21-Sep-2017 14:37:10 GMT')
 
 cleanExit = 0.0;
 
@@ -480,7 +480,12 @@ if getappdata(0, 'dataCheck') > 0.0
     end
 
 	setappdata(0, 'dataCheck_time', toc(tic_pre))
-	fprintf('\n[NOTICE] Data Check complete (%fs)\n', toc(tic_pre))
+    
+    if getappdata(0, 'echoMessagesToCWIN') == 1.0
+        fprintf('\n[NOTICE] Data Check complete. Scroll up for details (%fs)\n', toc(tic_pre))
+    else
+        fprintf('\n[NOTICE] Data Check complete (%fs)\n', toc(tic_pre))
+    end
     messenger.writeMessage(-999.0)
     fprintf(fid_status, '\r\n\r\nTHE ANALYSIS HAS COMPLETED SUCCESSFULLY');
     fclose(fid_status);
@@ -1091,6 +1096,5 @@ fprintf(fid_status, '\r\n\r\nTHE ANALYSIS HAS COMPLETED SUCCESSFULLY');
 fclose(fid_status);
 
 %% REMOVE APPDATA
-
 cleanup(0.0)
 % End main code - DO NOT EDIT

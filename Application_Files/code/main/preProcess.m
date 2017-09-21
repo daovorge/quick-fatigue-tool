@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 21-Sep-2017 12:46:54 GMT
+%   Last modified 21-Sep-2017 14:37:10 GMT
     
     %%
     
@@ -4159,6 +4159,7 @@ classdef preProcess < handle
         %% Make sure the output directory exists
         function [dir, error] = checkOutput(jobName, outputField, outputHistory, outputFigure)
             error = 0.0;
+            datacheck = getappdata(0, 'dataCheck');
             
             %%  Create the output directory if it doesn't exist
             dir = sprintf('Project/output/%s/', jobName);
@@ -4193,7 +4194,7 @@ classdef preProcess < handle
                     mkdir([dir, 'Data Files'])
                 end
                 
-                if outputFigure == 1.0
+                if (outputFigure == 1.0) && (datacheck == 0.0)
                     mkdir([dir, 'MATLAB Figures'])
                 end
             elseif exist(dir, 'dir') == 7.0
@@ -4230,7 +4231,7 @@ classdef preProcess < handle
                         end
                     end
                     
-                    if outputFigure == 1.0
+                    if (outputFigure == 1.0) && (datacheck == 0.0)
                         if exist([dir, 'MATLAB Figures'], 'dir') == 0.0
                             try
                                 mkdir([dir, 'MATLAB Figures'])
