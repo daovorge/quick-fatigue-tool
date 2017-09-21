@@ -12,7 +12,7 @@ function varargout = UniaxialStrainLife(varargin)%#ok<*DEFNU>
 %      A3.6 Uniaxial Strain-Life
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 30-Aug-2017 18:00:59 GMT
+%   Last modified 21-Sep-2017 09:00:05 GMT
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -744,6 +744,10 @@ end
 if get(handles.pMenu_msc, 'value') ~= 6.0
     set(handles.text_walkerGamma, 'enable', 'off')
     set(handles.edit_walkerGamma, 'enable', 'off')
+end
+if get(handles.rButton_typePlastic, 'value') == 1.0
+    set(handles.text_scf, 'enable', 'off')
+    set(handles.edit_scf, 'enable', 'off')
 end
 
 % Output definition
