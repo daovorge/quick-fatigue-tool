@@ -26,7 +26,7 @@ function [] = job(varargin)
 %      1 Job file options
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 21-Jun-2017 09:48:34 GMT
+%   Last modified 22-Sep-2017 10:14:41 GMT
     
     %%
     
@@ -297,7 +297,8 @@ while feof(fid) == 0.0
                 
                 break
             end
-        elseif isnumeric(str2double(currentChar)) == 1.0 && isnan(str2double(currentChar)) == 0.0 && isreal(str2double(currentChar)) == 1.0
+        elseif (isnumeric(str2double(currentChar)) == 1.0 && isnan(str2double(currentChar)) == 0.0 && isreal(str2double(currentChar)) == 1.0) ||...
+                (isnumeric(str2double(currentLine)) == 1.0 && isnan(str2double(currentLine)) == 0.0 && isreal(str2double(currentLine)) == 1.0)
             % The keyword definition appears to be a numeric value
             kwData{matchingKw} = str2double(currentLine);
             
