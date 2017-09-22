@@ -1,4 +1,4 @@
-function [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz)
+function [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz, fid_status)
 %FOS    QFT function to find surface elements and nodes.
 %   This function uses the ODB file specified by OUTPUT_DATABASE to
 %   determine the elements and nodes which lie on the mesh surface.
@@ -234,6 +234,9 @@ end
 %% Run the script
 % Run script like this:
 % abaqus python getSurface_qft.py -- <odbName> <position> <shell> <instance-1>... <instance-n> <n>
+
+fprintf('\n[PRE] Detecting model surface')
+fprintf(fid_status, '\n[PRE] Detecting model surface');
 
 inputString = sprintf('%s python Application_Files\\code\\odb_interface\\getSurface.py -- "%s" %s %s %s %s %.0f',...
     abqCmd, outputDatabase, odbResultPosition, searchRegion, shell, partInstance, numberOfInstances);

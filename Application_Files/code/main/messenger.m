@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 22-Sep-2017 10:14:41 GMT
+%   Last modified 22-Sep-2017 15:43:34 GMT
 
     %%
 
@@ -2145,6 +2145,8 @@ classdef messenger < handle
                         if isempty(strfind(message, 'The database is from a previous release of Abaqus.')) == 0.0
                             fprintf(fidType(i), ['-> The installed Abaqus API is from a more recent version of Abaqus than that which was used to generate the model ODB file', returnType{i}]);
                             fprintf(fidType(i), ['-> Set the environment variables ''autoExport_upgradeODB=1.0'' and ''autoExport_abqCmd=<abaqus-version>'', where <abaqus-version> is the identifier of the Abaqus version to which the ODB file is upgraded', returnType{i}]);
+                        elseif isempty(strfind(message, getappdata(0, 'partInstance'))) == 0.0
+                            fprintf(fidType(i), ['-> The part instance name is either spelled incorrectly or it does not exist in the model', returnType{i}]);
                         end
                             
                         fprintf(fidType(i), ['-> All items will be analysed', returnType{i}]);
@@ -2249,7 +2251,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n', version);
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 22-Sep-2017 10:14:41 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 22-Sep-2017 15:43:34 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

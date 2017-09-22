@@ -6,7 +6,7 @@ function [] = cleanup(status)
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 22-Sep-2017 10:14:41 GMT
+%   Last modified 22-Sep-2017 15:43:34 GMT
     
     %%
     
@@ -75,7 +75,7 @@ if status == 1.0
     % Write file header
     fprintf(fid, 'Quick Fatigue Tool 6.11-04\r\n');
     fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-    fprintf(fid, 'Last modified 22-Sep-2017 10:14:41 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 22-Sep-2017 15:43:34 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');
@@ -149,7 +149,7 @@ if status == 1.0
             fprintf(fid, '\r\n\r\n***ERROR: The stress dataset ''%s'' could not be found',...
             missingChannel);
         end
-        fprintf(fid, '\r\n-> Make sure the file is spelled correctly and is located in Project/input');
+        fprintf(fid, '\r\n-> Make sure the file is spelled correctly');
         fprintf(fid, '\r\n\r\nError code: E035');
         rmappdata(0, 'E035')
     end
@@ -169,7 +169,7 @@ if status == 1.0
     if getappdata(0, 'E036') == 1.0
         fprintf(fid, '\r\n\r\n***ERROR: The load history ''%s'' could not be found',...
             getappdata(0, 'errorMissingScale'));
-        fprintf(fid, '\r\n-> Make sure the file is spelled correctly and is located in Project/input');
+        fprintf(fid, '\r\n-> Make sure the file is spelled correctly');
         fprintf(fid, '\r\n\r\nError code: E036');
         rmappdata(0, 'E036')
     end
