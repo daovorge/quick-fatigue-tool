@@ -11,7 +11,7 @@ classdef postProcess < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 16-Sep-2017 16:32:58 GMT
+%   Last modified 22-Sep-2017 18:19:43 GMT
     
     %%
     
@@ -2097,6 +2097,7 @@ classdef postProcess < handle
                 % If there was an error while writing the field data, abort the
                 % export process
                 if error == 1.0
+                    setappdata(0, 'warning_087_partInstance', partInstanceName)
                     messenger.writeMessage(87.0)
                     
                     fprintf('\n[ERROR] ODB Interface exited with errors. Check the results log for details (Project/output/%s/Data Files/%s.log)', getappdata(0, 'jobName'), resultsDatabaseName');

@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 22-Sep-2017 15:43:34 GMT
+%   Last modified 22-Sep-2017 18:19:43 GMT
 
     %%
 
@@ -949,7 +949,7 @@ classdef messenger < handle
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 87.0
-                        fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: Consistent element-node IDs for instance ''%s'' could not', returnType{i}], getappdata(0, 'warning_067_partInstance'));
+                        fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: Consistent element-node IDs for instance ''%s'' could not', returnType{i}], getappdata(0, 'warning_087_partInstance'));
                         fprintf(fidType(i), ['be found between the model output database and the field data (matching node IDs contain zero-valued indices)', returnType{i}]);
                         fprintf(fidType(i), ['-> This can occur when an invalid part instance is specified', returnType{i}]);
                         fprintf(fidType(i), ['-> Field data will not be exported', returnType{i}]);
@@ -2251,7 +2251,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n', version);
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 22-Sep-2017 15:43:34 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 22-Sep-2017 18:19:43 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
