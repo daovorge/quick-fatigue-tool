@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 22-Sep-2017 18:19:43 GMT
+%   Last modified 23-Sep-2017 12:19:02 GMT
 
     %%
 
@@ -2096,7 +2096,14 @@ classdef messenger < handle
                         fprintf(fidType(i), [returnType{i}, '***WARNING: User FRF diagnostic item %.0f does not exist in the model', returnType{i}], getappdata(0, 'message_264_item'));
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 265.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: Abaqus ODB field output has been exported to ''%s\\Project\\output\\%s\\Data Files''', returnType{i}], pwd, getappdata(0, 'jobName'));
+                        exportMode = getappdata(0, 'autoExport_executionMode');
+                        jobName = getappdata(0, 'jobName');
+                        
+                        if (exportMode == 1.0) || (exportMode == 2.0)
+                            fprintf(fidType(i), [returnType{i}, '***NOTE: Abaqus ODB field output has been exported to ''%s\\Project\\output\\%s\\Data Files''', returnType{i}], pwd, jobName);
+                        elseif exportMode == 3.0
+                            fprintf(fidType(i), [returnType{i}, '***NOTE: Abaqus ODB Python script has been exported to ''%s\\Project\\output\\%s\\Data Files''', returnType{i}], pwd, jobName);
+                        end
                     case 266.0
                         if getappdata(0, 'suppress_ID266') == 0.0
                             fprintf(fidType(i), [returnType{i}, '***NOTE: User-defined items were read from the file ''%s''', returnType{i}], getappdata(0, 'hotspotFile'));
@@ -2251,7 +2258,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n', version);
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 22-Sep-2017 18:19:43 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 23-Sep-2017 12:19:02 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

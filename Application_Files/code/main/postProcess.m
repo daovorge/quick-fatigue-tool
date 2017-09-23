@@ -2188,8 +2188,8 @@ classdef postProcess < handle
             end
             
             fprintf(fid_debug, ' Success');
-            fprintf('\n[POST] Export complete. Check the log file in Project/output/%s/Data Files for possible messages', getappdata(0, 'jobName'));
-            fprintf(fid_status, '\n[POST] Export complete. Check the log file in Project/output/%s/Data Files for possible messages', getappdata(0, 'jobName'));
+            fprintf('\n[POST] Export complete. Check the log file in Project/output/%s/Data Files for detailed information', getappdata(0, 'jobName'));
+            fprintf(fid_status, '\n[POST] Export complete. Check the log file in Project/output/%s/Data Files for detailed information', getappdata(0, 'jobName'));
             fclose(fid_debug);
             
             % Update the message file
