@@ -29,7 +29,7 @@ classdef material < handle
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 08-Sep-2017 134302:48 GMT
+%   Last modified 23-Sep-2017 15:01:48 GMT
     
     %%
     
@@ -625,7 +625,11 @@ classdef material < handle
             end
             
             % Remove '.mat' extension
-            userMaterial(end - 3.0:end) = [];
+            [~, ~, ext] = fileparts(userMaterial);
+            
+            if isempty(ext) == 0.0
+                userMaterial(end - 3.0:end) = [];
+            end
             
             % Create file name
             fileName = sprintf('Project/output/material_reports/%s_report.dat', userMaterial);
