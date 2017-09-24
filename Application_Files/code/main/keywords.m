@@ -167,12 +167,8 @@ classdef keywords < handle
             % Processed keywords
             fprintf(fid, '\r\n\tThe following keywords were processed:');
             
-            if length(kw_processed) == 1.0 && isempty(kw_processed{1.0}) == 1.0
-                fprintf(fid, '\r\n\t(NONE)\r\');
-            else
-                for i = 1:length(kw_processed)
-                    fprintf(fid, '\r\n\t*%s', kw_processed{i});
-                end
+            for i = 1:length(kw_processed)
+                fprintf(fid, '\r\n\t*%s', kw_processed{i});
             end
 
             % Get problematic keywords
@@ -184,7 +180,7 @@ classdef keywords < handle
             if (isempty(kw_bad{1.0}) == 0.0) || (isempty(kw_undefined{1.0}) == 0.0) || (isempty(kw_partial{1.0}) == 0.0) || (isempty(kw_ambiguous{1.0}) == 0.0)
                 fprintf(fid, '\r\n\r\n\tWarning: One or more keywords were not processed');
             else
-                fprintf(fid, '\r\n\r\n\tThe input file has been read successfully');
+                fprintf(fid, '\r\n\r\n\tThe input file processor completed successfully');
             end
             
             % Badly defined keywords

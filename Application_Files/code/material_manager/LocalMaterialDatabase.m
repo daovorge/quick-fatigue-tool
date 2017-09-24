@@ -12,7 +12,7 @@ function varargout = LocalMaterialDatabase(varargin)%#ok<*DEFNU>
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 02-Sep-2017 19:02:40 GMT
+%   Last modified 23-Sep-2017 18:38:59 GMT
     
     %%
 
@@ -433,7 +433,7 @@ if getappdata(0, 'missingDefaultLocalDatabase') == 1.0
 elseif get(handles.check_defaultDataDirectory, 'value') == 1.0
     msg1 = sprintf('The %s (default) local material directory is the folder:\n\n', string);
     msg2 = sprintf('''%s''\n\n', get(handles.edit_userDataDirectory, 'string'));
-    msg3 = sprintf('If you wish to specify the folder yourself, deselect "Default" ');
+    msg3 = sprintf('If you wish to specify the folder yourself, deselect "Default path" ');
     msg4 = sprintf('and manually enter the path to the new folder.\n\n');
     
     messages = [messages, msg1, msg2, msg3, msg4];
@@ -444,7 +444,7 @@ else
     messages = [messages, msg1, msg2];
 end
 
-msg1 = sprintf('If "Save path" is selected, the local material database path ');
+msg1 = sprintf('If "Save to pathdef.m" is selected, the local material database path ');
 msg2 = sprintf('will be written to PATHDEF.m so that it is remembered even if the location is ');
 msg3 = sprintf('removed from MATLAB''s current search path. If this option is selected, it is ');
 msg4 = sprintf('strongly recommended that you keep a back-up of this file.');

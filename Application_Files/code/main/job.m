@@ -26,7 +26,7 @@ function [] = job(varargin)
 %      1 Job file options
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 22-Sep-2017 10:14:41 GMT
+%   Last modified 24-Sep-2017 10:42:46 GMT
     
     %%
     
@@ -90,6 +90,10 @@ if isempty(EXT) == 1.0
     inputFile = [inputFile, '.inp'];
 elseif strcmp(EXT, '.') == 1.0
     inputFile = [inputFile, 'inp'];
+elseif strcmp(EXT, '.m') == 1.0
+    clc
+    fprintf('ERROR: Input file ''%s'' is an M-file and cannot be submitted using JOB. Type the name of the M-file and hit RETURN, or right-click the file and select "Run"\n', inputFile);
+    return
 end
 
 % Check that the file exists
@@ -343,6 +347,12 @@ setappdata(0, 'kw_ambiguous', ambiguousKw)
 %% CLOSE THE FILE AND SUBMIT THE JOB
 % Close the input file
 fclose(fid);
+
+%% IF THERE WERE NO PROCESSED KEYWORDS, EXIT WITH AN ERROR
+if length(processedKeywords) == 1.0 && isempty(processedKeywords{1.0}) == 1.0
+    fprintf('ERROR: There are no keywords defined in the input file\n');
+    return
+end
 
 % Submit the job for analysis
 main(kwData)
