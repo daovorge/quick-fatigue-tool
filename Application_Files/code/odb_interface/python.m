@@ -11,7 +11,7 @@ classdef python < handle
 %      10.4 The ODB Interface
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 04-Apr-2017 13:26:59 GMT
+%   Last modified 25-Sep-2017 15:02:25 GMT
     
     %%
     
@@ -612,7 +612,7 @@ classdef python < handle
                     %}
                     if all(fos == -1.0) == 1.0
                         columnsToDelete = columnsToDelete + 1.0;
-                        fprintf(fid_debug, '\r\n\tWarning: Requested field FOS is not available. The field will not be written to the output database. To export this field, set FACTOR_OF_STRENGTH = 1.0 in the job file');
+                        fprintf(fid_debug, '\r\n\tWarning: Requested field FOS is not available. The field will not be written to the output database.');
                     else
                         fieldData(:, index) = fos;
                         fieldNames{index} = sprintf('FOS, Factor of Strength');
@@ -630,11 +630,11 @@ classdef python < handle
                     end
                 else
                     columnsToDelete = columnsToDelete + 1.0;
-                    fprintf(fid_debug, '\r\n\tWarning: Requested field FOS is not available. The field will not be written to the output database. To export this field, set FACTOR_OF_STRENGTH = 1.0 in the job file');
+                    fprintf(fid_debug, '\r\n\tWarning: Requested field FOS is not available. The field will not be written to the output database.');
                 end
             else
                 if requestedFields(5.0) == true && availableFields < 7.0
-                    fprintf(fid_debug, '\r\n\tWarning: Requested field FOS is not available. The field will not be written to the output database. To export this field, set FACTOR_OF_STRENGTH = 1.0 in the job file');
+                    fprintf(fid_debug, '\r\n\tWarning: Requested field FOS is not available. The field will not be written to the output database.');
                 end
             end
             
@@ -1064,7 +1064,7 @@ classdef python < handle
             fprintf(fid, '\r\n#   louisvallance@hotmail.co.uk');
             fprintf(fid, '\r\n#');
             fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017');
-            fprintf(fid, '\r\n#   Last modified 17-Mar-2017 12:54:53 GMT');
+            fprintf(fid, '\r\n#   Last modified 25-Sep-2017 15:02:25 GMT');
             
             % Write Abaqus import header
             fprintf(fid, '\r\n\r\nfrom odbAccess import *');
@@ -1453,7 +1453,7 @@ classdef python < handle
             fprintf(fid, '\r\n#   louisvallance@hotmail.co.uk');
             fprintf(fid, '\r\n#');
             fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017');
-            fprintf(fid, '\r\n#   Last modified 17-Mar-2017 12:54:53 GMT');
+            fprintf(fid, '\r\n#   Last modified 25-Sep-2017 15:02:25 GMT');
             
             % Write Abaqus import header
             fprintf(fid, '\r\n\r\nfrom odbAccess import *');
@@ -1682,7 +1682,7 @@ classdef python < handle
             fprintf(fid, '\r\n#   louisvallance@hotmail.co.uk');
             fprintf(fid, '\r\n#');
             fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017');
-            fprintf(fid, '\r\n#   Last modified 17-Mar-2017 12:54:53 GMT');
+            fprintf(fid, '\r\n#   Last modified 25-Sep-2017 15:02:25 GMT');
             
             % Write Abaqus import header
             fprintf(fid, '\r\n\r\nfrom odbAccess import *');

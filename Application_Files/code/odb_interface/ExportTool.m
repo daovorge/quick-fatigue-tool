@@ -12,7 +12,7 @@ function varargout = ExportTool(varargin)%#ok<*DEFNU>
 %      10.4 The ODB Interface
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 22-Jun-2017 16:09:40 GMT
+%   Last modified 25-Sep-2017 15:02:25 GMT
     
     %%
     
@@ -1310,7 +1310,7 @@ switch tag
         set(handles.check_LL, 'value', 1.0)
         set(handles.check_D, 'value', 0.0)
         set(handles.check_DDL, 'value', 0.0)
-        set(handles.check_FOS, 'value', 0.0)
+        set(handles.check_FOS, 'value', 1.0)
         set(handles.check_SFA, 'value', 0.0)
         set(handles.check_FRFR, 'value', 1.0)
         set(handles.check_FRFV, 'value', 1.0)
