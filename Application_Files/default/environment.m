@@ -479,7 +479,7 @@ setappdata(0, 'autoExport_LL', 1.0)     % LOG10(Life)
 setappdata(0, 'autoExport_L', 0.0)      % Life
 setappdata(0, 'autoExport_D', 0.0)      % Damage
 setappdata(0, 'autoExport_DDL', 0.0)    % Damage at design life
-setappdata(0, 'autoExport_FOS', 0.0)    % Factor of strength
+setappdata(0, 'autoExport_FOS', 1.0)    % Factor of strength
 setappdata(0, 'autoExport_SFA', 0.0)    % Endurance safety factor
 setappdata(0, 'autoExport_FRFR', 1.0)   % Radial fatigue reserve factor
 setappdata(0, 'autoExport_FRFV', 1.0)   % Vertical fatigue reserve factor
