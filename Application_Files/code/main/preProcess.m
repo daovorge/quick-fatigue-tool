@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 21-Sep-2017 14:37:10 GMT
+%   Last modified 26-Sep-2017 21:01:00 GMT
     
     %%
     
@@ -3964,9 +3964,13 @@ classdef preProcess < handle
                 
                 cael = getappdata(0, 'cael');
                 cael_status = getappdata(0, 'cael_status');
+                E = getappdata(0, 'E');
                 Sf = getappdata(0, 'Sf');
                 b = getappdata(0, 'b');
-                E = getappdata(0, 'E');
+                Ef = getappdata(0, 'Ef');
+                c = getappdata(0, 'c');
+                kp = getappdata(0, 'kp');
+                np = getappdata(0, 'np');
                 
                 setappdata(0, 'enduranceLimitGroupNumber', i)
                 
@@ -3976,7 +3980,7 @@ classdef preProcess < handle
                     messenger.writeMessage(88.0)
                 elseif (enduranceSource == 3.0) && (isempty(userEnduranceLimit(i)) == 0.0)
                     conditionalStress = userEnduranceLimit(i);
-                elseif getappdata(0, 'useSN') == 1.0
+                elseif (getappdata(0, 'useSN') == 1.0) && (algorithm ~= 3.0)
                     N = getappdata(0, 'n_values');
                     
                     if getappdata(0, 'nSNDatasets') > 1.0
@@ -4003,13 +4007,18 @@ classdef preProcess < handle
                         setappdata(0, 'cael', 2.0*N(end))
                     end
                 elseif enduranceSource == 1.0
-                    conditionalStress = Sf*((cael)^b);
+                    if algorithm == 3.0
+                        conditionalStress = E*((Sf/E)*((cael)^b) + Ef*((cael)^c));
+                        [~, ~, conditionalStress, ~] = css2(conditionalStress, E, kp, np);
+                        
+                        messenger.writeMessage(48.0)
+                    else
+                        conditionalStress = Sf*((cael)^b);
+                    end
                 elseif algorithm == 4.0 %SBBM
-                    Ef = getappdata(0, 'Ef');
-                    c = getappdata(0, 'c');
-                    
                     if plasticSN == 1.0 && (isempty(Ef) == 0.0 && isempty(c) == 0.0)
                         conditionalStress = E*(((1.65*Sf)/(E))*(cael)^b + (1.75*Ef)*(cael)^c);
+                        [~, ~, conditionalStress, ~] = css2(conditionalStress, E, kp, np);
                     else
                         conditionalStress = (1.65*Sf)*(cael)^b;
                     end

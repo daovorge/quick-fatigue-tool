@@ -102,8 +102,8 @@ df = -1 - (Ee/x0)^2 - (num/den);
 x1 = x0 - f/df; % initial estimate
 
 N = 0.0;
-tol = getappdata(0, 'cssTolerance');
-maxIters = getappdata(0, 'cssMaxIterations');
+tol = 1e-5;
+maxIters = 100.0;
 
 % iterate to determine monotonic excursion
 while (f > tol) && (N < maxIters)

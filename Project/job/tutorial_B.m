@@ -19,7 +19,7 @@ function [] = tutorial_B()
 %      1 Job file options
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 19-Sep-2017 18:21:43 GMT
+%   Last modified 26-Sep-2017 21:01:00 GMT
 
 %% JOB
 
@@ -261,7 +261,7 @@ B2 = [];
 % LIFE ABOVE WHICH TO USE B2
 B2_NF = [];
 
-% ULTIMATE COMPRESSIVE STRENGTH
+% ULTIMATE COMPRESSIVE STRENGTH (MPA)
 UCS = [];
 
 %% - DO NOT EDIT

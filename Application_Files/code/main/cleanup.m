@@ -6,7 +6,7 @@ function [] = cleanup(status)
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 25-Sep-2017 15:02:25 GMT
+%   Last modified 26-Sep-2017 21:01:00 GMT
     
     %%
     
@@ -75,7 +75,7 @@ if status == 1.0
     % Write file header
     fprintf(fid, 'Quick Fatigue Tool 6.11-04\r\n');
     fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-    fprintf(fid, 'Last modified 25-Sep-2017 15:02:25 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 26-Sep-2017 21:01:00 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');
@@ -194,7 +194,7 @@ if status == 1.0
     % Insufficient material data for analysis
     if getappdata(0, 'E005') == 1.0
         fprintf(fid, '\r\n\r\n***ERROR: The material definition is insufficient. In at least one group:');
-        if getappdata(0, 'useSN') == 1.0
+        if (getappdata(0, 'useSN') == 1.0) && (getappdata(0, 'algorithm') ~= 3.0)
             fprintf(fid, '\r\n-> S-N data points are not available');
             fprintf(fid, '\r\n-> Fatigue coefficients could not be derived');
         else

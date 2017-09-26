@@ -13,7 +13,7 @@
 %      2 Environment variables
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 21-Sep-2017 12:46:54 GMT
+%   Last modified 26-Sep-2017 21:01:00 GMT
 
 %% GATE TENSORS
 %{
@@ -226,13 +226,13 @@ setappdata(0, 'ndCompression', 0.0)
 
 % FATIGUE LIMIT DERIVATION
 %{
-    1: Calculate the fatigue limit from S-N (Basquin) material coefficients
+    1: Calculate the fatigue limit from the standard curve
     2: Calculate the fatigue limit from algorithm-specific equation (if applicable)
     3: User-defined
 %}
 setappdata(0, 'fatigueLimitSource', 1.0)
 
-% USER-DEFINED FATIGUE LIMIT
+% USER-DEFINED FATIGUE LIMIT (MPA)
 setappdata(0, 'userFatigueLimit', [])
 
 % DAMAGE BELOW ENDURANCE LIMIT

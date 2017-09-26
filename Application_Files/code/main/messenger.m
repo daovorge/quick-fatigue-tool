@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 25-Sep-2017 15:02:25 GMT
+%   Last modified 26-Sep-2017 21:01:00 GMT
 
     %%
 
@@ -612,7 +612,15 @@ classdef messenger < handle
                             setappdata(0, 'messageFileWarnings', 1.0)
                         end
                     case 48.0
-                        %_AVAILABLE_%
+                        if getappdata(0, 'suppress_ID48') == 0.0
+                            fprintf(fidType(i), [returnType{i}, '***NOTE: A strain-based fatigue algorithm has been selected without a user-defined fatigue limit', returnType{i}]);
+                            fprintf(fidType(i), ['-> The fatigue limit will be approximated from the Manson-Coffin curve and the Ramberg-Osgood relationship', returnType{i}]);
+                            fprintf(fidType(i), ['-> For such analyses, the user is strongly encouraged to specify the fatigue limit directly with the environment variables ''fatigueLimitSource=3'' and ''userFatigueLimit''', returnType{i}]);
+                            
+                            if i == X
+                                setappdata(0, 'suppress_ID48', 1.0)
+                            end
+                        end
                     case 49.0
                         % Print warning(s) if there is a problem with the mean stress correction
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The Morrow mean stress correction requires a value for the fatigue strength coefficient', returnType{i}]);
@@ -2213,6 +2221,7 @@ classdef messenger < handle
             setappdata(0, 'suppress_ID16', 0.0)
             setappdata(0, 'suppress_ID17', 0.0)
             setappdata(0, 'suppress_ID26', 0.0)
+            setappdata(0, 'suppress_ID48', 0.0)
             setappdata(0, 'suppress_ID58', 0.0)
             setappdata(0, 'suppress_ID59', 0.0)
             setappdata(0, 'suppress_ID62', 0.0)
@@ -2258,7 +2267,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n', version);
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 25-Sep-2017 15:02:25 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 26-Sep-2017 21:01:00 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

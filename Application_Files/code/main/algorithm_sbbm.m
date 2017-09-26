@@ -227,8 +227,6 @@ classdef algorithm_sbbm < handle
             end
             
             E = getappdata(0, 'E');
-            kp = getappdata(0, 'kp');
-            np = getappdata(0, 'np');
             
             scaleFactors = ones(1.0, length(cycles));
             
