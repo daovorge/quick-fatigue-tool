@@ -174,10 +174,10 @@ setappdata(0, 'importMaterialState', 1.0)
 
 %% ALGORITHM SETTINGS FOR STRESS-BASED BROWN-MILLER
 
-% S-N CURVE
+% FATIGUE DATA
 %{
-    0: Use elastic region of S-N curve only (Sf' and b)
-    1: Include plastic region of S-N curve (Ef' and c)
+    0: Use elastic fatigue properties only
+    1: Include the effect of fatigue ductility (if applicable)
 %}
 setappdata(0, 'plasticSN', 0.0)
 
