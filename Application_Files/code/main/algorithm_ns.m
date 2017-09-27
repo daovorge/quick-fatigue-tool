@@ -14,7 +14,7 @@ classdef algorithm_ns < handle
 %      6.3 Normal Stress
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 21-Sep-2017 12:46:54 GMT
+%   Last modified 27-Sep-2017 13:32:23 GMT
     
     %%
         
@@ -69,10 +69,17 @@ classdef algorithm_ns < handle
                 Tyzi, Txzi, signalLength, step, gateTensors, tensorGate, precision)
             
             % Create the stress tensor
-            St = cell(1.0, signalLength);
-            for i = 1:signalLength
-                St{i} = [Sxxi(i), Txyi(i), Txzi(i); Txyi(i), Syyi(i), Tyzi(i); Txzi(i), Tyzi(i), Szzi(i)];
-            end
+            St = zeros(3.0, 3.0, signalLength);
+            
+            St(1.0, 1.0, :) = Sxxi;
+            St(1.0, 2.0, :) = Txyi;
+            St(1.0, 3.0, :) = Txzi;
+            St(2.0, 1.0, :) = Txyi;
+            St(2.0, 2.0, :) = Syyi;
+            St(2.0, 3.0, :) = Tyzi;
+            St(3.0, 1.0, :) = Txzi;
+            St(3.0, 2.0, :) = Tyzi;
+            St(3.0, 3.0, :) = Szzi;
             
             % Initialize matrices for normal stress components on each plane
             f = zeros(precision, precision);
@@ -112,7 +119,7 @@ classdef algorithm_ns < handle
                     
                     % Calculate the transform stress tensor for the current plane
                     for y = 1:signalLength
-                        S_prime{y}=Q'*St{y}*Q;
+                        S_prime{y}=Q'*St(:, :, y)*Q;
                     end
                     
                     % Calculate stress components for the first face of rotated stress matrix
@@ -330,10 +337,17 @@ classdef algorithm_ns < handle
             damageCube = damageParamCube;
             
             % Create the stress tensor
-            St = cell(1.0, signalLength);
-            for i = 1:signalLength
-                St{i} = [stress(1.0, i), stress(4.0, i), stress(5.0, i); stress(4.0, i), stress(2.0, i), stress(6.0, i); stress(5.0, i), stress(6.0, i), stress(3.0, i)];
-            end
+            St = zeros(3.0, 3.0, signalLength);
+            
+            St(1.0, 1.0, :) = stress(1.0, :);
+            St(1.0, 2.0, :) = stress(4.0, :);
+            St(1.0, 3.0, :) = stress(5.0, :);
+            St(2.0, 1.0, :) = stress(4.0, :);
+            St(2.0, 2.0, :) = stress(2.0, :);
+            St(2.0, 3.0, :) = stress(6.0, :);
+            St(3.0, 1.0, :) = stress(5.0, :);
+            St(3.0, 2.0, :) = stress(6.0, :);
+            St(3.0, 3.0, :) = stress(3.0, :);
             
             % Initialize matrices for normal stress on each plane
             sn = zeros(1.0, precision);
@@ -364,7 +378,7 @@ classdef algorithm_ns < handle
                 
                 % Calculate the transform stress tensor for the current plane
                 for y = 1:1:signalLength
-                    S_prime{y}=Q'*St{y}*Q;
+                    S_prime{y}=Q'*St(:, :, y)*Q;
                 end
                 
                 % Calculate stress components for the first face of rotated stress matrix
