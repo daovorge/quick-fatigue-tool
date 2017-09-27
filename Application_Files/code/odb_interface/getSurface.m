@@ -13,7 +13,7 @@ function [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(ma
 %      4.5.3 Custom analysis items
 %
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 19-Sep-2017 14:58:20 GMT
+%   Last modified 27-Sep-2017 16:13:56 GMT
 
 %%
 
@@ -262,6 +262,15 @@ if (isempty(strfind(message, 'SUCCESS')) == 0.0) && (status == 0.0)
     if isempty(strfind(message, 'GEOM_INCOMPATIBLE')) == 0.0
         % Write to message file
         messenger.writeMessage(272.0)
+    end
+    
+    % Check for unsupported elements
+    if isempty(strfind(message, 'Unsupported elements')) == 0.0
+        index = strfind(message, 'Unsupported elements');
+        if (length(message) - index) > 24.0
+            setappdata(0, 'message_289_unsupportedElements', message(index + 22.0:end))
+            messenger.writeMessage(289.0)
+        end
     end
 else
     message = [message, sprintf('\nOutcome: SYSTEM() RETURNED STATUS 1 (ERROR)\n')];

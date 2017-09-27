@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 27-Sep-2017 13:32:23 GMT
+%   Last modified 27-Sep-2017 16:13:56 GMT
 
     %%
 
@@ -2138,7 +2138,7 @@ classdef messenger < handle
                             fprintf(fidType(i), ['-> If the first job contains damaging cycles and the second job contains cycles below the endurance limit, fatigue damage may not be calculated for the small cycles', returnType{i}]);
                         end
                     case 269.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: Surface detection did not find any elements or nodes', returnType{i}]);
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The surface detection algorithm did not find any surface elements or nodes in the model', returnType{i}]);
                         fprintf(fidType(i), ['-> All items will be analysed', returnType{i}]);
                     case 270.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Surface detection is not supported for integration point stress data', returnType{i}]);
@@ -2212,6 +2212,9 @@ classdef messenger < handle
                     case 287.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: Some items in the surface definition file could not be located in the stress dataset', returnType{i}]);
                         fprintf(fidType(i), ['-> Verify that the results position in the surface definition is consistent with the model definition in the job file', returnType{i}]);
+                    case 289.0
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: The following elements are not supported by the surface detection algorithm: %s', returnType{i}], getappdata(0, 'message_289_unsupportedElements'));
+                        fprintf(fidType(i), ['-> These elements have been skipped', returnType{i}]);
                 end
             end
         end
@@ -2267,7 +2270,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n', version);
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 27-Sep-2017 13:32:23 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 27-Sep-2017 16:13:56 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

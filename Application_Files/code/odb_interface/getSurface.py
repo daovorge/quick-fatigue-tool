@@ -19,7 +19,7 @@
 #   louisvallance@hotmail.co.uk
 #
 #   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-#   Last modified 18-Aug-2017 10:26:46 GMT
+#   Last modified 27-Sep-2017 16:13:56 GMT
 
 import os
 from odbAccess import *
@@ -67,6 +67,9 @@ if (SEARCH_REGION.lower() == 'dataset'):
 	f = fid.read()
 	ELEMENT_ID = f.split(',')
 	fid.close()
+
+# Initialize buffer containing any supported elements
+unsupportedElements = []
 	
 # Loop over each part instance to find surface:
 for instanceNumber in range(nInstances):
@@ -337,6 +340,24 @@ for instanceNumber in range(nInstances):
 			
 			indexIncrement = 6
 			
+		# 3D continuum solid hexahedral shell elements
+		elif (element.type == 'CSS8'):
+			
+			# Increment INDEX face node variable:
+			if (i > 0):
+				index = index + indexIncrement
+			
+			faces[index + 0][:] = itemgetter(*[0, 1, 2, 3])(conn)
+			faces[index + 1][:] = itemgetter(*[4, 7, 6, 5])(conn)
+			faces[index + 2][:] = itemgetter(*[0, 4, 5, 1])(conn)
+			faces[index + 3][:] = itemgetter(*[1, 5, 6, 2])(conn)
+			faces[index + 4][:] = itemgetter(*[2, 6, 7, 3])(conn)
+			faces[index + 5][:] = itemgetter(*[3, 7, 4, 0])(conn)
+			
+			linearAndQuad[0] = 1
+			
+			indexIncrement = 6
+			
 		# 2D continuum triangular elements:
 		elif ((element.type == 'CPE3') or (element.type == 'CPE3H') or (element.type == 'CPE6') or (element.type == 'CPE6H') or (element.type == 'CPE6M') or (element.type == 'CPE6MH') or (element.type == 'CPS3') or (element.type == 'CPS6') or (element.type == 'CPS6M') or (element.type == 'CPEG3') or (element.type == 'CPEG3H') or (element.type == 'CPEG6') or (element.type == 'CPEG6H') or (element.type == 'CPEG6M') or (element.type == 'CPEG6MH')):
 			
@@ -428,7 +449,10 @@ for instanceNumber in range(nInstances):
 					linearAndQuad[1] = 1
 				
 				indexIncrement = 1
-	
+		else:
+			# This element is not supported by the surface detection algorithm
+			unsupportedElements.append(element.type)
+			
 	# Get surface nodes from unique faces:
 	surfaceNodes = Counter([tuple(sorted(x)) for x in faces])
 	surfaceNodes = [list(k) for k, v in surfaceNodes.items() if v == 1]
@@ -529,3 +553,4 @@ elif (POSITION.lower() == 'centroidal'):
 odb.close()
 
 print "Outcome: SUCCESS"
+print "Unsupported elements: %s" % list(set(unsupportedElements))
