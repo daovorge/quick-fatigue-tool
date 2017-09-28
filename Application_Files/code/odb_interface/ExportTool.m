@@ -1122,7 +1122,7 @@ msg3 = sprintf('\nIf no argument is specified, ''abaqus'' is used by default.');
 
 msg4 = sprintf('\n\n*ODB part instance name(s):');
 msg5 = sprintf('\nSpecify the part instance name(s) belonging to the elements or nodes in the field data.');
-msg6 = sprintf('\nAt least one part instance name must be specified.');
+msg6 = sprintf(' At least one part instance name must be specified.');
 
 msg7 = sprintf('\n\n*Results step name:');
 msg8 = sprintf('\nIf field data is written to an existing step in the ODB, the step name');
