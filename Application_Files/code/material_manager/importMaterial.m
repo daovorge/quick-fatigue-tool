@@ -495,10 +495,10 @@ classdef importMaterial < handle
                                     
                                     % Process the data line
                                     nProperties = length(properties);
-                                    if nProperties > 4.0
-                                        properties = properties(1.0:4.0);
-                                    elseif nProperties < 4.0
-                                        properties(nProperties + 1.0:4.0) = -9e100;
+                                    if nProperties > 5.0
+                                        properties = properties(1.0:5.0);
+                                    elseif nProperties < 5.0
+                                        properties(nProperties + 1.0:5.0) = -9e100;
                                     end
                                     
                                     % E

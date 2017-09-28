@@ -157,10 +157,20 @@ classdef material < handle
                     fprintf('ERROR: Unable to save material ''%s''. Make sure the material save location has read/write access.\n', materialName)
                     return
                 end
-                
-                % List materials in the local database
-                material.list()
+            elseif error == 0.0
+                % Save the material
+                try
+                    save([localPath, '\', materialName], 'material_properties')
+                catch
+                    fprintf('ERROR: Unable to save material ''%s''. Make sure the material save location has read/write access.\n', materialName)
+                    return
+                end
+            else
+                return
             end
+            
+            % List materials in the local database
+            material.list()
         end
         
         %% Fetch material from system database

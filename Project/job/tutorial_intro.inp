@@ -22,7 +22,7 @@
 **Material data
 *USER MATERIAL, steel
 *MECHANICAL
-200e3, 0.33, 400, 325
+200e3, 0.33, 400, 400, 325
 *FATIGUE, constants
 930, -0.095, , ,
 *FATIGUE, test data
