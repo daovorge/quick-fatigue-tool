@@ -12,7 +12,7 @@ function varargout = ExportTool(varargin)%#ok<*DEFNU>
 %      10.4 The ODB Interface
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 25-Sep-2017 15:02:25 GMT
+%   Last modified 28-Sep-2017 10:31:34 GMT
     
     %%
     
@@ -1120,9 +1120,9 @@ msg1 = sprintf('*Abaqus command line argument:');
 msg2 = sprintf('\nSpecify the command used to access the Abaqus API.');
 msg3 = sprintf('\nIf no argument is specified, ''abaqus'' is used by default.');
 
-msg4 = sprintf('\n\n*ODB part instance name:');
-msg5 = sprintf('\nExport Tool can write field data to a single part instance.');
-msg6 = sprintf('\nThe part instance name must be specified.');
+msg4 = sprintf('\n\n*ODB part instance name(s):');
+msg5 = sprintf('\nSpecify the part instance name(s) belonging to the elements or nodes in the field data.');
+msg6 = sprintf('\nAt least one part instance name must be specified.');
 
 msg7 = sprintf('\n\n*Results step name:');
 msg8 = sprintf('\nIf field data is written to an existing step in the ODB, the step name');

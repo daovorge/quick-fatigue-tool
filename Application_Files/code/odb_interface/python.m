@@ -11,7 +11,7 @@ classdef python < handle
 %      10.4 The ODB Interface
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 25-Sep-2017 15:02:25 GMT
+%   Last modified 28-Sep-2017 10:31:34 GMT
     
     %%
     
@@ -1064,7 +1064,7 @@ classdef python < handle
             fprintf(fid, '\r\n#   louisvallance@hotmail.co.uk');
             fprintf(fid, '\r\n#');
             fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017');
-            fprintf(fid, '\r\n#   Last modified 25-Sep-2017 15:02:25 GMT');
+            fprintf(fid, '\r\n#   Last modified 28-Sep-2017 10:31:34 GMT');
             
             % Write Abaqus import header
             fprintf(fid, '\r\n\r\nfrom odbAccess import *');
@@ -1453,7 +1453,7 @@ classdef python < handle
             fprintf(fid, '\r\n#   louisvallance@hotmail.co.uk');
             fprintf(fid, '\r\n#');
             fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017');
-            fprintf(fid, '\r\n#   Last modified 25-Sep-2017 15:02:25 GMT');
+            fprintf(fid, '\r\n#   Last modified 28-Sep-2017 10:31:34 GMT');
             
             % Write Abaqus import header
             fprintf(fid, '\r\n\r\nfrom odbAccess import *');
@@ -1682,7 +1682,7 @@ classdef python < handle
             fprintf(fid, '\r\n#   louisvallance@hotmail.co.uk');
             fprintf(fid, '\r\n#');
             fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017');
-            fprintf(fid, '\r\n#   Last modified 25-Sep-2017 15:02:25 GMT');
+            fprintf(fid, '\r\n#   Last modified 28-Sep-2017 10:31:34 GMT');
             
             % Write Abaqus import header
             fprintf(fid, '\r\n\r\nfrom odbAccess import *');
