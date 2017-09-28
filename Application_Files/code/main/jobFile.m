@@ -6,7 +6,7 @@ classdef jobFile < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 21-Sep-2017 14:37:10 GMT
+%   Last modified 28-Sep-2017 16:31:00 GMT
     
     %%
     
@@ -56,31 +56,30 @@ classdef jobFile < handle
             userUnits = flags{27};  setappdata(0, 'userUnits', userUnits)
             outputDatabase = flags{28};  setappdata(0, 'outputDatabase', outputDatabase)
             partInstance = flags{29};  setappdata(0, 'partInstance', partInstance)
-            ucs = flags{30};  setappdata(0, 'ucs', ucs)
-            offset = flags{31};  setappdata(0, 'offset', offset)
-            stepName = flags{32};   setappdata(0, 'stepName', stepName)
-            enableFOS = flags{33};  setappdata(0, 'enableFOS', enableFOS)
-            analysisGroups = flags{34}; setappdata(0, 'analysisGroups', analysisGroups)
-            getHotSpots = flags{35}; setappdata(0, 'getHotSpots', getHotSpots)
-            snKnockDown = flags{36}; setappdata(0, 'snKnockDown', snKnockDown)
-            isExplicit = flags{37}; setappdata(0, 'isExplicit', isExplicit)
-            odbResultPosition = flags{38}; setappdata(0, 'odbResultPosition', odbResultPosition)
-            continueFrom = flags{39}; setappdata(0, 'continueFrom', continueFrom)
-            dataCheck = flags{40};  setappdata(0, 'dataCheck', dataCheck)
-            notchSensitivityConstant = flags{41};  setappdata(0, 'notchSensitivityConstant', notchSensitivityConstant)
-            notchRootRadius = flags{42};  setappdata(0, 'notchRootRadius', notchRootRadius)
-            vGaugeLoc = flags{43};  setappdata(0, 'vGaugeLoc', vGaugeLoc)
-            vGaugeOri = flags{44};  setappdata(0, 'vGaugeOri', vGaugeOri)
-            jobName = flags{45};  setappdata(0, 'jobName', jobName)
-            jobDescription = flags{46};  setappdata(0, 'jobDescription', jobDescription)
-            material = flags{47};  setappdata(0, 'material', material)
-            dataset = flags{48};  setappdata(0, 'dataset', dataset)
-            history = flags{49};  setappdata(0, 'history', history)
-            hfDataset = flags{50};  setappdata(0, 'hfDataset', hfDataset)
-            hfHistory = flags{51};  setappdata(0, 'hfHistory', hfHistory)
-            hfTime = flags{52};  setappdata(0, 'hfTime', hfTime)
-            hfScales = flags{53};  setappdata(0, 'hfScales', hfScales)
-            frfEnvelope = flags{54};    setappdata(0, 'frfEnvelope', frfEnvelope)
+            offset = flags{30};  setappdata(0, 'offset', offset)
+            stepName = flags{31};   setappdata(0, 'stepName', stepName)
+            enableFOS = flags{32};  setappdata(0, 'enableFOS', enableFOS)
+            analysisGroups = flags{33}; setappdata(0, 'analysisGroups', analysisGroups)
+            getHotSpots = flags{34}; setappdata(0, 'getHotSpots', getHotSpots)
+            snKnockDown = flags{35}; setappdata(0, 'snKnockDown', snKnockDown)
+            isExplicit = flags{36}; setappdata(0, 'isExplicit', isExplicit)
+            odbResultPosition = flags{37}; setappdata(0, 'odbResultPosition', odbResultPosition)
+            continueFrom = flags{38}; setappdata(0, 'continueFrom', continueFrom)
+            dataCheck = flags{39};  setappdata(0, 'dataCheck', dataCheck)
+            notchSensitivityConstant = flags{40};  setappdata(0, 'notchSensitivityConstant', notchSensitivityConstant)
+            notchRootRadius = flags{41};  setappdata(0, 'notchRootRadius', notchRootRadius)
+            vGaugeLoc = flags{42};  setappdata(0, 'vGaugeLoc', vGaugeLoc)
+            vGaugeOri = flags{43};  setappdata(0, 'vGaugeOri', vGaugeOri)
+            jobName = flags{44};  setappdata(0, 'jobName', jobName)
+            jobDescription = flags{45};  setappdata(0, 'jobDescription', jobDescription)
+            material = flags{46};  setappdata(0, 'material', material)
+            dataset = flags{47};  setappdata(0, 'dataset', dataset)
+            history = flags{48};  setappdata(0, 'history', history)
+            hfDataset = flags{49};  setappdata(0, 'hfDataset', hfDataset)
+            hfHistory = flags{50};  setappdata(0, 'hfHistory', hfHistory)
+            hfTime = flags{51};  setappdata(0, 'hfTime', hfTime)
+            hfScales = flags{52};  setappdata(0, 'hfScales', hfScales)
+            frfEnvelope = flags{53};    setappdata(0, 'frfEnvelope', frfEnvelope)
             
             %% DEFAULT FLAGS
             if isempty(jobName) == 1.0

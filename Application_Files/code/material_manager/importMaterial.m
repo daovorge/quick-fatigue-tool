@@ -9,7 +9,7 @@ classdef importMaterial < handle
 %   LocalMaterialDatabase, material, MaterialEditor, MaterialManager.
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 03-Sep-2017 10:19:27 GMT
+%   Last modified 28-Sep-2017 16:31:00 GMT
     
     %%
     
@@ -28,6 +28,7 @@ classdef importMaterial < handle
                 'e', [],...
                 'e_active', 0.0,...
                 'uts', [],...
+                'ucs', [],...
                 'uts_active', 0.0,...
                 'proof', [],...
                 'proof_active', 0.0,...
@@ -99,7 +100,7 @@ classdef importMaterial < handle
             
             % Initialize the keyword warnings
             keywordWarnings = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,...
-                0.0, 0.0, 0.0, 0.0, ];
+                0.0, 0.0, 0.0, 0.0];
             
             % Counter for number of lines read for the material
             nTLINE_material = 1.0;
@@ -515,9 +516,14 @@ classdef importMaterial < handle
                                         material_properties.uts = properties(3.0);
                                     end
                                     
-                                    % Proof
+                                    % UCS
                                     if properties(4.0) ~= -9e100
-                                        material_properties.proof = properties(4.0);
+                                        material_properties.ucs = properties(4.0);
+                                    end
+                                    
+                                    % Proof
+                                    if properties(5.0) ~= -9e100
+                                        material_properties.proof = properties(5.0);
                                     end
                                 else
                                     % Get the numeric value of the data line

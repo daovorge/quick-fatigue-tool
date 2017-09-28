@@ -6,7 +6,7 @@ function [] = cleanup(status)
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 28-Sep-2017 10:31:34 GMT
+%   Last modified 28-Sep-2017 16:31:00 GMT
     
     %%
     
@@ -51,7 +51,7 @@ if status == 1.0
     errLogFile = [dir, sprintf('%s.log', job)];
     
     %{
-    	Available error codes: E009, E010, E011
+    	Available error codes: E009, E010, E011, E085, E092, E093, E094
     %}
     
     % Remove the DATA and MATLAB FIGURES directories if applicable
@@ -75,7 +75,7 @@ if status == 1.0
     % Write file header
     fprintf(fid, 'Quick Fatigue Tool 6.11-04\r\n');
     fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-    fprintf(fid, 'Last modified 28-Sep-2017 10:31:34 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 28-Sep-2017 16:31:00 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');
@@ -856,17 +856,6 @@ if status == 1.0
         fprintf(fid, '\r\n\r\nError code: E084');
         rmappdata(0, 'E084')
     end
-    if getappdata(0, 'E085') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: Two values of ucs are specified, but only one analysis group was defined');
-        fprintf(fid, '\r\n-> The ucs definition is ambiguous');
-        fprintf(fid, '\r\n-> Either modify the ucs definition so that only one ucs value is specified, or modify the group');
-        fprintf(fid, '\r\n   defintion so that the number of groups and ucs values agree with each other');
-        fprintf(fid, '\r\n-> If you wish to define ucs values for a single analysis group, followed by analysis of the');
-        fprintf(fid, '\r\n   remainder of the model, specify GROUP as {<sub_group>, ''DEFAULT''}, where the first ucs value is used');
-        fprintf(fid, '\r\n   to analyse <sub_group> and the second ucs is used to analyse the rest of the model');
-        fprintf(fid, '\r\n\r\nError code: E085');
-        rmappdata(0, 'E085')
-    end
     if getappdata(0, 'E086') == 1.0
         fprintf(fid, '\r\n\r\n***ERROR: There are %.0f analysis groups but only %.0f b2 values', getappdata(0, 'error_log_086_numberOfGroups'), getappdata(0, 'error_log_086_numberOfB2'));
         fprintf(fid, '\r\n-> Modify the group and/or b2 defintions so that the number of groups and b2 values agree with each other');
@@ -916,31 +905,6 @@ if status == 1.0
         fprintf(fid, '\r\n   defintion so that the number of groups and b2Nf values agree with each other');
         fprintf(fid, '\r\n\r\nError code: E091');
         rmappdata(0, 'E091')
-    end
-    if getappdata(0, 'E092') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: There are %.0f analysis groups but only %.0f UCS values', getappdata(0, 'error_log_092_numberOfGroups'), getappdata(0, 'error_log_092_numberOfUCS'));
-        fprintf(fid, '\r\n-> Modify the group and/or UCS defintions so that the number of groups and UCS values agree with each other');
-        fprintf(fid, '\r\n\r\nError code: E092');
-        rmappdata(0, 'E092')
-    end
-    if getappdata(0, 'E093') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: There are %.0f UCS values but only %.0f analysis groups', getappdata(0, 'error_log_093_numberOfUCS'), getappdata(0, 'error_log_093_numberOfGroups'));
-        fprintf(fid, '\r\n-> The UCS definition is ambiguous');
-        fprintf(fid, '\r\n-> Either modify the UCS values so that only one UCS value is specified, or modify the group');
-        fprintf(fid, '\r\n   defintion so that the number of groups and UCS values agree with each other');
-        fprintf(fid, '\r\n-> If you wish to define UCS values for multiple analysis groups, followed by analysis of the');
-        fprintf(fid, '\r\n   remainder of the model, specify GROUP as {<sub_group_1>,..., <sub_group_n>, ''DEFAULT''}, where the');
-        fprintf(fid, '\r\n   last UCS value is used to analyse the rest of the model');
-        fprintf(fid, '\r\n\r\nError code: E093');
-        rmappdata(0, 'E093')
-    end
-    if getappdata(0, 'E094') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: There are %.0f UCS values but only %.0f analysis groups', getappdata(0, 'error_log_094_numberOfUCS'), getappdata(0, 'error_log_094_numberOfGroups'));
-        fprintf(fid, '\r\n-> The UCS definition is ambiguous');
-        fprintf(fid, '\r\n-> Either modify the UCS values so that only one UCS value is specified, or modify the group');
-        fprintf(fid, '\r\n   defintion so that the number of groups and UCS values agree with each other');
-        fprintf(fid, '\r\n\r\nError code: E094');
-        rmappdata(0, 'E094')
     end
     if getappdata(0, 'E095') == 1.0
         fprintf(fid, '\r\n\r\n***ERROR: The number of values in B2 and B2_NF do not agree');

@@ -9,7 +9,7 @@ classdef group < handle
 %      4.6 Analysis groups
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 07-Apr-2017 14:38:24 GMT
+%   Last modified 28-Sep-2017 16:31:00 GMT
     
     %%
     
@@ -831,10 +831,9 @@ classdef group < handle
             % Save the residual stresses
             setappdata(0, 'residualStress_original', residualStress)
             
-            %% Verify B2/B2_NF/UCS definition
+            %% Verify B2/B2_NF definition
             b2 = getappdata(0, 'b2');
             b2Nf = getappdata(0, 'b2Nf');
-            ucs = getappdata(0, 'ucs');
             
             if isempty(b2) == 1.0
                 numberOfB2 = [];
@@ -845,11 +844,6 @@ classdef group < handle
                 numberOfB2Nf = [];
             else
                 numberOfB2Nf = length(b2Nf);
-            end
-            if isempty(ucs) == 1.0
-                numberOfUCS = [];
-            else
-                numberOfUCS = length(ucs);
             end
             
             if length(b2) ~= length(b2Nf)
@@ -884,15 +878,6 @@ classdef group < handle
                     %}
                     messenger.writeMessage(128.0)
                     setappdata(0, 'b2Nf', b2Nf(1.0))
-                end
-                
-                if numberOfUCS > 1.0
-                    %{
-                        There is more than one UCS, making the
-                        definition ambiguous. Use only the first value
-                    %}
-                    messenger.writeMessage(129.0)
-                    setappdata(0, 'ucs', ucs(1.0))
                 end
             elseif (numberOfGroups == 1.0) && (strcmpi(analysisGroups, 'defualt') == 0.0)
                 %{
@@ -938,26 +923,6 @@ classdef group < handle
                     %}
                     error = 1.0;
                     setappdata(0, 'E084', 1.0)
-                    return
-                end
-                
-                if numberOfUCS > 2.0
-                    %{
-                        There are multiple B2Nfs, making the definition
-                        ambiguous
-                    %}
-                    messenger.writeMessage(132.0)
-                    setappdata(0, 'ucs', ucs(1.0))
-                elseif numberOfUCS == 2.0
-                    %{
-                        There are two UCS values, making the definition
-                        ambiguous. It's possible that the user meant to
-                        define a group UCS followed by a DEFAULT group,
-                        but forgot to add 'DEFAULT' to the GROUP option.
-                        Inform the user and abort the analysis
-                    %}
-                    error = 1.0;
-                    setappdata(0, 'E085', 1.0)
                     return
                 end
             elseif numberOfGroups > 1.0
@@ -1022,35 +987,6 @@ classdef group < handle
                     setappdata(0, 'error_log_091_numberOfGroups', numberOfGroups)
                     return
                 end
-                
-                if numberOfUCS < numberOfGroups
-                    % There are fewer UCS values than analysis groups
-                    error = 1.0;
-                    setappdata(0, 'E092', 1.0)
-                    setappdata(0, 'error_log_092_numberOfUCS', numberOfUCS)
-                    setappdata(0, 'error_log_092_numberOfGroups', numberOfGroups)
-                    return
-                elseif numberOfUCS == (numberOfGroups - 1.0)
-                    %{
-                        There is one more UCS than there are analysis
-                        groups
-                    %}
-                    error = 1.0;
-                    setappdata(0, 'E093', 1.0)
-                    setappdata(0, 'error_log_093_numberOfUCS', numberOfUCS)
-                    setappdata(0, 'error_log_093_numberOfGroups', numberOfGroups)
-                    return
-                elseif numberOfUCS > numberOfGroups
-                    %{
-                        There is greater than one UCS more than there
-                        are analysis groups
-                    %}
-                    error = 1.0;
-                    setappdata(0, 'E094', 1.0)
-                    setappdata(0, 'error_log_094_numberOfUCS', numberOfUCS)
-                    setappdata(0, 'error_log_094_numberOfGroups', numberOfGroups)
-                    return
-                end
             end
             
             % Save b2
@@ -1058,9 +994,6 @@ classdef group < handle
             
             % Save b2Nf
             setappdata(0, 'b2Nf_original', b2Nf)
-            
-            % Save UCS
-            setappdata(0, 'ucs_original', ucs)
             
             %% Verify SN_KNOCK_DOWN definition
             snKnockDown = getappdata(0, 'snKnockDown');

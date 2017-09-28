@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 26-Sep-2017 21:01:00 GMT
+%   Last modified 28-Sep-2017 16:31:00 GMT
     
     %%
     
@@ -233,6 +233,35 @@ classdef preProcess < handle
                 uts = [];
                 setappdata(0, 'uts', [])
                 setappdata(0, 'uts_status', -1.0)
+            end
+            
+            %% Ultimate compressive strength
+            if material_properties.uts_active == 1.0
+                if ischar(material_properties.ucs)
+                    ucs = str2double(material_properties.ucs);
+                else
+                    ucs = material_properties.ucs;
+                end
+                
+                if isnumeric(ucs) == 0.0
+                    error = 3.0;
+                    return
+                elseif isempty(ucs) == 1.0 || isnan(ucs) == 1.0 || isinf(ucs) == 1.0
+                    setappdata(0, 'ucs', uts)
+                    setappdata(0, 'ucs_status', 2.0)
+                elseif ucs <= 0.0
+                    error = 3.0;
+                    return
+                elseif isreal(ucs) == 0.0
+                    error = 3.0;
+                    return
+                else
+                    setappdata(0, 'ucs', ucs)
+                    setappdata(0, 'ucs_status', 0.0)
+                end
+            else
+                setappdata(0, 'ucs', [])
+                setappdata(0, 'ucs_status', -1.0)
             end
             
             %% Poisson's ratio

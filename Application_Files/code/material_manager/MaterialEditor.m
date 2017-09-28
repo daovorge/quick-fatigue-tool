@@ -13,7 +13,7 @@ function varargout = MaterialEditor(varargin)%#ok<*DEFNU>
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 27-Jun-2017 16:21:27 GMT
+%   Last modified 28-Sep-2017 16:31:00 GMT
     
     %%
     
@@ -355,14 +355,25 @@ switch get(hObject, 'value')
     case 0.0
         setappdata(0, 'uts_value', get(handles.edit_uts, 'string'))
         set(handles.edit_uts, 'string', [])
+        set(handles.text_slash, 'enable', 'off')
         set(handles.edit_uts, 'enable', 'inactive')
         set(handles.edit_uts, 'backgroundColor', [241/255, 241/255, 241/255])
         set(handles.text_uts_units, 'enable', 'off')
+        
+        setappdata(0, 'ucs_value', get(handles.edit_ucs, 'string'))
+        set(handles.edit_ucs, 'string', [])
+        set(handles.edit_ucs, 'enable', 'inactive')
+        set(handles.edit_ucs, 'backgroundColor', [241/255, 241/255, 241/255])
     case 1.0
         set(handles.edit_uts, 'enable', 'on')
         set(handles.edit_uts, 'backgroundColor', [1, 1, 1])
+        set(handles.text_slash, 'enable', 'on')
         set(handles.edit_uts, 'string', getappdata(0, 'uts_value'))
         set(handles.text_uts_units, 'enable', 'on')
+        
+        set(handles.edit_ucs, 'enable', 'on')
+        set(handles.edit_ucs, 'backgroundColor', [1, 1, 1])
+        set(handles.edit_ucs, 'string', getappdata(0, 'ucs_value'))
 end
 
 
@@ -1091,8 +1102,9 @@ else
     set(handles.pMenu_regModel, 'value', 1.0)
     set(handles.edit_e, 'string', '', 'enable', 'inactive', 'backgroundColor', [241/255, 241/255, 241/255])
     set(handles.check_e, 'value', 0.0)
-    set(handles.edit_uts, 'string', '', 'enable', 'inactive', 'backgroundColor', [241/255, 241/255, 241/255])
     set(handles.check_uts, 'value', 0.0)
+    set(handles.edit_uts, 'string', '', 'enable', 'inactive', 'backgroundColor', [241/255, 241/255, 241/255])
+    set(handles.edit_ucs, 'string', '', 'enable', 'inactive', 'backgroundColor', [241/255, 241/255, 241/255])
     set(handles.edit_proof, 'string', '', 'enable', 'inactive', 'backgroundColor', simulia_blue)
     set(handles.check_proof, 'value', 0.0)
     set(handles.edit_poisson, 'string', '0.33', 'enable', 'inactive', 'backgroundColor', [241/255, 241/255, 241/255])
@@ -1157,6 +1169,7 @@ material_properties = struct(...
 'e', get(handles.edit_e, 'string'),...
 'e_active', get(handles.check_e, 'value'),...
 'uts', get(handles.edit_uts, 'string'),...
+'ucs', get(handles.edit_ucs, 'string'),...
 'uts_active', get(handles.check_uts, 'value'),...
 'proof', get(handles.edit_proof, 'string'),...
 'proof_active', get(handles.check_proof, 'value'),...
@@ -1214,9 +1227,20 @@ if properties.material_properties.e_active == 1.0
 end
 
 set(handles.edit_uts, 'string', properties.material_properties.uts)
+try
+    if isempty(properties.material_properties.ucs) == 1.0
+        set(handles.edit_ucs, 'string', properties.material_properties.uts)
+    else
+        set(handles.edit_ucs, 'string', properties.material_properties.ucs)
+    end
+catch
+    set(handles.edit_ucs, 'string', properties.material_properties.uts)
+end
 if properties.material_properties.uts_active == 1.0
     set(handles.edit_uts, 'backgroundColor', [1.0, 1.0, 1.0], 'enable', 'on')
+    set(handles.edit_ucs, 'backgroundColor', [1.0, 1.0, 1.0], 'enable', 'on')
     set(handles.check_uts, 'value', 1.0)
+    set(handles.text_slash, 'enable', 'on')
     set(handles.text_uts_units, 'enable', 'on')
 end
 
@@ -2062,6 +2086,8 @@ if get(handles.check_poisson, 'value') == 0.0
 end
 if get(handles.check_uts, 'value') == 0.0
     set(handles.edit_uts, 'enable', 'off')
+    set(handles.text_slash, 'enable', 'off')
+    set(handles.edit_ucs, 'enable', 'off')
     set(handles.text_uts_units, 'enable', 'off')
 end
 if get(handles.check_proof, 'value') == 0.0
@@ -2115,4 +2141,27 @@ end
 % Back button
 if (isappdata(0, 'multiaxial_gauge_fatigue_skip_material_manager') == 1.0) || (isappdata(0, 'uniaxial_strain_life_skip_material_manager') == 1.0)
     set(handles.pButton_manager, 'enable', 'off')
+end
+
+
+
+function edit_ucs_Callback(~, ~, ~)
+% hObject    handle to edit_ucs (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_ucs as text
+%        str2double(get(hObject,'String')) returns contents of edit_ucs as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_ucs_CreateFcn(hObject, ~, ~)
+% hObject    handle to edit_ucs (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
 end
