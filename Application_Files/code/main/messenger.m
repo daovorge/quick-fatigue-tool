@@ -1216,7 +1216,15 @@ classdef messenger < handle
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 132.0
-                        %_AVAILABLE_%
+                        if getappdata(0, 'suppress_ID132') == 0.0
+                            fprintf(fidType(i), [returnType{i}, '***NOTE: Out-of-plane stresses were found during the composite failure calculation', returnType{i}]);
+                            fprintf(fidType(i), ['-> The composite failure criteria assume plane stress conditions', returnType{i}]);
+                            fprintf(fidType(i), ['-> Results of the damage initiation calculation may be inaccurate', returnType{i}]);
+                            
+                            if i == X
+                                setappdata(0, 'suppress_ID132', 1.0)
+                            end
+                        end
                     case 133.0
                         if (ispc == 1.0) && (ismac == 0.0)
                             [userView, systemView] = memory;
@@ -2235,6 +2243,7 @@ classdef messenger < handle
             setappdata(0, 'suppress_ID77', 0.0)
             setappdata(0, 'suppress_ID78', 0.0)
             setappdata(0, 'suppress_ID97', 0.0)
+            setappdata(0, 'suppress_ID132', 0.0)
             setappdata(0, 'suppress_ID143', 0.0)
             setappdata(0, 'suppress_ID144', 0.0)
             setappdata(0, 'suppress_ID145', 0.0)

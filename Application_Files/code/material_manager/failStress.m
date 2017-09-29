@@ -277,8 +277,8 @@ if error == 1.0
     return
 end
 
-if failStress_tsfd < 0.0  || failStress_csfd < 0.0 || failStress_tstd < 0.0 || failStress_cstd < 0.0 || failStress_shear < 0.0
-    errordlg('Stress values cannot be negative.', 'Quick Fatigue Tool')
+if failStress_tsfd <= 0.0  || failStress_csfd <= 0.0 || failStress_tstd <= 0.0 || failStress_cstd <= 0.0 || failStress_shear <= 0.0
+    errordlg('Stress values must be positive.', 'Quick Fatigue Tool')
     return
 end
 

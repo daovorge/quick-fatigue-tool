@@ -245,6 +245,7 @@ end
 function pButton_ok_Callback(~, ~, handles)
 error = 0.0;
 
+% Check for bad inputs
 failStrain_tsfd = str2double(get(handles.edit_tsfd, 'string'));
 if isnan(failStrain_tsfd) == 1.0 || isinf(failStrain_tsfd) == 1.0 || isreal(failStrain_tsfd) == 0.0
     error = 1.0;
@@ -271,8 +272,9 @@ if error == 1.0
     return
 end
 
-if failStrain_tsfd < 0.0  || failStrain_csfd < 0.0 || failStrain_tstd < 0.0 || failStrain_cstd < 0.0 || failStrain_shear < 0.0
-    errordlg('Strain values cannot be negative.', 'Quick Fatigue Tool')
+% Check for non-physical inputs
+if failStrain_tsfd <= 0.0  || failStrain_csfd <= 0.0 || failStrain_tstd <= 0.0 || failStrain_cstd <= 0.0 || failStrain_shear <= 0.0
+    errordlg('Strain values must be positive.', 'Quick Fatigue Tool')
     return
 end
 

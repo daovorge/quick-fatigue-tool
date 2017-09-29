@@ -79,20 +79,21 @@ for groups = 1:G
     else
         failStress = 1.0;
     end
-        
-    % Store the current group number
-    setappdata(0, 'message_groupNumber', groups)
     
     % Get stress tensor
     S11 = getappdata(0, 'Sxx');
     S22 = getappdata(0, 'Syy');
     S33 = getappdata(0, 'Szz');
     S12 = getappdata(0, 'Txy');
+    S13 = getappdata(0, 'Txz');
+    S23 = getappdata(0, 'Tyz');
     
     S11 = S11(startID:(startID + N) - 1.0, :);
     S22 = S22(startID:(startID + N) - 1.0, :);
     S33 = S33(startID:(startID + N) - 1.0, :);
     S12 = S12(startID:(startID + N) - 1.0, :);
+    S13 = S13(startID:(startID + N) - 1.0, :);
+    S23 = S23(startID:(startID + N) - 1.0, :);
     
     X = zeros(1.0, L);
     Y = zeros(1.0, L);
@@ -121,6 +122,13 @@ for groups = 1:G
         S22i = S22(i, :);
         S33i = S33(i, :);
         S12i = S12(i, :);
+        S13i = S13(i, :);
+        S23i = S23(i, :);
+        
+        %% Check for out-of-plane stress components
+        if any(S13i) == 1.0 || any(S23i) == 1.0
+            messenger.writeMessage(132.0)
+        end
         
         %% FAIL STRESS CALCULATION
         if failStress == 1.0
@@ -208,7 +216,7 @@ if N_MSTRN > 0.0
 end
 
 %% Write output to file
-if failStress ~= -1.0 || failStrain ~= -1.0
+if (failStress ~= -1.0) || (failStrain ~= -1.0)
     mainIDs = getappdata(0, 'mainID');
     subIDs = getappdata(0, 'subID');
     
