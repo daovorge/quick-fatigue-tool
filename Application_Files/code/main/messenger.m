@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 28-Sep-2017 16:31:00 GMT
+%   Last modified 29-Sep-2017 15:10:28 GMT
 
     %%
 
@@ -1202,7 +1202,7 @@ classdef messenger < handle
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 129.0
-                        %_AVAILABLE_%
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Composite damage initiation criteria information has been written to ''%s\\Project\\output\\%s\\Data Files\\composite_criteria.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
                     case 130.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The B2 option is used with %.0f values, but there is only one analysis group', returnType{i}], length(getappdata(0, 'b2')));
                         fprintf(fidType(i), ['-> The first value of B2 will be used for the analysis', returnType{i}]);
@@ -2207,6 +2207,16 @@ classdef messenger < handle
                     case 289.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The following elements are not supported by the surface detection algorithm: %s', returnType{i}], getappdata(0, 'message_289_unsupportedElements'));
                         fprintf(fidType(i), ['-> These elements have been skipped', returnType{i}]);
+                    case 290.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The maximum stress composite failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'MSTRS'));
+                    case 291.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Tsai-Hill composite failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'TSAIH'));
+                    case 292.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Tsai-Wu composite failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'TSAIW'));
+                    case 293.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Azzi-Tsai-Hill composite failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'AZZIT'));
+                    case 294.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The maximum strain composite failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'MSTRN'));
                 end
             end
         end
@@ -2262,7 +2272,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n', version);
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 28-Sep-2017 16:31:00 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 29-Sep-2017 15:10:28 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

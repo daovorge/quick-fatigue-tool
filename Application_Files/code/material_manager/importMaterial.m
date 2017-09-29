@@ -15,7 +15,7 @@ classdef importMaterial < handle
     
     methods(Static = true)
         %% INITIALIZE DEFAULT KEYWORDS
-        function [material_properties, kwStr, kwStrSp, algStr, mscStr, regStr, fatStr, nssStr, classStr] = initialize()
+        function [material_properties, kwStr, kwStrSp, algStr, mscStr, regStr, fatStr, nssStr, classStr, compositeStr] = initialize()
             % DEFAULT MATERIAL STRUCTURE
             material_properties = struct(...
                 'default_algorithm', 6.0,...
@@ -51,18 +51,25 @@ classdef importMaterial < handle
                 'np_active', 0.0,...
                 'nssc', 0.2857,...
                 'nssc_active', 0.0,...
-                'comment', []);
+                'comment', [],...
+                'failStress_tsfd', [],...
+                'failStress_csfd', [],...
+                'failStress_tstd', [],...
+                'failStress_cstd', [],...
+                'failStress_shear', [],...
+                'failStress_cross', [],...
+                'failStress_limit', []);
             
             % KEYWORD STRINGS
             kwStr = {'USERMATERIAL', 'DESCRIPTION', 'DEFAULTALGORITHM',...
                 'DEFAULTMSC', 'CAEL', 'REGRESSION', 'MECHANICAL',...
                 'FATIGUE', 'CYCLIC', 'NORMALSTRESSSENSITIVITY', 'CLASS',...
-                'ENDMATERIAL'};
+                'COMPOSITEFAILURE', 'ENDMATERIAL'};
             
             kwStrSp = {'USER MATERIAL', 'DESCRIPTION', 'DEFAULT ALGORITHM',...
                 'DEFAULT MSC', 'CAEL', 'REGRESSION', 'MECHANICAL',...
                 'FATIGUE', 'CYCLIC', 'NORMAL STRESS SENSITIVITY', 'CLASS',...
-                'END MATERIAL'};
+                'COMPOSITE FAILURE', 'END MATERIAL'};
             
             % ALGORITHM STRINGS
             algStr = {'UNIAXIALSTRESS', 'UNIAXIALSTRAIN', 'SBBM', 'NORMAL', 'FINDLEY', 'INVARIANT', 'NASALIFE'};
@@ -81,6 +88,9 @@ classdef importMaterial < handle
             
             % CLASS STRINGS
             classStr = {'WROUGHTSTEEL', 'DUCTILEIRON', 'MALLEABLEIRON', 'WROUGHTIRON', 'CASTIRON', 'ALUMINIUM', 'OTHER'};
+            
+            % COMPOSITE FAILURE STRINGS
+            compositeStr = {'STRESS', 'STRAIN', 'HASHIN'};
         end
         
         %% PROCESS THE MATERIAL FILE
@@ -93,7 +103,7 @@ classdef importMaterial < handle
             error = 0.0;
             
             % Initialize the material properties
-            [material_properties, kwStr, kwStrSp, algStr, mscStr, regStr, fatStr, nssStr, classStr] = importMaterial.initialize();
+            [material_properties, kwStr, kwStrSp, algStr, mscStr, regStr, fatStr, nssStr, classStr, compositeStr] = importMaterial.initialize();
             
             % Initialize the material name
             materialName = 'Material-1 (empty)';
@@ -985,7 +995,7 @@ classdef importMaterial < handle
                             %{
                                 The normal stress sensitivity is defined by
                                 a single parameter after the keyword
-                                declaration, followed by uptp one data line
+                                declaration, followed by upto one data line
                             %}
                             % Get the parameter after the keyword
                             parameter = lower(parameter);
@@ -1206,7 +1216,160 @@ classdef importMaterial < handle
                             
                             % Get the next line in the file
                             TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
-                        case 12.0 % *END MATERIAL
+                        case 12.0 % *COMPOSITE FAILURE
+                            %{
+                                The composite failure parameters are
+                                defined by a single parameter after the
+                                keyword declaration, followed by upto one
+                                data line
+                            %}
+                            % Get the parameter after the keyword
+                            parameter = lower(parameter);
+                            parameter(ismember(parameter,' ,')) = [];
+                            
+                            % Check if the parameter matches the library
+                            matchingParameter = find(strncmpi({parameter}, compositeStr, length(parameter)) == 1.0);
+                            
+                            %{
+                                If there is not matching parameter, use the
+                                default value
+                            %}
+                            if (isempty(matchingParameter) == 1.0) || (length(matchingParameter) ~= 1.0)
+                                TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
+                                
+                                keywordWarnings(12.0) = 1.0;
+                                continue
+                            else
+                                switch matchingParameter
+                                    case 1.0 % Stress
+                                        TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
+                                        
+                                        TLINE(ismember(TLINE,' ')) = [];
+                                        
+                                        index = 1.0;
+                                        while 1.0 == 1.0
+                                            if index == length(TLINE)
+                                                break
+                                            elseif (index == 1.0) && (strcmp(TLINE(length(TLINE) - length(strtrim(TLINE)) + 1.0), ',') == 1.0)
+                                                TLINE = ['-9e100', TLINE]; %#ok<AGROW>
+                                                index = index + 6.0;
+                                            elseif strcmp(TLINE(index:index + 1.0), ',,') == 1.0
+                                                % This value is undefined
+                                                TLINE = [TLINE(1.0: index), '-9e100', TLINE(index + 1.0:end)];
+                                                index = index + 7.0;
+                                            else
+                                                index = index + 1.0;
+                                            end
+                                        end
+                                        
+                                        % Get the numeric value of the data line
+                                        properties = str2num(TLINE); %#ok<ST2NM>
+                                        
+                                        % Process the data line
+                                        nProperties = length(properties);
+                                        if nProperties > 7.0
+                                            properties = properties(1.0:7.0);
+                                        elseif nProperties < 7.0
+                                            properties(nProperties + 1.0:7.0) = -9e100;
+                                        end
+                                        
+                                        % Tensile stress (fiber direction)
+                                        if properties(1.0) ~= -9e100
+                                            material_properties.failStress_tsfd = properties(1.0);
+                                        end
+                                        
+                                        % Compressive stress (fiber direction)
+                                        if properties(2.0) ~= -9e100
+                                            material_properties.failStress_csfd = properties(2.0);
+                                        end
+                                        
+                                        % Tensile stress (transverse direction)
+                                        if properties(3.0) ~= -9e100
+                                            material_properties.failStress_tstd = properties(3.0);
+                                        end
+                                        
+                                        % Compressive stress (transverse direction)
+                                        if properties(4.0) ~= -9e100
+                                            material_properties.failStress_cstd = properties(4.0);
+                                        end
+                                        
+                                        % Shear strength
+                                        if properties(5.0) ~= -9e100
+                                            material_properties.failStress_shear = properties(5.0);
+                                        end
+                                        
+                                        % Cross product coefficient
+                                        if properties(6.0) ~= -9e100
+                                            material_properties.failStress_cross = properties(6.0);
+                                        end
+                                        
+                                        % Limit stress
+                                        if properties(7.0) ~= -9e100
+                                            material_properties.failStress_limit = properties(7.0);
+                                        end
+                                    case 2.0 % Strain
+                                        TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
+                                        
+                                        TLINE(ismember(TLINE,' ')) = [];
+                                        
+                                        index = 1.0;
+                                        while 1.0 == 1.0
+                                            if index == length(TLINE)
+                                                break
+                                            elseif (index == 1.0) && (strcmp(TLINE(length(TLINE) - length(strtrim(TLINE)) + 1.0), ',') == 1.0)
+                                                TLINE = ['-9e100', TLINE]; %#ok<AGROW>
+                                                index = index + 6.0;
+                                            elseif strcmp(TLINE(index:index + 1.0), ',,') == 1.0
+                                                % This value is undefined
+                                                TLINE = [TLINE(1.0: index), '-9e100', TLINE(index + 1.0:end)];
+                                                index = index + 7.0;
+                                            else
+                                                index = index + 1.0;
+                                            end
+                                        end
+                                        
+                                        % Get the numeric value of the data line
+                                        properties = str2num(TLINE); %#ok<ST2NM>
+                                        
+                                        % Process the data line
+                                        nProperties = length(properties);
+                                        if nProperties > 5.0
+                                            properties = properties(1.0:5.0);
+                                        elseif nProperties < 5.0
+                                            properties(nProperties + 1.0:5.0) = -9e100;
+                                        end
+                                        
+                                        % Tensile strain (fiber direction)
+                                        if properties(1.0) ~= -9e100
+                                            material_properties.failStrain_tsfd = properties(1.0);
+                                        end
+                                        
+                                        % Compressive strain (fiber direction)
+                                        if properties(2.0) ~= -9e100
+                                            material_properties.failStrain_csfd = properties(2.0);
+                                        end
+                                        
+                                        % Tensile strain (transverse direction)
+                                        if properties(3.0) ~= -9e100
+                                            material_properties.failStrain_tstd = properties(3.0);
+                                        end
+                                        
+                                        % Compressive strain (transverse direction)
+                                        if properties(4.0) ~= -9e100
+                                            material_properties.failStrain_cstd = properties(4.0);
+                                        end
+                                        
+                                        % Shear strain
+                                        if properties(5.0) ~= -9e100
+                                            material_properties.failStrain_shear = properties(5.0);
+                                        end
+                                    case 3.0 % Hashin
+                                end
+                            end
+                            
+                            % Get the next line in the file
+                            TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
+                        case 13.0 % *END MATERIAL
                             %{
                                 The user has manually declared the end of
                                 the material definition. Stop processing

@@ -13,7 +13,7 @@ function varargout = MaterialEditor(varargin)%#ok<*DEFNU>
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 28-Sep-2017 16:31:00 GMT
+%   Last modified 29-Sep-2017 15:10:28 GMT
     
     %%
     
@@ -120,7 +120,7 @@ setappdata(0, 'simulia_blue', [177/255, 206/255, 237/255])
 
 %% Populate dialogue box with user material for editing if user pressed
 % "EDIT" in the material manager
-if isappdata(0, 'editMaterial')
+if isappdata(0, 'editMaterial') == 1.0
     % Get the name of the material to edit
     materialToEdit = char(getappdata(0, 'materialToEdit'));
     
@@ -145,7 +145,7 @@ if isappdata(0, 'editMaterial')
         errordlg(message, 'Quick Fatigue Tool')
         uiwait
         return
-    end
+    end    
     
     % Populate the dialogue box with the material properties
     try
@@ -1152,6 +1152,44 @@ else
     set(handles.text_proof_units, 'enable', 'off')
     set(handles.text_sf_units, 'enable', 'off')
     set(handles.text_kp_units, 'enable', 'off')
+    
+    % Reset composite failure properties
+    if isappdata(0, 'failStress_tsfd') == 1.0
+        rmappdata(0, 'failStress_tsfd')
+    end
+    if isappdata(0, 'failStress_csfd') == 1.0
+        rmappdata(0, 'failStress_csfd')
+    end
+    if isappdata(0, 'failStress_tstd') == 1.0
+        rmappdata(0, 'failStress_tstd')
+    end
+    if isappdata(0, 'failStress_cstd') == 1.0
+        rmappdata(0, 'failStress_cstd')
+    end
+    if isappdata(0, 'failStress_shear') == 1.0
+        rmappdata(0, 'failStress_shear')
+    end
+    if isappdata(0, 'failStress_cross') == 1.0
+        rmappdata(0, 'failStress_cross')
+    end
+    if isappdata(0, 'failStress_limit') == 1.0
+        rmappdata(0, 'failStress_limit')
+    end
+    if isappdata(0, 'failStrain_tsfd') == 1.0
+        rmappdata(0, 'failStrain_tsfd')
+    end
+    if isappdata(0, 'failStrain_csfd') == 1.0
+        rmappdata(0, 'failStrain_csfd')
+    end
+    if isappdata(0, 'failStrain_tstd') == 1.0
+        rmappdata(0, 'failStrain_tstd')
+    end
+    if isappdata(0, 'failStrain_cstd') == 1.0
+        rmappdata(0, 'failStrain_cstd')
+    end
+    if isappdata(0, 'failStrain_shear') == 1.0
+        rmappdata(0, 'failStrain_shear')
+    end
 end
 
 % Enable the GUI
@@ -1192,7 +1230,19 @@ material_properties = struct(...
 'np_active', get(handles.check_np, 'value'),...
 'nssc', get(handles.edit_nssc, 'string'),...
 'nssc_active', get(handles.check_nssc, 'value'),...
-'comment', get(handles.edit_comment, 'string'));
+'comment', get(handles.edit_comment, 'string'),...
+'failStress_tsfd', getappdata(0, 'failStress_tsfd'),...
+'failStress_csfd', getappdata(0, 'failStress_csfd'),...
+'failStress_tstd', getappdata(0, 'failStress_tstd'),...
+'failStress_cstd', getappdata(0, 'failStress_cstd'),...
+'failStress_shear', getappdata(0, 'failStress_shear'),...
+'failStress_cross', getappdata(0, 'failStress_cross'),...
+'failStress_limit', getappdata(0, 'failStress_limit'),...
+'failStrain_tsfd', getappdata(0, 'failStrain_tsfd'),...
+'failStrain_csfd', getappdata(0, 'failStrain_csfd'),...
+'failStrain_tstd', getappdata(0, 'failStrain_tstd'),...
+'failStrain_cstd', getappdata(0, 'failStrain_cstd'),...
+'failStrain_shear', getappdata(0, 'failStrain_shear'));
 
 
 function [] = populateGUI(handles, properties, materialToEdit)
@@ -1326,6 +1376,118 @@ if properties.material_properties.nssc_active == 1.0
 end
 
 set(handles.pMenu_class, 'value', properties.material_properties.class)
+
+% Initliaize fail stress properties
+try
+    if isempty(properties.material_properties.failStress_tsfd) == 1.0
+        setappdata(0, 'failStress_tsfd', [])
+    else
+        setappdata(0, 'failStress_tsfd', properties.material_properties.failStress_tsfd)
+    end
+catch
+    setappdata(0, 'failStress_tsfd', [])
+end
+try
+    if isempty(properties.material_properties.failStress_csfd) == 1.0
+        setappdata(0, 'failStress_csfd', [])
+    else
+        setappdata(0, 'failStress_csfd', properties.material_properties.failStress_csfd)
+    end
+catch
+    setappdata(0, 'failStress_csfd', [])
+end
+try
+    if isempty(properties.material_properties.failStress_tstd) == 1.0
+        setappdata(0, 'failStress_tstd', [])
+    else
+        setappdata(0, 'failStress_tstd', properties.material_properties.failStress_tstd)
+    end
+catch
+    setappdata(0, 'failStress_tstd', [])
+end
+try
+    if isempty(properties.material_properties.failStress_cstd) == 1.0
+        setappdata(0, 'failStress_cstd', [])
+    else
+        setappdata(0, 'failStress_cstd', properties.material_properties.failStress_cstd)
+    end
+catch
+    setappdata(0, 'failStress_cstd', [])
+end
+try
+    if isempty(properties.material_properties.failStress_shear) == 1.0
+        setappdata(0, 'failStress_shear', [])
+    else
+        setappdata(0, 'failStress_shear', properties.material_properties.failStress_shear)
+    end
+catch
+    setappdata(0, 'failStress_shear', [])
+end
+try
+    if isempty(properties.material_properties.failStress_cross) == 1.0
+        setappdata(0, 'failStress_cross', [])
+    else
+        setappdata(0, 'failStress_cross', properties.material_properties.failStress_cross)
+    end
+catch
+    setappdata(0, 'failStress_cross', [])
+end
+try
+    if isempty(properties.material_properties.failStress_limit) == 1.0
+        setappdata(0, 'failStress_limit', [])
+    else
+        setappdata(0, 'failStress_limit', properties.material_properties.failStress_limit)
+    end
+catch
+    setappdata(0, 'failStress_limit', [])
+end
+
+% Initliaize fail strain properties
+try
+    if isempty(properties.material_properties.failStrain_tsfd) == 1.0
+        setappdata(0, 'failStrain_tsfd', [])
+    else
+        setappdata(0, 'failStrain_tsfd', properties.material_properties.failStrain_tsfd)
+    end
+catch
+    setappdata(0, 'failStrain_tsfd', [])
+end
+try
+    if isempty(properties.material_properties.failStrain_csfd) == 1.0
+        setappdata(0, 'failStrain_csfd', [])
+    else
+        setappdata(0, 'failStrain_csfd', properties.material_properties.failStrain_csfd)
+    end
+catch
+    setappdata(0, 'failStrain_csfd', [])
+end
+try
+    if isempty(properties.material_properties.failStrain_tstd) == 1.0
+        setappdata(0, 'failStrain_tstd', [])
+    else
+        setappdata(0, 'failStrain_tstd', properties.material_properties.failStrain_tstd)
+    end
+catch
+    setappdata(0, 'failStrain_tstd', [])
+end
+try
+    if isempty(properties.material_properties.failStrain_cstd) == 1.0
+        setappdata(0, 'failStrain_cstd', [])
+    else
+        setappdata(0, 'failStrain_cstd', properties.material_properties.failStrain_cstd)
+    end
+catch
+    setappdata(0, 'failStrain_cstd', [])
+end
+try
+    if isempty(properties.material_properties.failStrain_shear) == 1.0
+        setappdata(0, 'failStrain_shear', [])
+    else
+        setappdata(0, 'failStrain_shear', properties.material_properties.failStrain_shear)
+    end
+catch
+    setappdata(0, 'failStrain_shear', [])
+end
 
 
 % --- Executes on button press in pButton_manager.
@@ -2056,6 +2218,28 @@ if isappdata(0, 'b_value') == 1.0
     rmappdata(0, 'b_value')
 end
 
+if isappdata(0, 'failStress_tsfd') == 1.0
+    rmappdata(0, 'failStress_tsfd')
+end
+if isappdata(0, 'failStress_csfd') == 1.0
+    rmappdata(0, 'failStress_csfd')
+end
+if isappdata(0, 'failStress_tstd') == 1.0
+    rmappdata(0, 'failStress_tstd')
+end
+if isappdata(0, 'failStress_cstd') == 1.0
+    rmappdata(0, 'failStress_cstd')
+end
+if isappdata(0, 'failStress_shear') == 1.0
+    rmappdata(0, 'failStress_shear')
+end
+if isappdata(0, 'failStress_cross') == 1.0
+    rmappdata(0, 'failStress_cross')
+end
+if isappdata(0, 'failStress_limit') == 1.0
+    rmappdata(0, 'failStress_limit')
+end
+
 delete(hObject);
 
 function blank(handles)
@@ -2165,3 +2349,39 @@ function edit_ucs_CreateFcn(hObject, ~, ~)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in pButton_failStress.
+function pButton_failStress_Callback(~, ~, handles)
+% Blank the GUI
+blank(handles)
+
+failStress
+uiwait
+
+% Enable the GUI
+enable(handles)
+
+
+% --- Executes on button press in pButton_hashin.
+function pButton_hashin_Callback(~, ~, handles)
+% Blank the GUI
+blank(handles)
+
+hashin
+uiwait
+
+% Enable the GUI
+enable(handles)
+
+
+% --- Executes on button press in pButton_failStrain.
+function pButton_failStrain_Callback(~, ~, handles)
+% Blank the GUI
+blank(handles)
+
+failStrain
+uiwait
+
+% Enable the GUI
+enable(handles)

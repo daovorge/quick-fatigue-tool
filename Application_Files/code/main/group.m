@@ -9,7 +9,7 @@ classdef group < handle
 %      4.6 Analysis groups
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 28-Sep-2017 16:31:00 GMT
+%   Last modified 29-Sep-2017 15:10:28 GMT
     
     %%
     
@@ -300,6 +300,18 @@ classdef group < handle
             group_materialProps(numberOfMaterials).goodmanLimitStress = [];
             group_materialProps(numberOfMaterials).notchSensitivityConstant = [];
             group_materialProps(numberOfMaterials).notchRootRadius = [];
+            group_materialProps(numberOfMaterials).failStress_tsfd = [];
+            group_materialProps(numberOfMaterials).failStress_csfd = [];
+            group_materialProps(numberOfMaterials).failStress_tstd = [];
+            group_materialProps(numberOfMaterials).failStress_cstd = [];
+            group_materialProps(numberOfMaterials).failStress_shear = [];
+            group_materialProps(numberOfMaterials).failStress_cross = [];
+            group_materialProps(numberOfMaterials).failStress_limit = [];
+            group_materialProps(numberOfMaterials).failStrain_tsfd = [];
+            group_materialProps(numberOfMaterials).failStrain_csfd = [];
+            group_materialProps(numberOfMaterials).failStrain_tstd = [];
+            group_materialProps(numberOfMaterials).failStrain_cstd = [];
+            group_materialProps(numberOfMaterials).failStrain_shear = [];
             
             setappdata(0, 'group_materialProps', group_materialProps)
             
@@ -1969,6 +1981,19 @@ classdef group < handle
             group_materialProps(materialNumber).goodmanLimitStress = getappdata(0, 'goodmanMeanStressLimit');
             group_materialProps(materialNumber).notchSensitivityConstant = getappdata(0, 'notchSensitivityConstant');
             group_materialProps(materialNumber).notchRootRadius = getappdata(0, 'notchRootRadius');
+            group_materialProps(materialNumber).failStress_tsfd = getappdata(0, 'failStress_tsfd');
+            group_materialProps(materialNumber).failStress_csfd = getappdata(0, 'failStress_csfd');
+            group_materialProps(materialNumber).failStress_tstd = getappdata(0, 'failStress_tstd');
+            group_materialProps(materialNumber).failStress_cstd = getappdata(0, 'failStress_cstd');
+            group_materialProps(materialNumber).failStress_shear = getappdata(0, 'failStress_shear');
+            group_materialProps(materialNumber).failStress_cross = getappdata(0, 'failStress_cross');
+            group_materialProps(materialNumber).failStress_limit = getappdata(0, 'failStress_limit');
+            group_materialProps(materialNumber).failStrain_tsfd = getappdata(0, 'failStrain_tsfd');
+            group_materialProps(materialNumber).failStrain_csfd = getappdata(0, 'failStrain_csfd');
+            group_materialProps(materialNumber).failStrain_tstd = getappdata(0, 'failStrain_tstd');
+            group_materialProps(materialNumber).failStrain_cstd = getappdata(0, 'failStrain_cstd');
+            group_materialProps(materialNumber).failStrain_shear = getappdata(0, 'failStrain_shear');
+            
             
             setappdata(0, 'group_materialProps', group_materialProps)
         end
@@ -2029,6 +2054,18 @@ classdef group < handle
             setappdata(0, 'goodmanMeanStressLimit', group_materialProps(materialNumber).goodmanLimitStress)
             setappdata(0, 'notchSensitivityConstant', group_materialProps(materialNumber).notchSensitivityConstant)
             setappdata(0, 'notchRootRadius', group_materialProps(materialNumber).notchRootRadius)
+            setappdata(0, 'failStress_tsfd', group_materialProps(materialNumber).failStress_tsfd)
+            setappdata(0, 'failStress_csfd', group_materialProps(materialNumber).failStress_csfd)
+            setappdata(0, 'failStress_tstd', group_materialProps(materialNumber).failStress_tstd)
+            setappdata(0, 'failStress_cstd', group_materialProps(materialNumber).failStress_cstd)
+            setappdata(0, 'failStress_shear', group_materialProps(materialNumber).failStress_shear)
+            setappdata(0, 'failStress_cross', group_materialProps(materialNumber).failStress_cross)
+            setappdata(0, 'failStress_limit', group_materialProps(materialNumber).failStress_limit)
+            setappdata(0, 'failStrain_tsfd', group_materialProps(materialNumber).failStrain_tsfd)
+            setappdata(0, 'failStrain_csfd', group_materialProps(materialNumber).failStrain_csfd)
+            setappdata(0, 'failStrain_tstd', group_materialProps(materialNumber).failStrain_tstd)
+            setappdata(0, 'failStrain_cstd', group_materialProps(materialNumber).failStrain_cstd)
+            setappdata(0, 'failStrain_shear', group_materialProps(materialNumber).failStrain_shear)
         end
         
         %% READ A GROUP FILE

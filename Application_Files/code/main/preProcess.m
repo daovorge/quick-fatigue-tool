@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 28-Sep-2017 16:31:00 GMT
+%   Last modified 29-Sep-2017 15:10:28 GMT
     
     %%
     
@@ -237,10 +237,14 @@ classdef preProcess < handle
             
             %% Ultimate compressive strength
             if material_properties.uts_active == 1.0
-                if ischar(material_properties.ucs)
-                    ucs = str2double(material_properties.ucs);
-                else
-                    ucs = material_properties.ucs;
+                try
+                    if ischar(material_properties.ucs)
+                        ucs = str2double(material_properties.ucs);
+                    else
+                        ucs = material_properties.ucs;
+                    end
+                catch
+                    ucs = uts;
                 end
                 
                 if isnumeric(ucs) == 0.0
@@ -1282,6 +1286,176 @@ classdef preProcess < handle
             k = getappdata(0, 'k');
             setappdata(0, 'TfPrime', TfPrime)
             setappdata(0, 'Tfs', sqrt(1.0 + (k*k))*TfPrime)
+            
+            %% Fail stress parameters for composite failure
+            
+            % Tensile stress (fiber direction)
+            try
+                if ischar(material_properties.failStress_tsfd) == 1.0
+                    failStress_tsfd = str2double(material_properties.failStress_tsfd);
+                else
+                    failStress_tsfd = [];
+                end
+            catch
+                failStress_tsfd = [];
+                setappdata(0, 'failStress_tsfd', failStress_tsfd)
+            end
+            setappdata(0, 'failStress_tsfd', failStress_tsfd)
+            
+            % Compressive stress (fiber direction)
+            try
+                if ischar(material_properties.failStress_csfd) == 1.0
+                    failStress_csfd = str2double(material_properties.failStress_csfd);
+                else
+                    failStress_csfd = [];
+                end
+            catch
+                failStress_csfd = [];
+                setappdata(0, 'failStress_csfd', failStress_csfd)
+            end
+            setappdata(0, 'failStress_csfd', failStress_csfd)
+            
+            % Tensile stress (transverse direction)
+            try
+                if ischar(material_properties.failStress_tstd) == 1.0
+                    failStress_tstd = str2double(material_properties.failStress_tstd);
+                else
+                    failStress_tstd = [];
+                end
+            catch
+                failStress_tstd = [];
+                setappdata(0, 'failStress_tstd', failStress_tstd)
+            end
+            setappdata(0, 'failStress_tstd', failStress_tstd)
+            
+            % Compressive stress (transverse direction)
+            try
+                if ischar(material_properties.failStress_cstd) == 1.0
+                    failStress_cstd = str2double(material_properties.failStress_cstd);
+                else
+                    failStress_cstd = [];
+                end
+            catch
+                failStress_cstd = [];
+                setappdata(0, 'failStress_cstd', failStress_cstd)
+            end
+            setappdata(0, 'failStress_cstd', failStress_cstd)
+            
+            % Shear strength
+            try
+                if ischar(material_properties.failStress_shear) == 1.0
+                    failStress_shear = str2double(material_properties.failStress_shear);
+                else
+                    failStress_shear = [];
+                end
+            catch
+                failStress_shear = [];
+                setappdata(0, 'failStress_shear', failStress_shear)
+            end
+            setappdata(0, 'failStress_shear', failStress_shear)
+            
+            % Cross product coefficient
+            try
+                if ischar(material_properties.failStress_cross) == 1.0
+                    failStress_cross = str2double(material_properties.failStress_cross);
+                else
+                    failStress_cross = [];
+                end
+            catch
+                failStress_cross = [];
+                setappdata(0, 'failStress_cross', failStress_cross)
+            end
+            
+            if isnan(failStress_cross) == 1.0
+                failStress_cross = 0.0;
+            end
+            
+            setappdata(0, 'failStress_cross', failStress_cross)
+            
+            % Limit stress
+            try
+                if ischar(material_properties.failStress_limit) == 1.0
+                    failStress_limit = str2double(material_properties.failStress_limit);
+                else
+                    failStress_limit = [];
+                end
+            catch
+                failStress_limit = [];
+                setappdata(0, 'failStress_limit', failStress_limit)
+            end
+            
+            if isnan(failStress_limit) == 1.0
+                failStress_limit = [];
+            end
+            
+            setappdata(0, 'failStress_limit', failStress_limit)
+            
+            %% Fail strain parameters for composite failure
+            
+            % Tensile strain (fiber direction)
+            try
+                if ischar(material_properties.failStrain_tsfd) == 1.0
+                    failStrain_tsfd = str2double(material_properties.failStrain_tsfd);
+                else
+                    failStrain_tsfd = [];
+                end
+            catch
+                failStrain_tsfd = [];
+                setappdata(0, 'failStrain_tsfd', failStrain_tsfd)
+            end
+            setappdata(0, 'failStrain_tsfd', failStrain_tsfd)
+            
+            % Compressive strain (fiber direction)
+            try
+                if ischar(material_properties.failStrain_csfd) == 1.0
+                    failStrain_csfd = str2double(material_properties.failStrain_csfd);
+                else
+                    failStrain_csfd = [];
+                end
+            catch
+                failStrain_csfd = [];
+                setappdata(0, 'failStrain_csfd', failStrain_csfd)
+            end
+            setappdata(0, 'failStrain_csfd', failStrain_csfd)
+            
+            % Tensile strain (transverse direction)
+            try
+                if ischar(material_properties.failStrain_tstd) == 1.0
+                    failStrain_tstd = str2double(material_properties.failStrain_tstd);
+                else
+                    failStrain_tstd = [];
+                end
+            catch
+                failStrain_tstd = [];
+                setappdata(0, 'failStrain_tstd', failStrain_tstd)
+            end
+            setappdata(0, 'failStrain_tstd', failStrain_tstd)
+            
+            % Compressive strain (transverse direction)
+            try
+                if ischar(material_properties.failStrain_cstd) == 1.0
+                    failStrain_cstd = str2double(material_properties.failStrain_cstd);
+                else
+                    failStrain_cstd = [];
+                end
+            catch
+                failStrain_cstd = [];
+                setappdata(0, 'failStrain_cstd', failStrain_cstd)
+            end
+            setappdata(0, 'failStrain_cstd', failStrain_cstd)
+            
+            % Shear strain
+            try
+                if ischar(material_properties.failStrain_shear) == 1.0
+                    failStrain_shear = str2double(material_properties.failStrain_shear);
+                else
+                    failStrain_shear = [];
+                end
+            catch
+                failStrain_shear = [];
+                setappdata(0, 'failStrain_shear', failStrain_shear)
+            end
+            setappdata(0, 'failStrain_shear', failStrain_shear)
         end
         
         %% Approximate the yield stress:
