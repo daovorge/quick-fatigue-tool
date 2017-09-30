@@ -1154,6 +1154,8 @@ else
     set(handles.text_kp_units, 'enable', 'off')
     
     % Reset composite failure properties
+    
+    % Fail stress
     if isappdata(0, 'failStress_tsfd') == 1.0
         rmappdata(0, 'failStress_tsfd')
     end
@@ -1175,6 +1177,8 @@ else
     if isappdata(0, 'failStress_limit') == 1.0
         rmappdata(0, 'failStress_limit')
     end
+    
+    % Fail strain
     if isappdata(0, 'failStrain_tsfd') == 1.0
         rmappdata(0, 'failStrain_tsfd')
     end
@@ -1189,6 +1193,29 @@ else
     end
     if isappdata(0, 'failStrain_shear') == 1.0
         rmappdata(0, 'failStrain_shear')
+    end
+    
+    % Hashin
+    if isappdata(0, 'hashin_alpha') == 1.0
+        setappdata(0, 'hashin_alpha', 0.0)
+    end
+    if isappdata(0, 'hashin_lts') == 1.0
+        rmappdata(0, 'hashin_lts')
+    end
+    if isappdata(0, 'hashin_lcs') == 1.0
+        rmappdata(0, 'hashin_lcs')
+    end
+    if isappdata(0, 'hashin_tts') == 1.0
+        rmappdata(0, 'hashin_tts')
+    end
+    if isappdata(0, 'hashin_tcs') == 1.0
+        rmappdata(0, 'hashin_tcs')
+    end
+    if isappdata(0, 'hashin_lss') == 1.0
+        rmappdata(0, 'hashin_lss')
+    end
+    if isappdata(0, 'hashin_tss') == 1.0
+        rmappdata(0, 'hashin_tss')
     end
 end
 
@@ -1242,7 +1269,14 @@ material_properties = struct(...
 'failStrain_csfd', getappdata(0, 'failStrain_csfd'),...
 'failStrain_tstd', getappdata(0, 'failStrain_tstd'),...
 'failStrain_cstd', getappdata(0, 'failStrain_cstd'),...
-'failStrain_shear', getappdata(0, 'failStrain_shear'));
+'failStrain_shear', getappdata(0, 'failStrain_shear'),...
+'hashin_alpha', getappdata(0, 'hashin_alpha'),...
+'hashin_lts', getappdata(0, 'hashin_lts'),...
+'hashin_lcs', getappdata(0, 'hashin_lcs'),...
+'hashin_tts', getappdata(0, 'hashin_tts'),...
+'hashin_lcs', getappdata(0, 'hashin_lcs'),...
+'hashin_lss', getappdata(0, 'hashin_tss'),...
+'hashin_tss', getappdata(0, 'hashin_tss'));
 
 
 function [] = populateGUI(handles, properties, materialToEdit)
@@ -1489,6 +1523,70 @@ catch
     setappdata(0, 'failStrain_shear', [])
 end
 
+% Initialize Hashin properties
+try
+    if isempty(properties.material_properties.hashin_alpha) == 1.0
+        setappdata(0, 'hashin_alpha', 0.0)
+    else
+        setappdata(0, 'hashin_alpha', properties.material_properties.hashin_alpha)
+    end
+catch
+    setappdata(0, 'hashin_alpha', 0.0)
+end
+try
+    if isempty(properties.material_properties.hashin_lts) == 1.0
+        setappdata(0, 'hashin_lts', [])
+    else
+        setappdata(0, 'hashin_lts', properties.material_properties.hashin_lts)
+    end
+catch
+    setappdata(0, 'hashin_lts', [])
+end
+try
+    if isempty(properties.material_properties.hashin_lcs) == 1.0
+        setappdata(0, 'hashin_lcs', [])
+    else
+        setappdata(0, 'hashin_lcs', properties.material_properties.hashin_lcs)
+    end
+catch
+    setappdata(0, 'hashin_lcs', [])
+end
+try
+    if isempty(properties.material_properties.hashin_tts) == 1.0
+        setappdata(0, 'hashin_tts', [])
+    else
+        setappdata(0, 'hashin_tts', properties.material_properties.hashin_tts)
+    end
+catch
+    setappdata(0, 'hashin_tts', [])
+end
+try
+    if isempty(properties.material_properties.hashin_tcs) == 1.0
+        setappdata(0, 'hashin_tcs', [])
+    else
+        setappdata(0, 'hashin_tcs', properties.material_properties.hashin_tcs)
+    end
+catch
+    setappdata(0, 'hashin_tcs', [])
+end
+try
+    if isempty(properties.material_properties.hashin_lss) == 1.0
+        setappdata(0, 'hashin_lss', [])
+    else
+        setappdata(0, 'hashin_lss', properties.material_properties.hashin_lss)
+    end
+catch
+    setappdata(0, 'hashin_lss', [])
+end
+try
+    if isempty(properties.material_properties.hashin_tss) == 1.0
+        setappdata(0, 'hashin_tss', [])
+    else
+        setappdata(0, 'hashin_tss', properties.material_properties.hashin_tss)
+    end
+catch
+    setappdata(0, 'hashin_tss', [])
+end
 
 % --- Executes on button press in pButton_manager.
 function pButton_manager_Callback(~, ~, handles)

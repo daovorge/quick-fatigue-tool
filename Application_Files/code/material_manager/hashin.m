@@ -1,9 +1,9 @@
-function varargout = hashin(varargin)
-%HASHIN    QFT functions for user material editor.
+function varargout = hashin(varargin)%#ok<*DEFNU>
+%HASHINDAMAGE    QFT functions for user material editor.
 %   These functions are used to call and operate the User Material user
 %   interface.
 %   
-%   HASHIN is used internally by Quick Fatigue Tool. The user is
+%   HASHINDAMAGE is used internally by Quick Fatigue Tool. The user is
 %   not required to run this file.
 %
 %   Reference section in Quick Fatigue Tool User Guide
@@ -32,15 +32,15 @@ end
 % End initialization code - DO NOT EDIT
 
 
-% --- Executes just before hashin is made visible.
-function hashin_OpeningFcn(hObject, eventdata, handles, varargin)
+% --- Executes just before hashinDamage is made visible.
+function hashin_OpeningFcn(hObject, ~, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to hashin (see VARARGIN)
+% varargin   command line arguments to hashinDamage (see VARARGIN)
 
-% Choose default command line output for hashin
+% Choose default command line output for hashinDamage
 handles.output = hObject;
 
 % Update handles structure
@@ -49,12 +49,34 @@ guidata(hObject, handles);
 % Position the figure in the centre of the screen
 movegui(hObject, 'center')
 
-% UIWAIT makes hashin wait for user response (see UIRESUME)
-% uiwait(handles.hashin);
+% UIWAIT makes hashinDamage wait for user response (see UIRESUME)
+% uiwait(handles.hashinDamage);
+
+if isappdata(0, 'hashin_alpha')
+    set(handles.edit_alpha, 'string', getappdata(0, 'hashin_alpha'))
+end
+if isappdata(0, 'hashin_lts')
+    set(handles.edit_lts, 'string', getappdata(0, 'hashin_lts'))
+end
+if isappdata(0, 'hashin_lcs')
+    set(handles.edit_lcs, 'string', getappdata(0, 'hashin_lcs'))
+end
+if isappdata(0, 'hashin_tts')
+    set(handles.edit_tts, 'string', getappdata(0, 'hashin_tts'))
+end
+if isappdata(0, 'hashin_tcs')
+    set(handles.edit_tcs, 'string', getappdata(0, 'hashin_tcs'))
+end
+if isappdata(0, 'hashin_lss')
+    set(handles.edit_lss, 'string', getappdata(0, 'hashin_lss'))
+end
+if isappdata(0, 'hashin_tss')
+    set(handles.edit_tss, 'string', getappdata(0, 'hashin_tss'))
+end
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = hashin_OutputFcn(hObject, eventdata, handles) 
+function varargout = hashin_OutputFcn(~, ~, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -65,7 +87,7 @@ varargout{1} = handles.output;
 
 
 
-function edit_lts_Callback(hObject, eventdata, handles)
+function edit_lts_Callback(~, ~, ~)
 % hObject    handle to edit_lts (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -75,7 +97,7 @@ function edit_lts_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function edit_lts_CreateFcn(hObject, eventdata, handles)
+function edit_lts_CreateFcn(hObject, ~, ~)
 % hObject    handle to edit_lts (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -88,7 +110,7 @@ end
 
 
 
-function edit_lcs_Callback(hObject, eventdata, handles)
+function edit_lcs_Callback(~, ~, ~)
 % hObject    handle to edit_lcs (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -98,7 +120,7 @@ function edit_lcs_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function edit_lcs_CreateFcn(hObject, eventdata, handles)
+function edit_lcs_CreateFcn(hObject, ~, ~)
 % hObject    handle to edit_lcs (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -111,7 +133,7 @@ end
 
 
 
-function edit_tts_Callback(hObject, eventdata, handles)
+function edit_tts_Callback(~, ~, ~)
 % hObject    handle to edit_tts (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -121,7 +143,7 @@ function edit_tts_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function edit_tts_CreateFcn(hObject, eventdata, handles)
+function edit_tts_CreateFcn(hObject, ~, ~)
 % hObject    handle to edit_tts (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -134,7 +156,7 @@ end
 
 
 
-function edit_tcs_Callback(hObject, eventdata, handles)
+function edit_tcs_Callback(~, ~, ~)
 % hObject    handle to edit_tcs (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -144,7 +166,7 @@ function edit_tcs_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function edit_tcs_CreateFcn(hObject, eventdata, handles)
+function edit_tcs_CreateFcn(hObject, ~, ~)
 % hObject    handle to edit_tcs (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -157,7 +179,7 @@ end
 
 
 
-function edit_lss_Callback(hObject, eventdata, handles)
+function edit_lss_Callback(~, ~, ~)
 % hObject    handle to edit_lss (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -167,7 +189,7 @@ function edit_lss_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function edit_lss_CreateFcn(hObject, eventdata, handles)
+function edit_lss_CreateFcn(hObject, ~, ~)
 % hObject    handle to edit_lss (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -180,7 +202,7 @@ end
 
 
 
-function edit_tss_Callback(hObject, eventdata, handles)
+function edit_tss_Callback(~, ~, ~)
 % hObject    handle to edit_tss (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -190,7 +212,7 @@ function edit_tss_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function edit_tss_CreateFcn(hObject, eventdata, handles)
+function edit_tss_CreateFcn(hObject, ~, ~)
 % hObject    handle to edit_tss (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -203,7 +225,7 @@ end
 
 
 
-function edit_limit_Callback(hObject, eventdata, handles)
+function edit_limit_Callback(~, ~, ~)
 % hObject    handle to edit_limit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -213,7 +235,7 @@ function edit_limit_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function edit_limit_CreateFcn(hObject, eventdata, handles)
+function edit_limit_CreateFcn(hObject, ~, ~)
 % hObject    handle to edit_limit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -226,24 +248,73 @@ end
 
 
 % --- Executes on button press in pButton_ok.
-function pButton_ok_Callback(hObject, eventdata, handles)
-close 'Hashin Parameters'
+function pButton_ok_Callback(~, ~, handles)
+error = 0.0;
+
+if isempty(get(handles.edit_alpha, 'string'))
+    set(handles.edit_alpha, 'string', '0')
+else
+    hashin_alpha = str2double(get(handles.edit_alpha, 'string'));
+    if isnan(hashin_alpha) == 1.0 || isinf(hashin_alpha) == 1.0 || isreal(hashin_alpha) == 0.0
+        error = 1.0;
+    end
+end
+hashin_lts = str2double(get(handles.edit_lts, 'string'));
+if isnan(hashin_lts) == 1.0 || isinf(hashin_lts) == 1.0 || isreal(hashin_lts) == 0.0
+    error = 1.0;
+end
+hashin_lcs = str2double(get(handles.edit_lcs, 'string'));
+if isnan(hashin_lcs) == 1.0 || isinf(hashin_lcs) == 1.0 || isreal(hashin_lcs) == 0.0
+    error = 1.0;
+end
+hashin_tts = str2double(get(handles.edit_tts, 'string'));
+if isnan(hashin_tts) == 1.0 || isinf(hashin_tts) == 1.0 || isreal(hashin_tts) == 0.0
+    error = 1.0;
+end
+hashin_tcs = str2double(get(handles.edit_tcs, 'string'));
+if isnan(hashin_tcs) == 1.0 || isinf(hashin_tcs) == 1.0 || isreal(hashin_tcs) == 0.0
+    error = 1.0;
+end
+hashin_lss = str2double(get(handles.edit_lss, 'string'));
+if isnan(hashin_lss) == 1.0 || isinf(hashin_lss) == 1.0 || isreal(hashin_lss) == 0.0
+    error = 1.0;
+end
+hashin_tss = str2double(get(handles.edit_tss, 'string'));
+if isnan(hashin_tss) == 1.0 || isinf(hashin_tss) == 1.0 || isreal(hashin_tss) == 0.0
+    error = 1.0;
+end
+
+if error == 1.0
+    errordlg('One or more inputs contain a syntax error.', 'Quick Fatigue Tool')
+    return
+end
+
+% Save panel state
+setappdata(0, 'hashin_alpha', get(handles.edit_alpha, 'string'))
+setappdata(0, 'hashin_lts', get(handles.edit_lts, 'string'))
+setappdata(0, 'hashin_lcs', get(handles.edit_lcs, 'string'))
+setappdata(0, 'hashin_tts', get(handles.edit_tts, 'string'))
+setappdata(0, 'hashin_tcs', get(handles.edit_tcs, 'string'))
+setappdata(0, 'hashin_lss', get(handles.edit_lss, 'string'))
+setappdata(0, 'hashin_tss', get(handles.edit_tss, 'string'))
+
+close 'Hashin Damage'
 
 
 % --- Executes on button press in pButton_cancel.
-function pButton_cancel_Callback(hObject, eventdata, handles)
-close 'Hashin Parameters'
+function pButton_cancel_Callback(~, ~, ~)
+close 'Hashin Damage'
 
 
-% --- Executes when hashin is resized.
-function hashin_ResizeFcn(hObject, eventdata, handles)
-% hObject    handle to hashin (see GCBO)
+% --- Executes when hashinDamage is resized.
+function hashinDamage_ResizeFcn(~, ~, ~)
+% hObject    handle to hashinDamage (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 
 
-function edit_alpha_Callback(hObject, eventdata, handles)
+function edit_alpha_Callback(~, ~, ~)
 % hObject    handle to edit_alpha (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -253,7 +324,7 @@ function edit_alpha_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function edit_alpha_CreateFcn(hObject, eventdata, handles)
+function edit_alpha_CreateFcn(hObject, ~, ~)
 % hObject    handle to edit_alpha (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
