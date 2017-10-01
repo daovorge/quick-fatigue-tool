@@ -307,7 +307,7 @@ if (failStress ~= -1.0) || (failStrain ~= -1.0) || (hashin ~= -1.0)
         mkdir(sprintf('%s/Data Files', root))
     end
     
-    dir = [root, 'Data Files/composite_criteria.dat'];
+    dir = [root, 'Data Files/composite-criteria.dat'];
     
     fid = fopen(dir, 'w+');
     

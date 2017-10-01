@@ -287,6 +287,20 @@ if isempty(get(handles.edit_shear, 'string')) == 0.0
     end
 end
 
+failStress_cross = str2double(get(handles.edit_cross, 'string'));
+if isempty(get(handles.edit_cross, 'string')) == 0.0
+    if isnan(failStress_cross) == 1.0 || isinf(failStress_cross) == 1.0 || isreal(failStress_cross) == 0.0
+        error = 1.0;
+    end
+end
+
+failStress_limit = str2double(get(handles.edit_limit, 'string'));
+if isempty(get(handles.edit_limit, 'string')) == 0.0
+    if isnan(failStress_limit) == 1.0 || isinf(failStress_limit) == 1.0 || isreal(failStress_limit) == 0.0
+        error = 1.0;
+    end
+end
+
 if error == 1.0
     errordlg('One or more inputs contain a syntax error.', 'Quick Fatigue Tool')
     uiwait; enable(handles)
@@ -299,7 +313,7 @@ if failStress_tsfd <= 0.0  || failStress_csfd <= 0.0 || failStress_tstd <= 0.0 |
     return
 end
 
-if isempty(get(handles.edit_cross, 'string'))
+if isempty(get(handles.edit_cross, 'string')) == 1.0
     set(handles.edit_cross, 'string', '0')
 end
 failStress_cross = str2double(get(handles.edit_cross, 'string'));

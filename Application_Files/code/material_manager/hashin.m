@@ -252,12 +252,16 @@ function pButton_ok_Callback(~, ~, handles)
 blank(handles)
 error = 0.0;
 
-if isempty(get(handles.edit_alpha, 'string'))
+if isempty(get(handles.edit_alpha, 'string')) ==1.0
     set(handles.edit_alpha, 'string', '0')
 else
     hashin_alpha = str2double(get(handles.edit_alpha, 'string'));
     if isnan(hashin_alpha) == 1.0 || isinf(hashin_alpha) == 1.0 || isreal(hashin_alpha) == 0.0
         error = 1.0;
+    elseif hashin_alpha < -1.0 || hashin_alpha > 1.0
+        errordlg('Alpha must be in the range (0 <= alpha <= 1.0).', 'Quick Fatigue Tool')
+        uiwait; enable(handles)
+        return
     end
 end
 
