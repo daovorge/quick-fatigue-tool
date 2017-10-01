@@ -1202,7 +1202,7 @@ classdef messenger < handle
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 129.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: Composite damage initiation criteria information has been written to ''%s\\Project\\output\\%s\\Data Files\\composite_criteria.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Composite failure/damage initiation results have been written to ''%s\\Project\\output\\%s\\Data Files\\composite_criteria.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
                     case 130.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The B2 option is used with %.0f values, but there is only one analysis group', returnType{i}], length(getappdata(0, 'b2')));
                         fprintf(fidType(i), ['-> The first value of B2 will be used for the analysis', returnType{i}]);
@@ -1217,9 +1217,9 @@ classdef messenger < handle
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 132.0
                         if getappdata(0, 'suppress_ID132') == 0.0
-                            fprintf(fidType(i), [returnType{i}, '***NOTE: Out-of-plane stresses were found during the composite failure calculation', returnType{i}]);
-                            fprintf(fidType(i), ['-> The composite failure criteria assume plane stress conditions', returnType{i}]);
-                            fprintf(fidType(i), ['-> Results of the damage initiation calculation may be inaccurate', returnType{i}]);
+                            fprintf(fidType(i), [returnType{i}, '***NOTE: Out-of-plane stresses were found during the composite failure/damage initiation calculation', returnType{i}]);
+                            fprintf(fidType(i), ['-> The calculation assumes plane stress conditions', returnType{i}]);
+                            fprintf(fidType(i), ['-> Results may be inaccurate', returnType{i}]);
                             
                             if i == X
                                 setappdata(0, 'suppress_ID132', 1.0)
@@ -2226,18 +2226,18 @@ classdef messenger < handle
                     case 294.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The maximum strain composite failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'MSTRN'));
                     case 295.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin failure (fiber tensile) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNFTCRT'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin damage initiation (fiber tensile) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNFTCRT'));
                     case 296.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin failure (fiber compression) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNFCCRT'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin damage initiation (fiber compression) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNFCCRT'));
                     case 297.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin failure (matrix tensile) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNMTCRT'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin damage initiation (matrix tensile) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNMTCRT'));
                     case 298.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin failure (matrix compression) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNMTCRT'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin damage initiation (matrix compression) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNMTCRT'));
                     case 299.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The COMPOSITE job file option was specified, but composite failure criteria were not evaluated', returnType{i}]);
-                        fprintf(fidType(i), ['-> Insufficient composite failure properies were provided', returnType{i}]);
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The COMPOSITE_CRITERIA job file option was specified, but composite criteria were not evaluated', returnType{i}]);
+                        fprintf(fidType(i), ['-> Insufficient composite properies were provided', returnType{i}]);
                     case 300.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: After evaluating composite failure criteria, no failures were detected', returnType{i}]);
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: After evaluating composite criteria, no failure/damage initiation was detected', returnType{i}]);
                 end
             end
         end
