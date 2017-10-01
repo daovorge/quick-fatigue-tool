@@ -130,14 +130,6 @@ setappdata(0, 'nodalElimination', 1.0)
 % ELIMINATION THRESHOLD SCALE FACTOR
 setappdata(0, 'thresholdScaleFactor', 0.8)
 
-%% YIELD CALCULATION
-%{
-    0: Do not perform yield calculations
-    1: Perform yield calculations based on the total strain energy theory
-    2: Perform yield calculations based on the shear strain energy theory
-%}
-setappdata(0, 'yieldCriterion', 0.0)
-
 %% CRITICAL PLANE (CP) ANALYSIS
 
 % SEARCH PARAMETERS

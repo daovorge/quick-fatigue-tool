@@ -80,7 +80,8 @@ classdef jobFile < handle
             hfTime = flags{51};  setappdata(0, 'hfTime', hfTime)
             hfScales = flags{52};  setappdata(0, 'hfScales', hfScales)
             frfEnvelope = flags{53};    setappdata(0, 'frfEnvelope', frfEnvelope)
-            compositeFailure = flags{54};   setappdata(0, 'compositeFailure', compositeFailure)
+            compositeCriteria = flags{54};   setappdata(0, 'compositeCriteria', compositeCriteria)
+            yieldCriteria = flags{55};   setappdata(0, 'yieldCriteria', yieldCriteria)
             
             %% DEFAULT FLAGS
             if isempty(jobName) == 1.0
@@ -235,9 +236,14 @@ classdef jobFile < handle
                 setappdata(0, 'outputDatabase', outputDatabase)
             end
             
-            if isempty(compositeFailure) == 1.0
-                compositeFailure = 0.0;
-                setappdata(0, 'compositeFailure', compositeFailure)
+            if isempty(compositeCriteria) == 1.0
+                compositeCriteria = 0.0;
+                setappdata(0, 'compositeCriteria', compositeCriteria)
+            end
+            
+            if isempty(yieldCriteria) == 1.0
+                yieldCriteria = 0.0;
+                setappdata(0, 'yieldCriteria', yieldCriteria)
             end
             
             %% CHECK CERTAIN FLAGS FOR STRING INPUT

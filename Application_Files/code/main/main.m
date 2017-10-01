@@ -354,7 +354,7 @@ if getappdata(0, 'warning_066') == 1.0
 end
 
 %% PERFORM COMPOSITE FAILURE CALCULATION IF REQUESTED
-if getappdata(0, 'compositeFailure') == 1.0
+if getappdata(0, 'compositeCriteria') == 1.0
     compositeFailure(N, signalLength)
 end
 

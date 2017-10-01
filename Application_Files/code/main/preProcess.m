@@ -3854,13 +3854,13 @@ classdef preProcess < handle
         %% Determine if an analysis item experiences plasticity
         function [] = getPlasticItems(N, algorithm)
             % Only find yielded items if requested
-            yieldCriterion = getappdata(0, 'yieldCriterion');
+            yieldCriteria = getappdata(0, 'yieldCriteria');
             
             % Get the history gating value
             historyGate = getappdata(0, 'historyGate');
             
             % Check that the yield criterion definition is correct
-            if (yieldCriterion < 1.0) || (yieldCriterion > 2.0) || (algorithm == 8.0)
+            if (yieldCriteria < 1.0) || (yieldCriteria > 2.0) || (algorithm == 8.0)
                 setappdata(0, 'YIELD', linspace(-1.0, -1.0, N))
                 setappdata(0, 'warning_063', 0.0)
                 return
@@ -3924,7 +3924,7 @@ classdef preProcess < handle
                     messenger.writeMessage(119.0)
                     totalCounter = totalCounter + 1.0;
                     continue
-                elseif (isempty(v) == 1.0) && (yieldCriterion == 1.0)
+                elseif (isempty(v) == 1.0) && (yieldCriteria == 1.0)
                     setappdata(0, 'YIELD', linspace(-2.0, -2.0, N))
                     messenger.writeMessage(162.0)
                     totalCounter = totalCounter + 1.0;
@@ -4039,7 +4039,7 @@ classdef preProcess < handle
                     %}
                     if error == 1.0
                         yield(totalCounter:(totalCounter + N) - 1.0) = -2.0;
-                        setappdata(0, 'yieldCriterion', 0.0)
+                        setappdata(0, 'yieldCriteria', 0.0)
                         setappdata(0, 'message_214_E', E)
                         setappdata(0, 'message_214_K', kp)
                         setappdata(0, 'message_214_N', np)
@@ -4052,7 +4052,7 @@ classdef preProcess < handle
                         break
                     elseif error == 2.0
                         yield(totalCounter:(totalCounter + N) - 1.0) = -2.0;
-                        setappdata(0, 'yieldCriterion', 0.0)
+                        setappdata(0, 'yieldCriteria', 0.0)
                         setappdata(0, 'message_242_groupMaterial', groupIDBuffer(groups).material)
                         setappdata(0, 'message_242_groupName', groupIDBuffer(groups).name)
                         setappdata(0, 'message_242_groupNumber', groups)
@@ -4084,7 +4084,7 @@ classdef preProcess < handle
                         Evaluate the principal stresses based on the
                         selected yield criterion
                     %}
-                    switch yieldCriterion
+                    switch yieldCriteria
                         case 1.0 % Total strain energy theory
                             totalStrainEnergy = s1_i.^2.0 + s2_i.^2.0 + s3_i.^2.0 - (2.0*v).*((s1_i.*s2_i) + (s2_i.*s3_i) + (s1_i.*s3_i));
                             if max(totalStrainEnergy) >= strainLimitEnergy

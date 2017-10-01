@@ -461,7 +461,7 @@ classdef python < handle
                     fprintf(fid_debug, '\r\n\tWarning: Requested field YIELD could not be evaluated due to insufficient material properties. The field will not be written to the output database');
                 elseif (requestedFields(19.0) == true) && (exist(energyFile, 'file') == 0.0) && (all(YIELD == -1.0) == 1.0)
                     % If YIELD was requested but the field was not enabled prior to analysis, warn the user
-                    fprintf(fid_debug, '\r\n\tWarning: Requested field YIELD was not enabled. Set yieldCriterion = 1.0 in the environment file. The field will not be written to the output database');
+                    fprintf(fid_debug, '\r\n\tWarning: Requested field YIELD was not enabled. Set YIELD_CRITERIA = 1.0 in the job file. The field will not be written to the output database');
                 end
                 
                 requestedFields(19.0) = false;

@@ -1931,7 +1931,7 @@ classdef postProcess < handle
                         end
                         
                         % If the yield criterion was enabled
-                        if (getappdata(0, 'yieldCriterion') == 1.0) || (getappdata(0, 'yieldCriterion') == 2.0)
+                        if (getappdata(0, 'yieldCriteria') == 1.0) || (getappdata(0, 'yieldCriteria') == 2.0)
                             requestedFields(19.0) = 1.0;
                         end
                     end
@@ -1945,7 +1945,7 @@ classdef postProcess < handle
                     if getappdata(0, 'enableFOS') == 0.0
                         requestedFields(5.0) = 0.0;
                     end
-                    if getappdata(0, 'yieldCriterion') == 0.0
+                    if getappdata(0, 'yieldCriteria') == 0.0
                         requestedFields(19.0) = 0.0;
                     end
             end
