@@ -1300,6 +1300,9 @@ classdef preProcess < handle
                 failStress_tsfd = [];
                 setappdata(0, 'failStress_tsfd', failStress_tsfd)
             end
+            if isnan(failStress_tsfd) == 1.0
+                failStress_tsfd = [];
+            end
             setappdata(0, 'failStress_tsfd', failStress_tsfd)
             
             % Compressive stress (fiber direction)
@@ -1312,6 +1315,9 @@ classdef preProcess < handle
             catch
                 failStress_csfd = [];
                 setappdata(0, 'failStress_csfd', failStress_csfd)
+            end
+            if isnan(failStress_csfd) == 1.0
+                failStress_csfd = [];
             end
             setappdata(0, 'failStress_csfd', failStress_csfd)
             
@@ -1326,6 +1332,9 @@ classdef preProcess < handle
                 failStress_tstd = [];
                 setappdata(0, 'failStress_tstd', failStress_tstd)
             end
+            if isnan(failStress_tstd) == 1.0
+                failStress_tstd = [];
+            end
             setappdata(0, 'failStress_tstd', failStress_tstd)
             
             % Compressive stress (transverse direction)
@@ -1339,6 +1348,9 @@ classdef preProcess < handle
                 failStress_cstd = [];
                 setappdata(0, 'failStress_cstd', failStress_cstd)
             end
+            if isnan(failStress_cstd) == 1.0
+                failStress_cstd = [];
+            end
             setappdata(0, 'failStress_cstd', failStress_cstd)
             
             % Shear strength
@@ -1351,6 +1363,9 @@ classdef preProcess < handle
             catch
                 failStress_shear = [];
                 setappdata(0, 'failStress_shear', failStress_shear)
+            end
+            if isnan(failStress_shear) == 1.0
+                failStress_shear = [];
             end
             setappdata(0, 'failStress_shear', failStress_shear)
             
@@ -1403,6 +1418,9 @@ classdef preProcess < handle
                 failStrain_tsfd = [];
                 setappdata(0, 'failStrain_tsfd', failStrain_tsfd)
             end
+            if isnan(failStrain_tsfd) == 1.0
+                failStrain_tsfd = [];
+            end
             setappdata(0, 'failStrain_tsfd', failStrain_tsfd)
             
             % Compressive strain (fiber direction)
@@ -1415,6 +1433,9 @@ classdef preProcess < handle
             catch
                 failStrain_csfd = [];
                 setappdata(0, 'failStrain_csfd', failStrain_csfd)
+            end
+            if isnan(failStrain_csfd) == 1.0
+                failStrain_csfd = [];
             end
             setappdata(0, 'failStrain_csfd', failStrain_csfd)
             
@@ -1429,6 +1450,9 @@ classdef preProcess < handle
                 failStrain_tstd = [];
                 setappdata(0, 'failStrain_tstd', failStrain_tstd)
             end
+            if isnan(failStrain_tstd) == 1.0
+                failStrain_tstd = [];
+            end
             setappdata(0, 'failStrain_tstd', failStrain_tstd)
             
             % Compressive strain (transverse direction)
@@ -1442,6 +1466,9 @@ classdef preProcess < handle
                 failStrain_cstd = [];
                 setappdata(0, 'failStrain_cstd', failStrain_cstd)
             end
+            if isnan(failStrain_cstd) == 1.0
+                failStrain_cstd = [];
+            end
             setappdata(0, 'failStrain_cstd', failStrain_cstd)
             
             % Shear strain
@@ -1454,6 +1481,9 @@ classdef preProcess < handle
             catch
                 failStrain_shear = [];
                 setappdata(0, 'failStrain_shear', failStrain_shear)
+            end
+            if isnan(failStrain_shear) == 1.0
+                failStrain_shear = [];
             end
             setappdata(0, 'failStrain_shear', failStrain_shear)
             
@@ -1470,6 +1500,9 @@ classdef preProcess < handle
                 hashin_alpha = 0.0;
                 setappdata(0, 'hashin_alpha', hashin_alpha)
             end
+            if isnan(hashin_alpha) == 1.0
+                hashin_alpha = [];
+            end
             setappdata(0, 'hashin_alpha', hashin_alpha)
             
             % Longitudinal tensile strength
@@ -1482,6 +1515,9 @@ classdef preProcess < handle
             catch
                 hashin_lts = [];
                 setappdata(0, 'hashin_lts', hashin_lts)
+            end
+            if isnan(hashin_lts) == 1.0
+                hashin_lts = [];
             end
             setappdata(0, 'hashin_lts', hashin_lts)
             
@@ -1496,6 +1532,9 @@ classdef preProcess < handle
                 hashin_lcs = [];
                 setappdata(0, 'hashin_lcs', hashin_lcs)
             end
+            if isnan(hashin_lcs) == 1.0
+                hashin_lcs = [];
+            end
             setappdata(0, 'hashin_lcs', hashin_lcs)
             
             % Transverse tensile strength
@@ -1508,6 +1547,9 @@ classdef preProcess < handle
             catch
                 hashin_tts = [];
                 setappdata(0, 'hashin_tts', hashin_tts)
+            end
+            if isnan(hashin_tts) == 1.0
+                hashin_tts = [];
             end
             setappdata(0, 'hashin_tts', hashin_tts)
             
@@ -1522,6 +1564,9 @@ classdef preProcess < handle
                 hashin_tcs = [];
                 setappdata(0, 'hashin_tcs', hashin_tcs)
             end
+            if isnan(hashin_tcs) == 1.0
+                hashin_tcs = [];
+            end
             setappdata(0, 'hashin_tcs', hashin_tcs)
             
             % Longitudinal shear strength
@@ -1535,6 +1580,9 @@ classdef preProcess < handle
                 hashin_lss = [];
                 setappdata(0, 'hashin_lss', hashin_lss)
             end
+            if isnan(hashin_lss) == 1.0
+                hashin_lss = [];
+            end
             setappdata(0, 'hashin_lss', hashin_lss)
             
             % Transverse shear strength
@@ -1547,6 +1595,9 @@ classdef preProcess < handle
             catch
                 hashin_tss = [];
                 setappdata(0, 'hashin_tss', hashin_tss)
+            end
+            if isnan(hashin_tss) == 1.0
+                hashin_tss = [];
             end
             setappdata(0, 'hashin_tss', hashin_tss)
         end

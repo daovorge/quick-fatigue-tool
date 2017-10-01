@@ -8,7 +8,7 @@ function [] = compositeFailure(N, L)
 %
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 29-Sep-2017 15:10:28 GMT
+%   Last modified 01-Oct-2017 14:09:15 GMT
     
     %%
 
@@ -77,7 +77,7 @@ for groups = 1:G
     St = getappdata(0, 'hashin_tss');
     
     % Check if there is enough data for fail stress
-    if isempty(Xt) == 1.0 && isempty(Xc) == 1.0 && isempty(Yt) == 1.0 && isempty(Yc) == 1.0 && isempty(S) == 1.0
+    if isempty(Xt) == 1.0 || isempty(Xc) == 1.0 || isempty(Yt) == 1.0 || isempty(Yc) == 1.0 || isempty(S) == 1.0
         failStress = -1.0;
     else
         failStress = 1.0;
@@ -85,7 +85,7 @@ for groups = 1:G
     
     % Check if there is enough data for fail strain
     if ((isempty(E) == 1.0 || isempty(kp) == 1.0 || isempty(np) == 1.0) && (isempty(v) == 1.0 || isempty(E) == 1.0)) ||...
-            (isempty(Xet) == 1.0 && isempty(Xec) == 1.0 && isempty(Yet) == 1.0 && isempty(Yec) == 1.0 && isempty(Se) == 1.0)
+            (isempty(Xet) == 1.0 || isempty(Xec) == 1.0 || isempty(Yet) == 1.0 || isempty(Yec) == 1.0 || isempty(Se) == 1.0)
         failStrain = -1.0;
     elseif (isempty(kp) == 1.0 || isempty(np) == 1.0) && isempty(E) == 0.0
         failStrain = 0.0;
@@ -95,7 +95,7 @@ for groups = 1:G
     end
     
     % Check if there is enough data for Hashin
-    if isempty(Xht) == 1.0 && isempty(Xhc) == 1.0 && isempty(Yht) == 1.0 && isempty(Yhc) == 1.0 && isempty(Sl) == 1.0 && isempty(St) == 1.0
+    if isempty(Xht) == 1.0 || isempty(Xhc) == 1.0 || isempty(Yht) == 1.0 || isempty(Yhc) == 1.0 || isempty(Sl) == 1.0 || isempty(St) == 1.0
         hashin = -1.0;
     else
         hashin = 1.0;

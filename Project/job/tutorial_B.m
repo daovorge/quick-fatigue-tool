@@ -19,7 +19,7 @@ function [] = tutorial_B()
 %      1 Job file options
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 29-Sep-2017 15:10:28 GMT
+%   Last modified 01-Oct-2017 14:09:15 GMT
 
 %% JOB
 

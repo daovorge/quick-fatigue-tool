@@ -17,7 +17,7 @@ function [] = default_job()
 %      1 Job file options
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 28-Sep-2017 16:31:00 GMT
+%   Last modified 01-Oct-2017 14:09:15 GMT
 
 %% JOB
 

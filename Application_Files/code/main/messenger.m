@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 29-Sep-2017 15:10:28 GMT
+%   Last modified 01-Oct-2017 14:09:15 GMT
 
     %%
 
@@ -1202,7 +1202,7 @@ classdef messenger < handle
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 129.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: Composite failure/damage initiation results have been written to ''%s\\Project\\output\\%s\\Data Files\\composite_criteria.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Composite criteria results have been written to ''%s\\Project\\output\\%s\\Data Files\\composite_criteria.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
                     case 130.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The B2 option is used with %.0f values, but there is only one analysis group', returnType{i}], length(getappdata(0, 'b2')));
                         fprintf(fidType(i), ['-> The first value of B2 will be used for the analysis', returnType{i}]);
@@ -2235,7 +2235,7 @@ classdef messenger < handle
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin damage initiation (matrix compression) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNMTCRT'));
                     case 299.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The COMPOSITE_CRITERIA job file option was specified, but composite criteria were not evaluated', returnType{i}]);
-                        fprintf(fidType(i), ['-> Insufficient composite properies were provided', returnType{i}]);
+                        fprintf(fidType(i), ['-> The specified composite properies are insufficient', returnType{i}]);
                     case 300.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: After evaluating composite criteria, no failure/damage initiation was detected', returnType{i}]);
                 end
@@ -2294,7 +2294,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n', version);
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 29-Sep-2017 15:10:28 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 01-Oct-2017 14:09:15 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

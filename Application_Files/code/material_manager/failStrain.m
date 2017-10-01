@@ -10,7 +10,7 @@ function varargout = failStrain(varargin)%#ok<*DEFNU>
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 29-Sep-2017 15:10:28 GMT
+%   Last modified 01-Oct-2017 14:09:15 GMT
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
