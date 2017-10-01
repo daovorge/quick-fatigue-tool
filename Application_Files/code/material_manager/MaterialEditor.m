@@ -1172,7 +1172,7 @@ else
         rmappdata(0, 'failStress_shear')
     end
     if isappdata(0, 'failStress_cross') == 1.0
-        rmappdata(0, 'failStress_cross')
+        setappdata(0, 'failStress_cross', 0.0)
     end
     if isappdata(0, 'failStress_limit') == 1.0
         rmappdata(0, 'failStress_limit')
@@ -1274,7 +1274,7 @@ material_properties = struct(...
 'hashin_lts', getappdata(0, 'hashin_lts'),...
 'hashin_lcs', getappdata(0, 'hashin_lcs'),...
 'hashin_tts', getappdata(0, 'hashin_tts'),...
-'hashin_lcs', getappdata(0, 'hashin_lcs'),...
+'hashin_tcs', getappdata(0, 'hashin_lcs'),...
 'hashin_lss', getappdata(0, 'hashin_tss'),...
 'hashin_tss', getappdata(0, 'hashin_tss'));
 
@@ -1402,7 +1402,6 @@ if properties.material_properties.np_active == 1.0
     set(handles.check_np, 'value', 1.0)
 end
 
-
 set(handles.edit_nssc, 'string', properties.material_properties.nssc)
 if properties.material_properties.nssc_active == 1.0
     set(handles.edit_nssc, 'backgroundColor', [1.0, 1.0, 1.0], 'enable', 'on')
@@ -1459,12 +1458,12 @@ catch
 end
 try
     if isempty(properties.material_properties.failStress_cross) == 1.0
-        setappdata(0, 'failStress_cross', [])
+        setappdata(0, 'failStress_cross', 0.0)
     else
         setappdata(0, 'failStress_cross', properties.material_properties.failStress_cross)
     end
 catch
-    setappdata(0, 'failStress_cross', [])
+    setappdata(0, 'failStress_cross', 0.0)
 end
 try
     if isempty(properties.material_properties.failStress_limit) == 1.0

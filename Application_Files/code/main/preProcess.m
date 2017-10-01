@@ -1456,6 +1456,99 @@ classdef preProcess < handle
                 setappdata(0, 'failStrain_shear', failStrain_shear)
             end
             setappdata(0, 'failStrain_shear', failStrain_shear)
+            
+            %% Hashin parameters for composite failure
+            
+            % Alpha
+            try
+                if ischar(material_properties.hashin_alpha) == 1.0
+                    hashin_alpha = str2double(material_properties.hashin_alpha);
+                else
+                    hashin_alpha = 0.0;
+                end
+            catch
+                hashin_alpha = 0.0;
+                setappdata(0, 'hashin_alpha', hashin_alpha)
+            end
+            setappdata(0, 'hashin_alpha', hashin_alpha)
+            
+            % Longitudinal tensile strength
+            try
+                if ischar(material_properties.hashin_lts) == 1.0
+                    hashin_lts = str2double(material_properties.hashin_lts);
+                else
+                    hashin_lts = [];
+                end
+            catch
+                hashin_lts = [];
+                setappdata(0, 'hashin_lts', hashin_lts)
+            end
+            setappdata(0, 'hashin_lts', hashin_lts)
+            
+            % Longitudinal compressive strength
+            try
+                if ischar(material_properties.hashin_lcs) == 1.0
+                    hashin_lcs = str2double(material_properties.hashin_lcs);
+                else
+                    hashin_lcs = [];
+                end
+            catch
+                hashin_lcs = [];
+                setappdata(0, 'hashin_lcs', hashin_lcs)
+            end
+            setappdata(0, 'hashin_lcs', hashin_lcs)
+            
+            % Transverse tensile strength
+            try
+                if ischar(material_properties.hashin_tts) == 1.0
+                    hashin_tts = str2double(material_properties.hashin_tts);
+                else
+                    hashin_tts = [];
+                end
+            catch
+                hashin_tts = [];
+                setappdata(0, 'hashin_tts', hashin_tts)
+            end
+            setappdata(0, 'hashin_tts', hashin_tts)
+            
+            % Transverse compressive strength
+            try
+                if ischar(material_properties.hashin_tcs) == 1.0
+                    hashin_tcs = str2double(material_properties.hashin_tcs);
+                else
+                    hashin_tcs = [];
+                end
+            catch
+                hashin_tcs = [];
+                setappdata(0, 'hashin_tcs', hashin_tcs)
+            end
+            setappdata(0, 'hashin_tcs', hashin_tcs)
+            
+            % Longitudinal shear strength
+            try
+                if ischar(material_properties.hashin_lss) == 1.0
+                    hashin_lss = str2double(material_properties.hashin_lss);
+                else
+                    hashin_lss = [];
+                end
+            catch
+                hashin_lss = [];
+                setappdata(0, 'hashin_lss', hashin_lss)
+            end
+            setappdata(0, 'hashin_lss', hashin_lss)
+            
+            % Transverse shear strength
+            try
+                if ischar(material_properties.hashin_tss) == 1.0
+                    hashin_tss = str2double(material_properties.hashin_tss);
+                else
+                    hashin_tss = [];
+                end
+            catch
+                hashin_tss = [];
+                setappdata(0, 'hashin_tss', hashin_tss)
+            end
+            setappdata(0, 'hashin_tss', hashin_tss)
         end
         
         %% Approximate the yield stress:

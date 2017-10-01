@@ -19,12 +19,16 @@ G = getappdata(0, 'numberOfGroups');
 % Get the group ID buffer
 groupIDBuffer = getappdata(0, 'groupIDBuffer');
 
-% Initialize yield variables
+% Initialize output variables
 MSTRS = linspace(-1.0, -1.0, N);
 MSTRN = linspace(-1.0, -1.0, N);
 TSAIH = linspace(-1.0, -1.0, N);
 TSAIW = linspace(-1.0, -1.0, N);
 AZZIT = linspace(-1.0, -1.0, N);
+HSNFTCRT = linspace(-1.0, -1.0, N);
+HSNFCCRT = linspace(-1.0, -1.0, N);
+HSNMTCRT = linspace(-1.0, -1.0, N);
+HSNMCCRT = linspace(-1.0, -1.0, N);
 
 startID = 1.0;
 totalCounter = 1.0;
@@ -63,7 +67,23 @@ for groups = 1:G
     np = getappdata(0, 'np');
     v = getappdata(0, 'poisson');
     
-    % Check if there is enough data
+    % Get Hashin properties
+    alpha = getappdata(0, 'hashin_alpha');
+    Xht = getappdata(0, 'hashin_lts');
+    Xhc = getappdata(0, 'hashin_lcs');
+    Yht = getappdata(0, 'hashin_tts');
+    Yhc = getappdata(0, 'hashin_tcs');
+    Sl = getappdata(0, 'hashin_lss');
+    St = getappdata(0, 'hashin_tss');
+    
+    % Check if there is enough data for fail stress
+    if isempty(Xt) == 1.0 && isempty(Xc) == 1.0 && isempty(Yt) == 1.0 && isempty(Yc) == 1.0 && isempty(S) == 1.0
+        failStress = -1.0;
+    else
+        failStress = 1.0;
+    end
+    
+    % Check if there is enough data for fail strain
     if ((isempty(E) == 1.0 || isempty(kp) == 1.0 || isempty(np) == 1.0) && (isempty(v) == 1.0 || isempty(E) == 1.0)) ||...
             (isempty(Xet) == 1.0 && isempty(Xec) == 1.0 && isempty(Yet) == 1.0 && isempty(Yec) == 1.0 && isempty(Se) == 1.0)
         failStrain = -1.0;
@@ -74,23 +94,27 @@ for groups = 1:G
         failStrain = 1.0;
     end
     
-    if isempty(Xt) == 1.0 && isempty(Xc) == 1.0 && isempty(Yt) == 1.0 && isempty(Yc) == 1.0 && isempty(S) == 1.0
-        failStress = -1.0;
+    % Check if there is enough data for Hashin
+    if isempty(Xht) == 1.0 && isempty(Xhc) == 1.0 && isempty(Yht) == 1.0 && isempty(Yhc) == 1.0 && isempty(Sl) == 1.0 && isempty(St) == 1.0
+        hashin = -1.0;
     else
-        failStress = 1.0;
+        hashin = 1.0;
+    end
+    
+    if failStress == -1.0 && failStrain == -1.0 && hashin == -1.0
+        totalCounter = totalCounter + N;
+        continue
     end
     
     % Get stress tensor
     S11 = getappdata(0, 'Sxx');
     S22 = getappdata(0, 'Syy');
-    S33 = getappdata(0, 'Szz');
     S12 = getappdata(0, 'Txy');
     S13 = getappdata(0, 'Txz');
     S23 = getappdata(0, 'Tyz');
     
     S11 = S11(startID:(startID + N) - 1.0, :);
     S22 = S22(startID:(startID + N) - 1.0, :);
-    S33 = S33(startID:(startID + N) - 1.0, :);
     S12 = S12(startID:(startID + N) - 1.0, :);
     S13 = S13(startID:(startID + N) - 1.0, :);
     S23 = S23(startID:(startID + N) - 1.0, :);
@@ -120,7 +144,6 @@ for groups = 1:G
         %% Get the stresses at the current item
         S11i = S11(i, :);
         S22i = S22(i, :);
-        S33i = S33(i, :);
         S12i = S12(i, :);
         S13i = S13(i, :);
         S23i = S23(i, :);
@@ -179,6 +202,35 @@ for groups = 1:G
             MSTRN(totalCounter) = max(max([ME11; ME22; ME12]));
         end
         
+        %% HASHIN CALCULATION
+        if hashin == 1.0
+            HSNFTCRTi = zeros(1.0, L);
+            HSNFCCRTi = zeros(1.0, L);
+            HSNMTCRTi = zeros(1.0, L);
+            HSNMCCRTi = zeros(1.0, L);
+            
+            for j = 1:L
+                % Mode I/II
+                if S11i(j) >= 0.0
+                    HSNFTCRTi(j) = (S11i(j)/Xht)^2.0 + alpha*(S12i(j)/Sl)^2.0;
+                else
+                    HSNFCCRTi(j) = (S11i(j)/Xhc)^2.0;
+                end
+                
+                % Mode III/IV
+                if S22(j) >= 0.0
+                    HSNMTCRTi(j) = (S22i(j)/Yht)^2.0 + (S12i(j)/Sl)^2.0;
+                else
+                    HSNMCCRTi(j) = (S22i(j)/(2.0*St))^2.0 + ((Yhc/(2.0*St))^2.0 - 1.0)*(S22i(j)/Yhc) + (S12i(j)/Sl)^2.0;
+                end
+            end
+            
+            HSNFTCRT = max(HSNFTCRTi);
+            HSNFCCRT = max(HSNFCCRTi);
+            HSNMTCRT = max(HSNMTCRTi);
+            HSNMCCRT = max(HSNMCCRTi);
+        end
+        
         totalCounter = totalCounter + 1.0;
     end
     
@@ -192,12 +244,20 @@ N_MSTRN = length(MSTRN(MSTRN >= 1.0));
 N_TSAIH = length(TSAIH(TSAIH >= 1.0));
 N_TSAIW = length(TSAIW(TSAIW >= 1.0));
 N_AZZIT = length(AZZIT(AZZIT >= 1.0));
+N_HSNFTCRT = length(HSNFTCRT(HSNFTCRT >= 1.0));
+N_HSNFCCRT = length(HSNFCCRT(HSNFCCRT >= 1.0));
+N_HSNMTCRT = length(HSNMTCRT(HSNMTCRT >= 1.0));
+N_HSNMCCRT = length(HSNMCCRT(HSNMCCRT >= 1.0));
 
 setappdata(0, 'MSTRS', N_MSTRS)
 setappdata(0, 'MSTRN', N_MSTRN)
 setappdata(0, 'TSAIH', N_TSAIH)
 setappdata(0, 'TSAIW', N_TSAIW)
 setappdata(0, 'AZZIT', N_AZZIT)
+setappdata(0, 'HSNFTCRT', N_HSNFTCRT)
+setappdata(0, 'HSNFCCRT', N_HSNFCCRT)
+setappdata(0, 'HSNMTCRT', N_HSNMTCRT)
+setappdata(0, 'HSNMTCRT', N_HSNMCCRT)
 
 if N_MSTRS > 0.0
     messenger.writeMessage(290.0)
@@ -214,13 +274,31 @@ end
 if N_MSTRN > 0.0
     messenger.writeMessage(294.0)
 end
+if N_HSNFTCRT > 0.0
+    messenger.writeMessage(295.0)
+end
+if N_HSNFCCRT > 0.0
+    messenger.writeMessage(296.0)
+end
+if N_HSNMTCRT > 0.0
+    messenger.writeMessage(297.0)
+end
+if N_HSNMCCRT > 0.0
+    messenger.writeMessage(298.0)
+end
 
 %% Write output to file
-if (failStress ~= -1.0) || (failStrain ~= -1.0)
+if (failStress ~= -1.0) || (failStrain ~= -1.0) || (hashin ~= -1.0)
+    % Check if there is failure 
+    FAIL_ALL = [N_MSTRS, N_TSAIH, N_TSAIW, N_AZZIT, N_MSTRN, N_HSNFTCRT, N_HSNFCCRT, N_HSNMTCRT, N_HSNMCCRT];
+    if any(FAIL_ALL) == 0.0
+        messenger.writeMessage(300.0)
+    end
+    
     mainIDs = getappdata(0, 'mainID');
     subIDs = getappdata(0, 'subID');
     
-    data = [mainIDs'; subIDs'; MSTRS; MSTRN; TSAIW; TSAIW; AZZIT]';
+    data = [mainIDs'; subIDs'; MSTRS; MSTRN; TSAIW; TSAIW; AZZIT; HSNFTCRT; HSNFCCRT; HSNMTCRT; HSNMCCRT]';
     
     % Print information to file
     root = getappdata(0, 'outputDirectory');
@@ -236,10 +314,12 @@ if (failStress ~= -1.0) || (failStrain ~= -1.0)
     fprintf(fid, 'COMPOSITE FAILURE\r\n');
     fprintf(fid, 'Job:\t%s\r\nLoading:\t%.3g\t%s\r\n', getappdata(0, 'jobName'), getappdata(0, 'loadEqVal'), getappdata(0, 'loadEqUnits'));
     
-    fprintf(fid, 'Main ID\tSub ID\tMSTRS\tMSTRN\tTSAIH\tTSAIW\tAZZIT\r\n');
-    fprintf(fid, '%.0f\t%.0f\t%f\t%f\t%f\t%f\t%f\r\n', data');
+    fprintf(fid, 'Main ID\tSub ID\tMSTRS\tMSTRN\tTSAIH\tTSAIW\tAZZIT\tHSNFTCRT\tHSNFCCRT\tHSNMTCRT\tHSNMCCRT\r\n');
+    fprintf(fid, '%.0f\t%.0f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\r\n', data');
     
     fclose(fid);
     
     messenger.writeMessage(129.0)
+else
+    messenger.writeMessage(299.0)
 end

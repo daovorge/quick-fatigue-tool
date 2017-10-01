@@ -312,6 +312,13 @@ classdef group < handle
             group_materialProps(numberOfMaterials).failStrain_tstd = [];
             group_materialProps(numberOfMaterials).failStrain_cstd = [];
             group_materialProps(numberOfMaterials).failStrain_shear = [];
+            group_materialProps(numberOfMaterials).hashin_alpha = [];
+            group_materialProps(numberOfMaterials).hashin_lts = [];
+            group_materialProps(numberOfMaterials).hashin_lcs = [];
+            group_materialProps(numberOfMaterials).hashin_tts = [];
+            group_materialProps(numberOfMaterials).hashin_tcs = [];
+            group_materialProps(numberOfMaterials).hashin_lss = [];
+            group_materialProps(numberOfMaterials).hashin_tss = [];
             
             setappdata(0, 'group_materialProps', group_materialProps)
             
@@ -1993,6 +2000,13 @@ classdef group < handle
             group_materialProps(materialNumber).failStrain_tstd = getappdata(0, 'failStrain_tstd');
             group_materialProps(materialNumber).failStrain_cstd = getappdata(0, 'failStrain_cstd');
             group_materialProps(materialNumber).failStrain_shear = getappdata(0, 'failStrain_shear');
+            group_materialProps(materialNumber).hashin_alpha = getappdata(0, 'hashin_alpha');
+            group_materialProps(materialNumber).hashin_lts = getappdata(0, 'hashin_lts');
+            group_materialProps(materialNumber).hashin_lcs = getappdata(0, 'hashin_lcs');
+            group_materialProps(materialNumber).hashin_tts = getappdata(0, 'hashin_tts');
+            group_materialProps(materialNumber).hashin_tcs = getappdata(0, 'hashin_tcs');
+            group_materialProps(materialNumber).hashin_lss = getappdata(0, 'hashin_lss');
+            group_materialProps(materialNumber).hashin_tss = getappdata(0, 'hashin_tss');
             
             
             setappdata(0, 'group_materialProps', group_materialProps)
@@ -2066,6 +2080,13 @@ classdef group < handle
             setappdata(0, 'failStrain_tstd', group_materialProps(materialNumber).failStrain_tstd)
             setappdata(0, 'failStrain_cstd', group_materialProps(materialNumber).failStrain_cstd)
             setappdata(0, 'failStrain_shear', group_materialProps(materialNumber).failStrain_shear)
+            setappdata(0, 'hashin_alpha', group_materialProps(materialNumber).hashin_alpha)
+            setappdata(0, 'hashin_lts', group_materialProps(materialNumber).hashin_lts)
+            setappdata(0, 'hashin_lcs', group_materialProps(materialNumber).hashin_lcs)
+            setappdata(0, 'hashin_tts', group_materialProps(materialNumber).hashin_tts)
+            setappdata(0, 'hashin_tcs', group_materialProps(materialNumber).hashin_tcs)
+            setappdata(0, 'hashin_lss', group_materialProps(materialNumber).hashin_lss)
+            setappdata(0, 'hashin_tss', group_materialProps(materialNumber).hashin_tss)
         end
         
         %% READ A GROUP FILE

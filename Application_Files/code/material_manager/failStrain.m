@@ -243,38 +243,55 @@ end
 
 % --- Executes on button press in pButton_ok.
 function pButton_ok_Callback(~, ~, handles)
+blank(handles)
 error = 0.0;
 
 % Check for bad inputs
 failStrain_tsfd = str2double(get(handles.edit_tsfd, 'string'));
-if isnan(failStrain_tsfd) == 1.0 || isinf(failStrain_tsfd) == 1.0 || isreal(failStrain_tsfd) == 0.0
-    error = 1.0;
+if isempty(get(handles.edit_tsfd, 'string')) == 0.0
+    if isnan(failStrain_tsfd) == 1.0 || isinf(failStrain_tsfd) == 1.0 || isreal(failStrain_tsfd) == 0.0
+        error = 1.0;
+    end
 end
+
 failStrain_csfd = str2double(get(handles.edit_csfd, 'string'));
-if isnan(failStrain_csfd) == 1.0 || isinf(failStrain_csfd) == 1.0 || isreal(failStrain_csfd) == 0.0
-    error = 1.0;
+if isempty(get(handles.edit_csfd, 'string')) == 0.0
+    if isnan(failStrain_csfd) == 1.0 || isinf(failStrain_csfd) == 1.0 || isreal(failStrain_csfd) == 0.0
+        error = 1.0;
+    end
 end
+
 failStrain_tstd = str2double(get(handles.edit_tstd, 'string'));
-if isnan(failStrain_tstd) == 1.0 || isinf(failStrain_tstd) == 1.0 || isreal(failStrain_tstd) == 0.0
-    error = 1.0;
+if isempty(get(handles.edit_tstd, 'string')) == 0.0
+    if isnan(failStrain_tstd) == 1.0 || isinf(failStrain_tstd) == 1.0 || isreal(failStrain_tstd) == 0.0
+        error = 1.0;
+    end
 end
+
 failStrain_cstd = str2double(get(handles.edit_cstd, 'string'));
-if isnan(failStrain_cstd) == 1.0 || isinf(failStrain_cstd) == 1.0 || isreal(failStrain_cstd) == 0.0
-    error = 1.0;
+if isempty(get(handles.edit_cstd, 'string')) == 0.0
+    if isnan(failStrain_cstd) == 1.0 || isinf(failStrain_cstd) == 1.0 || isreal(failStrain_cstd) == 0.0
+        error = 1.0;
+    end
 end
+
 failStrain_shear = str2double(get(handles.edit_shear, 'string'));
-if isnan(failStrain_shear) == 1.0 || isinf(failStrain_shear) == 1.0 || isreal(failStrain_shear) == 0.0
-    error = 1.0;
+if isempty(get(handles.edit_shear, 'string')) == 0.0
+    if isnan(failStrain_shear) == 1.0 || isinf(failStrain_shear) == 1.0 || isreal(failStrain_shear) == 0.0
+        error = 1.0;
+    end
 end
 
 if error == 1.0
     errordlg('One or more inputs contain a syntax error.', 'Quick Fatigue Tool')
+    uiwait; enable(handles)
     return
 end
 
 % Check for non-physical inputs
 if failStrain_tsfd <= 0.0  || failStrain_csfd <= 0.0 || failStrain_tstd <= 0.0 || failStrain_cstd <= 0.0 || failStrain_shear <= 0.0
     errordlg('Strain values must be positive.', 'Quick Fatigue Tool')
+    uiwait; enable(handles)
     return
 end
 
@@ -298,3 +315,11 @@ function failStrain_ResizeFcn(~, ~, ~)
 % hObject    handle to failStrain (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+function blank(handles)
+set(findall(handles.failStrain, '-property', 'Enable'), 'Enable', 'off')
+
+
+function enable(handles)
+set(findall(handles.failStrain, '-property', 'Enable'), 'Enable', 'on')

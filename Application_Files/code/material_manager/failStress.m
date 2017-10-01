@@ -249,42 +249,63 @@ end
 
 % --- Executes on button press in pButton_ok.
 function pButton_ok_Callback(~, ~, handles)
+blank(handles)
 error = 0.0;
 
 failStress_tsfd = str2double(get(handles.edit_tsfd, 'string'));
-if isnan(failStress_tsfd) == 1.0 || isinf(failStress_tsfd) == 1.0 || isreal(failStress_tsfd) == 0.0
-    error = 1.0;
+if isempty(get(handles.edit_tsfd, 'string')) == 0.0
+    if isnan(failStress_tsfd) == 1.0 || isinf(failStress_tsfd) == 1.0 || isreal(failStress_tsfd) == 0.0
+        error = 1.0;
+    end
 end
+
 failStress_csfd = str2double(get(handles.edit_csfd, 'string'));
-if isnan(failStress_csfd) == 1.0 || isinf(failStress_csfd) == 1.0 || isreal(failStress_csfd) == 0.0
-    error = 1.0;
+if isempty(get(handles.edit_csfd, 'string')) == 0.0
+    if isnan(failStress_csfd) == 1.0 || isinf(failStress_csfd) == 1.0 || isreal(failStress_csfd) == 0.0
+        error = 1.0;
+    end
 end
+
 failStress_tstd = str2double(get(handles.edit_tstd, 'string'));
-if isnan(failStress_tstd) == 1.0 || isinf(failStress_tstd) == 1.0 || isreal(failStress_tstd) == 0.0
-    error = 1.0;
+if isempty(get(handles.edit_tstd, 'string')) == 0.0
+    if isnan(failStress_tstd) == 1.0 || isinf(failStress_tstd) == 1.0 || isreal(failStress_tstd) == 0.0
+        error = 1.0;
+    end
 end
+
 failStress_cstd = str2double(get(handles.edit_cstd, 'string'));
-if isnan(failStress_cstd) == 1.0 || isinf(failStress_cstd) == 1.0 || isreal(failStress_cstd) == 0.0
-    error = 1.0;
+if isempty(get(handles.edit_cstd, 'string')) == 0.0
+    if isnan(failStress_cstd) == 1.0 || isinf(failStress_cstd) == 1.0 || isreal(failStress_cstd) == 0.0
+        error = 1.0;
+    end
 end
+
 failStress_shear = str2double(get(handles.edit_shear, 'string'));
-if isnan(failStress_shear) == 1.0 || isinf(failStress_shear) == 1.0 || isreal(failStress_shear) == 0.0
-    error = 1.0;
+if isempty(get(handles.edit_shear, 'string')) == 0.0
+    if isnan(failStress_shear) == 1.0 || isinf(failStress_shear) == 1.0 || isreal(failStress_shear) == 0.0
+        error = 1.0;
+    end
 end
 
 if error == 1.0
     errordlg('One or more inputs contain a syntax error.', 'Quick Fatigue Tool')
+    uiwait; enable(handles)
     return
 end
 
 if failStress_tsfd <= 0.0  || failStress_csfd <= 0.0 || failStress_tstd <= 0.0 || failStress_cstd <= 0.0 || failStress_shear <= 0.0
     errordlg('Stress values must be positive.', 'Quick Fatigue Tool')
+    uiwait; enable(handles)
     return
 end
 
+if isempty(get(handles.edit_cross, 'string'))
+    set(handles.edit_cross, 'string', '0')
+end
 failStress_cross = str2double(get(handles.edit_cross, 'string'));
 if failStress_cross < -1.0 || failStress_cross > 1.0
-    errordlg('The cross product coefficient must be in the range (-1 >= x <= 1.0).', 'Quick Fatigue Tool')
+    errordlg('The cross product coefficient must be in the range (-1 <= x <= 1.0).', 'Quick Fatigue Tool')
+    uiwait; enable(handles)
     return
 end
 
@@ -310,3 +331,11 @@ function failStress_ResizeFcn(~, ~, ~)
 % hObject    handle to failStress (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+function blank(handles)
+set(findall(handles.failStress, '-property', 'Enable'), 'Enable', 'off')
+
+
+function enable(handles)
+set(findall(handles.failStress, '-property', 'Enable'), 'Enable', 'on')

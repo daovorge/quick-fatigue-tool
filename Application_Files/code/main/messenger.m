@@ -2225,6 +2225,19 @@ classdef messenger < handle
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The Azzi-Tsai-Hill composite failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'AZZIT'));
                     case 294.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The maximum strain composite failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'MSTRN'));
+                    case 295.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin failure (fiber tensile) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNFTCRT'));
+                    case 296.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin failure (fiber compression) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNFCCRT'));
+                    case 297.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin failure (matrix tensile) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNMTCRT'));
+                    case 298.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin failure (matrix compression) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNMTCRT'));
+                    case 299.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The COMPOSITE job file option was specified, but composite failure criteria were not evaluated', returnType{i}]);
+                        fprintf(fidType(i), ['-> Insufficient composite failure properies were provided', returnType{i}]);
+                    case 300.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: After evaluating composite failure criteria, no failures were detected', returnType{i}]);
                 end
             end
         end

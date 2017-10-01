@@ -249,6 +249,7 @@ end
 
 % --- Executes on button press in pButton_ok.
 function pButton_ok_Callback(~, ~, handles)
+blank(handles)
 error = 0.0;
 
 if isempty(get(handles.edit_alpha, 'string'))
@@ -259,33 +260,52 @@ else
         error = 1.0;
     end
 end
+
 hashin_lts = str2double(get(handles.edit_lts, 'string'));
-if isnan(hashin_lts) == 1.0 || isinf(hashin_lts) == 1.0 || isreal(hashin_lts) == 0.0
-    error = 1.0;
+if isempty(get(handles.edit_lts, 'string')) == 0.0
+    if isnan(hashin_lts) == 1.0 || isinf(hashin_lts) == 1.0 || isreal(hashin_lts) == 0.0
+        error = 1.0;
+    end
 end
+
 hashin_lcs = str2double(get(handles.edit_lcs, 'string'));
-if isnan(hashin_lcs) == 1.0 || isinf(hashin_lcs) == 1.0 || isreal(hashin_lcs) == 0.0
-    error = 1.0;
+if isempty(get(handles.edit_lcs, 'string')) == 0.0
+    if isnan(hashin_lcs) == 1.0 || isinf(hashin_lcs) == 1.0 || isreal(hashin_lcs) == 0.0
+        error = 1.0;
+    end
 end
+
 hashin_tts = str2double(get(handles.edit_tts, 'string'));
-if isnan(hashin_tts) == 1.0 || isinf(hashin_tts) == 1.0 || isreal(hashin_tts) == 0.0
-    error = 1.0;
+if isempty(get(handles.edit_tts, 'string')) == 0.0
+    if isnan(hashin_tts) == 1.0 || isinf(hashin_tts) == 1.0 || isreal(hashin_tts) == 0.0
+        error = 1.0;
+    end
 end
+
 hashin_tcs = str2double(get(handles.edit_tcs, 'string'));
-if isnan(hashin_tcs) == 1.0 || isinf(hashin_tcs) == 1.0 || isreal(hashin_tcs) == 0.0
-    error = 1.0;
+if isempty(get(handles.edit_tcs, 'string')) == 0.0
+    if isnan(hashin_tcs) == 1.0 || isinf(hashin_tcs) == 1.0 || isreal(hashin_tcs) == 0.0
+        error = 1.0;
+    end
 end
+
 hashin_lss = str2double(get(handles.edit_lss, 'string'));
-if isnan(hashin_lss) == 1.0 || isinf(hashin_lss) == 1.0 || isreal(hashin_lss) == 0.0
-    error = 1.0;
+if isempty(get(handles.edit_lss, 'string')) == 0.0
+    if isnan(hashin_lss) == 1.0 || isinf(hashin_lss) == 1.0 || isreal(hashin_lss) == 0.0
+        error = 1.0;
+    end
 end
+
 hashin_tss = str2double(get(handles.edit_tss, 'string'));
-if isnan(hashin_tss) == 1.0 || isinf(hashin_tss) == 1.0 || isreal(hashin_tss) == 0.0
-    error = 1.0;
+if isempty(get(handles.edit_tss, 'string')) == 0.0
+    if isnan(hashin_tss) == 1.0 || isinf(hashin_tss) == 1.0 || isreal(hashin_tss) == 0.0
+        error = 1.0;
+    end
 end
 
 if error == 1.0
     errordlg('One or more inputs contain a syntax error.', 'Quick Fatigue Tool')
+    uiwait; enable(handles)
     return
 end
 
@@ -334,3 +354,11 @@ function edit_alpha_CreateFcn(hObject, ~, ~)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+function blank(handles)
+set(findall(handles.hashinDamage, '-property', 'Enable'), 'Enable', 'off')
+
+
+function enable(handles)
+set(findall(handles.hashinDamage, '-property', 'Enable'), 'Enable', 'on')
