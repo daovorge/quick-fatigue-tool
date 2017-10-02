@@ -9,7 +9,7 @@ classdef group < handle
 %      4.6 Analysis groups
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 29-Sep-2017 15:10:28 GMT
+%   Last modified 02-Oct-2017 13:11:53 GMT
     
     %%
     
@@ -304,9 +304,13 @@ classdef group < handle
             group_materialProps(numberOfMaterials).failStress_csfd = [];
             group_materialProps(numberOfMaterials).failStress_tstd = [];
             group_materialProps(numberOfMaterials).failStress_cstd = [];
+            group_materialProps(numberOfMaterials).failStress_tsttd = [];
+            group_materialProps(numberOfMaterials).failStress_csttd = [];
             group_materialProps(numberOfMaterials).failStress_shear = [];
-            group_materialProps(numberOfMaterials).failStress_cross = [];
-            group_materialProps(numberOfMaterials).failStress_limit = [];
+            group_materialProps(numberOfMaterials).failStress_cross12 = [];
+            group_materialProps(numberOfMaterials).failStress_cross23 = [];
+            group_materialProps(numberOfMaterials).failStress_limit12 = [];
+            group_materialProps(numberOfMaterials).failStress_limit23 = [];
             group_materialProps(numberOfMaterials).failStrain_tsfd = [];
             group_materialProps(numberOfMaterials).failStrain_csfd = [];
             group_materialProps(numberOfMaterials).failStrain_tstd = [];
@@ -1992,9 +1996,13 @@ classdef group < handle
             group_materialProps(materialNumber).failStress_csfd = getappdata(0, 'failStress_csfd');
             group_materialProps(materialNumber).failStress_tstd = getappdata(0, 'failStress_tstd');
             group_materialProps(materialNumber).failStress_cstd = getappdata(0, 'failStress_cstd');
+            group_materialProps(materialNumber).failStress_tsttd = getappdata(0, 'failStress_tsttd');
+            group_materialProps(materialNumber).failStress_csttd = getappdata(0, 'failStress_csttd');
             group_materialProps(materialNumber).failStress_shear = getappdata(0, 'failStress_shear');
-            group_materialProps(materialNumber).failStress_cross = getappdata(0, 'failStress_cross');
-            group_materialProps(materialNumber).failStress_limit = getappdata(0, 'failStress_limit');
+            group_materialProps(materialNumber).failStress_cross12 = getappdata(0, 'failStress_cross12');
+            group_materialProps(materialNumber).failStress_cross23 = getappdata(0, 'failStress_cross23');
+            group_materialProps(materialNumber).failStress_limit12 = getappdata(0, 'failStress_limit12');
+            group_materialProps(materialNumber).failStress_limit23 = getappdata(0, 'failStress_limit23');
             group_materialProps(materialNumber).failStrain_tsfd = getappdata(0, 'failStrain_tsfd');
             group_materialProps(materialNumber).failStrain_csfd = getappdata(0, 'failStrain_csfd');
             group_materialProps(materialNumber).failStrain_tstd = getappdata(0, 'failStrain_tstd');
@@ -2072,9 +2080,13 @@ classdef group < handle
             setappdata(0, 'failStress_csfd', group_materialProps(materialNumber).failStress_csfd)
             setappdata(0, 'failStress_tstd', group_materialProps(materialNumber).failStress_tstd)
             setappdata(0, 'failStress_cstd', group_materialProps(materialNumber).failStress_cstd)
+            setappdata(0, 'failStress_tsttd', group_materialProps(materialNumber).failStress_tsttd)
+            setappdata(0, 'failStress_csttd', group_materialProps(materialNumber).failStress_csttd)
             setappdata(0, 'failStress_shear', group_materialProps(materialNumber).failStress_shear)
-            setappdata(0, 'failStress_cross', group_materialProps(materialNumber).failStress_cross)
-            setappdata(0, 'failStress_limit', group_materialProps(materialNumber).failStress_limit)
+            setappdata(0, 'failStress_cross12', group_materialProps(materialNumber).failStress_cross12)
+            setappdata(0, 'failStress_cross23', group_materialProps(materialNumber).failStress_cross23)
+            setappdata(0, 'failStress_limit12', group_materialProps(materialNumber).failStress_limit12)
+            setappdata(0, 'failStress_limit23', group_materialProps(materialNumber).failStress_limit23)
             setappdata(0, 'failStrain_tsfd', group_materialProps(materialNumber).failStrain_tsfd)
             setappdata(0, 'failStrain_csfd', group_materialProps(materialNumber).failStrain_csfd)
             setappdata(0, 'failStrain_tstd', group_materialProps(materialNumber).failStrain_tstd)

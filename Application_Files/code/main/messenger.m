@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 01-Oct-2017 14:09:15 GMT
+%   Last modified 02-Oct-2017 13:11:53 GMT
 
     %%
 
@@ -1217,9 +1217,8 @@ classdef messenger < handle
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 132.0
                         if getappdata(0, 'suppress_ID132') == 0.0
-                            fprintf(fidType(i), [returnType{i}, '***NOTE: Out-of-plane shear stresses (S23/S13) were found during the composite failure/damage initiation calculation', returnType{i}]);
-                            fprintf(fidType(i), ['-> The calculation assumes plane stress conditions', returnType{i}]);
-                            fprintf(fidType(i), ['-> Results may be inaccurate', returnType{i}]);
+                            fprintf(fidType(i), [returnType{i}, '***NOTE: Out-of-plane stresses (S33/S23/S13) were found during the composite failure/damage initiation calculation', returnType{i}]);
+                            fprintf(fidType(i), ['-> For composite materials, plane stress conditions are assumed', returnType{i}]);
                             
                             if i == X
                                 setappdata(0, 'suppress_ID132', 1.0)
@@ -2216,27 +2215,29 @@ classdef messenger < handle
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The following elements are not supported by the surface detection algorithm: %s', returnType{i}], getappdata(0, 'message_289_unsupportedElements'));
                         fprintf(fidType(i), ['-> These elements have been skipped', returnType{i}]);
                     case 290.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The maximum stress composite failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'MSTRS'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The maximum stress failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'MSTRS'));
                     case 291.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Tsai-Hill composite failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'TSAIH'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Tsai-Hill failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'TSAIH'));
                     case 292.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Tsai-Wu composite failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'TSAIW'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Tsai-Wu failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'TSAIW'));
                     case 293.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Azzi-Tsai-Hill composite failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'AZZIT'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Tsai-Wu (through-thickness) failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'TSAIWTT'));
                     case 294.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The maximum strain composite failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'MSTRN'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Azzi-Tsai-Hill failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'AZZIT'));
                     case 295.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin damage initiation (fiber tensile) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNFTCRT'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The maximum strain failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'MSTRN'));
                     case 296.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin damage initiation (fiber compression) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNFCCRT'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin damage initiation (fiber tensile) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNFTCRT'));
                     case 297.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin damage initiation (matrix tensile) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNMTCRT'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin damage initiation (fiber compression) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNFCCRT'));
                     case 298.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin damage initiation (matrix compression) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNMTCRT'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin damage initiation (matrix tensile) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNMTCRT'));
                     case 299.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin damage initiation (matrix compression) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNMTCRT'));
+                    case 300.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The COMPOSITE_CRITERIA job file option was specified, but composite criteria were not evaluated', returnType{i}]);
                         fprintf(fidType(i), ['-> The specified composite properies are insufficient', returnType{i}]);
-                    case 300.0
+                    case 301.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: After evaluating composite criteria, no failure/damage initiation was detected', returnType{i}]);
                 end
             end
@@ -2294,7 +2295,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n', version);
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 01-Oct-2017 14:09:15 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 02-Oct-2017 13:11:53 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

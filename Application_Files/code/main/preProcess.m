@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 29-Sep-2017 15:10:28 GMT
+%   Last modified 02-Oct-2017 13:11:53 GMT
     
     %%
     
@@ -1353,6 +1353,38 @@ classdef preProcess < handle
             end
             setappdata(0, 'failStress_cstd', failStress_cstd)
             
+            % Tensile stress (through-thickness direction)
+            try
+                if ischar(material_properties.failStress_tsttd) == 1.0
+                    failStress_tsttd = str2double(material_properties.failStress_tsttd);
+                else
+                    failStress_tsttd = [];
+                end
+            catch
+                failStress_tsttd = [];
+                setappdata(0, 'failStress_tsttd', failStress_tsttd)
+            end
+            if isnan(failStress_tsttd) == 1.0
+                failStress_tsttd = [];
+            end
+            setappdata(0, 'failStress_tsttd', failStress_tsttd)
+            
+            % Compressive stress (through-thickness direction)
+            try
+                if ischar(material_properties.failStress_csttd) == 1.0
+                    failStress_csttd = str2double(material_properties.failStress_csttd);
+                else
+                    failStress_csttd = [];
+                end
+            catch
+                failStress_csttd = [];
+                setappdata(0, 'failStress_csttd', failStress_csttd)
+            end
+            if isnan(failStress_csttd) == 1.0
+                failStress_csttd = [];
+            end
+            setappdata(0, 'failStress_csttd', failStress_csttd)
+            
             % Shear strength
             try
                 if ischar(material_properties.failStress_shear) == 1.0
@@ -1369,41 +1401,77 @@ classdef preProcess < handle
             end
             setappdata(0, 'failStress_shear', failStress_shear)
             
-            % Cross product coefficient
+            % Cross product coefficient (12-direction)
             try
-                if ischar(material_properties.failStress_cross) == 1.0
-                    failStress_cross = str2double(material_properties.failStress_cross);
+                if ischar(material_properties.failStress_cross12) == 1.0
+                    failStress_cross12 = str2double(material_properties.failStress_cross12);
                 else
-                    failStress_cross = [];
+                    failStress_cross12 = [];
                 end
             catch
-                failStress_cross = [];
-                setappdata(0, 'failStress_cross', failStress_cross)
+                failStress_cross12 = [];
+                setappdata(0, 'failStress_cross12', failStress_cross12)
             end
             
-            if isnan(failStress_cross) == 1.0
-                failStress_cross = 0.0;
+            if isnan(failStress_cross12) == 1.0
+                failStress_cross12 = 0.0;
             end
             
-            setappdata(0, 'failStress_cross', failStress_cross)
+            setappdata(0, 'failStress_cross12', failStress_cross12)
             
-            % Limit stress
+            % Cross product coefficient (23-direction)
             try
-                if ischar(material_properties.failStress_limit) == 1.0
-                    failStress_limit = str2double(material_properties.failStress_limit);
+                if ischar(material_properties.failStress_cross23) == 1.0
+                    failStress_cross23 = str2double(material_properties.failStress_cross23);
                 else
-                    failStress_limit = [];
+                    failStress_cross23 = [];
                 end
             catch
-                failStress_limit = [];
-                setappdata(0, 'failStress_limit', failStress_limit)
+                failStress_cross23 = [];
+                setappdata(0, 'failStress_cross23', failStress_cross23)
             end
             
-            if isnan(failStress_limit) == 1.0
-                failStress_limit = [];
+            if isnan(failStress_cross23) == 1.0
+                failStress_cross23 = 0.0;
             end
             
-            setappdata(0, 'failStress_limit', failStress_limit)
+            setappdata(0, 'failStress_cross23', failStress_cross23)
+            
+            % Limit stress (12-direction)
+            try
+                if ischar(material_properties.failStress_limit12) == 1.0
+                    failStress_limit12 = str2double(material_properties.failStress_limit12);
+                else
+                    failStress_limit12 = [];
+                end
+            catch
+                failStress_limit12 = [];
+                setappdata(0, 'failStress_limit12', failStress_limit12)
+            end
+            
+            if isnan(failStress_limit12) == 1.0
+                failStress_limit12 = [];
+            end
+            
+            setappdata(0, 'failStress_limit12', failStress_limit12)
+            
+            % Limit stress (23-direction)
+            try
+                if ischar(material_properties.failStress_limit23) == 1.0
+                    failStress_limit23 = str2double(material_properties.failStress_limit23);
+                else
+                    failStress_limit23 = [];
+                end
+            catch
+                failStress_limit23 = [];
+                setappdata(0, 'failStress_limit23', failStress_limit23)
+            end
+            
+            if isnan(failStress_limit23) == 1.0
+                failStress_limit23 = [];
+            end
+            
+            setappdata(0, 'failStress_limit23', failStress_limit23)
             
             %% Fail strain parameters for composite failure
             

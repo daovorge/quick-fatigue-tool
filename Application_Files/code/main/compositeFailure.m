@@ -8,7 +8,7 @@ function [] = compositeFailure(N, L)
 %
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 01-Oct-2017 14:09:15 GMT
+%   Last modified 02-Oct-2017 13:11:53 GMT
     
     %%
 
@@ -24,7 +24,8 @@ MSTRS = linspace(-1.0, -1.0, N);
 MSTRN = linspace(-1.0, -1.0, N);
 TSAIH = linspace(-1.0, -1.0, N);
 TSAIW = linspace(-1.0, -1.0, N);
-TSAIW_foam = linspace(-1.0, -1.0, N);
+TSAIWTT = linspace(-1.0, -1.0, N);
+k = linspace(-1.0, -1.0, N);
 AZZIT = linspace(-1.0, -1.0, N);
 HSNFTCRT = linspace(-1.0, -1.0, N);
 HSNFCCRT = linspace(-1.0, -1.0, N);
@@ -53,12 +54,13 @@ for groups = 1:G
     Xc = getappdata(0, 'failStress_csfd');
     Yt = getappdata(0, 'failStress_tstd');
     Yc = getappdata(0, 'failStress_cstd');
-    Zt = Xt;
-    Zc = Xc;
+    Zt = getappdata(0, 'failStress_tsttd');
+    Zc = getappdata(0, 'failStress_csttd');
     S = getappdata(0, 'failStress_shear');
-    F = getappdata(0, 'failStress_cross');
-    B12 = getappdata(0, 'failStress_limit');
-    B23 = B12;
+    Fc12 = getappdata(0, 'failStress_cross12');
+    Fc23 = getappdata(0, 'failStress_cross23');
+    B12 = getappdata(0, 'failStress_limit12');
+    B23 = getappdata(0, 'failStress_limit23');
     
     % Get fail strain properties
     Xet = getappdata(0, 'failStrain_tsfd');
@@ -80,11 +82,18 @@ for groups = 1:G
     Sl = getappdata(0, 'hashin_lss');
     St = getappdata(0, 'hashin_tss');
     
-    % Check if there is enough data for fail stress
-    if isempty(Xt) == 1.0 || isempty(Xc) == 1.0 || isempty(Yt) == 1.0 || isempty(Yc) == 1.0 || isempty(S) == 1.0
-        failStress = -1.0;
+    % Check if there is enough data for maximum stress, Tsai-Hill, Tsai-Wu and Azzi-Tsai-Hill theory
+    if isempty(Xt) == 1.0 || isempty(Xc) == 1.0 || isempty(Yt) == 1.0 || isempty(Yc) == 1.0
+        failStressGeneral = -1.0;
     else
-        failStress = 1.0;
+        failStressGeneral = 1.0;
+    end
+    
+    % Check if there is enough data for Tsai-Wu (through-thickness)
+    if isempty(Yt) == 1.0 || isempty(Yc) == 1.0 || isempty(Zt) == 1.0 || isempty(Zc) == 1.0
+        tsaiWuTT = -1.0;
+    else
+        tsaiWuTT = 1.0;
     end
     
     % Check if there is enough data for fail strain
@@ -105,7 +114,7 @@ for groups = 1:G
         hashin = 1.0;
     end
     
-    if failStress == -1.0 && failStrain == -1.0 && hashin == -1.0
+    if failStressGeneral == -1.0 && tsaiWuTT == -1.0 && failStrain == -1.0 && hashin == -1.0
         totalCounter = totalCounter + N;
         continue
     end
@@ -132,21 +141,31 @@ for groups = 1:G
     Ye = zeros(1.0, L);
     
     % Initialize Tsai-Wu parameters
-    if failStress ~= -1.0
+    if failStressGeneral ~= -1.0
         F1 = (1.0/Xt) + (1.0/Xc);
         F2 = (1.0/Yt) + (1.0/Yc);
-        F3 = (1.0/Zt) + (1.0/Zc);
         F11 = -(1.0/(Xt*Xc));
         F22 = -(1.0/(Yt*Yc));
-        F33 = 1.0/(Zt*Zc);
         F66 = 1.0/S^2.0;
         
         if isempty(B12) == 0.0
             F12 = (1.0/(2.0*B12^2.0)) * (1.0 - ((1.0/Xt) + (1.0/Xc) + (1.0/Yt) + (1.0/Yc))*(B12^2.0) + ((1.0/(Xt*Xc)) + (1.0/(Yt*Yc)))*(B12^2.0));
+        else
+            F12 = Fc12*sqrt(F11*F22);
+        end
+    end
+    
+    % Initialize Tsai-Wu (through-thickness) parameters
+    if tsaiWuTT ~= -1.0
+        F2 = (1.0/Yt) + (1.0/Yc);
+        F3 = (1.0/Zt) + (1.0/Zc);
+        F22 = -(1.0/(Yt*Yc));
+        F33 = 1.0/(Zt*Zc);
+        
+        if isempty(B23) == 0.0
             F23 = (1.0/(2.0*B23^2.0)) * (1.0 - ((1.0/Yt) + (1.0/Yc) + (1.0/Zt) + (1.0/Zc))*(B23^2.0) + ((1.0/(Yt*Yc)) + (1.0/(Zt*Zc)))*(B23^2.0));
         else
-            F12 = F*sqrt(F11*F22);
-            F23 = F*sqrt(F22*F33);
+            F23 = Fc23*sqrt(F22*F33);
         end
     end
     
@@ -160,12 +179,12 @@ for groups = 1:G
         S23i = S23(i, :);
         
         %% Check for out-of-plane stress components
-        if any(S13i) == 1.0 || any(S23i) == 1.0
+        if any(S33i) == 1.0 || any(S13i) == 1.0 || any(S23i) == 1.0
             messenger.writeMessage(132.0)
         end
         
         %% FAIL STRESS CALCULATION
-        if failStress == 1.0
+        if failStressGeneral == 1.0
             % Tension-compression split
             X(S11i >= 0.0) = Xt;
             X(S11i < 0.0) = Xc;
@@ -181,8 +200,13 @@ for groups = 1:G
             
             TSAIH(totalCounter) = max((S11i.^2.0./X.^2.0) - ((S11i.*S22i)./X.^2.0) + (S22i.^2.0./Y.^2.0) + (S12i.^2.0./S.^2.0));
             TSAIW(totalCounter) = max((F1.*S11i) + (F2.*S22i) + (F11.*S11i.^2.0) + (F22.*S22i.^2.0) + (F66.*S12i.^2.0) + (2.0.*F12.*S11i.*S22i));
-            TSAIW_foam(totalCounter) = max((F2.*S22i) + (F3.*S33i) + (F22.*S22i.^2.0) + (F33*S33i.^2.0) + (2.0.*F23.*S22i.*S33i));
             AZZIT(totalCounter) = max((S11i.^2.0./X.^2.0) - (abs((S11i.*S22i))/X.^2.0) + (S22i.^2.0./Y.^2.0) + (S12i.^2.0./S.^2.0));
+        end
+        
+        if tsaiWuTT == 1.0
+            k(totalCounter) = max(S12i./S23i);
+            
+            TSAIWTT(totalCounter) = max((F2.*S22i) + (F3.*S33i) + (F22.*S22i.^2.0) + (F33*S33i.^2.0) + (2.0.*F23.*S22i.*S33i));
         end
         
         %% FAIL STRAIN CALCULATION
@@ -255,6 +279,7 @@ N_MSTRS = length(MSTRS(MSTRS >= 1.0));
 N_MSTRN = length(MSTRN(MSTRN >= 1.0));
 N_TSAIH = length(TSAIH(TSAIH >= 1.0));
 N_TSAIW = length(TSAIW(TSAIW >= 1.0));
+N_TSAIWTT = length(TSAIWTT(TSAIWTT >= (1.0 - k.^2.0)));
 N_AZZIT = length(AZZIT(AZZIT >= 1.0));
 N_HSNFTCRT = length(HSNFTCRT(HSNFTCRT >= 1.0));
 N_HSNFCCRT = length(HSNFCCRT(HSNFCCRT >= 1.0));
@@ -265,6 +290,7 @@ setappdata(0, 'MSTRS', N_MSTRS)
 setappdata(0, 'MSTRN', N_MSTRN)
 setappdata(0, 'TSAIH', N_TSAIH)
 setappdata(0, 'TSAIW', N_TSAIW)
+setappdata(0, 'TSAIWTT', N_TSAIWTT)
 setappdata(0, 'AZZIT', N_AZZIT)
 setappdata(0, 'HSNFTCRT', N_HSNFTCRT)
 setappdata(0, 'HSNFCCRT', N_HSNFCCRT)
@@ -280,37 +306,40 @@ end
 if N_TSAIW > 0.0
     messenger.writeMessage(292.0)
 end
-if N_AZZIT > 0.0
+if N_TSAIWTT > 0.0
     messenger.writeMessage(293.0)
 end
-if N_MSTRN > 0.0
+if N_AZZIT > 0.0
     messenger.writeMessage(294.0)
 end
-if N_HSNFTCRT > 0.0
+if N_MSTRN > 0.0
     messenger.writeMessage(295.0)
 end
-if N_HSNFCCRT > 0.0
+if N_HSNFTCRT > 0.0
     messenger.writeMessage(296.0)
 end
-if N_HSNMTCRT > 0.0
+if N_HSNFCCRT > 0.0
     messenger.writeMessage(297.0)
 end
-if N_HSNMCCRT > 0.0
+if N_HSNMTCRT > 0.0
     messenger.writeMessage(298.0)
+end
+if N_HSNMCCRT > 0.0
+    messenger.writeMessage(299.0)
 end
 
 %% Write output to file
-if (failStress ~= -1.0) || (failStrain ~= -1.0) || (hashin ~= -1.0)
+if (failStressGeneral ~= -1.0) || (tsaiWuTT ~= -1.0) || (failStrain ~= -1.0) || (hashin ~= -1.0)
     % Check if there is failure 
-    FAIL_ALL = [N_MSTRS, N_TSAIH, N_TSAIW, N_AZZIT, N_MSTRN, N_HSNFTCRT, N_HSNFCCRT, N_HSNMTCRT, N_HSNMCCRT];
+    FAIL_ALL = [N_MSTRS, N_TSAIH, N_TSAIW, N_TSAIWTT, N_AZZIT, N_MSTRN, N_HSNFTCRT, N_HSNFCCRT, N_HSNMTCRT, N_HSNMCCRT];
     if any(FAIL_ALL) == 0.0
-        messenger.writeMessage(300.0)
+        messenger.writeMessage(301.0)
     end
     
     mainIDs = getappdata(0, 'mainID');
     subIDs = getappdata(0, 'subID');
     
-    data = [mainIDs'; subIDs'; MSTRS; MSTRN; TSAIW; TSAIW; AZZIT; HSNFTCRT; HSNFCCRT; HSNMTCRT; HSNMCCRT]';
+    data = [mainIDs'; subIDs'; MSTRS; MSTRN; TSAIH; TSAIW; TSAIWTT; AZZIT; HSNFTCRT; HSNFCCRT; HSNMTCRT; HSNMCCRT]';
     
     % Print information to file
     root = getappdata(0, 'outputDirectory');
@@ -326,12 +355,12 @@ if (failStress ~= -1.0) || (failStrain ~= -1.0) || (hashin ~= -1.0)
     fprintf(fid, 'COMPOSITE FAILURE\r\n');
     fprintf(fid, 'Job:\t%s\r\nLoading:\t%.3g\t%s\r\n', getappdata(0, 'jobName'), getappdata(0, 'loadEqVal'), getappdata(0, 'loadEqUnits'));
     
-    fprintf(fid, 'Main ID\tSub ID\tMSTRS\tMSTRN\tTSAIH\tTSAIW\tAZZIT\tHSNFTCRT\tHSNFCCRT\tHSNMTCRT\tHSNMCCRT\r\n');
-    fprintf(fid, '%.0f\t%.0f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\r\n', data');
+    fprintf(fid, 'Main ID\tSub ID\tMSTRS\tMSTRN\tTSAIH\tTSAIW\tTSAIWTT\tAZZIT\tHSNFTCRT\tHSNFCCRT\tHSNMTCRT\tHSNMCCRT\r\n');
+    fprintf(fid, '%.0f\t%.0f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\r\n', data');
     
     fclose(fid);
     
     messenger.writeMessage(129.0)
 else
-    messenger.writeMessage(299.0)
+    messenger.writeMessage(300.0)
 end

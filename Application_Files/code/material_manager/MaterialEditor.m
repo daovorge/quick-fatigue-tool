@@ -13,7 +13,7 @@ function varargout = MaterialEditor(varargin)%#ok<*DEFNU>
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 01-Oct-2017 14:09:15 GMT
+%   Last modified 02-Oct-2017 13:11:53 GMT
     
     %%
     
@@ -1262,9 +1262,13 @@ material_properties = struct(...
 'failStress_csfd', getappdata(0, 'failStress_csfd'),...
 'failStress_tstd', getappdata(0, 'failStress_tstd'),...
 'failStress_cstd', getappdata(0, 'failStress_cstd'),...
+'failStress_tsttd', getappdata(0, 'failStress_tsttd'),...
+'failStress_csttd', getappdata(0, 'failStress_csttd'),...
 'failStress_shear', getappdata(0, 'failStress_shear'),...
-'failStress_cross', getappdata(0, 'failStress_cross'),...
-'failStress_limit', getappdata(0, 'failStress_limit'),...
+'failStress_cross12', getappdata(0, 'failStress_cross12'),...
+'failStress_cross23', getappdata(0, 'failStress_cross23'),...
+'failStress_limit12', getappdata(0, 'failStress_limit12'),...
+'failStress_limit23', getappdata(0, 'failStress_limit23'),...
 'failStrain_tsfd', getappdata(0, 'failStrain_tsfd'),...
 'failStrain_csfd', getappdata(0, 'failStrain_csfd'),...
 'failStrain_tstd', getappdata(0, 'failStrain_tstd'),...
@@ -1448,6 +1452,24 @@ catch
     setappdata(0, 'failStress_cstd', [])
 end
 try
+    if isempty(properties.material_properties.failStress_tsttd) == 1.0
+        setappdata(0, 'failStress_tsttd', [])
+    else
+        setappdata(0, 'failStress_tsttd', properties.material_properties.failStress_tsttd)
+    end
+catch
+    setappdata(0, 'failStress_tsttd', [])
+end
+try
+    if isempty(properties.material_properties.failStress_csttd) == 1.0
+        setappdata(0, 'failStress_csttd', [])
+    else
+        setappdata(0, 'failStress_csttd', properties.material_properties.failStress_csttd)
+    end
+catch
+    setappdata(0, 'failStress_csttd', [])
+end
+try
     if isempty(properties.material_properties.failStress_shear) == 1.0
         setappdata(0, 'failStress_shear', [])
     else
@@ -1457,22 +1479,40 @@ catch
     setappdata(0, 'failStress_shear', [])
 end
 try
-    if isempty(properties.material_properties.failStress_cross) == 1.0
-        setappdata(0, 'failStress_cross', 0.0)
+    if isempty(properties.material_properties.failStress_cross12) == 1.0
+        setappdata(0, 'failStress_cross12', 0.0)
     else
-        setappdata(0, 'failStress_cross', properties.material_properties.failStress_cross)
+        setappdata(0, 'failStress_cross12', properties.material_properties.failStress_cross12)
     end
 catch
-    setappdata(0, 'failStress_cross', 0.0)
+    setappdata(0, 'failStress_cross12', 0.0)
 end
 try
-    if isempty(properties.material_properties.failStress_limit) == 1.0
-        setappdata(0, 'failStress_limit', [])
+    if isempty(properties.material_properties.failStress_cross23) == 1.0
+        setappdata(0, 'failStress_cross23', 0.0)
     else
-        setappdata(0, 'failStress_limit', properties.material_properties.failStress_limit)
+        setappdata(0, 'failStress_cross23', properties.material_properties.failStress_cross23)
     end
 catch
-    setappdata(0, 'failStress_limit', [])
+    setappdata(0, 'failStress_cross23', 0.0)
+end
+try
+    if isempty(properties.material_properties.failStress_limit12) == 1.0
+        setappdata(0, 'failStress_limit12', [])
+    else
+        setappdata(0, 'failStress_limit12', properties.material_properties.failStress_limit12)
+    end
+catch
+    setappdata(0, 'failStress_limit12', [])
+end
+try
+    if isempty(properties.material_properties.failStress_limit23) == 1.0
+        setappdata(0, 'failStress_limit23', [])
+    else
+        setappdata(0, 'failStress_limit23', properties.material_properties.failStress_limit23)
+    end
+catch
+    setappdata(0, 'failStress_limit23', [])
 end
 
 % Initliaize fail strain properties

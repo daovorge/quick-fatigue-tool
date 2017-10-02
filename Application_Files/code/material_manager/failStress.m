@@ -10,7 +10,7 @@ function varargout = failStress(varargin)%#ok<*DEFNU>
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 01-Oct-2017 14:09:15 GMT
+%   Last modified 02-Oct-2017 13:11:53 GMT
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -64,14 +64,26 @@ end
 if isappdata(0, 'failStress_cstd')
     set(handles.edit_cstd, 'string', getappdata(0, 'failStress_cstd'))
 end
+if isappdata(0, 'failStress_tsttd')
+    set(handles.edit_tsttd, 'string', getappdata(0, 'failStress_tsttd'))
+end
+if isappdata(0, 'failStress_csttd')
+    set(handles.edit_csttd, 'string', getappdata(0, 'failStress_csttd'))
+end
 if isappdata(0, 'failStress_shear')
     set(handles.edit_shear, 'string', getappdata(0, 'failStress_shear'))
 end
-if isappdata(0, 'failStress_cross')
-    set(handles.edit_cross, 'string', getappdata(0, 'failStress_cross'))
+if isappdata(0, 'failStress_cross12')
+    set(handles.edit_cross12, 'string', getappdata(0, 'failStress_cross12'))
 end
-if isappdata(0, 'failStress_limit')
-    set(handles.edit_limit, 'string', getappdata(0, 'failStress_limit'))
+if isappdata(0, 'failStress_cross23')
+    set(handles.edit_cross23, 'string', getappdata(0, 'failStress_cross23'))
+end
+if isappdata(0, 'failStress_limit12')
+    set(handles.edit_limit12, 'string', getappdata(0, 'failStress_limit12'))
+end
+if isappdata(0, 'failStress_limit23')
+    set(handles.edit_limit23, 'string', getappdata(0, 'failStress_limit23'))
 end
 
 
@@ -202,18 +214,18 @@ end
 
 
 
-function edit_cross_Callback(~, ~, ~)
-% hObject    handle to edit_cross (see GCBO)
+function edit_cross23_Callback(~, ~, ~)
+% hObject    handle to edit_cross23 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit_cross as text
-%        str2double(get(hObject,'String')) returns contents of edit_cross as a double
+% Hints: get(hObject,'String') returns contents of edit_cross23 as text
+%        str2double(get(hObject,'String')) returns contents of edit_cross23 as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function edit_cross_CreateFcn(hObject, ~, ~)
-% hObject    handle to edit_cross (see GCBO)
+function edit_cross23_CreateFcn(hObject, ~, ~)
+% hObject    handle to edit_cross23 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -225,18 +237,18 @@ end
 
 
 
-function edit_limit_Callback(~, ~, ~)
-% hObject    handle to edit_limit (see GCBO)
+function edit_limit12_Callback(~, ~, ~)
+% hObject    handle to edit_limit12 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit_limit as text
-%        str2double(get(hObject,'String')) returns contents of edit_limit as a double
+% Hints: get(hObject,'String') returns contents of edit_limit12 as text
+%        str2double(get(hObject,'String')) returns contents of edit_limit12 as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function edit_limit_CreateFcn(hObject, ~, ~)
-% hObject    handle to edit_limit (see GCBO)
+function edit_limit12_CreateFcn(hObject, ~, ~)
+% hObject    handle to edit_limit12 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -280,6 +292,20 @@ if isempty(get(handles.edit_cstd, 'string')) == 0.0
     end
 end
 
+failStress_tsttd = str2double(get(handles.edit_tsttd, 'string'));
+if isempty(get(handles.edit_tsttd, 'string')) == 0.0
+    if isnan(failStress_tsttd) == 1.0 || isinf(failStress_tsttd) == 1.0 || isreal(failStress_tsttd) == 0.0
+        error = 1.0;
+    end
+end
+
+failStress_csttd = str2double(get(handles.edit_csttd, 'string'));
+if isempty(get(handles.edit_csttd, 'string')) == 0.0
+    if isnan(failStress_csttd) == 1.0 || isinf(failStress_csttd) == 1.0 || isreal(failStress_csttd) == 0.0
+        error = 1.0;
+    end
+end
+
 failStress_shear = str2double(get(handles.edit_shear, 'string'));
 if isempty(get(handles.edit_shear, 'string')) == 0.0
     if isnan(failStress_shear) == 1.0 || isinf(failStress_shear) == 1.0 || isreal(failStress_shear) == 0.0
@@ -287,16 +313,30 @@ if isempty(get(handles.edit_shear, 'string')) == 0.0
     end
 end
 
-failStress_cross = str2double(get(handles.edit_cross, 'string'));
-if isempty(get(handles.edit_cross, 'string')) == 0.0
-    if isnan(failStress_cross) == 1.0 || isinf(failStress_cross) == 1.0 || isreal(failStress_cross) == 0.0
+failStress_cross12 = str2double(get(handles.edit_cross12, 'string'));
+if isempty(get(handles.edit_cross12, 'string')) == 0.0
+    if isnan(failStress_cross12) == 1.0 || isinf(failStress_cross12) == 1.0 || isreal(failStress_cross12) == 0.0
         error = 1.0;
     end
 end
 
-failStress_limit = str2double(get(handles.edit_limit, 'string'));
-if isempty(get(handles.edit_limit, 'string')) == 0.0
-    if isnan(failStress_limit) == 1.0 || isinf(failStress_limit) == 1.0 || isreal(failStress_limit) == 0.0
+failStress_cross23 = str2double(get(handles.edit_cross23, 'string'));
+if isempty(get(handles.edit_cross23, 'string')) == 0.0
+    if isnan(failStress_cross23) == 1.0 || isinf(failStress_cross23) == 1.0 || isreal(failStress_cross23) == 0.0
+        error = 1.0;
+    end
+end
+
+failStress_limit12 = str2double(get(handles.edit_limit12, 'string'));
+if isempty(get(handles.edit_limit12, 'string')) == 0.0
+    if isnan(failStress_limit12) == 1.0 || isinf(failStress_limit12) == 1.0 || isreal(failStress_limit12) == 0.0
+        error = 1.0;
+    end
+end
+
+failStress_limit23 = str2double(get(handles.edit_limit23, 'string'));
+if isempty(get(handles.edit_limit23, 'string')) == 0.0
+    if isnan(failStress_limit23) == 1.0 || isinf(failStress_limit23) == 1.0 || isreal(failStress_limit23) == 0.0
         error = 1.0;
     end
 end
@@ -307,18 +347,28 @@ if error == 1.0
     return
 end
 
-if failStress_tsfd <= 0.0  || failStress_csfd <= 0.0 || failStress_tstd <= 0.0 || failStress_cstd <= 0.0 || failStress_shear <= 0.0
+if failStress_tsfd <= 0.0  || failStress_csfd <= 0.0 || failStress_tstd <= 0.0 || failStress_cstd <= 0.0 || failStress_tsttd <= 0.0 || failStress_csttd <= 0.0 || failStress_shear <= 0.0
     errordlg('Stress values must be positive.', 'Quick Fatigue Tool')
     uiwait; enable(handles)
     return
 end
 
-if isempty(get(handles.edit_cross, 'string')) == 1.0
-    set(handles.edit_cross, 'string', '0')
+if isempty(get(handles.edit_cross12, 'string')) == 1.0
+    set(handles.edit_cross12, 'string', '0')
 end
-failStress_cross = str2double(get(handles.edit_cross, 'string'));
-if failStress_cross < -1.0 || failStress_cross > 1.0
-    errordlg('The cross product coefficient must be in the range (-1 <= x <= 1.0).', 'Quick Fatigue Tool')
+failStress_cross12 = str2double(get(handles.edit_cross12, 'string'));
+if failStress_cross12 < -1.0 || failStress_cross12 > 1.0
+    errordlg('The cross product coefficient (12) must be in the range (-1 <= x <= 1.0).', 'Quick Fatigue Tool')
+    uiwait; enable(handles)
+    return
+end
+
+if isempty(get(handles.edit_cross23, 'string')) == 1.0
+    set(handles.edit_cross23, 'string', '0')
+end
+failStress_cross23 = str2double(get(handles.edit_cross23, 'string'));
+if failStress_cross23 < -1.0 || failStress_cross23 > 1.0
+    errordlg('The cross product coefficient (23) must be in the range (-1 <= x <= 1.0).', 'Quick Fatigue Tool')
     uiwait; enable(handles)
     return
 end
@@ -328,9 +378,13 @@ setappdata(0, 'failStress_tsfd', get(handles.edit_tsfd, 'string'))
 setappdata(0, 'failStress_csfd', get(handles.edit_csfd, 'string'))
 setappdata(0, 'failStress_tstd', get(handles.edit_tstd, 'string'))
 setappdata(0, 'failStress_cstd', get(handles.edit_cstd, 'string'))
+setappdata(0, 'failStress_tsttd', get(handles.edit_tsttd, 'string'))
+setappdata(0, 'failStress_csttd', get(handles.edit_csttd, 'string'))
 setappdata(0, 'failStress_shear', get(handles.edit_shear, 'string'))
-setappdata(0, 'failStress_cross', get(handles.edit_cross, 'string'))
-setappdata(0, 'failStress_limit', get(handles.edit_limit, 'string'))
+setappdata(0, 'failStress_cross12', get(handles.edit_cross12, 'string'))
+setappdata(0, 'failStress_cross23', get(handles.edit_cross23, 'string'))
+setappdata(0, 'failStress_limit12', get(handles.edit_limit12, 'string'))
+setappdata(0, 'failStress_limit23', get(handles.edit_limit23, 'string'))
 
 close 'Fail Stress'
 
@@ -353,3 +407,95 @@ set(findall(handles.failStress, '-property', 'Enable'), 'Enable', 'off')
 
 function enable(handles)
 set(findall(handles.failStress, '-property', 'Enable'), 'Enable', 'on')
+
+
+
+function edit_tsttd_Callback(~, ~, ~)
+% hObject    handle to edit_tsttd (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_tsttd as text
+%        str2double(get(hObject,'String')) returns contents of edit_tsttd as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_tsttd_CreateFcn(hObject, ~, ~)
+% hObject    handle to edit_tsttd (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_csttd_Callback(~, ~, ~)
+% hObject    handle to edit_csttd (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_csttd as text
+%        str2double(get(hObject,'String')) returns contents of edit_csttd as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_csttd_CreateFcn(hObject, ~, ~)
+% hObject    handle to edit_csttd (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_limit23_Callback(~, ~, ~)
+% hObject    handle to edit_limit23 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_limit23 as text
+%        str2double(get(hObject,'String')) returns contents of edit_limit23 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_limit23_CreateFcn(hObject, ~, ~)
+% hObject    handle to edit_limit23 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_cross12_Callback(~, ~, ~)
+% hObject    handle to edit_cross12 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_cross12 as text
+%        str2double(get(hObject,'String')) returns contents of edit_cross12 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_cross12_CreateFcn(hObject, ~, ~)
+% hObject    handle to edit_cross12 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

@@ -9,7 +9,7 @@ classdef importMaterial < handle
 %   LocalMaterialDatabase, material, MaterialEditor, MaterialManager.
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 01-Oct-2017 14:09:15 GMT
+%   Last modified 02-Oct-2017 13:11:53 GMT
     
     %%
     
@@ -1267,45 +1267,65 @@ classdef importMaterial < handle
                                         
                                         % Process the data line
                                         nProperties = length(properties);
-                                        if nProperties > 7.0
-                                            properties = properties(1.0:7.0);
-                                        elseif nProperties < 7.0
-                                            properties(nProperties + 1.0:7.0) = -9e100;
+                                        if nProperties > 11.0
+                                            properties = properties(1.0:11.0);
+                                        elseif nProperties < 11.0
+                                            properties(nProperties + 1.0:11.0) = -9e100;
                                         end
                                         
-                                        % Tensile stress (fiber direction)
+                                        % Tensile stress (11-direction)
                                         if properties(1.0) ~= -9e100
                                             material_properties.failStress_tsfd = properties(1.0);
                                         end
                                         
-                                        % Compressive stress (fiber direction)
+                                        % Compressive stress (11-direction)
                                         if properties(2.0) ~= -9e100
                                             material_properties.failStress_csfd = properties(2.0);
                                         end
                                         
-                                        % Tensile stress (transverse direction)
+                                        % Tensile stress (22-direction)
                                         if properties(3.0) ~= -9e100
                                             material_properties.failStress_tstd = properties(3.0);
                                         end
                                         
-                                        % Compressive stress (transverse direction)
+                                        % Compressive stress (22-direction)
                                         if properties(4.0) ~= -9e100
                                             material_properties.failStress_cstd = properties(4.0);
                                         end
                                         
-                                        % Shear strength
+                                        % Tensile stress (33-direction)
                                         if properties(5.0) ~= -9e100
-                                            material_properties.failStress_shear = properties(5.0);
+                                            material_properties.failStress_tsttd = properties(5.0);
                                         end
                                         
-                                        % Cross product coefficient
+                                        % Compressive stress (33-direction)
                                         if properties(6.0) ~= -9e100
-                                            material_properties.failStress_cross = properties(6.0);
+                                            material_properties.failStress_csttd = properties(6.0);
                                         end
                                         
-                                        % Limit stress
+                                        % Shear strength (12-direction)
                                         if properties(7.0) ~= -9e100
-                                            material_properties.failStress_limit = properties(7.0);
+                                            material_properties.failStress_shear = properties(7.0);
+                                        end
+                                        
+                                        % Cross product coefficient (12-direction)
+                                        if properties(8.0) ~= -9e100
+                                            material_properties.failStress_cross12 = properties(8.0);
+                                        end
+                                        
+                                        % Cross product coefficient (23-direction)
+                                        if properties(9.0) ~= -9e100
+                                            material_properties.failStress_cross23 = properties(9.0);
+                                        end
+                                        
+                                        % Limit stress (12-direction)
+                                        if properties(10.0) ~= -9e100
+                                            material_properties.failStress_limit12 = properties(10.0);
+                                        end
+                                        
+                                        % Limit stress (23-direction)
+                                        if properties(11.0) ~= -9e100
+                                            material_properties.failStress_limit23 = properties(11.0);
                                         end
                                     case 2.0 % Strain
                                         TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
