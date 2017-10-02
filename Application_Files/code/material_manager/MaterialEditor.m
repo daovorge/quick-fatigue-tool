@@ -1168,14 +1168,26 @@ else
     if isappdata(0, 'failStress_cstd') == 1.0
         rmappdata(0, 'failStress_cstd')
     end
+    if isappdata(0, 'failStress_tsttd') == 1.0
+        rmappdata(0, 'failStress_tsttd')
+    end
+    if isappdata(0, 'failStress_csttd') == 1.0
+        rmappdata(0, 'failStress_csttd')
+    end
     if isappdata(0, 'failStress_shear') == 1.0
         rmappdata(0, 'failStress_shear')
     end
-    if isappdata(0, 'failStress_cross') == 1.0
-        setappdata(0, 'failStress_cross', 0.0)
+    if isappdata(0, 'failStress_cross12') == 1.0
+        setappdata(0, 'failStress_cross12', 0.0)
     end
-    if isappdata(0, 'failStress_limit') == 1.0
-        rmappdata(0, 'failStress_limit')
+    if isappdata(0, 'failStress_cross23') == 1.0
+        setappdata(0, 'failStress_cross23', 0.0)
+    end
+    if isappdata(0, 'failStress_limit12') == 1.0
+        rmappdata(0, 'failStress_limit12')
+    end
+    if isappdata(0, 'failStress_limit23') == 1.0
+        rmappdata(0, 'failStress_limit23')
     end
     
     % Fail strain
