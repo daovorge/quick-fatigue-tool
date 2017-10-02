@@ -2221,7 +2221,7 @@ classdef messenger < handle
                     case 292.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The Tsai-Wu failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'TSAIW'));
                     case 293.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Tsai-Wu (through-thickness) failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'TSAIWTT'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Tsai-Wu failure criterion for closed cell PVC foam has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'TSAIWTT'));
                     case 294.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The Azzi-Tsai-Hill failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'AZZIT'));
                     case 295.0
