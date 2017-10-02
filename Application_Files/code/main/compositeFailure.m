@@ -57,7 +57,8 @@ for groups = 1:G
     Zc = Xc;
     S = getappdata(0, 'failStress_shear');
     F = getappdata(0, 'failStress_cross');
-    B = getappdata(0, 'failStress_limit');
+    B12 = getappdata(0, 'failStress_limit');
+    B23 = B12;
     
     % Get fail strain properties
     Xet = getappdata(0, 'failStrain_tsfd');
@@ -140,8 +141,8 @@ for groups = 1:G
         F33 = 1.0/(Zt*Zc);
         F66 = 1.0/S^2.0;
         
-        if isempty(B) == 0.0
-            F12 = (1.0/(2.0*B^2.0)) * (1.0 - ((1.0/Xt) + (1.0/Xc) + (1.0/Yt) + (1.0/Yc))*(B^2.0) + ((1.0/(Xt*Xc)) + (1.0/(Yt*Yc)))*(B^2.0));
+        if isempty(B12) == 0.0
+            F12 = (1.0/(2.0*B12^2.0)) * (1.0 - ((1.0/Xt) + (1.0/Xc) + (1.0/Yt) + (1.0/Yc))*(B12^2.0) + ((1.0/(Xt*Xc)) + (1.0/(Yt*Yc)))*(B12^2.0));
             F23 = (1.0/(2.0*B23^2.0)) * (1.0 - ((1.0/Yt) + (1.0/Yc) + (1.0/Zt) + (1.0/Zc))*(B23^2.0) + ((1.0/(Yt*Yc)) + (1.0/(Zt*Zc)))*(B23^2.0));
         else
             F12 = F*sqrt(F11*F22);
