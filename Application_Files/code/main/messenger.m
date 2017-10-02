@@ -1217,7 +1217,7 @@ classdef messenger < handle
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 132.0
                         if getappdata(0, 'suppress_ID132') == 0.0
-                            fprintf(fidType(i), [returnType{i}, '***NOTE: Out-of-plane stresses were found during the composite failure/damage initiation calculation', returnType{i}]);
+                            fprintf(fidType(i), [returnType{i}, '***NOTE: Out-of-plane shear stresses (S23/S13) were found during the composite failure/damage initiation calculation', returnType{i}]);
                             fprintf(fidType(i), ['-> The calculation assumes plane stress conditions', returnType{i}]);
                             fprintf(fidType(i), ['-> Results may be inaccurate', returnType{i}]);
                             

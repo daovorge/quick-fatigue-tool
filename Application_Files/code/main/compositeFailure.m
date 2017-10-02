@@ -24,6 +24,7 @@ MSTRS = linspace(-1.0, -1.0, N);
 MSTRN = linspace(-1.0, -1.0, N);
 TSAIH = linspace(-1.0, -1.0, N);
 TSAIW = linspace(-1.0, -1.0, N);
+TSAIW_foam = linspace(-1.0, -1.0, N);
 AZZIT = linspace(-1.0, -1.0, N);
 HSNFTCRT = linspace(-1.0, -1.0, N);
 HSNFCCRT = linspace(-1.0, -1.0, N);
@@ -52,6 +53,8 @@ for groups = 1:G
     Xc = getappdata(0, 'failStress_csfd');
     Yt = getappdata(0, 'failStress_tstd');
     Yc = getappdata(0, 'failStress_cstd');
+    Zt = Xt;
+    Zc = Xc;
     S = getappdata(0, 'failStress_shear');
     F = getappdata(0, 'failStress_cross');
     B = getappdata(0, 'failStress_limit');
@@ -109,12 +112,14 @@ for groups = 1:G
     % Get stress tensor
     S11 = getappdata(0, 'Sxx');
     S22 = getappdata(0, 'Syy');
+    S33 = getappdata(0, 'Szz');
     S12 = getappdata(0, 'Txy');
     S13 = getappdata(0, 'Txz');
     S23 = getappdata(0, 'Tyz');
     
     S11 = S11(startID:(startID + N) - 1.0, :);
     S22 = S22(startID:(startID + N) - 1.0, :);
+    S33 = S33(startID:(startID + N) - 1.0, :);
     S12 = S12(startID:(startID + N) - 1.0, :);
     S13 = S13(startID:(startID + N) - 1.0, :);
     S23 = S23(startID:(startID + N) - 1.0, :);
@@ -129,14 +134,18 @@ for groups = 1:G
     if failStress ~= -1.0
         F1 = (1.0/Xt) + (1.0/Xc);
         F2 = (1.0/Yt) + (1.0/Yc);
+        F3 = (1.0/Zt) + (1.0/Zc);
         F11 = -(1.0/(Xt*Xc));
         F22 = -(1.0/(Yt*Yc));
+        F33 = 1.0/(Zt*Zc);
         F66 = 1.0/S^2.0;
         
         if isempty(B) == 0.0
             F12 = (1.0/(2.0*B^2.0)) * (1.0 - ((1.0/Xt) + (1.0/Xc) + (1.0/Yt) + (1.0/Yc))*(B^2.0) + ((1.0/(Xt*Xc)) + (1.0/(Yt*Yc)))*(B^2.0));
+            F23 = (1.0/(2.0*B23^2.0)) * (1.0 - ((1.0/Yt) + (1.0/Yc) + (1.0/Zt) + (1.0/Zc))*(B23^2.0) + ((1.0/(Yt*Yc)) + (1.0/(Zt*Zc)))*(B23^2.0));
         else
             F12 = F*sqrt(F11*F22);
+            F23 = F*sqrt(F22*F33);
         end
     end
     
@@ -144,6 +153,7 @@ for groups = 1:G
         %% Get the stresses at the current item
         S11i = S11(i, :);
         S22i = S22(i, :);
+        S33i = S33(i, :);
         S12i = S12(i, :);
         S13i = S13(i, :);
         S23i = S23(i, :);
@@ -170,6 +180,7 @@ for groups = 1:G
             
             TSAIH(totalCounter) = max((S11i.^2.0./X.^2.0) - ((S11i.*S22i)./X.^2.0) + (S22i.^2.0./Y.^2.0) + (S12i.^2.0./S.^2.0));
             TSAIW(totalCounter) = max((F1.*S11i) + (F2.*S22i) + (F11.*S11i.^2.0) + (F22.*S22i.^2.0) + (F66.*S12i.^2.0) + (2.0.*F12.*S11i.*S22i));
+            TSAIW_foam(totalCounter) = max((F2.*S22i) + (F3.*S33i) + (F22.*S22i.^2.0) + (F33*S33i.^2.0) + (2.0.*F23.*S22i.*S33i));
             AZZIT(totalCounter) = max((S11i.^2.0./X.^2.0) - (abs((S11i.*S22i))/X.^2.0) + (S22i.^2.0./Y.^2.0) + (S12i.^2.0./S.^2.0));
         end
         
