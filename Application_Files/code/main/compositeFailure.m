@@ -261,10 +261,10 @@ for groups = 1:G
                 end
             end
             
-            HSNFTCRT = max(HSNFTCRTi);
-            HSNFCCRT = max(HSNFCCRTi);
-            HSNMTCRT = max(HSNMTCRTi);
-            HSNMCCRT = max(HSNMCCRTi);
+            HSNFTCRT(totalCounter) = max(HSNFTCRTi);
+            HSNFCCRT(totalCounter) = max(HSNFCCRTi);
+            HSNMTCRT(totalCounter) = max(HSNMTCRTi);
+            HSNMCCRT(totalCounter) = max(HSNMCCRTi);
         end
         
         totalCounter = totalCounter + 1.0;
