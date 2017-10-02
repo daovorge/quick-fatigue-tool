@@ -17,7 +17,7 @@ function [] = main(flags)
 format long;    clc;    warning('off', 'all');    tic_pre = tic;
 
 %% READ SETTINGS FROM THE ENVIRONMENT FILE
-error = preProcess.readEnvironment(flags{45.0});
+error = preProcess.readEnvironment(flags{44.0});
 
 if error == 1.0;
     return

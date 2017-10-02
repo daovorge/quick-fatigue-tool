@@ -915,23 +915,17 @@ classdef python < handle
                     % Get the associated energies as well
                     fieldDataFile_energy = importdata(energyFile, '\t');
                     energyMainIDs = fieldDataFile_energy.data(:, 1.0);
-                    energySubIDs = fieldDataFile_energy.data(:, 2.0);
                     totalStrainEnergy_i = fieldDataFile_energy.data(:, 3.0);
                     plasticStrainEnergy_i = fieldDataFile_energy.data(:, 4.0);
                     totalStrainEnergy = zeros(1.0, length(mainIDs));
                     plasticStrainEnergy = totalStrainEnergy;
                     
-                    for i = 1:length(energyMainIDs)
-                        matchingMainIDs = find(mainIDs == energyMainIDs(i));
-                        matchingSubIDs = find(subIDs == energySubIDs(i));
-                        matchingID = intersect(matchingMainIDs, matchingSubIDs);
-
-                        totalStrainEnergy(matchingID) = totalStrainEnergy_i(i);
-                        plasticStrainEnergy(matchingID) = plasticStrainEnergy_i(i);
-                    end
+                    commonIDs = ismember(energyMainIDs, mainIDs);
+                    totalStrainEnergy(commonIDs) = totalStrainEnergy_i(commonIDs);
+                    plasticStrainEnergy(commonIDs) = plasticStrainEnergy_i(commonIDs);
                     
-                    fieldData(:, index + 1.0) = totalStrainEnergy;
-                    fieldData(:, index + 2.0) = plasticStrainEnergy;
+                    fieldData(:, index + 1.0) = totalStrainEnergy';
+                    fieldData(:, index + 2.0) = plasticStrainEnergy';
                     
                     fieldNames{index + 1.0} = sprintf('TSE, Total strain energy [mJ]');
                     fieldNames{index + 2.0} = sprintf('PSE, Plastic strain energy [mJ]');

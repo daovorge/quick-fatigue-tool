@@ -3,8 +3,8 @@ function [] = compositeFailure(N, L)
 %   This function calculates composite failure criteria according to the
 %   maximum stress, Tsai-Hill, Tsai-Wu, Azzi-Tsai-Hill and Hashin criteria.
 %   
-%   COMPOSITEFAILURE is used internally by Quick Fatigue Tool. The user is not required
-%   to run this file.
+%   COMPOSITEFAILURE is used internally by Quick Fatigue Tool. The user is
+%   not required to run this file.
 %
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
@@ -273,6 +273,9 @@ for groups = 1:G
     % Update the start ID
     startID = startID + N;
 end
+
+%% Remove INF values of K
+k(isinf(k)) = 0.0;
 
 %% Inform the user if composite has failed
 N_MSTRS = length(MSTRS(MSTRS >= 1.0));
