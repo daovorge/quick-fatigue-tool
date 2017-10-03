@@ -35,6 +35,9 @@ HSNMCCRT = linspace(-1.0, -1.0, N);
 startID = 1.0;
 totalCounter = 1.0;
 
+% Get validity of E12 values
+E12_validity = getappdata(0, 'E12_validity');
+
 for groups = 1:G
     if strcmpi(groupIDBuffer(1.0).name, 'default') == 1.0
         % There is one, default group
@@ -68,10 +71,8 @@ for groups = 1:G
     Yet = getappdata(0, 'failStrain_tstd');
     Yec = getappdata(0, 'failStrain_cstd');
     Se = getappdata(0, 'failStrain_shear');
-    E = getappdata(0, 'E');
-    kp = getappdata(0, 'kp');
-    np = getappdata(0, 'np');
-    v = getappdata(0, 'poisson');
+    E11 = getappdata(0, 'E');
+    v12 = getappdata(0, 'poisson');
     
     % Get Hashin properties
     alpha = getappdata(0, 'hashin_alpha');
@@ -97,14 +98,13 @@ for groups = 1:G
     end
     
     % Check if there is enough data for fail strain
-    if ((isempty(E) == 1.0 || isempty(kp) == 1.0 || isempty(np) == 1.0) && (isempty(v) == 1.0 || isempty(E) == 1.0)) ||...
-            (isempty(Xet) == 1.0 || isempty(Xec) == 1.0 || isempty(Yet) == 1.0 || isempty(Yec) == 1.0 || isempty(Se) == 1.0)
+    if ((isempty(v12) == 1.0 || isempty(E11) == 1.0)) ||...
+            (isempty(Xet) == 1.0 || isempty(Xec) == 1.0 || isempty(Yet) == 1.0 || isempty(Yec) == 1.0 || isempty(Se) == 1.0) ||...
+            E12_validity(groups) == 0.0
         failStrain = -1.0;
-    elseif (isempty(kp) == 1.0 || isempty(np) == 1.0) && isempty(E) == 0.0
-        failStrain = 0.0;
-        sectionG = E/(2.0*(1.0 + v));
     else
         failStrain = 1.0;
+        G12 = E11/(2.0*(1.0 + v12));
     end
     
     % Check if there is enough data for Hashin
@@ -210,21 +210,11 @@ for groups = 1:G
         end
         
         %% FAIL STRAIN CALCULATION
-        if failStrain == 1.0            
-            [E11i, ~, ~, ~] = css2e(S11i, E, kp, np);
-            [E22i, ~, ~, ~] = css2e(S22i, E, kp, np);
-            [E12i, ~, ~, ~] = css2e(S12i, E, kp, np);
+        if failStrain ~= -1.0          
+            E11i = S11i./E11;
+            E22i = S22i./E11;
+            E12i = S12i./G12;
             
-            E11i = E11i(1.0 + length(E11i) - L:end);
-            E22i = E22i(1.0 + length(E22i) - L:end);
-            E12i = E11i(1.0 + length(E12i) - L:end);
-        elseif failStrain == 0.0
-            E11i = S11i./E;
-            E22i = S22i./E;
-            E12i = S12i./sectionG;
-        end
-        
-        if failStrain ~= -1.0
             % Tension-compression split
             Xe(E11i >= 0.0) = Xet;
             Xe(E11i < 0.0) = Xec;
@@ -370,3 +360,6 @@ end
 
 % Print footer to message file
 messenger.writeMessage(127.0)
+
+% Remove %APPDATA%
+rmappdata(0, 'E12_validity')

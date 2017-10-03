@@ -113,7 +113,12 @@ classdef preProcess < handle
             %% Force material to pass validation if composite analysis
             if getappdata(0, 'compositeCriteria') == 1.0
                 material_properties.reg_model = 5.0;
-                material_properties.e = 203e3;  material_properties.e_active = 1.0;
+                if isempty(material_properties.e) == 1.0
+                    setappdata(0, 'E12_validity', [getappdata(0, 'E12_validity'), 0.0])
+                    material_properties.e = 203e3;  material_properties.e_active = 1.0;
+                else
+                    setappdata(0, 'E12_validity', [getappdata(0, 'E12_validity'), 1.0])
+                end
                 material_properties.uts = 400.0;  material_properties.uts_active = 1.0;
                 material_properties.ucs = 400.0;
                 material_properties.proof = 325.0;  material_properties.proof_active = 1.0;

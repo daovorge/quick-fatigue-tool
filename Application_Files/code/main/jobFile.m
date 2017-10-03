@@ -237,6 +237,8 @@ classdef jobFile < handle
             if isempty(compositeCriteria) == 1.0
                 compositeCriteria = 0.0;
                 setappdata(0, 'compositeCriteria', compositeCriteria)
+            elseif compositeCriteria > 0.0
+                setappdata(0, 'dataCheck', 1.0)
             end
             
             if isempty(yieldCriteria) == 1.0
@@ -463,6 +465,9 @@ classdef jobFile < handle
                     
                     % Save the current material name
                     setappdata(0, 'getMaterial_name', material)
+                    
+                    % Initialize the E12 validity for composites
+                    setappdata(0, 'E12_validity', [])
                     
                     % Read material properties from MAT file
                     [error, material] = preProcess.getMaterial(material, useSN, groups);
