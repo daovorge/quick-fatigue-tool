@@ -146,12 +146,14 @@ if cleanExit == 1.0
 end
 
 %% DETERMINE THE ALGORITHM AND MEAN STRESS CORRECTION TO BE USED FOR THE ANALYSIS
-[algorithm, msCorrection, useSN, error] = jobFile.getAlgorithmAndMSC(algorithm, msCorrection, useSN);
-setappdata(0, 'algorithm', algorithm)
-
-if error == 1.0
-    cleanup(1.0)
-    return
+if getappdata(0, 'compositeCriteria') == 0.0
+    [algorithm, msCorrection, useSN, error] = jobFile.getAlgorithmAndMSC(algorithm, msCorrection, useSN);
+    setappdata(0, 'algorithm', algorithm)
+    
+    if error == 1.0
+        cleanup(1.0)
+        return
+    end
 end
 
 %% CHECK IF USER-DEFINED FRF DATA IS SUPPLIED
@@ -356,6 +358,13 @@ end
 %% PERFORM COMPOSITE FAILURE CALCULATION IF REQUESTED
 if getappdata(0, 'compositeCriteria') == 1.0
     compositeFailure(N, signalLength)
+    
+    %{
+        Composite/foam materials cannot be used for fatigue analysis. Abort
+        the analysis here.
+    %}
+    datacheckAbort(Sxx, Syy, Szz, Txy, Tyz, Txz, tic_pre, outputField, fid_status)
+    return
 end
 
 %% INITIALISE THE CP SEARCH PARAMETERS
@@ -480,20 +489,7 @@ if getappdata(0, 'dataCheck') > 0.0
         If the job is a data check analysis, abort here. Print the
         principal stresses to a text file
     %}
-    if outputField == 1.0
-        printTensor(Sxx, Syy, Szz, Txy, Tyz, Txz)
-    end
-
-	setappdata(0, 'dataCheck_time', toc(tic_pre))
-    
-    if getappdata(0, 'echoMessagesToCWIN') == 1.0
-        fprintf('\n[NOTICE] Data Check complete. Scroll up for details (%fs)\n', toc(tic_pre))
-    else
-        fprintf('\n[NOTICE] Data Check complete (%fs)\n', toc(tic_pre))
-    end
-    messenger.writeMessage(-999.0)
-    fprintf(fid_status, '\r\n\r\nTHE ANALYSIS HAS COMPLETED SUCCESSFULLY');
-    fclose(fid_status);
+    datacheckAbort(Sxx, Syy, Szz, Txy, Tyz, Txz, tic_pre, outputField, fid_status)
     return
 end
 

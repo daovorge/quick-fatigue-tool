@@ -367,3 +367,6 @@ if (failStressGeneral ~= -1.0) || (tsaiWuTT ~= -1.0) || (failStrain ~= -1.0) || 
 else
     messenger.writeMessage(300.0)
 end
+
+% Print footer to message file
+messenger.writeMessage(127.0)

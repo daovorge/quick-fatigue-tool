@@ -496,7 +496,7 @@ classdef jobFile < handle
                             elseif (useSN == 0.0) && (isempty(getappdata(0, 's_values')) == 0.0)
                                 setappdata(0, 'useSN', 1.0)
                                 messenger.writeMessage(36.0)
-                            elseif (useSN == 1) && (isempty(getappdata(0, 's_values')) == 1.0)
+                            elseif (useSN == 1.0) && (isempty(getappdata(0, 's_values')) == 1.0)
                                 setappdata(0, 'E006', 1.0)
                                 
                                 cleanExit = 1.0;

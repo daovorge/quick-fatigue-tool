@@ -1190,7 +1190,7 @@ classdef messenger < handle
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 127.0
-                        %_AVAILABLE_%
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Composite materials may not be used for fatigue analysis. The analysis will not continue beyond this point', returnType{i}]);
                     case 128.0
                         %_AVAILABLE_%
                     case 129.0

@@ -110,6 +110,21 @@ classdef preProcess < handle
                 2: Default
             %}
             
+            %% Force material to pass validation if composite analysis
+            if getappdata(0, 'compositeCriteria') == 1.0
+                material_properties.reg_model = 5.0;
+                material_properties.e = 203e3;  material_properties.e_active = 1.0;
+                material_properties.uts = 400.0;  material_properties.uts_active = 1.0;
+                material_properties.ucs = 400.0;
+                material_properties.proof = 325.0;  material_properties.proof_active = 1.0;
+                material_properties.sf = 930.0;  material_properties.sf_active = 1.0;
+                material_properties.b = -0.095;  material_properties.b_active = 1.0;
+                material_properties.ef = 0.26;  material_properties.ef_active = 1.0;
+                material_properties.c = -0.47;  material_properties.c_active = 1.0;
+                material_properties.kp = 1190.0;  material_properties.kp_active = 1.0;
+                material_properties.np = 0.193;  material_properties.np_active = 1.0;
+            end
+            
             %% Material description
             setappdata(0, 'materialDescription', material_properties.comment)
             
@@ -130,19 +145,19 @@ classdef preProcess < handle
             %% Material class
             class = material_properties.class;
             switch class
-                case 1
+                case 1.0
                     setappdata(0, 'fsc', 0.75)
-                case 2
+                case 2.0
                     setappdata(0, 'fsc', 0.90)
-                case 3
+                case 3.0
                     setappdata(0, 'fsc', 1.00)
-                case 4
+                case 4.0
                     setappdata(0, 'fsc', 0.83)
-                case 5
+                case 5.0
                     setappdata(0, 'fsc', 1.30)
-                case 6
+                case 6.0
                     setappdata(0, 'fsc', 0.65)
-                case 7
+                case 7.0
                     setappdata(0, 'fsc', -1.0)
             end
             
