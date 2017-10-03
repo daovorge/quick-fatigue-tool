@@ -113,12 +113,7 @@ classdef preProcess < handle
             %% Force material to pass validation if composite analysis
             if getappdata(0, 'compositeCriteria') == 1.0
                 material_properties.reg_model = 5.0;
-                if isempty(material_properties.e) == 1.0
-                    setappdata(0, 'E12_validity', [getappdata(0, 'E12_validity'), 0.0])
-                    material_properties.e = 203e3;  material_properties.e_active = 1.0;
-                else
-                    setappdata(0, 'E12_validity', [getappdata(0, 'E12_validity'), 1.0])
-                end
+                material_properties.e = 203e3;  material_properties.e_active = 1.0;
                 material_properties.uts = 400.0;  material_properties.uts_active = 1.0;
                 material_properties.ucs = 400.0;
                 material_properties.proof = 325.0;  material_properties.proof_active = 1.0;
@@ -1542,6 +1537,54 @@ classdef preProcess < handle
                 failStrain_shear = [];
             end
             setappdata(0, 'failStrain_shear', failStrain_shear)
+            
+            % Elastic modulus (fiber direction)
+            try
+                if ischar(material_properties.failStrain_e11) == 1.0
+                    failStrain_e11 = str2double(material_properties.failStrain_e11);
+                else
+                    failStrain_e11 = [];
+                end
+            catch
+                failStrain_e11 = [];
+                setappdata(0, 'failStrain_e11', failStrain_e11)
+            end
+            if isnan(failStrain_e11) == 1.0
+                failStrain_e11 = [];
+            end
+            setappdata(0, 'failStrain_e11', failStrain_e11)
+            
+            % Elastic modulus (transverse direction)
+            try
+                if ischar(material_properties.failStrain_e22) == 1.0
+                    failStrain_e22 = str2double(material_properties.failStrain_e22);
+                else
+                    failStrain_e22 = [];
+                end
+            catch
+                failStrain_e22 = [];
+                setappdata(0, 'failStrain_e22', failStrain_e22)
+            end
+            if isnan(failStrain_e22) == 1.0
+                failStrain_e22 = [];
+            end
+            setappdata(0, 'failStrain_e22', failStrain_e22)
+            
+            % Section Poisson's ratio
+            try
+                if ischar(material_properties.failStrain_g12) == 1.0
+                    failStrain_g12 = str2double(material_properties.failStrain_g12);
+                else
+                    failStrain_g12 = [];
+                end
+            catch
+                failStrain_g12 = [];
+                setappdata(0, 'failStrain_g12', failStrain_g12)
+            end
+            if isnan(failStrain_g12) == 1.0
+                failStrain_g12 = [];
+            end
+            setappdata(0, 'failStrain_g12', failStrain_g12)
             
             %% Hashin parameters for composite failure
             

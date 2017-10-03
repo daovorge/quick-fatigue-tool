@@ -1215,6 +1215,15 @@ else
     if isappdata(0, 'failStrain_shear') == 1.0
         rmappdata(0, 'failStrain_shear')
     end
+    if isappdata(0, 'failStrain_e11') == 1.0
+        rmappdata(0, 'failStrain_e11')
+    end
+    if isappdata(0, 'failStrain_e22') == 1.0
+        rmappdata(0, 'failStrain_e22')
+    end
+    if isappdata(0, 'failStrain_g12') == 1.0
+        rmappdata(0, 'failStrain_g12')
+    end
     
     % Hashin
     if isappdata(0, 'hashin_alpha') == 1.0
@@ -1297,6 +1306,9 @@ material_properties = struct(...
 'failStrain_tstd', getappdata(0, 'failStrain_tstd'),...
 'failStrain_cstd', getappdata(0, 'failStrain_cstd'),...
 'failStrain_shear', getappdata(0, 'failStrain_shear'),...
+'failStrain_e11', getappdata(0, 'failStrain_e11'),...
+'failStrain_e22', getappdata(0, 'failStrain_e22'),...
+'failStrain_g12', getappdata(0, 'failStrain_g12'),...
 'hashin_alpha', getappdata(0, 'hashin_alpha'),...
 'hashin_lts', getappdata(0, 'hashin_lts'),...
 'hashin_lcs', getappdata(0, 'hashin_lcs'),...
@@ -1603,6 +1615,33 @@ try
     end
 catch
     setappdata(0, 'failStrain_shear', [])
+end
+try
+    if isempty(properties.material_properties.failStrain_e11) == 1.0
+        setappdata(0, 'failStrain_e11', [])
+    else
+        setappdata(0, 'failStrain_e11', properties.material_properties.failStrain_e11)
+    end
+catch
+    setappdata(0, 'failStrain_e11', [])
+end
+try
+    if isempty(properties.material_properties.failStrain_e22) == 1.0
+        setappdata(0, 'failStrain_e22', [])
+    else
+        setappdata(0, 'failStrain_e22', properties.material_properties.failStrain_e22)
+    end
+catch
+    setappdata(0, 'failStrain_e22', [])
+end
+try
+    if isempty(properties.material_properties.failStrain_g12) == 1.0
+        setappdata(0, 'failStrain_g12', [])
+    else
+        setappdata(0, 'failStrain_g12', properties.material_properties.failStrain_g12)
+    end
+catch
+    setappdata(0, 'failStrain_g12', [])
 end
 
 % Initialize Hashin properties

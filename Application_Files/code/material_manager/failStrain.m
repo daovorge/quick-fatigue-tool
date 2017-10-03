@@ -67,6 +67,15 @@ end
 if isappdata(0, 'failStrain_shear')
     set(handles.edit_shear, 'string', getappdata(0, 'failStrain_shear'))
 end
+if isappdata(0, 'failStrain_e11')
+    set(handles.edit_e11, 'string', getappdata(0, 'failStrain_e11'))
+end
+if isappdata(0, 'failStrain_e22')
+    set(handles.edit_e22, 'string', getappdata(0, 'failStrain_e22'))
+end
+if isappdata(0, 'failStrain_g12')
+    set(handles.edit_g12, 'string', getappdata(0, 'failStrain_g12'))
+end
 
 
 % --- Outputs from this function are returned to the command line.
@@ -282,6 +291,27 @@ if isempty(get(handles.edit_shear, 'string')) == 0.0
     end
 end
 
+failStrain_e11 = str2double(get(handles.edit_e11, 'string'));
+if isempty(get(handles.edit_e11, 'string')) == 0.0
+    if isnan(failStrain_e11) == 1.0 || isinf(failStrain_e11) == 1.0 || isreal(failStrain_e11) == 0.0
+        error = 1.0;
+    end
+end
+
+failStrain_e22 = str2double(get(handles.edit_e22, 'string'));
+if isempty(get(handles.edit_e22, 'string')) == 0.0
+    if isnan(failStrain_e22) == 1.0 || isinf(failStrain_e22) == 1.0 || isreal(failStrain_e22) == 0.0
+        error = 1.0;
+    end
+end
+
+failStrain_g12 = str2double(get(handles.edit_g12, 'string'));
+if isempty(get(handles.edit_g12, 'string')) == 0.0
+    if isnan(failStrain_g12) == 1.0 || isinf(failStrain_g12) == 1.0 || isreal(failStrain_g12) == 0.0
+        error = 1.0;
+    end
+end
+
 if error == 1.0
     errordlg('One or more inputs contain a syntax error.', 'Quick Fatigue Tool')
     uiwait; enable(handles)
@@ -289,8 +319,8 @@ if error == 1.0
 end
 
 % Check for non-physical inputs
-if failStrain_tsfd <= 0.0  || failStrain_csfd <= 0.0 || failStrain_tstd <= 0.0 || failStrain_cstd <= 0.0 || failStrain_shear <= 0.0
-    errordlg('Strain values must be positive.', 'Quick Fatigue Tool')
+if failStrain_tsfd <= 0.0  || failStrain_csfd <= 0.0 || failStrain_tstd <= 0.0 || failStrain_cstd <= 0.0 || failStrain_shear <= 0.0 || failStrain_e11 <= 0.0 || failStrain_e22 <= 0.0 || failStrain_g12 <= 0.0
+    errordlg('Stress/strain values must be positive.', 'Quick Fatigue Tool')
     uiwait; enable(handles)
     return
 end
@@ -301,6 +331,9 @@ setappdata(0, 'failStrain_csfd', get(handles.edit_csfd, 'string'))
 setappdata(0, 'failStrain_tstd', get(handles.edit_tstd, 'string'))
 setappdata(0, 'failStrain_cstd', get(handles.edit_cstd, 'string'))
 setappdata(0, 'failStrain_shear', get(handles.edit_shear, 'string'))
+setappdata(0, 'failStrain_e11', get(handles.edit_e11, 'string'))
+setappdata(0, 'failStrain_e22', get(handles.edit_e22, 'string'))
+setappdata(0, 'failStrain_g12', get(handles.edit_g12, 'string'))
 
 close 'Fail Strain'
 
@@ -323,3 +356,72 @@ set(findall(handles.failStrain, '-property', 'Enable'), 'Enable', 'off')
 
 function enable(handles)
 set(findall(handles.failStrain, '-property', 'Enable'), 'Enable', 'on')
+
+
+
+function edit_e11_Callback(~, ~, ~)
+% hObject    handle to edit_e11 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_e11 as text
+%        str2double(get(hObject,'String')) returns contents of edit_e11 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_e11_CreateFcn(hObject, ~, ~)
+% hObject    handle to edit_e11 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_e22_Callback(~, ~, ~)
+% hObject    handle to edit_e22 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_e22 as text
+%        str2double(get(hObject,'String')) returns contents of edit_e22 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_e22_CreateFcn(hObject, ~, ~)
+% hObject    handle to edit_e22 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_g12_Callback(~, ~, ~)
+% hObject    handle to edit_g12 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_g12 as text
+%        str2double(get(hObject,'String')) returns contents of edit_g12 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_g12_CreateFcn(hObject, ~, ~)
+% hObject    handle to edit_g12 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

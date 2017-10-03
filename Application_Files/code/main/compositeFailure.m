@@ -35,9 +35,6 @@ HSNMCCRT = linspace(-1.0, -1.0, N);
 startID = 1.0;
 totalCounter = 1.0;
 
-% Get validity of E12 values
-E12_validity = getappdata(0, 'E12_validity');
-
 for groups = 1:G
     if strcmpi(groupIDBuffer(1.0).name, 'default') == 1.0
         % There is one, default group
@@ -71,8 +68,9 @@ for groups = 1:G
     Yet = getappdata(0, 'failStrain_tstd');
     Yec = getappdata(0, 'failStrain_cstd');
     Se = getappdata(0, 'failStrain_shear');
-    E11 = getappdata(0, 'E');
-    v12 = getappdata(0, 'poisson');
+    E11 = getappdata(0, 'failStrain_e11');
+    E22 = getappdata(0, 'failStrain_e22');
+    G12 = getappdata(0, 'failStrain_g12');
     
     % Get Hashin properties
     alpha = getappdata(0, 'hashin_alpha');
@@ -98,13 +96,11 @@ for groups = 1:G
     end
     
     % Check if there is enough data for fail strain
-    if ((isempty(v12) == 1.0 || isempty(E11) == 1.0)) ||...
-            (isempty(Xet) == 1.0 || isempty(Xec) == 1.0 || isempty(Yet) == 1.0 || isempty(Yec) == 1.0 || isempty(Se) == 1.0) ||...
-            E12_validity(groups) == 0.0
+    if ((isempty(G12) == 1.0 || isempty(E11) == 1.0 || isempty(E22) == 1.0)) ||...
+            (isempty(Xet) == 1.0 || isempty(Xec) == 1.0 || isempty(Yet) == 1.0 || isempty(Yec) == 1.0 || isempty(Se) == 1.0)
         failStrain = -1.0;
     else
         failStrain = 1.0;
-        G12 = E11/(2.0*(1.0 + v12));
     end
     
     % Check if there is enough data for Hashin
@@ -212,7 +208,7 @@ for groups = 1:G
         %% FAIL STRAIN CALCULATION
         if failStrain ~= -1.0          
             E11i = S11i./E11;
-            E22i = S22i./E11;
+            E22i = S22i./E22;
             E12i = S12i./G12;
             
             % Tension-compression split
@@ -360,6 +356,3 @@ end
 
 % Print footer to message file
 messenger.writeMessage(127.0)
-
-% Remove %APPDATA%
-rmappdata(0, 'E12_validity')
