@@ -238,7 +238,17 @@ classdef jobFile < handle
                 compositeCriteria = 0.0;
                 setappdata(0, 'compositeCriteria', compositeCriteria)
             elseif compositeCriteria > 0.0
+                setappdata(0, 'useSN', 0.0)
                 setappdata(0, 'dataCheck', 1.0)
+                
+                if algorithm == 0.0
+                    algorithm = 4.0;
+                    setappdata(0, 'algorithm', 7.0)
+                end
+                if msCorrection == 0.0
+                    msCorrection = 2.0;
+                    setappdata(0, 'msCorrection', 2.0)
+                end
             end
             
             if isempty(yieldCriteria) == 1.0

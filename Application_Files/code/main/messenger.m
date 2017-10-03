@@ -2217,7 +2217,7 @@ classdef messenger < handle
                     case 298.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin damage initiation (matrix tensile) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNMTCRT'));
                     case 299.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin damage initiation (matrix compression) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNMTCRT'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin damage initiation (matrix compression) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNMCCRT'));
                     case 300.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The COMPOSITE_CRITERIA job file option was specified, but composite criteria were not evaluated', returnType{i}]);
                         fprintf(fidType(i), ['-> The specified composite properies are insufficient', returnType{i}]);

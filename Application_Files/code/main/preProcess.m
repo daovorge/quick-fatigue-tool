@@ -1920,7 +1920,7 @@ classdef preProcess < handle
                         
                         morrowSf = Sf - mean_item(totalCounter);
                         
-                        if plasticSN == 1.0 && (~isempty(Ef) && ~isempty(c))
+                        if plasticSN == 1.0 && (isempty(Ef) == 0.0 && isempty(c) == 0.0)
                             conditionalStress = E*(((1.65*morrowSf)/(E))*(cael)^b + (1.75*Ef)*(cael)^c) - shear;
                         else
                             conditionalStress = ((1.65*morrowSf))*(cael)^b - shear;

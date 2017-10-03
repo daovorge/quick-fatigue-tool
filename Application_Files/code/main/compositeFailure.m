@@ -82,7 +82,7 @@ for groups = 1:G
     St = getappdata(0, 'hashin_tss');
     
     % Check if there is enough data for maximum stress, Tsai-Hill, Tsai-Wu and Azzi-Tsai-Hill theory
-    if isempty(Xt) == 1.0 || isempty(Xc) == 1.0 || isempty(Yt) == 1.0 || isempty(Yc) == 1.0
+    if isempty(Xt) == 1.0 || isempty(Xc) == 1.0 || isempty(Yt) == 1.0 || isempty(Yc) == 1.0 || isempty(S) == 1.0
         failStressGeneral = -1.0;
     else
         failStressGeneral = 1.0;
@@ -284,7 +284,7 @@ setappdata(0, 'AZZIT', N_AZZIT)
 setappdata(0, 'HSNFTCRT', N_HSNFTCRT)
 setappdata(0, 'HSNFCCRT', N_HSNFCCRT)
 setappdata(0, 'HSNMTCRT', N_HSNMTCRT)
-setappdata(0, 'HSNMTCRT', N_HSNMCCRT)
+setappdata(0, 'HSNMCCRT', N_HSNMCCRT)
 
 if N_MSTRS > 0.0
     messenger.writeMessage(290.0)
