@@ -9,7 +9,7 @@ classdef importMaterial < handle
 %   LocalMaterialDatabase, material, MaterialEditor, MaterialManager.
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 02-Oct-2017 13:11:53 GMT
+%   Last modified 03-Oct-2017 13:44:11 GMT
     
     %%
     
@@ -41,6 +41,8 @@ classdef importMaterial < handle
                 'sf_active', 0.0,...
                 'b', [],...
                 'b_active', 0.0,...
+                'b2', [],...
+                'b2Nf', [],...
                 'ef', [],...
                 'ef_active', 0.0,...
                 'c', [],...
@@ -64,12 +66,12 @@ classdef importMaterial < handle
             kwStr = {'USERMATERIAL', 'DESCRIPTION', 'DEFAULTALGORITHM',...
                 'DEFAULTMSC', 'CAEL', 'REGRESSION', 'MECHANICAL',...
                 'FATIGUE', 'CYCLIC', 'NORMALSTRESSSENSITIVITY', 'CLASS',...
-                'COMPOSITECRITERION', 'ENDMATERIAL'};
+                'COMPOSITECRITERION', 'KNEE', 'ENDMATERIAL'};
             
             kwStrSp = {'USER MATERIAL', 'DESCRIPTION', 'DEFAULT ALGORITHM',...
                 'DEFAULT MSC', 'CAEL', 'REGRESSION', 'MECHANICAL',...
                 'FATIGUE', 'CYCLIC', 'NORMAL STRESS SENSITIVITY', 'CLASS',...
-                'COMPOSITE CRITERION', 'END MATERIAL'};
+                'COMPOSITE CRITERION', 'KNEE', 'END MATERIAL'};
             
             % ALGORITHM STRINGS
             algStr = {'UNIAXIALSTRESS', 'UNIAXIALSTRAIN', 'SBBM', 'NORMAL', 'FINDLEY', 'INVARIANT', 'NASALIFE'};
@@ -1454,7 +1456,49 @@ classdef importMaterial < handle
                             
                             % Get the next line in the file
                             TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
-                        case 13.0 % *END MATERIAL
+                        case 13.0 % *KNEE
+                            %{
+                                The S-N knee is defined as up to two
+                                numeric values directly below the keyword
+                                declaration
+                            %}
+                            % Get the next line
+                            TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
+                            
+                            % If the next line is a keyword definition, continue
+                            if (isempty(TLINE) == 0.0) && (strcmp(TLINE, '*') == 1.0)
+                                keywordWarnings(13.0) = 1.0;
+                                continue
+                            end
+                            
+                            % Get the numeric value of the data line
+                            knee = str2num(TLINE); %#ok<ST2NM>
+                            
+                            if isempty(knee) == 1.0
+                                % Get the next line
+                                TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
+                                
+                                keywordWarnings(13.0) = 1.0;
+                                continue
+                            end
+                            
+                            % Process the data line
+                            if length(knee) >= 2.0
+                                knee = knee(1.0:2.0);
+                                
+                                material_properties.b2 = knee(1.0);
+                                material_properties.b2Nf = knee(2.0);
+                            else
+                                % Get the next line
+                                TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
+                                
+                                keywordWarnings(13.0) = 1.0;
+                                continue
+                            end
+                            
+                            % Get the next line
+                            TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
+                        case 14.0 % *END MATERIAL
                             %{
                                 The user has manually declared the end of
                                 the material definition. Stop processing

@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 02-Oct-2017 13:11:53 GMT
+%   Last modified 03-Oct-2017 13:44:11 GMT
 
     %%
 
@@ -1190,31 +1190,15 @@ classdef messenger < handle
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 127.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The B2 option is used with %.0f values, but there is only one analysis group', returnType{i}], length(getappdata(0, 'b2')));
-                        fprintf(fidType(i), ['-> The first value of B2 will be used for the analysis', returnType{i}]);
-                        fprintf(fidType(i), ['-> Ensure that the number of values in B2 matches the number of analysis groups', returnType{i}]);
-
-                        setappdata(0, 'messageFileNotes', 1.0)
+                        %_AVAILABLE_%
                     case 128.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The B2_NF option is used with %.0f values, but there is only one analysis group', returnType{i}], length(getappdata(0, 'b2Nf')));
-                        fprintf(fidType(i), ['-> The first value of B2_NF will be used for the analysis', returnType{i}]);
-                        fprintf(fidType(i), ['-> Ensure that the number of values in B2_NF matches the number of analysis groups', returnType{i}]);
-
-                        setappdata(0, 'messageFileNotes', 1.0)
+                        %_AVAILABLE_%
                     case 129.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Composite criteria results have been written to ''%s\\Project\\output\\%s\\Data Files\\composite_criteria.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
                     case 130.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The B2 option is used with %.0f values, but there is only one analysis group', returnType{i}], length(getappdata(0, 'b2')));
-                        fprintf(fidType(i), ['-> The first value of B2 will be used for the analysis', returnType{i}]);
-                        fprintf(fidType(i), ['-> Ensure that the number of values in B2 matches the number of analysis groups', returnType{i}]);
-
-                        setappdata(0, 'messageFileNotes', 1.0)
+                        %_AVAILABLE_%
                     case 131.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The B2_NF option is used with %.0f values, but there is only one analysis group', returnType{i}], length(getappdata(0, 'b2Nf')));
-                        fprintf(fidType(i), ['-> The first value of B2_NF will be used for the analysis', returnType{i}]);
-                        fprintf(fidType(i), ['-> Ensure that the number of values in B2_NF matches the number of analysis groups', returnType{i}]);
-
-                        setappdata(0, 'messageFileNotes', 1.0)
+                        %_AVAILABLE_%
                     case 132.0
                         if getappdata(0, 'suppress_ID132') == 0.0
                             fprintf(fidType(i), [returnType{i}, '***NOTE: Out-of-plane stresses (S33/S23/S13) were found during the composite failure/damage initiation calculation', returnType{i}]);
@@ -2295,7 +2279,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n', version);
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 02-Oct-2017 13:11:53 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 03-Oct-2017 13:44:11 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

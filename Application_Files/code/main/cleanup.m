@@ -6,7 +6,7 @@ function [] = cleanup(status)
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 02-Oct-2017 13:11:53 GMT
+%   Last modified 03-Oct-2017 13:44:11 GMT
     
     %%
     
@@ -51,7 +51,8 @@ if status == 1.0
     errLogFile = [dir, sprintf('%s.log', job)];
     
     %{
-    	Available error codes: E009, E010, E011, E085, E092, E093, E094
+    	Available error codes: E009, E010, E011, E083, E084, E085, E086,
+    	E087, E088, E089, E090, E091, E092, E093, E094, E095
     %}
     
     % Remove the DATA and MATLAB FIGURES directories if applicable
@@ -75,7 +76,7 @@ if status == 1.0
     % Write file header
     fprintf(fid, 'Quick Fatigue Tool 6.11-04\r\n');
     fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-    fprintf(fid, 'Last modified 02-Oct-2017 13:11:53 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 03-Oct-2017 13:44:11 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');
@@ -833,83 +834,6 @@ if status == 1.0
         fprintf(fid, '\r\n-> For multiple analysis groups, FATIGUE_RESERVE_FACTOR must either be a numerical array of envelope numbers, or a cell array of envelope numbers and/or user defined FRF files');
         fprintf(fid, '\r\n\r\nError code: E082');
         rmappdata(0, 'E082')
-    end
-    if getappdata(0, 'E083') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: Two values of b2 are specified, but only one analysis group was defined');
-        fprintf(fid, '\r\n-> The b2 definition is ambiguous');
-        fprintf(fid, '\r\n-> Either modify the b2 definition so that only one b2 value is specified, or modify the group');
-        fprintf(fid, '\r\n   defintion so that the number of groups and b2 values agree with each other');
-        fprintf(fid, '\r\n-> If you wish to define b2 values for a single analysis group, followed by analysis of the');
-        fprintf(fid, '\r\n   remainder of the model, specify GROUP as {<sub_group>, ''DEFAULT''}, where the first b2 value is used');
-        fprintf(fid, '\r\n   to analyse <sub_group> and the second b2 is used to analyse the rest of the model');
-        fprintf(fid, '\r\n\r\nError code: E083');
-        rmappdata(0, 'E083')
-    end
-    if getappdata(0, 'E084') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: Two values of b2Nf are specified, but only one analysis group was defined');
-        fprintf(fid, '\r\n-> The b2Nf definition is ambiguous');
-        fprintf(fid, '\r\n-> Either modify the b2Nf definition so that only one b2Nf value is specified, or modify the group');
-        fprintf(fid, '\r\n   defintion so that the number of groups and b2Nf values agree with each other');
-        fprintf(fid, '\r\n-> If you wish to define b2Nf values for a single analysis group, followed by analysis of the');
-        fprintf(fid, '\r\n   remainder of the model, specify GROUP as {<sub_group>, ''DEFAULT''}, where the first b2Nf value is used');
-        fprintf(fid, '\r\n   to analyse <sub_group> and the second b2Nf is used to analyse the rest of the model');
-        fprintf(fid, '\r\n\r\nError code: E084');
-        rmappdata(0, 'E084')
-    end
-    if getappdata(0, 'E086') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: There are %.0f analysis groups but only %.0f b2 values', getappdata(0, 'error_log_086_numberOfGroups'), getappdata(0, 'error_log_086_numberOfB2'));
-        fprintf(fid, '\r\n-> Modify the group and/or b2 defintions so that the number of groups and b2 values agree with each other');
-        fprintf(fid, '\r\n\r\nError code: E086');
-        rmappdata(0, 'E086')
-    end
-    if getappdata(0, 'E087') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: There are %.0f b2 values but only %.0f analysis groups', getappdata(0, 'error_log_087_numberOfB2'), getappdata(0, 'error_log_087_numberOfGroups'));
-        fprintf(fid, '\r\n-> The b2 definition is ambiguous');
-        fprintf(fid, '\r\n-> Either modify the b2 values so that only one b2 value is specified, or modify the group');
-        fprintf(fid, '\r\n   defintion so that the number of groups and b2 values agree with each other');
-        fprintf(fid, '\r\n-> If you wish to define b2 values for multiple analysis groups, followed by analysis of the');
-        fprintf(fid, '\r\n   remainder of the model, specify GROUP as {<sub_group_1>,..., <sub_group_n>, ''DEFAULT''}, where the');
-        fprintf(fid, '\r\n   last b2 value is used to analyse the rest of the model');
-        fprintf(fid, '\r\n\r\nError code: E087');
-        rmappdata(0, 'E087')
-    end
-    if getappdata(0, 'E088') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: There are %.0f b2 values but only %.0f analysis groups', getappdata(0, 'error_log_088_numberOfB2'), getappdata(0, 'error_log_088_numberOfGroups'));
-        fprintf(fid, '\r\n-> The b2 definition is ambiguous');
-        fprintf(fid, '\r\n-> Either modify the b2 values so that only one b2 value is specified, or modify the group');
-        fprintf(fid, '\r\n   defintion so that the number of groups and b2 values agree with each other');
-        fprintf(fid, '\r\n\r\nError code: E088');
-        rmappdata(0, 'E088')
-    end
-    if getappdata(0, 'E089') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: There are %.0f analysis groups but only %.0f b2Nf values', getappdata(0, 'error_log_089_numberOfGroups'), getappdata(0, 'error_log_089_numberOfB2Nf'));
-        fprintf(fid, '\r\n-> Modify the group and/or b2Nf defintions so that the number of groups and b2 values agree with each other');
-        fprintf(fid, '\r\n\r\nError code: E089');
-        rmappdata(0, 'E089')
-    end
-    if getappdata(0, 'E090') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: There are %.0f b2Nf values but only %.0f analysis groups', getappdata(0, 'error_log_090_numberOfB2Nf'), getappdata(0, 'error_log_090_numberOfGroups'));
-        fprintf(fid, '\r\n-> The b2Nf definition is ambiguous');
-        fprintf(fid, '\r\n-> Either modify the b2Nf values so that only one b2Nf value is specified, or modify the group');
-        fprintf(fid, '\r\n   defintion so that the number of groups and b2Nf values agree with each other');
-        fprintf(fid, '\r\n-> If you wish to define b2Nf values for multiple analysis groups, followed by analysis of the');
-        fprintf(fid, '\r\n   remainder of the model, specify GROUP as {<sub_group_1>,..., <sub_group_n>, ''DEFAULT''}, where the');
-        fprintf(fid, '\r\n   last b2Nf value is used to analyse the rest of the model');
-        fprintf(fid, '\r\n\r\nError code: E090');
-        rmappdata(0, 'E090')
-    end
-    if getappdata(0, 'E091') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: There are %.0f b2Nf values but only %.0f analysis groups', getappdata(0, 'error_log_091_numberOfB2Nf'), getappdata(0, 'error_log_091_numberOfGroups'));
-        fprintf(fid, '\r\n-> The b2Nf definition is ambiguous');
-        fprintf(fid, '\r\n-> Either modify the b2Nf values so that only one b2Nf value is specified, or modify the group');
-        fprintf(fid, '\r\n   defintion so that the number of groups and b2Nf values agree with each other');
-        fprintf(fid, '\r\n\r\nError code: E091');
-        rmappdata(0, 'E091')
-    end
-    if getappdata(0, 'E095') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: The number of values in B2 and B2_NF do not agree');
-        fprintf(fid, '\r\n\r\nError code: E095');
-        rmappdata(0, 'E095')
     end
     if getappdata(0, 'E096') == 1.0
         fprintf(fid, '\r\n\r\n***ERROR: The number of endurance limit definitions does not match the number of analysis groups');

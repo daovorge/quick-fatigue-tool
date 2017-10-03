@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 02-Oct-2017 13:11:53 GMT
+%   Last modified 03-Oct-2017 13:44:11 GMT
     
     %%
     
@@ -469,7 +469,7 @@ classdef preProcess < handle
             setappdata(0, 'regressionModel', reg_model);
             
             if material_properties.b_active == 1.0
-                if ischar(material_properties.b)
+                if ischar(material_properties.b) == 1.0
                     b = str2double(material_properties.b);
                 else
                     b = material_properties.b;
@@ -522,61 +522,29 @@ classdef preProcess < handle
             end
             messenger.writeMessage(10.0)
             
-            %% Fatigue strength exponent above knee point
-            b2i = getappdata(0, 'b2_original');
-            b2Nfi = getappdata(0, 'b2Nf_original');
-            
-            for i = 1:length(b2i)
-                if isempty(b2i(i)) == 0.0
-                    if isnumeric(b2i(i)) == 0.0
-                        b2i(i) = [];
-                    elseif isnan(b2i(i)) == 1.0 || isinf(b2i(i)) == 1.0
-                        b2i(i) = [];
-                    elseif isreal(b2i(i)) == 0.0
-                        b2i(i) = [];
-                    end
+            %% Fatigue strength exponent (beyond user-defined knee)
+            if material_properties.b_active == 1.0
+                if ischar(material_properties.b) == 1.0
+                    b2 = str2double(material_properties.b2);
+                    b2Nf = str2double(material_properties.b2Nf);
+                else
+                    b2 = material_properties.b2;
+                    b2Nf = material_properties.b2Nf;
                 end
-            end
-            
-            if isempty(b2i) == 0.0
-                setappdata(0, 'b2', b2i(getappdata(0, 'getMaterial_currentGroup')))
-            end
-            
-            for i = 1:length(b2Nfi)
-                if isempty(b2Nfi(i)) == 0.0
-                    if isnumeric(b2Nfi(i)) == 0.0
-                        b2Nfi(i) = [];
-                    elseif isnan(b2Nfi(i)) == 1.0 || isinf(b2Nfi(i)) == 1.0
-                        b2Nfi(i) = [];
-                    elseif b2Nfi(i) <= 0.0
-                        b2Nfi(i) = [];
-                    elseif isreal(b2Nfi(i)) == 0.0
-                        b2Nfi(i) = [];
-                    end
+                
+                if isempty(b2) == 1.0
+                    setappdata(0, 'b2', [])
+                else
+                    setappdata(0, 'b2', b2)
                 end
-            end
-            
-            if isempty(b2Nfi) == 0.0
-                setappdata(0, 'b2Nf', b2Nfi(getappdata(0, 'getMaterial_currentGroup')))
-            end
-            
-            %% UCS
-            ucsi = getappdata(0, 'ucs_original');
-            
-            for i = 1:length(ucsi)
-                if isempty(ucsi(i)) == 0.0
-                    if isnumeric(ucsi(i)) == 0.0
-                        ucsi(i) = [];
-                    elseif isnan(ucsi(i)) == 1.0 || isinf(ucsi(i)) == 1.0
-                        ucsi(i) = [];
-                    elseif isreal(ucsi(i)) == 0.0
-                        ucsi(i) = [];
-                    end
+                if isempty(b2Nf) == 1.0
+                    setappdata(0, 'b2Nf', [])
+                else
+                    setappdata(0, 'b2Nf', b2Nf)
                 end
-            end
-            
-            if isempty(ucsi) == 0.0
-                setappdata(0, 'ucs', ucsi(getappdata(0, 'getMaterial_currentGroup')))
+            else
+                setappdata(0, 'b2', [])
+                setappdata(0, 'b2Nf', [])
             end
             
             %% Fatigue strength coefficient

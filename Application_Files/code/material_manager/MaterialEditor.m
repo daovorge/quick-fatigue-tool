@@ -13,7 +13,7 @@ function varargout = MaterialEditor(varargin)%#ok<*DEFNU>
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 02-Oct-2017 13:11:53 GMT
+%   Last modified 03-Oct-2017 13:44:11 GMT
     
     %%
     
@@ -104,6 +104,14 @@ y=ceil(c/35);
 g=a(1:x:end,1:y:end,:);
 g(g==255)=5.5*255;
 set(handles.pButton_changeLocation, 'CData', g);
+
+[a,~]=imread('icoR_knee.jpg');
+[r,c,~]=size(a); 
+x=ceil(r/35); 
+y=ceil(c/35); 
+g=a(1:x:end,1:y:end,:);
+g(g==255)=5.5*255;
+set(handles.pButton_knee, 'CData', g);
 
 %% Other tasks
 % Choose default command line output for MaterialEditor
@@ -518,9 +526,11 @@ switch get(hObject, 'value')
         setappdata(0, 'b_value', get(handles.edit_b, 'string'))
         set(handles.edit_b, 'string', [])
         set(handles.edit_b, 'enable', 'inactive')
+        set(handles.pButton_knee, 'enable', 'off')
         set(handles.edit_b, 'backgroundColor', [177/255, 206/255, 237/255])
     case 1.0
         set(handles.edit_b, 'enable', 'on')
+        set(handles.pButton_knee, 'enable', 'on')
         set(handles.edit_b, 'backgroundColor', [1, 1, 1])
         set(handles.edit_b, 'string', getappdata(0, 'b_value'))
 end
@@ -1115,12 +1125,11 @@ else
     set(handles.edit_rValues, 'string', 'Undefined')
     set(handles.pButton_viewRValues, 'enable', 'off')
     set(handles.pButton_rmRValues, 'enable', 'off')
-    set(handles.edit_snData, 'backgroundColor', [(241/255), (241/255), (241/255)])
-    set(handles.edit_rValues, 'backgroundColor', [(241/255), (241/255), (241/255)])
     setappdata(0, 'panel_userMaterial_snData', [pwd, '/Data/material/sn_data'])
     set(handles.edit_sf, 'string', '', 'enable', 'inactive', 'backgroundColor', simulia_blue)
     set(handles.check_sf, 'value', 0.0)
     set(handles.edit_b, 'string', '', 'enable', 'inactive', 'backgroundColor', simulia_blue)
+    set(handles.pButton_knee, 'enable', 'off')
     set(handles.check_b, 'value', 0.0)
     set(handles.edit_ef, 'string', '', 'enable', 'inactive', 'backgroundColor', simulia_blue)
     set(handles.check_ef, 'value', 0.0)
@@ -1259,6 +1268,8 @@ material_properties = struct(...
 'sf_active', get(handles.check_sf, 'value'),...
 'b', get(handles.edit_b, 'string'),...
 'b_active', get(handles.check_b, 'value'),...
+'b2', getappdata(0, 'b2'),...
+'b2Nf', getappdata(0, 'b2Nf'),...
 'ef', get(handles.edit_ef, 'string'),...
 'ef_active', get(handles.check_ef, 'value'),...
 'c', get(handles.edit_c, 'string'),...
@@ -1390,7 +1401,27 @@ end
 set(handles.edit_b, 'string', properties.material_properties.b)
 if properties.material_properties.b_active == 1.0
     set(handles.edit_b, 'backgroundColor', [1.0, 1.0, 1.0], 'enable', 'on')
+    set(handles.pButton_knee, 'enable', 'on')
     set(handles.check_b, 'value', 1.0)
+end
+
+try
+    if isempty(properties.material_properties.b2) == 1.0
+        setappdata(0, 'b2', [])
+    else
+        setappdata(0, 'b2', properties.material_properties.b2)
+    end
+catch
+    setappdata(0, 'b2', [])
+end
+try
+    if isempty(properties.material_properties.b2Nf) == 1.0
+        setappdata(0, 'b2Nf', [])
+    else
+        setappdata(0, 'b2Nf', properties.material_properties.b2Nf)
+    end
+catch
+    setappdata(0, 'b2Nf', [])
 end
 
 set(handles.edit_ef, 'string', properties.material_properties.ef)
@@ -2431,6 +2462,8 @@ end
 % Fatigue
 set(handles.edit_snData, 'enable', 'inactive')
 set(handles.edit_rValues, 'enable', 'inactive')
+set(handles.edit_snData, 'backgroundColor', [242/255, 242/255, 242/255])
+set(handles.edit_rValues, 'backgroundColor', [242/255, 242/255, 242/255])
 
 if strncmpi(get(handles.edit_snData, 'string'), 'undefined', 9.0) == 1.0
     set(handles.pButton_rmSNData, 'enable', 'off')
@@ -2446,6 +2479,7 @@ if get(handles.check_sf, 'value') == 0.0
 end
 if get(handles.check_b, 'value') == 0.0
     set(handles.edit_b, 'enable', 'inactive', 'backgroundColor', simuliaBlue)
+    set(handles.pButton_knee, 'enable', 'off')
 end
 if get(handles.check_ef, 'value') == 0.0
     set(handles.edit_ef, 'enable', 'inactive', 'backgroundColor', simuliaBlue)
@@ -2530,6 +2564,18 @@ function pButton_failStrain_Callback(~, ~, handles)
 blank(handles)
 
 failStrain
+uiwait
+
+% Enable the GUI
+enable(handles)
+
+
+% --- Executes on button press in pButton_knee.
+function pButton_knee_Callback(~, ~, handles)
+% Blank the GUI
+blank(handles)
+
+insertKnee
 uiwait
 
 % Enable the GUI

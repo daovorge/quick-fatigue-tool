@@ -11,13 +11,13 @@ function [] = main(flags)
 %   Author contact: louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 02-Oct-2017 13:11:53 GMT
+%   Last modified 03-Oct-2017 13:44:11 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');    tic_pre = tic;
 
 %% READ SETTINGS FROM THE ENVIRONMENT FILE
-error = preProcess.readEnvironment(flags{44.0});
+error = preProcess.readEnvironment(flags{42.0});
 
 if error == 1.0;
     return
@@ -43,7 +43,7 @@ setappdata(0, 'messageFileWarnings', 0.0)
 %% PRINT COMMAND WINDOW HEADER
 fprintf('[NOTICE] Quick Fatigue Tool 6.11-04')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2017)')
-fprintf('\n[NOTICE] Last modified 02-Oct-2017 13:11:53 GMT')
+fprintf('\n[NOTICE] Last modified 03-Oct-2017 13:44:11 GMT')
 
 cleanExit = 0.0;
 
