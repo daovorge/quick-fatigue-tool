@@ -1170,6 +1170,11 @@ else
         rmappdata(0, 'b2Nf')
     end
     
+    % NSSC
+    if isappdata(0, 'nssc_value') == 1.0
+        rmappdata(0, 'nssc_value')
+    end
+    
     % Reset composite failure properties
     
     % Fail stress
@@ -2445,6 +2450,11 @@ if isappdata(0, 'b_value') == 1.0
     rmappdata(0, 'b_value')
 end
 
+if isappdata(0, 'nssc_value') == 1.0
+    rmappdata(0, 'nssc_value')
+end
+
+% Stress-based failure
 if isappdata(0, 'failStress_tsfd') == 1.0
     rmappdata(0, 'failStress_tsfd')
 end
@@ -2457,14 +2467,75 @@ end
 if isappdata(0, 'failStress_cstd') == 1.0
     rmappdata(0, 'failStress_cstd')
 end
+if isappdata(0, 'failStress_tsttd') == 1.0
+    rmappdata(0, 'failStress_tsttd')
+end
+if isappdata(0, 'failStress_csttd') == 1.0
+    rmappdata(0, 'failStress_csttd')
+end
 if isappdata(0, 'failStress_shear') == 1.0
     rmappdata(0, 'failStress_shear')
 end
-if isappdata(0, 'failStress_cross') == 1.0
-    rmappdata(0, 'failStress_cross')
+if isappdata(0, 'failStress_cross12') == 1.0
+    rmappdata(0, 'failStress_cross12')
 end
-if isappdata(0, 'failStress_limit') == 1.0
-    rmappdata(0, 'failStress_limit')
+if isappdata(0, 'failStress_cross23') == 1.0
+    rmappdata(0, 'failStress_cross23')
+end
+if isappdata(0, 'failStress_limit12') == 1.0
+    rmappdata(0, 'failStress_limit12')
+end
+if isappdata(0, 'failStress_limit23') == 1.0
+    rmappdata(0, 'failStress_limit23')
+end
+
+% Strain-based failure
+if isappdata(0, 'failStrain_tsfd') == 1.0
+    rmappdata(0, 'failStrain_tsfd')
+end
+if isappdata(0, 'failStrain_csfd') == 1.0
+    rmappdata(0, 'failStrain_csfd')
+end
+if isappdata(0, 'failStrain_tstd') == 1.0
+    rmappdata(0, 'failStrain_tstd')
+end
+if isappdata(0, 'failStrain_cstd') == 1.0
+    rmappdata(0, 'failStrain_cstd')
+end
+if isappdata(0, 'failStrain_shear') == 1.0
+    rmappdata(0, 'failStrain_shear')
+end
+if isappdata(0, 'failStrain_e11') == 1.0
+    rmappdata(0, 'failStrain_e11')
+end
+if isappdata(0, 'failStrain_e22') == 1.0
+    rmappdata(0, 'failStrain_e22')
+end
+if isappdata(0, 'failStrain_g12') == 1.0
+    rmappdata(0, 'failStrain_g12')
+end
+
+% Hashin damage initiation
+if isappdata(0, 'hashin_alpha') == 1.0
+    rmappdata(0, 'hashin_alpha')
+end
+if isappdata(0, 'hashin_lts') == 1.0
+    rmappdata(0, 'hashin_lts')
+end
+if isappdata(0, 'hashin_lcs') == 1.0
+    rmappdata(0, 'hashin_lcs')
+end
+if isappdata(0, 'hashin_tts') == 1.0
+    rmappdata(0, 'hashin_tts')
+end
+if isappdata(0, 'hashin_tcs') == 1.0
+    rmappdata(0, 'hashin_tcs')
+end
+if isappdata(0, 'hashin_lss') == 1.0
+    rmappdata(0, 'hashin_lss')
+end
+if isappdata(0, 'hashin_tss') == 1.0
+    rmappdata(0, 'hashin_tss')
 end
 
 delete(hObject);
