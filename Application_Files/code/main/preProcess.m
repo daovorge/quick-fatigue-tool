@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 03-Oct-2017 13:44:11 GMT
+%   Last modified 04-Oct-2017 18:09:00 GMT
     
     %%
     
@@ -2381,7 +2381,7 @@ classdef preProcess < handle
                 end
                 
                 % Make sure each loading is the same length
-                if range(historyLengths) ~= 0.0
+                if (max(historyLengths) - min(historyLengths)) ~= 0.0
                     % Get the length of the largest load history
                     maxLength = max(historyLengths);
                     
@@ -2487,7 +2487,7 @@ classdef preProcess < handle
                 
                 %% Make sure data position is the same for all RPT files
                 dataLabel = getappdata(0, 'dataLabel');
-                if range(dataLabel) ~= 0.0
+                if (max(dataLabel) - min(dataLabel)) ~= 0.0
                     error = 1.0;
                     setappdata(0, 'E021', 1.0)
                     
@@ -3081,7 +3081,7 @@ classdef preProcess < handle
                 
                 %% Make sure data position is the same for all RPT files
                 dataLabel = getappdata(0, 'dataLabel');
-                if range(dataLabel) ~= 0.0
+                if (max(dataLabel) - min(dataLabel)) ~= 0.0
                     error = true;
                     setappdata(0, 'E021', 1.0)
                     

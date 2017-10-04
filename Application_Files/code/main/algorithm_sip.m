@@ -14,7 +14,7 @@ classdef algorithm_sip < handle
 %      6.5 Stress Invariant Parameter
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 21-Sep-2017 12:46:54 GMT
+%   Last modified 04-Oct-2017 18:09:00 GMT
     
     %%
     
@@ -299,7 +299,7 @@ classdef algorithm_sip < handle
             end
             
             if G > 1.0
-                if range(preferredParameter) ~= 0.0
+                if (max(preferredParameter) - min(preferredParameter)) ~= 0.0
                     %{
                         If the preferred stress invariant parameter is
                         different between two or more groups, warn the user

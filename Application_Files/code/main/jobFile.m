@@ -6,7 +6,7 @@ classdef jobFile < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 03-Oct-2017 13:44:11 GMT
+%   Last modified 04-Oct-2017 18:09:00 GMT
     
     %%
     
@@ -1571,7 +1571,7 @@ classdef jobFile < handle
             end
             
             values = [fosMaxValue, fosMaxFine, fosMinFine, fosMinValue];
-            if range(values) == 0.0
+            if (max(values) - min(values)) == 0.0
                 error = 1.0;
             end
             
