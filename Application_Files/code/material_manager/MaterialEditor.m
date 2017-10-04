@@ -1162,6 +1162,14 @@ else
     set(handles.text_sf_units, 'enable', 'off')
     set(handles.text_kp_units, 'enable', 'off')
     
+    % Knee
+    if isappdata(0, 'b2') == 1.0
+        rmappdata(0, 'b2')
+    end
+    if isappdata(0, 'b2Nf') == 1.0
+        rmappdata(0, 'b2Nf')
+    end
+    
     % Reset composite failure properties
     
     % Fail stress
