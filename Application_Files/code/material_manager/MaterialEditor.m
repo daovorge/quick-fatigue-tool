@@ -2438,18 +2438,24 @@ if isappdata(0, 'qft_materialLocation') == 1.0
     rmappdata(0, 'qft_materialLocation')
 end
 
+% Fatigue
 if isappdata(0, 'e_value') == 1.0
     rmappdata(0, 'e_value')
 end
-
 if isappdata(0, 'uts_value') == 1.0
     rmappdata(0, 'uts_value')
 end
-
 if isappdata(0, 'b_value') == 1.0
     rmappdata(0, 'b_value')
 end
+if isappdata(0, 'b2') == 1.0
+    rmappdata(0, 'b2')
+end
+if isappdata(0, 'b2Nf') == 1.0
+    rmappdata(0, 'b2Nf')
+end
 
+% nssc
 if isappdata(0, 'nssc_value') == 1.0
     rmappdata(0, 'nssc_value')
 end
