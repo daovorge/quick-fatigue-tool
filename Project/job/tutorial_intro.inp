@@ -38,12 +38,13 @@
 *USE SN = 1
 **
 **Loading definition
-*HISTORY = [200, -200]
-*SCALE = 1
+*DATASET = stress_uni.dat
+*HISTORY = [1, -1]
+*SCALE = 0.8285
 *UNITS = MPa
 **
 **Analysis definition
-*ALGORITHM = uniaxial stress
+*ALGORITHM = sbbm
 *MS CORRECTION = none
 *FACTOR OF STRENGTH = 1
 **
@@ -53,4 +54,5 @@
 **
 **Output requests
 *OUTPUT FIELD = 1
-*OUTPUT HISTORY = 1
+*OUTPUT HISTORY = 0
+*OUTPUT FIGURE = 0
