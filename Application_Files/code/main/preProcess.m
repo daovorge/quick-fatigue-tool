@@ -1277,7 +1277,7 @@ classdef preProcess < handle
                 if ischar(material_properties.failStress_tsfd) == 1.0
                     failStress_tsfd = str2double(material_properties.failStress_tsfd);
                 else
-                    failStress_tsfd = [];
+                    failStress_tsfd = material_properties.failStress_tsfd;
                 end
             catch
                 failStress_tsfd = [];
@@ -1293,7 +1293,7 @@ classdef preProcess < handle
                 if ischar(material_properties.failStress_csfd) == 1.0
                     failStress_csfd = str2double(material_properties.failStress_csfd);
                 else
-                    failStress_csfd = [];
+                    failStress_csfd = material_properties.failStress_csfd;
                 end
             catch
                 failStress_csfd = [];
@@ -1309,7 +1309,7 @@ classdef preProcess < handle
                 if ischar(material_properties.failStress_tstd) == 1.0
                     failStress_tstd = str2double(material_properties.failStress_tstd);
                 else
-                    failStress_tstd = [];
+                    failStress_tstd = material_properties.failStress_tstd;
                 end
             catch
                 failStress_tstd = [];
@@ -1325,7 +1325,7 @@ classdef preProcess < handle
                 if ischar(material_properties.failStress_cstd) == 1.0
                     failStress_cstd = str2double(material_properties.failStress_cstd);
                 else
-                    failStress_cstd = [];
+                    failStress_cstd = material_properties.failStress_cstd;
                 end
             catch
                 failStress_cstd = [];
@@ -1341,7 +1341,7 @@ classdef preProcess < handle
                 if ischar(material_properties.failStress_tsttd) == 1.0
                     failStress_tsttd = str2double(material_properties.failStress_tsttd);
                 else
-                    failStress_tsttd = [];
+                    failStress_tsttd = material_properties.failStress_tsttd;
                 end
             catch
                 failStress_tsttd = [];
@@ -1357,7 +1357,7 @@ classdef preProcess < handle
                 if ischar(material_properties.failStress_csttd) == 1.0
                     failStress_csttd = str2double(material_properties.failStress_csttd);
                 else
-                    failStress_csttd = [];
+                    failStress_csttd = material_properties.failStress_csttd;
                 end
             catch
                 failStress_csttd = [];
@@ -1373,7 +1373,7 @@ classdef preProcess < handle
                 if ischar(material_properties.failStress_shear) == 1.0
                     failStress_shear = str2double(material_properties.failStress_shear);
                 else
-                    failStress_shear = [];
+                    failStress_shear = material_properties.failStress_shear;
                 end
             catch
                 failStress_shear = [];
@@ -1389,7 +1389,7 @@ classdef preProcess < handle
                 if ischar(material_properties.failStress_cross12) == 1.0
                     failStress_cross12 = str2double(material_properties.failStress_cross12);
                 else
-                    failStress_cross12 = [];
+                    failStress_cross12 = material_properties.failStress_cross12;
                 end
             catch
                 failStress_cross12 = [];
@@ -1407,7 +1407,7 @@ classdef preProcess < handle
                 if ischar(material_properties.failStress_cross23) == 1.0
                     failStress_cross23 = str2double(material_properties.failStress_cross23);
                 else
-                    failStress_cross23 = [];
+                    failStress_cross23 = material_properties.failStress_cross23;
                 end
             catch
                 failStress_cross23 = [];
@@ -1425,7 +1425,7 @@ classdef preProcess < handle
                 if ischar(material_properties.failStress_limit12) == 1.0
                     failStress_limit12 = str2double(material_properties.failStress_limit12);
                 else
-                    failStress_limit12 = [];
+                    failStress_limit12 = material_properties.failStress_limit12;
                 end
             catch
                 failStress_limit12 = [];
@@ -1443,7 +1443,7 @@ classdef preProcess < handle
                 if ischar(material_properties.failStress_limit23) == 1.0
                     failStress_limit23 = str2double(material_properties.failStress_limit23);
                 else
-                    failStress_limit23 = [];
+                    failStress_limit23 = material_properties.failStress_limit23;
                 end
             catch
                 failStress_limit23 = [];
@@ -1463,7 +1463,7 @@ classdef preProcess < handle
                 if ischar(material_properties.failStrain_tsfd) == 1.0
                     failStrain_tsfd = str2double(material_properties.failStrain_tsfd);
                 else
-                    failStrain_tsfd = [];
+                    failStrain_tsfd = material_properties.failStrain_tsfd;
                 end
             catch
                 failStrain_tsfd = [];
@@ -1479,7 +1479,7 @@ classdef preProcess < handle
                 if ischar(material_properties.failStrain_csfd) == 1.0
                     failStrain_csfd = str2double(material_properties.failStrain_csfd);
                 else
-                    failStrain_csfd = [];
+                    failStrain_csfd = material_properties.failStrain_csfd;
                 end
             catch
                 failStrain_csfd = [];
@@ -1495,7 +1495,7 @@ classdef preProcess < handle
                 if ischar(material_properties.failStrain_tstd) == 1.0
                     failStrain_tstd = str2double(material_properties.failStrain_tstd);
                 else
-                    failStrain_tstd = [];
+                    failStrain_tstd = material_properties.failStrain_tstd;
                 end
             catch
                 failStrain_tstd = [];
@@ -1511,7 +1511,7 @@ classdef preProcess < handle
                 if ischar(material_properties.failStrain_cstd) == 1.0
                     failStrain_cstd = str2double(material_properties.failStrain_cstd);
                 else
-                    failStrain_cstd = [];
+                    failStrain_cstd = material_properties.failStrain_cstd;
                 end
             catch
                 failStrain_cstd = [];
@@ -1527,7 +1527,7 @@ classdef preProcess < handle
                 if ischar(material_properties.failStrain_shear) == 1.0
                     failStrain_shear = str2double(material_properties.failStrain_shear);
                 else
-                    failStrain_shear = [];
+                    failStrain_shear = material_properties.failStrain_shear;
                 end
             catch
                 failStrain_shear = [];
@@ -1543,7 +1543,7 @@ classdef preProcess < handle
                 if ischar(material_properties.failStrain_e11) == 1.0
                     failStrain_e11 = str2double(material_properties.failStrain_e11);
                 else
-                    failStrain_e11 = [];
+                    failStrain_e11 = material_properties.failStrain_e11;
                 end
             catch
                 failStrain_e11 = [];
@@ -1559,7 +1559,7 @@ classdef preProcess < handle
                 if ischar(material_properties.failStrain_e22) == 1.0
                     failStrain_e22 = str2double(material_properties.failStrain_e22);
                 else
-                    failStrain_e22 = [];
+                    failStrain_e22 = material_properties.failStrain_e22;
                 end
             catch
                 failStrain_e22 = [];
@@ -1575,7 +1575,7 @@ classdef preProcess < handle
                 if ischar(material_properties.failStrain_g12) == 1.0
                     failStrain_g12 = str2double(material_properties.failStrain_g12);
                 else
-                    failStrain_g12 = [];
+                    failStrain_g12 = material_properties.failStrain_g12;
                 end
             catch
                 failStrain_g12 = [];
@@ -1593,7 +1593,7 @@ classdef preProcess < handle
                 if ischar(material_properties.hashin_alpha) == 1.0
                     hashin_alpha = str2double(material_properties.hashin_alpha);
                 else
-                    hashin_alpha = 0.0;
+                    hashin_alpha = material_properties.hashin_alpha;
                 end
             catch
                 hashin_alpha = 0.0;
@@ -1609,7 +1609,7 @@ classdef preProcess < handle
                 if ischar(material_properties.hashin_lts) == 1.0
                     hashin_lts = str2double(material_properties.hashin_lts);
                 else
-                    hashin_lts = [];
+                    hashin_lts = material_properties.hashin_lts;
                 end
             catch
                 hashin_lts = [];
@@ -1625,7 +1625,7 @@ classdef preProcess < handle
                 if ischar(material_properties.hashin_lcs) == 1.0
                     hashin_lcs = str2double(material_properties.hashin_lcs);
                 else
-                    hashin_lcs = [];
+                    hashin_lcs = material_properties.hashin_lcs;
                 end
             catch
                 hashin_lcs = [];
@@ -1641,7 +1641,7 @@ classdef preProcess < handle
                 if ischar(material_properties.hashin_tts) == 1.0
                     hashin_tts = str2double(material_properties.hashin_tts);
                 else
-                    hashin_tts = [];
+                    hashin_tts = material_properties.hashin_tts;
                 end
             catch
                 hashin_tts = [];
@@ -1657,7 +1657,7 @@ classdef preProcess < handle
                 if ischar(material_properties.hashin_tcs) == 1.0
                     hashin_tcs = str2double(material_properties.hashin_tcs);
                 else
-                    hashin_tcs = [];
+                    hashin_tcs = material_properties.hashin_tcs;
                 end
             catch
                 hashin_tcs = [];
@@ -1673,7 +1673,7 @@ classdef preProcess < handle
                 if ischar(material_properties.hashin_lss) == 1.0
                     hashin_lss = str2double(material_properties.hashin_lss);
                 else
-                    hashin_lss = [];
+                    hashin_lss = material_properties.hashin_lss;
                 end
             catch
                 hashin_lss = [];
@@ -1689,7 +1689,7 @@ classdef preProcess < handle
                 if ischar(material_properties.hashin_tss) == 1.0
                     hashin_tss = str2double(material_properties.hashin_tss);
                 else
-                    hashin_tss = [];
+                    hashin_tss = material_properties.hashin_tss;
                 end
             catch
                 hashin_tss = [];
