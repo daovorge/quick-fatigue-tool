@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 04-Oct-2017 18:09:00 GMT
+%   Last modified 06-Oct-2017 14:39:49 GMT
     
     %%
     
@@ -539,12 +539,17 @@ classdef preProcess < handle
             
             %% Fatigue strength exponent (beyond user-defined knee)
             if material_properties.b_active == 1.0
-                if ischar(material_properties.b) == 1.0
-                    b2 = str2double(material_properties.b2);
-                    b2Nf = str2double(material_properties.b2Nf);
-                else
-                    b2 = material_properties.b2;
-                    b2Nf = material_properties.b2Nf;
+                try
+                    if ischar(material_properties.b2) == 1.0
+                        b2 = str2double(material_properties.b2);
+                        b2Nf = str2double(material_properties.b2Nf);
+                    else
+                        b2 = material_properties.b2;
+                        b2Nf = material_properties.b2Nf;
+                    end
+                catch
+                    b2 = [];
+                    b2Nf = [];
                 end
                 
                 if isempty(b2) == 1.0
