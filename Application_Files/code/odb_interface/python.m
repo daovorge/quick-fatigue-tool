@@ -10,8 +10,8 @@ classdef python < handle
 %   Reference section in Quick Fatigue Tool Appendices
 %      10.4 The ODB Interface
 %   
-%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 04-Apr-2017 13:26:59 GMT
+%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
+%   Last modified 28-Sep-2017 10:31:34 GMT
     
     %%
     
@@ -434,7 +434,7 @@ classdef python < handle
                 return
             end
             loadingUnits = char(c{3});
-            stepDescription = ['version 6.11-03; ', job, ', ', loading];
+            stepDescription = ['version 6.11-04; ', job, ', ', loading];
             
             %% Get the requested field data
             fprintf(fid_debug, ' %.0f fields requested', length(requestedFields(requestedFields == true)));
@@ -461,7 +461,7 @@ classdef python < handle
                     fprintf(fid_debug, '\r\n\tWarning: Requested field YIELD could not be evaluated due to insufficient material properties. The field will not be written to the output database');
                 elseif (requestedFields(19.0) == true) && (exist(energyFile, 'file') == 0.0) && (all(YIELD == -1.0) == 1.0)
                     % If YIELD was requested but the field was not enabled prior to analysis, warn the user
-                    fprintf(fid_debug, '\r\n\tWarning: Requested field YIELD was not enabled. Set yieldCriterion = 1.0 in the environment file. The field will not be written to the output database');
+                    fprintf(fid_debug, '\r\n\tWarning: Requested field YIELD was not enabled. Set YIELD_CRITERIA = 1.0 in the job file. The field will not be written to the output database');
                 end
                 
                 requestedFields(19.0) = false;
@@ -612,7 +612,7 @@ classdef python < handle
                     %}
                     if all(fos == -1.0) == 1.0
                         columnsToDelete = columnsToDelete + 1.0;
-                        fprintf(fid_debug, '\r\n\tWarning: Requested field FOS is not available. The field will not be written to the output database. To export this field, set FACTOR_OF_STRENGTH = 1.0 in the job file');
+                        fprintf(fid_debug, '\r\n\tWarning: Requested field FOS is not available. The field will not be written to the output database.');
                     else
                         fieldData(:, index) = fos;
                         fieldNames{index} = sprintf('FOS, Factor of Strength');
@@ -630,11 +630,11 @@ classdef python < handle
                     end
                 else
                     columnsToDelete = columnsToDelete + 1.0;
-                    fprintf(fid_debug, '\r\n\tWarning: Requested field FOS is not available. The field will not be written to the output database. To export this field, set FACTOR_OF_STRENGTH = 1.0 in the job file');
+                    fprintf(fid_debug, '\r\n\tWarning: Requested field FOS is not available. The field will not be written to the output database.');
                 end
             else
                 if requestedFields(5.0) == true && availableFields < 7.0
-                    fprintf(fid_debug, '\r\n\tWarning: Requested field FOS is not available. The field will not be written to the output database. To export this field, set FACTOR_OF_STRENGTH = 1.0 in the job file');
+                    fprintf(fid_debug, '\r\n\tWarning: Requested field FOS is not available. The field will not be written to the output database.');
                 end
             end
             
@@ -915,23 +915,17 @@ classdef python < handle
                     % Get the associated energies as well
                     fieldDataFile_energy = importdata(energyFile, '\t');
                     energyMainIDs = fieldDataFile_energy.data(:, 1.0);
-                    energySubIDs = fieldDataFile_energy.data(:, 2.0);
                     totalStrainEnergy_i = fieldDataFile_energy.data(:, 3.0);
                     plasticStrainEnergy_i = fieldDataFile_energy.data(:, 4.0);
                     totalStrainEnergy = zeros(1.0, length(mainIDs));
                     plasticStrainEnergy = totalStrainEnergy;
                     
-                    for i = 1:length(energyMainIDs)
-                        matchingMainIDs = find(mainIDs == energyMainIDs(i));
-                        matchingSubIDs = find(subIDs == energySubIDs(i));
-                        matchingID = intersect(matchingMainIDs, matchingSubIDs);
-
-                        totalStrainEnergy(matchingID) = totalStrainEnergy_i(i);
-                        plasticStrainEnergy(matchingID) = plasticStrainEnergy_i(i);
-                    end
+                    commonIDs = ismember(energyMainIDs, mainIDs);
+                    totalStrainEnergy(commonIDs) = totalStrainEnergy_i(commonIDs);
+                    plasticStrainEnergy(commonIDs) = plasticStrainEnergy_i(commonIDs);
                     
-                    fieldData(:, index + 1.0) = totalStrainEnergy;
-                    fieldData(:, index + 2.0) = plasticStrainEnergy;
+                    fieldData(:, index + 1.0) = totalStrainEnergy';
+                    fieldData(:, index + 2.0) = plasticStrainEnergy';
                     
                     fieldNames{index + 1.0} = sprintf('TSE, Total strain energy [mJ]');
                     fieldNames{index + 2.0} = sprintf('PSE, Plastic strain energy [mJ]');
@@ -1063,8 +1057,8 @@ classdef python < handle
             fprintf(fid, '\r\n#   M.Sc. Louis Vallance, AMIMechE');
             fprintf(fid, '\r\n#   louisvallance@hotmail.co.uk');
             fprintf(fid, '\r\n#');
-            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017');
-            fprintf(fid, '\r\n#   Last modified 17-Mar-2017 12:54:53 GMT');
+            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017');
+            fprintf(fid, '\r\n#   Last modified 28-Sep-2017 10:31:34 GMT');
             
             % Write Abaqus import header
             fprintf(fid, '\r\n\r\nfrom odbAccess import *');
@@ -1452,8 +1446,8 @@ classdef python < handle
             fprintf(fid, '\r\n#   M.Sc. Louis Vallance');
             fprintf(fid, '\r\n#   louisvallance@hotmail.co.uk');
             fprintf(fid, '\r\n#');
-            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017');
-            fprintf(fid, '\r\n#   Last modified 17-Mar-2017 12:54:53 GMT');
+            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017');
+            fprintf(fid, '\r\n#   Last modified 28-Sep-2017 10:31:34 GMT');
             
             % Write Abaqus import header
             fprintf(fid, '\r\n\r\nfrom odbAccess import *');
@@ -1681,8 +1675,8 @@ classdef python < handle
             fprintf(fid, '\r\n#   Technical Specialist SIMULIA');
             fprintf(fid, '\r\n#   louisvallance@hotmail.co.uk');
             fprintf(fid, '\r\n#');
-            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017');
-            fprintf(fid, '\r\n#   Last modified 17-Mar-2017 12:54:53 GMT');
+            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017');
+            fprintf(fid, '\r\n#   Last modified 28-Sep-2017 10:31:34 GMT');
             
             % Write Abaqus import header
             fprintf(fid, '\r\n\r\nfrom odbAccess import *');

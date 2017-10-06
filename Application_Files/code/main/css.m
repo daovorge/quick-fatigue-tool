@@ -35,7 +35,7 @@ function [trueStrain, trueStress, signal2] = css(signal, E, K, n)
 %   hysteresis loop, the material response reverts to the previous history
 %   point.
 
-%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
 %   Last modified 24-Jul-2015 10:43:07 GMT
 
 %% Convert to strain units:
@@ -102,8 +102,8 @@ df = -1 - (Ee/x0)^2 - (num/den);
 x1 = x0 - f/df; % initial estimate
 
 N = 0.0;
-tol = getappdata(0, 'cssTolerance');
-maxIters = getappdata(0, 'cssMaxIterations');
+tol = 1e-5;
+maxIters = 100.0;
 
 % iterate to determine monotonic excursion
 while (f > tol) && (N < maxIters)

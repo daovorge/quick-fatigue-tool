@@ -25,8 +25,8 @@ function [] = job(varargin)
 %   Reference section in Quick Fatigue Tool User Settings Reference Guide
 %      1 Job file options
 %   
-%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 21-Jun-2017 09:48:34 GMT
+%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
+%   Last modified 24-Sep-2017 10:42:46 GMT
     
     %%
     
@@ -90,6 +90,10 @@ if isempty(EXT) == 1.0
     inputFile = [inputFile, '.inp'];
 elseif strcmp(EXT, '.') == 1.0
     inputFile = [inputFile, 'inp'];
+elseif strcmp(EXT, '.m') == 1.0
+    clc
+    fprintf('ERROR: Input file ''%s'' is an M-file and cannot be submitted using JOB. Type the name of the M-file and hit RETURN, or right-click the file and select "Run"\n', inputFile);
+    return
 end
 
 % Check that the file exists
@@ -297,7 +301,8 @@ while feof(fid) == 0.0
                 
                 break
             end
-        elseif isnumeric(str2double(currentChar)) == 1.0 && isnan(str2double(currentChar)) == 0.0 && isreal(str2double(currentChar)) == 1.0
+        elseif (isnumeric(str2double(currentChar)) == 1.0 && isnan(str2double(currentChar)) == 0.0 && isreal(str2double(currentChar)) == 1.0) ||...
+                (isnumeric(str2double(currentLine)) == 1.0 && isnan(str2double(currentLine)) == 0.0 && isreal(str2double(currentLine)) == 1.0)
             % The keyword definition appears to be a numeric value
             kwData{matchingKw} = str2double(currentLine);
             
@@ -342,6 +347,12 @@ setappdata(0, 'kw_ambiguous', ambiguousKw)
 %% CLOSE THE FILE AND SUBMIT THE JOB
 % Close the input file
 fclose(fid);
+
+%% IF THERE WERE NO PROCESSED KEYWORDS, EXIT WITH AN ERROR
+if length(processedKeywords) == 1.0 && isempty(processedKeywords{1.0}) == 1.0
+    fprintf('ERROR: There are no keywords defined in the input file\n');
+    return
+end
 
 % Submit the job for analysis
 main(kwData)

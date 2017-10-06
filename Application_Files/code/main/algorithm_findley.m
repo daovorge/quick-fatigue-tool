@@ -13,8 +13,8 @@ classdef algorithm_findley < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.4 Findley's Method
 %   
-%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 12-May-2017 15:25:52 GMT
+%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
+%   Last modified 27-Sep-2017 13:32:23 GMT
     
     %%
     
@@ -61,10 +61,17 @@ classdef algorithm_findley < handle
                 signConvention, S1, S2, S3, k)
             
             % Create the stress tensor
-            St = cell(1.0, signalLength);
-            for i = 1:signalLength
-                St{i} = [Sxxi(i), Txyi(i), Txzi(i); Txyi(i), Syyi(i), Tyzi(i); Txzi(i), Tyzi(i), Szzi(i)];
-            end
+            St = zeros(3.0, 3.0, signalLength);
+            
+            St(1.0, 1.0, :) = Sxxi;
+            St(1.0, 2.0, :) = Txyi;
+            St(1.0, 3.0, :) = Txzi;
+            St(2.0, 1.0, :) = Txyi;
+            St(2.0, 2.0, :) = Syyi;
+            St(2.0, 3.0, :) = Tyzi;
+            St(3.0, 1.0, :) = Txzi;
+            St(3.0, 2.0, :) = Tyzi;
+            St(3.0, 3.0, :) = Szzi;
             
             % Initialize matrices for normal and shear stress components on each plane
             f = zeros(precision, precision);
@@ -102,7 +109,7 @@ classdef algorithm_findley < handle
                     
                     % Calculate the transform stress tensor for the current plane
                     for y = 1:signalLength
-                        S_prime{y}=Q'*St{y}*Q;
+                        S_prime{y}=Q'*St(:, :, y)*Q;
                     end
                     
                     % Calculate stress components for the first face of rotated stress matrix
@@ -196,7 +203,7 @@ classdef algorithm_findley < handle
             
             % Calculate the transform stress tensor for the critical plane
             for y = 1:1:signalLength
-                S_prime{y}=Q'*St{y}*Q;
+                S_prime{y}=Q'*St(:, :, y)*Q;
             end
             
             % Calculate stress components for the first face of rotated stress matrix
@@ -271,9 +278,6 @@ classdef algorithm_findley < handle
             
             cumulativeDamage = zeros(1.0, numberOfCycles);
             
-            % Plasticity correction
-            nlMaterial = getappdata(0, 'nlMaterial');
-            
             % Get the endurance limit
             modifyEnduranceLimit = getappdata(0, 'modifyEnduranceLimit');
             ndEndurance = getappdata(0, 'ndEndurance');
@@ -281,30 +285,7 @@ classdef algorithm_findley < handle
             fatigueLimit_original = fatigueLimit;
             enduranceScale = getappdata(0, 'enduranceScaleFactor');
             cyclesToRecover = abs(round(getappdata(0, 'cyclesToRecover')));
-            
-            if nlMaterial == 1.0
-                scaleFactors = zeros(1.0, length(combinations));
-                E = getappdata(0, 'E');
-                kp = getappdata(0, 'kp');
-                np = getappdata(0, 'np');
-                
-                for i = 1:length(combinations)
-                    if combinations(i) == 0.0
-                        continue
-                    else
-                        oldCycle = combinations(i);
-                        
-                        [~, combinations_i, ~] = css(combinations(i), E, kp, np);
-                        combinations_i(1) = []; combinations_i = real(combinations_i);
-                        
-                        combinations(i) = combinations_i;
-                    end
-                    
-                    scaleFactors(i) = combinations_i/oldCycle;
-                end
-            else
-                scaleFactors = ones(1.0, length(combinations));
-            end
+            scaleFactors = ones(1.0, length(combinations));
             
             if use_sn == 1.0 % S-N curve was defined directly
                 [cumulativeDamage] = interpolate(cumulativeDamage, pairs, msCorrection, numberOfCycles, combinations, scaleFactors, 0.0, 0.0);
@@ -391,10 +372,17 @@ classdef algorithm_findley < handle
             damageCube = damageParamCube;
             
             % Create the stress tensor
-            St = cell(1.0, signalLength);
-            for i = 1:signalLength
-                St{i} = [stress(1.0, i), stress(4.0, i), stress(5.0, i); stress(4.0, i), stress(2.0, i), stress(6.0, i); stress(5.0, i), stress(6.0, i), stress(3.0, i)];
-            end
+            St = zeros(3.0, 3.0, signalLength);
+            
+            St(1.0, 1.0, :) = stress(1.0, :);
+            St(1.0, 2.0, :) = stress(4.0, :);
+            St(1.0, 3.0, :) = stress(5.0, :);
+            St(2.0, 1.0, :) = stress(4.0, :);
+            St(2.0, 2.0, :) = stress(2.0, :);
+            St(2.0, 3.0, :) = stress(6.0, :);
+            St(3.0, 1.0, :) = stress(5.0, :);
+            St(3.0, 2.0, :) = stress(6.0, :);
+            St(3.0, 3.0, :) = stress(3.0, :);
             
             % Initialize matrices for normal and shear stress components on each plane
             sn = zeros(1.0, precision);
@@ -425,7 +413,7 @@ classdef algorithm_findley < handle
                 
                 % Calculate the transform stress tensor for the current plane
                 for y = 1:1:signalLength
-                    S_prime{y}=Q'*St{y}*Q;
+                    S_prime{y}=Q'*St(:, :, y)*Q;
                 end
                 
                 % Calculate stress components for the first face of rotated stress matrix

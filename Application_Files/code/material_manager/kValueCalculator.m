@@ -14,7 +14,7 @@ function varargout = kValueCalculator(varargin)%#ok<*DEFNU>
 %      5 Materials
 %      6.4 Findley's Method
 %   
-%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
 %   Last modified 04-Apr-2017 13:26:59 GMT
     
     %%
@@ -69,23 +69,23 @@ if isappdata(0, 'k_solution_model')
     set(handles.pMenu_solution, 'value', getappdata(0, 'k_solution_model'))
     
     switch getappdata(0, 'k_solution_model')
-        case 1
-        case 2
+        case 1.0
+        case 2.0
             set(handles.text_r, 'enable', 'on');    set(handles.edit_r, 'enable', 'on', 'BackgroundColor', 'White')
             set(handles.text_fi, 'enable', 'on');    set(handles.edit_fi, 'enable', 'on', 'BackgroundColor', 'White');  set(handles.text_units_fi, 'enable', 'on')
             set(handles.text_t, 'enable', 'on');    set(handles.edit_t, 'enable', 'on', 'BackgroundColor', 'White');  set(handles.text_units_t, 'enable', 'on')
             set(handles.text_uts, 'enable', 'off');    set(handles.edit_uts, 'enable', 'inactive', 'BackgroundColor', grey);  set(handles.text_units_uts, 'enable', 'off')
-        case 3
+        case 3.0
             set(handles.text_r, 'enable', 'on');    set(handles.edit_r, 'enable', 'inactive', 'BackgroundColor', blue, 'String', '-1')
             set(handles.text_fi, 'enable', 'on');    set(handles.edit_fi, 'enable', 'on', 'BackgroundColor', 'White');  set(handles.text_units_fi, 'enable', 'on')
             set(handles.text_t, 'enable', 'on');    set(handles.edit_t, 'enable', 'on', 'BackgroundColor', 'White');  set(handles.text_units_t, 'enable', 'on')
             set(handles.text_uts, 'enable', 'off');    set(handles.edit_uts, 'enable', 'inactive', 'BackgroundColor', grey);  set(handles.text_units_uts, 'enable', 'off')
-        case 4
+        case 4.0
             set(handles.text_r, 'enable', 'on');    set(handles.edit_r, 'enable', 'inactive', 'BackgroundColor', blue, 'String', '-1')
             set(handles.text_fi, 'enable', 'on');    set(handles.edit_fi, 'enable', 'on', 'BackgroundColor', 'White');  set(handles.text_units_fi, 'enable', 'on')
             set(handles.text_t, 'enable', 'on');    set(handles.edit_t, 'enable', 'on', 'BackgroundColor', 'White');  set(handles.text_units_t, 'enable', 'on')
             set(handles.text_uts, 'enable', 'on');    set(handles.edit_uts, 'enable', 'on', 'BackgroundColor', 'White');  set(handles.text_units_uts, 'enable', 'on')
-        case 5
+        case 5.0
             set(handles.text_r, 'enable', 'on');    set(handles.edit_r, 'enable', 'inactive', 'BackgroundColor', blue, 'String', '-1')
             set(handles.text_fi, 'enable', 'on');    set(handles.edit_fi, 'enable', 'on', 'BackgroundColor', 'White');  set(handles.text_units_fi, 'enable', 'on')
             set(handles.text_t, 'enable', 'on');    set(handles.edit_t, 'enable', 'on', 'BackgroundColor', 'White');  set(handles.text_units_t, 'enable', 'on')

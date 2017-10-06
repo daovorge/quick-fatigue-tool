@@ -12,8 +12,8 @@ function varargout = MaterialEditor(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials
 %   
-%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 27-Jun-2017 16:21:27 GMT
+%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
+%   Last modified 03-Oct-2017 13:44:11 GMT
     
     %%
     
@@ -105,6 +105,14 @@ g=a(1:x:end,1:y:end,:);
 g(g==255)=5.5*255;
 set(handles.pButton_changeLocation, 'CData', g);
 
+[a,~]=imread('icoR_knee.jpg');
+[r,c,~]=size(a); 
+x=ceil(r/35); 
+y=ceil(c/35); 
+g=a(1:x:end,1:y:end,:);
+g(g==255)=5.5*255;
+set(handles.pButton_knee, 'CData', g);
+
 %% Other tasks
 % Choose default command line output for MaterialEditor
 handles.output = hObject;
@@ -120,7 +128,7 @@ setappdata(0, 'simulia_blue', [177/255, 206/255, 237/255])
 
 %% Populate dialogue box with user material for editing if user pressed
 % "EDIT" in the material manager
-if isappdata(0, 'editMaterial')
+if isappdata(0, 'editMaterial') == 1.0
     % Get the name of the material to edit
     materialToEdit = char(getappdata(0, 'materialToEdit'));
     
@@ -145,7 +153,7 @@ if isappdata(0, 'editMaterial')
         errordlg(message, 'Quick Fatigue Tool')
         uiwait
         return
-    end
+    end    
     
     % Populate the dialogue box with the material properties
     try
@@ -355,14 +363,25 @@ switch get(hObject, 'value')
     case 0.0
         setappdata(0, 'uts_value', get(handles.edit_uts, 'string'))
         set(handles.edit_uts, 'string', [])
+        set(handles.text_slash, 'enable', 'off')
         set(handles.edit_uts, 'enable', 'inactive')
         set(handles.edit_uts, 'backgroundColor', [241/255, 241/255, 241/255])
         set(handles.text_uts_units, 'enable', 'off')
+        
+        setappdata(0, 'ucs_value', get(handles.edit_ucs, 'string'))
+        set(handles.edit_ucs, 'string', [])
+        set(handles.edit_ucs, 'enable', 'inactive')
+        set(handles.edit_ucs, 'backgroundColor', [241/255, 241/255, 241/255])
     case 1.0
         set(handles.edit_uts, 'enable', 'on')
         set(handles.edit_uts, 'backgroundColor', [1, 1, 1])
+        set(handles.text_slash, 'enable', 'on')
         set(handles.edit_uts, 'string', getappdata(0, 'uts_value'))
         set(handles.text_uts_units, 'enable', 'on')
+        
+        set(handles.edit_ucs, 'enable', 'on')
+        set(handles.edit_ucs, 'backgroundColor', [1, 1, 1])
+        set(handles.edit_ucs, 'string', getappdata(0, 'ucs_value'))
 end
 
 
@@ -507,9 +526,11 @@ switch get(hObject, 'value')
         setappdata(0, 'b_value', get(handles.edit_b, 'string'))
         set(handles.edit_b, 'string', [])
         set(handles.edit_b, 'enable', 'inactive')
+        set(handles.pButton_knee, 'enable', 'off')
         set(handles.edit_b, 'backgroundColor', [177/255, 206/255, 237/255])
     case 1.0
         set(handles.edit_b, 'enable', 'on')
+        set(handles.pButton_knee, 'enable', 'on')
         set(handles.edit_b, 'backgroundColor', [1, 1, 1])
         set(handles.edit_b, 'string', getappdata(0, 'b_value'))
 end
@@ -1091,8 +1112,9 @@ else
     set(handles.pMenu_regModel, 'value', 1.0)
     set(handles.edit_e, 'string', '', 'enable', 'inactive', 'backgroundColor', [241/255, 241/255, 241/255])
     set(handles.check_e, 'value', 0.0)
-    set(handles.edit_uts, 'string', '', 'enable', 'inactive', 'backgroundColor', [241/255, 241/255, 241/255])
     set(handles.check_uts, 'value', 0.0)
+    set(handles.edit_uts, 'string', '', 'enable', 'inactive', 'backgroundColor', [241/255, 241/255, 241/255])
+    set(handles.edit_ucs, 'string', '', 'enable', 'inactive', 'backgroundColor', [241/255, 241/255, 241/255])
     set(handles.edit_proof, 'string', '', 'enable', 'inactive', 'backgroundColor', simulia_blue)
     set(handles.check_proof, 'value', 0.0)
     set(handles.edit_poisson, 'string', '0.33', 'enable', 'inactive', 'backgroundColor', [241/255, 241/255, 241/255])
@@ -1103,12 +1125,11 @@ else
     set(handles.edit_rValues, 'string', 'Undefined')
     set(handles.pButton_viewRValues, 'enable', 'off')
     set(handles.pButton_rmRValues, 'enable', 'off')
-    set(handles.edit_snData, 'backgroundColor', [(241/255), (241/255), (241/255)])
-    set(handles.edit_rValues, 'backgroundColor', [(241/255), (241/255), (241/255)])
     setappdata(0, 'panel_userMaterial_snData', [pwd, '/Data/material/sn_data'])
     set(handles.edit_sf, 'string', '', 'enable', 'inactive', 'backgroundColor', simulia_blue)
     set(handles.check_sf, 'value', 0.0)
     set(handles.edit_b, 'string', '', 'enable', 'inactive', 'backgroundColor', simulia_blue)
+    set(handles.pButton_knee, 'enable', 'off')
     set(handles.check_b, 'value', 0.0)
     set(handles.edit_ef, 'string', '', 'enable', 'inactive', 'backgroundColor', simulia_blue)
     set(handles.check_ef, 'value', 0.0)
@@ -1140,6 +1161,105 @@ else
     set(handles.text_proof_units, 'enable', 'off')
     set(handles.text_sf_units, 'enable', 'off')
     set(handles.text_kp_units, 'enable', 'off')
+    
+    % Knee
+    if isappdata(0, 'b2') == 1.0
+        rmappdata(0, 'b2')
+    end
+    if isappdata(0, 'b2Nf') == 1.0
+        rmappdata(0, 'b2Nf')
+    end
+    
+    % NSSC
+    if isappdata(0, 'nssc_value') == 1.0
+        rmappdata(0, 'nssc_value')
+    end
+    
+    % Reset composite failure properties
+    
+    % Fail stress
+    if isappdata(0, 'failStress_tsfd') == 1.0
+        rmappdata(0, 'failStress_tsfd')
+    end
+    if isappdata(0, 'failStress_csfd') == 1.0
+        rmappdata(0, 'failStress_csfd')
+    end
+    if isappdata(0, 'failStress_tstd') == 1.0
+        rmappdata(0, 'failStress_tstd')
+    end
+    if isappdata(0, 'failStress_cstd') == 1.0
+        rmappdata(0, 'failStress_cstd')
+    end
+    if isappdata(0, 'failStress_tsttd') == 1.0
+        rmappdata(0, 'failStress_tsttd')
+    end
+    if isappdata(0, 'failStress_csttd') == 1.0
+        rmappdata(0, 'failStress_csttd')
+    end
+    if isappdata(0, 'failStress_shear') == 1.0
+        rmappdata(0, 'failStress_shear')
+    end
+    if isappdata(0, 'failStress_cross12') == 1.0
+        setappdata(0, 'failStress_cross12', 0.0)
+    end
+    if isappdata(0, 'failStress_cross23') == 1.0
+        setappdata(0, 'failStress_cross23', 0.0)
+    end
+    if isappdata(0, 'failStress_limit12') == 1.0
+        rmappdata(0, 'failStress_limit12')
+    end
+    if isappdata(0, 'failStress_limit23') == 1.0
+        rmappdata(0, 'failStress_limit23')
+    end
+    
+    % Fail strain
+    if isappdata(0, 'failStrain_tsfd') == 1.0
+        rmappdata(0, 'failStrain_tsfd')
+    end
+    if isappdata(0, 'failStrain_csfd') == 1.0
+        rmappdata(0, 'failStrain_csfd')
+    end
+    if isappdata(0, 'failStrain_tstd') == 1.0
+        rmappdata(0, 'failStrain_tstd')
+    end
+    if isappdata(0, 'failStrain_cstd') == 1.0
+        rmappdata(0, 'failStrain_cstd')
+    end
+    if isappdata(0, 'failStrain_shear') == 1.0
+        rmappdata(0, 'failStrain_shear')
+    end
+    if isappdata(0, 'failStrain_e11') == 1.0
+        rmappdata(0, 'failStrain_e11')
+    end
+    if isappdata(0, 'failStrain_e22') == 1.0
+        rmappdata(0, 'failStrain_e22')
+    end
+    if isappdata(0, 'failStrain_g12') == 1.0
+        rmappdata(0, 'failStrain_g12')
+    end
+    
+    % Hashin
+    if isappdata(0, 'hashin_alpha') == 1.0
+        setappdata(0, 'hashin_alpha', 0.0)
+    end
+    if isappdata(0, 'hashin_lts') == 1.0
+        rmappdata(0, 'hashin_lts')
+    end
+    if isappdata(0, 'hashin_lcs') == 1.0
+        rmappdata(0, 'hashin_lcs')
+    end
+    if isappdata(0, 'hashin_tts') == 1.0
+        rmappdata(0, 'hashin_tts')
+    end
+    if isappdata(0, 'hashin_tcs') == 1.0
+        rmappdata(0, 'hashin_tcs')
+    end
+    if isappdata(0, 'hashin_lss') == 1.0
+        rmappdata(0, 'hashin_lss')
+    end
+    if isappdata(0, 'hashin_tss') == 1.0
+        rmappdata(0, 'hashin_tss')
+    end
 end
 
 % Enable the GUI
@@ -1157,6 +1277,7 @@ material_properties = struct(...
 'e', get(handles.edit_e, 'string'),...
 'e_active', get(handles.check_e, 'value'),...
 'uts', get(handles.edit_uts, 'string'),...
+'ucs', get(handles.edit_ucs, 'string'),...
 'uts_active', get(handles.check_uts, 'value'),...
 'proof', get(handles.edit_proof, 'string'),...
 'proof_active', get(handles.check_proof, 'value'),...
@@ -1169,6 +1290,8 @@ material_properties = struct(...
 'sf_active', get(handles.check_sf, 'value'),...
 'b', get(handles.edit_b, 'string'),...
 'b_active', get(handles.check_b, 'value'),...
+'b2', getappdata(0, 'b2'),...
+'b2Nf', getappdata(0, 'b2Nf'),...
 'ef', get(handles.edit_ef, 'string'),...
 'ef_active', get(handles.check_ef, 'value'),...
 'c', get(handles.edit_c, 'string'),...
@@ -1179,7 +1302,33 @@ material_properties = struct(...
 'np_active', get(handles.check_np, 'value'),...
 'nssc', get(handles.edit_nssc, 'string'),...
 'nssc_active', get(handles.check_nssc, 'value'),...
-'comment', get(handles.edit_comment, 'string'));
+'comment', get(handles.edit_comment, 'string'),...
+'failStress_tsfd', getappdata(0, 'failStress_tsfd'),...
+'failStress_csfd', getappdata(0, 'failStress_csfd'),...
+'failStress_tstd', getappdata(0, 'failStress_tstd'),...
+'failStress_cstd', getappdata(0, 'failStress_cstd'),...
+'failStress_tsttd', getappdata(0, 'failStress_tsttd'),...
+'failStress_csttd', getappdata(0, 'failStress_csttd'),...
+'failStress_shear', getappdata(0, 'failStress_shear'),...
+'failStress_cross12', getappdata(0, 'failStress_cross12'),...
+'failStress_cross23', getappdata(0, 'failStress_cross23'),...
+'failStress_limit12', getappdata(0, 'failStress_limit12'),...
+'failStress_limit23', getappdata(0, 'failStress_limit23'),...
+'failStrain_tsfd', getappdata(0, 'failStrain_tsfd'),...
+'failStrain_csfd', getappdata(0, 'failStrain_csfd'),...
+'failStrain_tstd', getappdata(0, 'failStrain_tstd'),...
+'failStrain_cstd', getappdata(0, 'failStrain_cstd'),...
+'failStrain_shear', getappdata(0, 'failStrain_shear'),...
+'failStrain_e11', getappdata(0, 'failStrain_e11'),...
+'failStrain_e22', getappdata(0, 'failStrain_e22'),...
+'failStrain_g12', getappdata(0, 'failStrain_g12'),...
+'hashin_alpha', getappdata(0, 'hashin_alpha'),...
+'hashin_lts', getappdata(0, 'hashin_lts'),...
+'hashin_lcs', getappdata(0, 'hashin_lcs'),...
+'hashin_tts', getappdata(0, 'hashin_tts'),...
+'hashin_tcs', getappdata(0, 'hashin_lcs'),...
+'hashin_lss', getappdata(0, 'hashin_tss'),...
+'hashin_tss', getappdata(0, 'hashin_tss'));
 
 
 function [] = populateGUI(handles, properties, materialToEdit)
@@ -1214,9 +1363,20 @@ if properties.material_properties.e_active == 1.0
 end
 
 set(handles.edit_uts, 'string', properties.material_properties.uts)
+try
+    if isempty(properties.material_properties.ucs) == 1.0
+        set(handles.edit_ucs, 'string', properties.material_properties.uts)
+    else
+        set(handles.edit_ucs, 'string', properties.material_properties.ucs)
+    end
+catch
+    set(handles.edit_ucs, 'string', properties.material_properties.uts)
+end
 if properties.material_properties.uts_active == 1.0
     set(handles.edit_uts, 'backgroundColor', [1.0, 1.0, 1.0], 'enable', 'on')
+    set(handles.edit_ucs, 'backgroundColor', [1.0, 1.0, 1.0], 'enable', 'on')
     set(handles.check_uts, 'value', 1.0)
+    set(handles.text_slash, 'enable', 'on')
     set(handles.text_uts_units, 'enable', 'on')
 end
 
@@ -1266,7 +1426,27 @@ end
 set(handles.edit_b, 'string', properties.material_properties.b)
 if properties.material_properties.b_active == 1.0
     set(handles.edit_b, 'backgroundColor', [1.0, 1.0, 1.0], 'enable', 'on')
+    set(handles.pButton_knee, 'enable', 'on')
     set(handles.check_b, 'value', 1.0)
+end
+
+try
+    if isempty(properties.material_properties.b2) == 1.0
+        setappdata(0, 'b2', [])
+    else
+        setappdata(0, 'b2', properties.material_properties.b2)
+    end
+catch
+    setappdata(0, 'b2', [])
+end
+try
+    if isempty(properties.material_properties.b2Nf) == 1.0
+        setappdata(0, 'b2Nf', [])
+    else
+        setappdata(0, 'b2Nf', properties.material_properties.b2Nf)
+    end
+catch
+    setappdata(0, 'b2Nf', [])
 end
 
 set(handles.edit_ef, 'string', properties.material_properties.ef)
@@ -1294,7 +1474,6 @@ if properties.material_properties.np_active == 1.0
     set(handles.check_np, 'value', 1.0)
 end
 
-
 set(handles.edit_nssc, 'string', properties.material_properties.nssc)
 if properties.material_properties.nssc_active == 1.0
     set(handles.edit_nssc, 'backgroundColor', [1.0, 1.0, 1.0], 'enable', 'on')
@@ -1303,6 +1482,245 @@ end
 
 set(handles.pMenu_class, 'value', properties.material_properties.class)
 
+% Initliaize fail stress properties
+try
+    if isempty(properties.material_properties.failStress_tsfd) == 1.0
+        setappdata(0, 'failStress_tsfd', [])
+    else
+        setappdata(0, 'failStress_tsfd', properties.material_properties.failStress_tsfd)
+    end
+catch
+    setappdata(0, 'failStress_tsfd', [])
+end
+try
+    if isempty(properties.material_properties.failStress_csfd) == 1.0
+        setappdata(0, 'failStress_csfd', [])
+    else
+        setappdata(0, 'failStress_csfd', properties.material_properties.failStress_csfd)
+    end
+catch
+    setappdata(0, 'failStress_csfd', [])
+end
+try
+    if isempty(properties.material_properties.failStress_tstd) == 1.0
+        setappdata(0, 'failStress_tstd', [])
+    else
+        setappdata(0, 'failStress_tstd', properties.material_properties.failStress_tstd)
+    end
+catch
+    setappdata(0, 'failStress_tstd', [])
+end
+try
+    if isempty(properties.material_properties.failStress_cstd) == 1.0
+        setappdata(0, 'failStress_cstd', [])
+    else
+        setappdata(0, 'failStress_cstd', properties.material_properties.failStress_cstd)
+    end
+catch
+    setappdata(0, 'failStress_cstd', [])
+end
+try
+    if isempty(properties.material_properties.failStress_tsttd) == 1.0
+        setappdata(0, 'failStress_tsttd', [])
+    else
+        setappdata(0, 'failStress_tsttd', properties.material_properties.failStress_tsttd)
+    end
+catch
+    setappdata(0, 'failStress_tsttd', [])
+end
+try
+    if isempty(properties.material_properties.failStress_csttd) == 1.0
+        setappdata(0, 'failStress_csttd', [])
+    else
+        setappdata(0, 'failStress_csttd', properties.material_properties.failStress_csttd)
+    end
+catch
+    setappdata(0, 'failStress_csttd', [])
+end
+try
+    if isempty(properties.material_properties.failStress_shear) == 1.0
+        setappdata(0, 'failStress_shear', [])
+    else
+        setappdata(0, 'failStress_shear', properties.material_properties.failStress_shear)
+    end
+catch
+    setappdata(0, 'failStress_shear', [])
+end
+try
+    if isempty(properties.material_properties.failStress_cross12) == 1.0
+        setappdata(0, 'failStress_cross12', 0.0)
+    else
+        setappdata(0, 'failStress_cross12', properties.material_properties.failStress_cross12)
+    end
+catch
+    setappdata(0, 'failStress_cross12', 0.0)
+end
+try
+    if isempty(properties.material_properties.failStress_cross23) == 1.0
+        setappdata(0, 'failStress_cross23', 0.0)
+    else
+        setappdata(0, 'failStress_cross23', properties.material_properties.failStress_cross23)
+    end
+catch
+    setappdata(0, 'failStress_cross23', 0.0)
+end
+try
+    if isempty(properties.material_properties.failStress_limit12) == 1.0
+        setappdata(0, 'failStress_limit12', [])
+    else
+        setappdata(0, 'failStress_limit12', properties.material_properties.failStress_limit12)
+    end
+catch
+    setappdata(0, 'failStress_limit12', [])
+end
+try
+    if isempty(properties.material_properties.failStress_limit23) == 1.0
+        setappdata(0, 'failStress_limit23', [])
+    else
+        setappdata(0, 'failStress_limit23', properties.material_properties.failStress_limit23)
+    end
+catch
+    setappdata(0, 'failStress_limit23', [])
+end
+
+% Initliaize fail strain properties
+try
+    if isempty(properties.material_properties.failStrain_tsfd) == 1.0
+        setappdata(0, 'failStrain_tsfd', [])
+    else
+        setappdata(0, 'failStrain_tsfd', properties.material_properties.failStrain_tsfd)
+    end
+catch
+    setappdata(0, 'failStrain_tsfd', [])
+end
+try
+    if isempty(properties.material_properties.failStrain_csfd) == 1.0
+        setappdata(0, 'failStrain_csfd', [])
+    else
+        setappdata(0, 'failStrain_csfd', properties.material_properties.failStrain_csfd)
+    end
+catch
+    setappdata(0, 'failStrain_csfd', [])
+end
+try
+    if isempty(properties.material_properties.failStrain_tstd) == 1.0
+        setappdata(0, 'failStrain_tstd', [])
+    else
+        setappdata(0, 'failStrain_tstd', properties.material_properties.failStrain_tstd)
+    end
+catch
+    setappdata(0, 'failStrain_tstd', [])
+end
+try
+    if isempty(properties.material_properties.failStrain_cstd) == 1.0
+        setappdata(0, 'failStrain_cstd', [])
+    else
+        setappdata(0, 'failStrain_cstd', properties.material_properties.failStrain_cstd)
+    end
+catch
+    setappdata(0, 'failStrain_cstd', [])
+end
+try
+    if isempty(properties.material_properties.failStrain_shear) == 1.0
+        setappdata(0, 'failStrain_shear', [])
+    else
+        setappdata(0, 'failStrain_shear', properties.material_properties.failStrain_shear)
+    end
+catch
+    setappdata(0, 'failStrain_shear', [])
+end
+try
+    if isempty(properties.material_properties.failStrain_e11) == 1.0
+        setappdata(0, 'failStrain_e11', [])
+    else
+        setappdata(0, 'failStrain_e11', properties.material_properties.failStrain_e11)
+    end
+catch
+    setappdata(0, 'failStrain_e11', [])
+end
+try
+    if isempty(properties.material_properties.failStrain_e22) == 1.0
+        setappdata(0, 'failStrain_e22', [])
+    else
+        setappdata(0, 'failStrain_e22', properties.material_properties.failStrain_e22)
+    end
+catch
+    setappdata(0, 'failStrain_e22', [])
+end
+try
+    if isempty(properties.material_properties.failStrain_g12) == 1.0
+        setappdata(0, 'failStrain_g12', [])
+    else
+        setappdata(0, 'failStrain_g12', properties.material_properties.failStrain_g12)
+    end
+catch
+    setappdata(0, 'failStrain_g12', [])
+end
+
+% Initialize Hashin properties
+try
+    if isempty(properties.material_properties.hashin_alpha) == 1.0
+        setappdata(0, 'hashin_alpha', 0.0)
+    else
+        setappdata(0, 'hashin_alpha', properties.material_properties.hashin_alpha)
+    end
+catch
+    setappdata(0, 'hashin_alpha', 0.0)
+end
+try
+    if isempty(properties.material_properties.hashin_lts) == 1.0
+        setappdata(0, 'hashin_lts', [])
+    else
+        setappdata(0, 'hashin_lts', properties.material_properties.hashin_lts)
+    end
+catch
+    setappdata(0, 'hashin_lts', [])
+end
+try
+    if isempty(properties.material_properties.hashin_lcs) == 1.0
+        setappdata(0, 'hashin_lcs', [])
+    else
+        setappdata(0, 'hashin_lcs', properties.material_properties.hashin_lcs)
+    end
+catch
+    setappdata(0, 'hashin_lcs', [])
+end
+try
+    if isempty(properties.material_properties.hashin_tts) == 1.0
+        setappdata(0, 'hashin_tts', [])
+    else
+        setappdata(0, 'hashin_tts', properties.material_properties.hashin_tts)
+    end
+catch
+    setappdata(0, 'hashin_tts', [])
+end
+try
+    if isempty(properties.material_properties.hashin_tcs) == 1.0
+        setappdata(0, 'hashin_tcs', [])
+    else
+        setappdata(0, 'hashin_tcs', properties.material_properties.hashin_tcs)
+    end
+catch
+    setappdata(0, 'hashin_tcs', [])
+end
+try
+    if isempty(properties.material_properties.hashin_lss) == 1.0
+        setappdata(0, 'hashin_lss', [])
+    else
+        setappdata(0, 'hashin_lss', properties.material_properties.hashin_lss)
+    end
+catch
+    setappdata(0, 'hashin_lss', [])
+end
+try
+    if isempty(properties.material_properties.hashin_tss) == 1.0
+        setappdata(0, 'hashin_tss', [])
+    else
+        setappdata(0, 'hashin_tss', properties.material_properties.hashin_tss)
+    end
+catch
+    setappdata(0, 'hashin_tss', [])
+end
 
 % --- Executes on button press in pButton_manager.
 function pButton_manager_Callback(~, ~, handles)
@@ -2020,16 +2438,110 @@ if isappdata(0, 'qft_materialLocation') == 1.0
     rmappdata(0, 'qft_materialLocation')
 end
 
+% Fatigue
 if isappdata(0, 'e_value') == 1.0
     rmappdata(0, 'e_value')
 end
-
 if isappdata(0, 'uts_value') == 1.0
     rmappdata(0, 'uts_value')
 end
-
 if isappdata(0, 'b_value') == 1.0
     rmappdata(0, 'b_value')
+end
+if isappdata(0, 'b2') == 1.0
+    rmappdata(0, 'b2')
+end
+if isappdata(0, 'b2Nf') == 1.0
+    rmappdata(0, 'b2Nf')
+end
+
+% nssc
+if isappdata(0, 'nssc_value') == 1.0
+    rmappdata(0, 'nssc_value')
+end
+
+% Stress-based failure
+if isappdata(0, 'failStress_tsfd') == 1.0
+    rmappdata(0, 'failStress_tsfd')
+end
+if isappdata(0, 'failStress_csfd') == 1.0
+    rmappdata(0, 'failStress_csfd')
+end
+if isappdata(0, 'failStress_tstd') == 1.0
+    rmappdata(0, 'failStress_tstd')
+end
+if isappdata(0, 'failStress_cstd') == 1.0
+    rmappdata(0, 'failStress_cstd')
+end
+if isappdata(0, 'failStress_tsttd') == 1.0
+    rmappdata(0, 'failStress_tsttd')
+end
+if isappdata(0, 'failStress_csttd') == 1.0
+    rmappdata(0, 'failStress_csttd')
+end
+if isappdata(0, 'failStress_shear') == 1.0
+    rmappdata(0, 'failStress_shear')
+end
+if isappdata(0, 'failStress_cross12') == 1.0
+    rmappdata(0, 'failStress_cross12')
+end
+if isappdata(0, 'failStress_cross23') == 1.0
+    rmappdata(0, 'failStress_cross23')
+end
+if isappdata(0, 'failStress_limit12') == 1.0
+    rmappdata(0, 'failStress_limit12')
+end
+if isappdata(0, 'failStress_limit23') == 1.0
+    rmappdata(0, 'failStress_limit23')
+end
+
+% Strain-based failure
+if isappdata(0, 'failStrain_tsfd') == 1.0
+    rmappdata(0, 'failStrain_tsfd')
+end
+if isappdata(0, 'failStrain_csfd') == 1.0
+    rmappdata(0, 'failStrain_csfd')
+end
+if isappdata(0, 'failStrain_tstd') == 1.0
+    rmappdata(0, 'failStrain_tstd')
+end
+if isappdata(0, 'failStrain_cstd') == 1.0
+    rmappdata(0, 'failStrain_cstd')
+end
+if isappdata(0, 'failStrain_shear') == 1.0
+    rmappdata(0, 'failStrain_shear')
+end
+if isappdata(0, 'failStrain_e11') == 1.0
+    rmappdata(0, 'failStrain_e11')
+end
+if isappdata(0, 'failStrain_e22') == 1.0
+    rmappdata(0, 'failStrain_e22')
+end
+if isappdata(0, 'failStrain_g12') == 1.0
+    rmappdata(0, 'failStrain_g12')
+end
+
+% Hashin damage initiation
+if isappdata(0, 'hashin_alpha') == 1.0
+    rmappdata(0, 'hashin_alpha')
+end
+if isappdata(0, 'hashin_lts') == 1.0
+    rmappdata(0, 'hashin_lts')
+end
+if isappdata(0, 'hashin_lcs') == 1.0
+    rmappdata(0, 'hashin_lcs')
+end
+if isappdata(0, 'hashin_tts') == 1.0
+    rmappdata(0, 'hashin_tts')
+end
+if isappdata(0, 'hashin_tcs') == 1.0
+    rmappdata(0, 'hashin_tcs')
+end
+if isappdata(0, 'hashin_lss') == 1.0
+    rmappdata(0, 'hashin_lss')
+end
+if isappdata(0, 'hashin_tss') == 1.0
+    rmappdata(0, 'hashin_tss')
 end
 
 delete(hObject);
@@ -2062,6 +2574,8 @@ if get(handles.check_poisson, 'value') == 0.0
 end
 if get(handles.check_uts, 'value') == 0.0
     set(handles.edit_uts, 'enable', 'off')
+    set(handles.text_slash, 'enable', 'off')
+    set(handles.edit_ucs, 'enable', 'off')
     set(handles.text_uts_units, 'enable', 'off')
 end
 if get(handles.check_proof, 'value') == 0.0
@@ -2072,6 +2586,8 @@ end
 % Fatigue
 set(handles.edit_snData, 'enable', 'inactive')
 set(handles.edit_rValues, 'enable', 'inactive')
+set(handles.edit_snData, 'backgroundColor', [242/255, 242/255, 242/255])
+set(handles.edit_rValues, 'backgroundColor', [242/255, 242/255, 242/255])
 
 if strncmpi(get(handles.edit_snData, 'string'), 'undefined', 9.0) == 1.0
     set(handles.pButton_rmSNData, 'enable', 'off')
@@ -2087,6 +2603,7 @@ if get(handles.check_sf, 'value') == 0.0
 end
 if get(handles.check_b, 'value') == 0.0
     set(handles.edit_b, 'enable', 'inactive', 'backgroundColor', simuliaBlue)
+    set(handles.pButton_knee, 'enable', 'off')
 end
 if get(handles.check_ef, 'value') == 0.0
     set(handles.edit_ef, 'enable', 'inactive', 'backgroundColor', simuliaBlue)
@@ -2116,3 +2633,74 @@ end
 if (isappdata(0, 'multiaxial_gauge_fatigue_skip_material_manager') == 1.0) || (isappdata(0, 'uniaxial_strain_life_skip_material_manager') == 1.0)
     set(handles.pButton_manager, 'enable', 'off')
 end
+
+
+
+function edit_ucs_Callback(~, ~, ~)
+% hObject    handle to edit_ucs (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_ucs as text
+%        str2double(get(hObject,'String')) returns contents of edit_ucs as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_ucs_CreateFcn(hObject, ~, ~)
+% hObject    handle to edit_ucs (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in pButton_failStress.
+function pButton_failStress_Callback(~, ~, handles)
+% Blank the GUI
+blank(handles)
+
+failStress
+uiwait
+
+% Enable the GUI
+enable(handles)
+
+
+% --- Executes on button press in pButton_hashin.
+function pButton_hashin_Callback(~, ~, handles)
+% Blank the GUI
+blank(handles)
+
+hashin
+uiwait
+
+% Enable the GUI
+enable(handles)
+
+
+% --- Executes on button press in pButton_failStrain.
+function pButton_failStrain_Callback(~, ~, handles)
+% Blank the GUI
+blank(handles)
+
+failStrain
+uiwait
+
+% Enable the GUI
+enable(handles)
+
+
+% --- Executes on button press in pButton_knee.
+function pButton_knee_Callback(~, ~, handles)
+% Blank the GUI
+blank(handles)
+
+insertKnee
+uiwait
+
+% Enable the GUI
+enable(handles)

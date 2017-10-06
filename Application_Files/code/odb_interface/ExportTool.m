@@ -11,8 +11,8 @@ function varargout = ExportTool(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool User Guide
 %      10.4 The ODB Interface
 %   
-%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 22-Jun-2017 16:09:40 GMT
+%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
+%   Last modified 28-Sep-2017 10:31:34 GMT
     
     %%
     
@@ -610,8 +610,8 @@ end
 % Open the log file for writing
 fid_debug = fopen(sprintf('%s\\%s.log', resultsDatabasePath, resultsDatabaseName), 'w+');
 clc
-fprintf(fid_debug, 'Quick Fatigue Tool 6.11-03 ODB Interface Log');
-fprintf('Quick Fatigue Tool 6.11-03 ODB Interface Log\n');
+fprintf(fid_debug, 'Quick Fatigue Tool 6.11-04 ODB Interface Log');
+fprintf('Quick Fatigue Tool 6.11-04 ODB Interface Log\n');
 
 % Get the selected position
 userPosition = get(handles.pMenu_elementPosition, 'value');
@@ -1120,9 +1120,9 @@ msg1 = sprintf('*Abaqus command line argument:');
 msg2 = sprintf('\nSpecify the command used to access the Abaqus API.');
 msg3 = sprintf('\nIf no argument is specified, ''abaqus'' is used by default.');
 
-msg4 = sprintf('\n\n*ODB part instance name:');
-msg5 = sprintf('\nExport Tool can write field data to a single part instance.');
-msg6 = sprintf('\nThe part instance name must be specified.');
+msg4 = sprintf('\n\n*ODB part instance name(s):');
+msg5 = sprintf('\nSpecify the part instance name(s) belonging to the elements or nodes in the field data.');
+msg6 = sprintf(' At least one part instance name must be specified.');
 
 msg7 = sprintf('\n\n*Results step name:');
 msg8 = sprintf('\nIf field data is written to an existing step in the ODB, the step name');
@@ -1310,7 +1310,7 @@ switch tag
         set(handles.check_LL, 'value', 1.0)
         set(handles.check_D, 'value', 0.0)
         set(handles.check_DDL, 'value', 0.0)
-        set(handles.check_FOS, 'value', 0.0)
+        set(handles.check_FOS, 'value', 1.0)
         set(handles.check_SFA, 'value', 0.0)
         set(handles.check_FRFR, 'value', 1.0)
         set(handles.check_FRFV, 'value', 1.0)

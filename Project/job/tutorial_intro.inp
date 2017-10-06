@@ -16,13 +16,13 @@
 **      1 Job file options
 **      3 Material keywords
 **   
-**   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
+**   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
 **   Last modified 20-Aug-2017 18:25:05 GMT
 **
 **Material data
 *USER MATERIAL, steel
 *MECHANICAL
-200e3, 0.33, 400, 325
+200e3, 0.33, 400, 400, 325
 *FATIGUE, constants
 930, -0.095, , ,
 *FATIGUE, test data
@@ -38,12 +38,13 @@
 *USE SN = 1
 **
 **Loading definition
-*HISTORY = [200, -200]
-*SCALE = 1
+*DATASET = stress_uni.dat
+*HISTORY = [1, -1]
+*SCALE = 0.8285
 *UNITS = MPa
 **
 **Analysis definition
-*ALGORITHM = uniaxial stress
+*ALGORITHM = sbbm
 *MS CORRECTION = none
 *FACTOR OF STRENGTH = 1
 **
@@ -53,4 +54,5 @@
 **
 **Output requests
 *OUTPUT FIELD = 1
-*OUTPUT HISTORY = 1
+*OUTPUT HISTORY = 0
+*OUTPUT FIGURE = 0

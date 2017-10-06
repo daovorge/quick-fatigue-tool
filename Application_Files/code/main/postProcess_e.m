@@ -9,8 +9,8 @@ classdef postProcess_e < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      10 Output
 %   
-%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 16-Sep-2017 16:32:58 GMT
+%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
+%   Last modified 04-Oct-2017 18:09:00 GMT
     
     %%
     
@@ -892,7 +892,7 @@ classdef postProcess_e < handle
                     f7 = figure('visible', figureVisibility);
                     
                     % Smooth the data
-                    if length(damageParameter) > 9.0 && range(damageParameter) ~= 0.0 && smoothness > 1.0 && smoothness > 0.0
+                    if length(damageParameter) > 9.0 && (max(damageParameter) - min(damageParameter)) ~= 0.0 && smoothness > 1.0 && smoothness > 0.0
                         damageParameter = interp(damageParameter, smoothness);
                     end
                     x = linspace(0.0, 180.0, length(damageParameter));
@@ -932,7 +932,7 @@ classdef postProcess_e < handle
                     f8 = figure('visible', figureVisibility);
                     
                     % Smooth the data
-                    if length(damage) > 9.0 && range(damage) ~= 0.0 && smoothness > 0.0
+                    if length(damage) > 9.0 && (max(damage) - min(damage)) ~= 0.0 && smoothness > 0.0
                         damageTheta2 = interp(damage, smoothness);
                     else
                         damageTheta2 = damage;
@@ -977,7 +977,7 @@ classdef postProcess_e < handle
                     f9 = figure('visible', figureVisibility);
                     
                     % Smooth the data
-                    if length(lifeTheta) > 9.0 && range(lifeTheta) ~= 0.0 && smoothness > 0.0
+                    if length(lifeTheta) > 9.0 && (max(lifeTheta) - min(lifeTheta)) ~= 0.0 && smoothness > 0.0
                         lifeTheta = interp(lifeTheta, smoothness);
                     end
                     x = linspace(0.0, 180.0, length(lifeTheta));
@@ -1019,7 +1019,7 @@ classdef postProcess_e < handle
                         shearStress = getappdata(0, 'shear_cp');
                         
                         % Smooth the data
-                        if length(shearStress) > 9.0 && any(isinf(shearStress)) == 0.0 && range(shearStress) ~= 0.0 && smoothness > 0.0
+                        if length(shearStress) > 9.0 && any(isinf(shearStress)) == 0.0 && (max(shearStress) - min(shearStress)) ~= 0.0 && smoothness > 0.0
                             shearStress = interp(shearStress, smoothness);
                         end
                         x = linspace(0.0, 180.0, length(shearStress));
@@ -1057,7 +1057,7 @@ classdef postProcess_e < handle
                         normalStress = getappdata(0, 'normal_cp');
                         
                         % Smooth the data
-                        if length(normalStress) > 9.0 && any(isinf(normalStress)) == 0.0 && range(normalStress) ~= 0.0 && smoothness > 0.0
+                        if length(normalStress) > 9.0 && any(isinf(normalStress)) == 0.0 && (max(normalStress) - min(normalStress)) ~= 0.0 && smoothness > 0.0
                             normalStress = interp(normalStress, smoothness);
                         end
                         x = linspace(0.0, 180.0, length(normalStress));
@@ -1153,67 +1153,70 @@ classdef postProcess_e < handle
                 end
             end
             
-            %% RHIST RAINFLOW HISTOGRAM OF CYCLES
-            
-            if outputFigure == 1.0 && outputField == 1.0 && getappdata(0, 'figure_RHIST') == 1.0
-                f12 = figure('visible', figureVisibility);
-                rhistData = [Sm'; 2.*amplitudes]';
-                nBins = getappdata(0, 'numberOfBins');
-                hist3(rhistData, [nBins, nBins])
+            try
+                %% RHIST RAINFLOW HISTOGRAM OF CYCLES
                 
-                set(gcf, 'renderer', 'opengl');
-                set(get(gca, 'child'), 'FaceColor', 'interp', 'CDataMode', 'auto');
-                colorbar
-                
-                msg = sprintf('RHIST, Rainflow cycle histogram at item %.0f.%.0f', mainID, subID);
-                xlabel('Mean Stress (MPa)', 'FontSize', fontX)
-                ylabel('Stress Range (MPa)', 'FontSize', fontY)
-                title(msg, 'FontSize', fontTitle)
-                set(gca, 'FontSize', fontTicks)
-                
-                try
-                    axis tight
-                catch
-                    % Don't tighten the axis
+                if outputFigure == 1.0 && outputField == 1.0 && getappdata(0, 'figure_RHIST') == 1.0
+                    f12 = figure('visible', figureVisibility);
+                    rhistData = [Sm'; 2.*amplitudes]';
+                    nBins = getappdata(0, 'numberOfBins');
+                    hist3(rhistData, [nBins, nBins])
+                    
+                    set(gcf, 'renderer', 'opengl');
+                    set(get(gca, 'child'), 'FaceColor', 'interp', 'CDataMode', 'auto');
+                    colorbar
+                    
+                    msg = sprintf('RHIST, Rainflow cycle histogram at item %.0f.%.0f', mainID, subID);
+                    xlabel('Mean Stress (MPa)', 'FontSize', fontX)
+                    ylabel('Stress Range (MPa)', 'FontSize', fontY)
+                    title(msg, 'FontSize', fontTitle)
+                    set(gca, 'FontSize', fontTicks)
+                    
+                    try
+                        axis tight
+                    catch
+                        % Don't tighten the axis
+                    end
+                    
+                    dir = [root, 'MATLAB Figures/RHIST, Rainflow cycle histogram at worst item'];
+                    saveas(f12, dir, figureFormat)
+                    if strcmpi(figureFormat, 'fig') == true
+                        postProcess.makeVisible([dir, '.fig'])
+                    end
                 end
                 
-                dir = [root, 'MATLAB Figures/RHIST, Rainflow cycle histogram at worst item'];
-                saveas(f12, dir, figureFormat)
-                if strcmpi(figureFormat, 'fig') == true
-                    postProcess.makeVisible([dir, '.fig'])
-                end
-            end
-            
-            %% RC RANGE vs CYCLES
-            
-            if outputFigure == 1.0 && outputField == 1.0 && getappdata(0, 'figure_RC') == 1.0
-                f13 = figure('visible', figureVisibility);
-                msg = sprintf('RC, Stress range distribution at item %.0f.%.0f', mainID, subID);
-                title(msg, 'FontSize', fontTitle)
-                rhistData = [Sm'; 2.0*amplitudes]';
-                [h, bins] = hist3(rhistData, [nBins, nBins]);
+                %% RC RANGE vs CYCLES
                 
-                plot(bins{2.0}, sum(h), '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
-
-                xlabel('Stress Range (MPa)', 'FontSize', fontX)
-                ylabel('Cycles', 'FontSize', fontY)
-                set(gca, 'FontSize', fontTicks)
-                
-                try
-                    axis tight
-                catch
-                    % Don't tighten the axis
+                if outputFigure == 1.0 && outputField == 1.0 && getappdata(0, 'figure_RC') == 1.0
+                    f13 = figure('visible', figureVisibility);
+                    msg = sprintf('RC, Stress range distribution at item %.0f.%.0f', mainID, subID);
+                    title(msg, 'FontSize', fontTitle)
+                    rhistData = [Sm'; 2.0*amplitudes]';
+                    [h, bins] = hist3(rhistData, [nBins, nBins]);
+                    
+                    plot(bins{2.0}, sum(h), '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
+                    
+                    xlabel('Stress Range (MPa)', 'FontSize', fontX)
+                    ylabel('Cycles', 'FontSize', fontY)
+                    set(gca, 'FontSize', fontTicks)
+                    
+                    try
+                        axis tight
+                    catch
+                        % Don't tighten the axis
+                    end
+                    
+                    if strcmpi(gridLines, 'on') == 1.0 || str2double(gridLines) == 1.0
+                        grid on
+                    end
+                    
+                    dir = [root, 'MATLAB Figures/RC, Stress range distribution at worst item'];
+                    saveas(f13, dir, figureFormat)
+                    if strcmpi(figureFormat, 'fig') == true
+                        postProcess.makeVisible([dir, '.fig'])
+                    end
                 end
-                
-                if strcmpi(gridLines, 'on') == 1.0 || str2double(gridLines) == 1.0
-                    grid on
-                end
-                
-                dir = [root, 'MATLAB Figures/RC, Stress range distribution at worst item'];
-                saveas(f13, dir, figureFormat)
-                if strcmpi(figureFormat, 'fig') == true
-                    postProcess.makeVisible([dir, '.fig'])
-                end
+            catch
             end
             
             %% SIGS UNIAXIAL STRESS HISTORY (BEFORE AND AFTER FILTERING *)

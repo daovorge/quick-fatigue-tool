@@ -10,14 +10,14 @@ function [] = main(flags)
 %
 %   Author contact: louisvallance@hotmail.co.uk
 %
-%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 19-Sep-2017 14:58:20 GMT
+%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
+%   Last modified 06-Oct-2017 14:39:49 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');    tic_pre = tic;
 
 %% READ SETTINGS FROM THE ENVIRONMENT FILE
-error = preProcess.readEnvironment(flags{45.0});
+error = preProcess.readEnvironment(flags{42.0});
 
 if error == 1.0;
     return
@@ -41,9 +41,9 @@ setappdata(0, 'messageFileNotes', 0.0)
 setappdata(0, 'messageFileWarnings', 0.0)
 
 %% PRINT COMMAND WINDOW HEADER
-fprintf('[NOTICE] Quick Fatigue Tool 6.11-03')
+fprintf('[NOTICE] Quick Fatigue Tool 6.11-04')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2017)')
-fprintf('\n[NOTICE] Last modified 19-Sep-2017 14:58:20 GMT')
+fprintf('\n[NOTICE] Last modified 06-Oct-2017 14:39:49 GMT')
 
 cleanExit = 0.0;
 
@@ -73,7 +73,7 @@ fileName = sprintf('Project/output/%s/%s.sta', jobName, jobName);
 fid_status = fopen(fileName, 'w+');
 setappdata(0, 'fid_status', fid_status)
 c = clock;
-fprintf(fid_status, '[NOTICE] Quick Fatigue Tool 6.11-03\t%s', datestr(datenum(c(1.0), c(2.0), c(3.0), c(4.0), c(5.0), c(6.0))));
+fprintf(fid_status, '[NOTICE] Quick Fatigue Tool 6.11-04\t%s', datestr(datenum(c(1.0), c(2.0), c(3.0), c(4.0), c(5.0), c(6.0))));
 
 fprintf('\n[NOTICE] The job ''%s'' has been submitted for analysis', jobName)
 fprintf(fid_status, '\n[NOTICE] The job file "%s.m" has been submitted for analysis', jobName);
@@ -146,12 +146,14 @@ if cleanExit == 1.0
 end
 
 %% DETERMINE THE ALGORITHM AND MEAN STRESS CORRECTION TO BE USED FOR THE ANALYSIS
-[algorithm, msCorrection, nlMaterial, useSN, error] = jobFile.getAlgorithmAndMSC(algorithm, msCorrection, useSN);
-setappdata(0, 'algorithm', algorithm)
-
-if error == 1.0
-    cleanup(1.0)
-    return
+if getappdata(0, 'compositeCriteria') == 0.0
+    [algorithm, msCorrection, useSN, error] = jobFile.getAlgorithmAndMSC(algorithm, msCorrection, useSN);
+    setappdata(0, 'algorithm', algorithm)
+    
+    if error == 1.0
+        cleanup(1.0)
+        return
+    end
 end
 
 %% CHECK IF USER-DEFINED FRF DATA IS SUPPLIED
@@ -215,7 +217,7 @@ setappdata(0, 'errorDuringLoading', 1.0)
     subID, gateHistories, gateTensors, tensorGate, error]...
     ...
     = jobFile.getLoading(units, scale,...
-    algorithm, msCorrection, nlMaterial, userUnits, hfDataset, hfHistory,...
+    algorithm, msCorrection, userUnits, hfDataset, hfHistory,...
     hfTime, hfScales, items, dataset, history, elementType, offset);
 
 if error == 1.0
@@ -225,7 +227,7 @@ end
 setappdata(0, 'errorDuringLoading', 0.0)
 
 %% DETECT SURFACE ITAMS IF APPLICABLE
-[mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz);
+[mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz, fid_status);
 
 %% WARN THE USER IF THERE ARE DUPLICATE ITEMS IN THE MODEL
 preProcess.checkDuplicateItems(N, mainID, subID)
@@ -303,7 +305,7 @@ if (algorithm ~= 10.0) && (algorithm ~= 8.0) && (algorithm ~= 3.0)
         fprintf(fid_status, '\n[PRE] Optimizing datasets');
 
         [coldItems, removedItems, hotspotWarning] = preProcess.nodalElimination(algorithm,...
-            nlMaterial, msCorrection, N);
+            msCorrection, N);
 
         setappdata(0, 'separateFieldOutput', 1.0)
         messenger.writeMessage(22.0)
@@ -351,6 +353,18 @@ preProcess.getPlasticItems(N, algorithm);
 
 if getappdata(0, 'warning_066') == 1.0
     postProcess.writeYieldingItems(jobName, mainID, subID)
+end
+
+%% PERFORM COMPOSITE FAILURE CALCULATION IF REQUESTED
+if getappdata(0, 'compositeCriteria') == 1.0
+    compositeFailure(N, signalLength)
+    
+    %{
+        Composite/foam materials cannot be used for fatigue analysis. Abort
+        the analysis here.
+    %}
+    datacheckAbort(Sxx, Syy, Szz, Txy, Tyz, Txz, tic_pre, outputField, fid_status)
+    return
 end
 
 %% INITIALISE THE CP SEARCH PARAMETERS
@@ -475,15 +489,7 @@ if getappdata(0, 'dataCheck') > 0.0
         If the job is a data check analysis, abort here. Print the
         principal stresses to a text file
     %}
-    if outputField == 1.0
-        printTensor(Sxx, Syy, Szz, Txy, Tyz, Txz)
-    end
-
-	setappdata(0, 'dataCheck_time', toc(tic_pre))
-	fprintf('\n[NOTICE] Data Check complete (%fs)\n', toc(tic_pre))
-    messenger.writeMessage(-999.0)
-    fprintf(fid_status, '\r\n\r\nTHE ANALYSIS HAS COMPLETED SUCCESSFULLY');
-    fclose(fid_status);
+    datacheckAbort(Sxx, Syy, Szz, Txy, Tyz, Txz, tic_pre, outputField, fid_status)
     return
 end
 
@@ -1067,7 +1073,7 @@ messenger.writeLog(jobName, jobDescription, dataset, material,...
     history, items, units, scale, repeats, useSN, gateHistories, gateTensors,...
     nodalElimination, planePrecision, worstAnalysisItem, thetaOnCP,...
     phiOnCP, outputField, algorithm, nodalDamage, worstMainID, worstSubID,...
-    dir, step, cael, msCorrection, nlMaterial, removedItems,...
+    dir, step, cael, msCorrection, removedItems,...
     hotspotWarning, loadEqVal, loadEqUnits, elementType, offset, analysisTime)
 
 % SAVE WORKSPACE TO FILE
@@ -1091,6 +1097,5 @@ fprintf(fid_status, '\r\n\r\nTHE ANALYSIS HAS COMPLETED SUCCESSFULLY');
 fclose(fid_status);
 
 %% REMOVE APPDATA
-
 cleanup(0.0)
 % End main code - DO NOT EDIT

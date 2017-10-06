@@ -13,8 +13,8 @@ classdef algorithm_bs7608 < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.6 BS 7608 Fatigue of Welded Steel Joints
 %   
-%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 16-Sep-2017 16:32:58 GMT
+%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
+%   Last modified 04-Oct-2017 18:09:00 GMT
     
     %%
     
@@ -341,10 +341,17 @@ classdef algorithm_bs7608 < handle
                 failureMode, gateTensors, tensorGate, signConvention, S1, S2, S3)
             
             % Create the stress tensor
-            St = cell(1.0, signalLength);
-            for i = 1:signalLength
-                St{i} = [Sxxi(i), Txyi(i), Txzi(i); Txyi(i), Syyi(i), Tyzi(i); Txzi(i), Tyzi(i), Szzi(i)];
-            end
+            St = zeros(3.0, 3.0, signalLength);
+            
+            St(1.0, 1.0, :) = Sxxi;
+            St(1.0, 2.0, :) = Txyi;
+            St(1.0, 3.0, :) = Txzi;
+            St(2.0, 1.0, :) = Txyi;
+            St(2.0, 2.0, :) = Syyi;
+            St(2.0, 3.0, :) = Tyzi;
+            St(3.0, 1.0, :) = Txzi;
+            St(3.0, 2.0, :) = Tyzi;
+            St(3.0, 3.0, :) = Szzi;
             
             % Initialize matrices for normal and shear stress components on each plane
             f = zeros(precision, precision);
@@ -386,7 +393,7 @@ classdef algorithm_bs7608 < handle
                     
                     % Calculate the transform stress tensor for the current plane
                     for y = 1:signalLength
-                        S_prime{y}=Q'*St{y}*Q;
+                        S_prime{y}=Q'*St(:, :, y)*Q;
                     end
                     
                     % Calculate stress components for the first face of rotated stress matrix
@@ -612,10 +619,17 @@ classdef algorithm_bs7608 < handle
             damageCube = damageParamCube;
             
             % Create the stress tensor
-            St = cell(1.0, signalLength);
-            for i = 1:signalLength
-                St{i} = [stress(1.0, i), stress(4.0, i), stress(5.0, i); stress(4.0, i), stress(2.0, i), stress(6.0, i); stress(5.0, i), stress(6.0, i), stress(3.0, i)];
-            end
+            St = zeros(3.0, 3.0, signalLength);
+            
+            St(1.0, 1.0, :) = stress(1.0, :);
+            St(1.0, 2.0, :) = stress(4.0, :);
+            St(1.0, 3.0, :) = stress(5.0, :);
+            St(2.0, 1.0, :) = stress(4.0, :);
+            St(2.0, 2.0, :) = stress(2.0, :);
+            St(2.0, 3.0, :) = stress(6.0, :);
+            St(3.0, 1.0, :) = stress(5.0, :);
+            St(3.0, 2.0, :) = stress(6.0, :);
+            St(3.0, 3.0, :) = stress(3.0, :);
             
             % Initialize matrices for normal stress on each plane
             sn = zeros(1.0, precision);
@@ -646,7 +660,7 @@ classdef algorithm_bs7608 < handle
                 
                 % Calculate the transform stress tensor for the current plane
                 for y = 1:1:signalLength
-                    S_prime{y}=Q'*St{y}*Q;
+                    S_prime{y}=Q'*St(:, :, y)*Q;
                 end
                 
                 % Calculate stress components for the first face of rotated stress matrix
@@ -1270,7 +1284,7 @@ classdef algorithm_bs7608 < handle
                 f6 = figure('visible', figureVisibility);
                 
                 % Smooth the data
-                if length(damageParameter) > 9.0 && range(damageParameter) ~= 0.0 && smoothness > 0.0
+                if length(damageParameter) > 9.0 && (max(damageParameter) - min(damageParameter)) ~= 0.0 && smoothness > 0.0
                     damageParameter = interp(damageParameter, smoothness);
                 end
                 x = linspace(0.0, 180.0, length(damageParameter));
@@ -1311,7 +1325,7 @@ classdef algorithm_bs7608 < handle
                 f7 = figure('visible', figureVisibility);
                 
                 % Smooth the data
-                if length(damage) > 9.0 && range(damage) ~= 0.0 && smoothness > 0.0
+                if length(damage) > 9.0 && (max(damage) - min(damage)) ~= 0.0 && smoothness > 0.0
                     damageTheta2 = interp(damage, smoothness);
                 else
                     damageTheta2 = damage;
@@ -1356,7 +1370,7 @@ classdef algorithm_bs7608 < handle
                 f8 = figure('visible', figureVisibility);
                 
                 % Smooth the data
-                if length(lifeTheta) > 9.0 && any(isinf(lifeTheta)) == 0.0 && range(lifeTheta) ~= 0.0 && smoothness > 0.0
+                if length(lifeTheta) > 9.0 && any(isinf(lifeTheta)) == 0.0 && (max(lifeTheta) - min(lifeTheta)) ~= 0.0 && smoothness > 0.0
                     lifeTheta = interp(lifeTheta, smoothness);
                 end
                 x = linspace(0.0, 180.0, length(lifeTheta));
@@ -1398,7 +1412,7 @@ classdef algorithm_bs7608 < handle
                     shearStress = getappdata(0, 'shear_cp');
                     
                     % Smooth the data
-                    if length(shearStress) > 9.0 && any(isinf(shearStress)) == 0.0 && range(shearStress) ~= 0.0 && smoothness > 0.0
+                    if length(shearStress) > 9.0 && any(isinf(shearStress)) == 0.0 && (max(shearStress) - min(shearStress)) ~= 0.0 && smoothness > 0.0
                         shearStress = interp(shearStress, smoothness);
                     end
                     x = linspace(0.0, 180.0, length(shearStress));
@@ -1436,7 +1450,7 @@ classdef algorithm_bs7608 < handle
                     normalStress = getappdata(0, 'normal_cp');
                     
                     % Smooth the data
-                    if length(normalStress) > 9.0 && any(isinf(normalStress)) == 0.0 && range(normalStress) ~= 0.0 && smoothness > 0.0
+                    if length(normalStress) > 9.0 && any(isinf(normalStress)) == 0.0 && (max(normalStress) - min(normalStress)) ~= 0.0 && smoothness > 0.0
                         normalStress = interp(normalStress, smoothness);
                     end
                     x = linspace(0.0, 180.0, length(normalStress));
@@ -1533,63 +1547,66 @@ classdef algorithm_bs7608 < handle
             cycles = getappdata(0, 'cyclesOnCP');
             Sm = 0.5*(cycles(:, 1) + cycles(:, 2));
             
-            %% RHIST RAINFLOW HISTOGRAM OF CYCLES
-            
-            if outputFigure == 1.0 && outputField == 1.0 && getappdata(0, 'figure_RHIST') == 1.0
-                f12 = figure('visible', figureVisibility);
-                rhistData = [Sm'; 2.*amplitudes]';
-                nBins = getappdata(0, 'numberOfBins');
-                hist3(rhistData, [nBins, nBins])
+            try
+                %% RHIST RAINFLOW HISTOGRAM OF CYCLES
                 
-                set(gcf, 'renderer', 'opengl');
-                set(get(gca, 'child'), 'FaceColor', 'interp', 'CDataMode', 'auto');
-                colorbar
-                
-                msg = sprintf('RHIST, Rainflow cycle histogram for item %.0f.%.0f', mainID, subID);
-                xlabel('Mean Stress (MPa)', 'FontSize', fontX)
-                ylabel('Stress Range (MPa)', 'FontSize', fontY)
-                title(msg, 'FontSize', fontTitle)
-                set(gca, 'FontSize', fontTicks)
-                
-                try
-                    axis tight
-                catch
-                    % Don't tighten the axis
+                if outputFigure == 1.0 && outputField == 1.0 && getappdata(0, 'figure_RHIST') == 1.0
+                    f12 = figure('visible', figureVisibility);
+                    rhistData = [Sm'; 2.*amplitudes]';
+                    nBins = getappdata(0, 'numberOfBins');
+                    hist3(rhistData, [nBins, nBins])
+                    
+                    set(gcf, 'renderer', 'opengl');
+                    set(get(gca, 'child'), 'FaceColor', 'interp', 'CDataMode', 'auto');
+                    colorbar
+                    
+                    msg = sprintf('RHIST, Rainflow cycle histogram for item %.0f.%.0f', mainID, subID);
+                    xlabel('Mean Stress (MPa)', 'FontSize', fontX)
+                    ylabel('Stress Range (MPa)', 'FontSize', fontY)
+                    title(msg, 'FontSize', fontTitle)
+                    set(gca, 'FontSize', fontTicks)
+                    
+                    try
+                        axis tight
+                    catch
+                        % Don't tighten the axis
+                    end
+                    
+                    dir = [root, 'MATLAB Figures/RHIST, Rainflow cycle histogram at worst item'];
+                    saveas(f12, dir, 'fig')
+                    postProcess.makeVisible([dir, '.fig'])
                 end
                 
-                dir = [root, 'MATLAB Figures/RHIST, Rainflow cycle histogram at worst item'];
-                saveas(f12, dir, 'fig')
-                postProcess.makeVisible([dir, '.fig'])
-            end
-            
-            %% RC RANGE vs CYCLES
-            
-            if outputFigure == 1.0 && outputField == 1.0 && getappdata(0, 'figure_RC') == 1.0
-                f13 = figure('visible', figureVisibility);
-                rhistData = [Sm'; 2*amplitudes]';
-                [h, bins] = hist3(rhistData, [nBins, nBins]);
+                %% RC RANGE vs CYCLES
                 
-                plot(bins{2}, sum(h), '-', 'LineWidth', lineWidth, 'Color', midnightBlue);
-
-                msg = sprintf('RC, Stress range distribution for item %.0f.%.0f', mainID, subID);
-                xlabel('Stress Range (MPa)', 'FontSize', fontX)
-                ylabel('Cycles', 'FontSize', fontY)
-                title(msg, 'FontSize', fontTitle)
-                set(gca, 'FontSize', fontTicks)
-                
-                try
-                    axis tight
-                catch
-                    % Don't tighten the axis
+                if outputFigure == 1.0 && outputField == 1.0 && getappdata(0, 'figure_RC') == 1.0
+                    f13 = figure('visible', figureVisibility);
+                    rhistData = [Sm'; 2*amplitudes]';
+                    [h, bins] = hist3(rhistData, [nBins, nBins]);
+                    
+                    plot(bins{2}, sum(h), '-', 'LineWidth', lineWidth, 'Color', midnightBlue);
+                    
+                    msg = sprintf('RC, Stress range distribution for item %.0f.%.0f', mainID, subID);
+                    xlabel('Stress Range (MPa)', 'FontSize', fontX)
+                    ylabel('Cycles', 'FontSize', fontY)
+                    title(msg, 'FontSize', fontTitle)
+                    set(gca, 'FontSize', fontTicks)
+                    
+                    try
+                        axis tight
+                    catch
+                        % Don't tighten the axis
+                    end
+                    
+                    if strcmpi(gridLines, 'on') == 1.0 || str2double(gridLines) == 1.0
+                        grid on
+                    end
+                    
+                    dir = [root, 'MATLAB Figures/RC, Stress range distribution at worst item'];
+                    saveas(f13, dir, 'fig')
+                    postProcess.makeVisible([dir, '.fig'])
                 end
-                
-                if strcmpi(gridLines, 'on') == 1.0 || str2double(gridLines) == 1.0
-                    grid on
-                end
-                
-                dir = [root, 'MATLAB Figures/RC, Stress range distribution at worst item'];
-                saveas(f13, dir, 'fig')
-                postProcess.makeVisible([dir, '.fig'])
+            catch
             end
             
             %% LH LOAD HISTORIES

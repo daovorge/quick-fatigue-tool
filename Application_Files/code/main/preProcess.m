@@ -7,8 +7,8 @@ classdef preProcess < handle
 %
 %   See also postProcess.
 %
-%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 19-Sep-2017 14:07:49 GMT
+%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
+%   Last modified 06-Oct-2017 14:39:49 GMT
     
     %%
     
@@ -110,6 +110,21 @@ classdef preProcess < handle
                 2: Default
             %}
             
+            %% Force material to pass validation if composite analysis
+            if getappdata(0, 'compositeCriteria') == 1.0
+                material_properties.reg_model = 5.0;
+                material_properties.e = 203e3;  material_properties.e_active = 1.0;
+                material_properties.uts = 400.0;  material_properties.uts_active = 1.0;
+                material_properties.ucs = 400.0;
+                material_properties.proof = 325.0;  material_properties.proof_active = 1.0;
+                material_properties.sf = 930.0;  material_properties.sf_active = 1.0;
+                material_properties.b = -0.095;  material_properties.b_active = 1.0;
+                material_properties.ef = 0.26;  material_properties.ef_active = 1.0;
+                material_properties.c = -0.47;  material_properties.c_active = 1.0;
+                material_properties.kp = 1190.0;  material_properties.kp_active = 1.0;
+                material_properties.np = 0.193;  material_properties.np_active = 1.0;
+            end
+            
             %% Material description
             setappdata(0, 'materialDescription', material_properties.comment)
             
@@ -130,19 +145,19 @@ classdef preProcess < handle
             %% Material class
             class = material_properties.class;
             switch class
-                case 1
+                case 1.0
                     setappdata(0, 'fsc', 0.75)
-                case 2
+                case 2.0
                     setappdata(0, 'fsc', 0.90)
-                case 3
+                case 3.0
                     setappdata(0, 'fsc', 1.00)
-                case 4
+                case 4.0
                     setappdata(0, 'fsc', 0.83)
-                case 5
+                case 5.0
                     setappdata(0, 'fsc', 1.30)
-                case 6
+                case 6.0
                     setappdata(0, 'fsc', 0.65)
-                case 7
+                case 7.0
                     setappdata(0, 'fsc', -1.0)
             end
             
@@ -233,6 +248,39 @@ classdef preProcess < handle
                 uts = [];
                 setappdata(0, 'uts', [])
                 setappdata(0, 'uts_status', -1.0)
+            end
+            
+            %% Ultimate compressive strength
+            if material_properties.uts_active == 1.0
+                try
+                    if ischar(material_properties.ucs)
+                        ucs = str2double(material_properties.ucs);
+                    else
+                        ucs = material_properties.ucs;
+                    end
+                catch
+                    ucs = uts;
+                end
+                
+                if isnumeric(ucs) == 0.0
+                    error = 3.0;
+                    return
+                elseif isempty(ucs) == 1.0 || isnan(ucs) == 1.0 || isinf(ucs) == 1.0
+                    setappdata(0, 'ucs', uts)
+                    setappdata(0, 'ucs_status', 2.0)
+                elseif ucs <= 0.0
+                    error = 3.0;
+                    return
+                elseif isreal(ucs) == 0.0
+                    error = 3.0;
+                    return
+                else
+                    setappdata(0, 'ucs', ucs)
+                    setappdata(0, 'ucs_status', 0.0)
+                end
+            else
+                setappdata(0, 'ucs', [])
+                setappdata(0, 'ucs_status', -1.0)
             end
             
             %% Poisson's ratio
@@ -436,7 +484,7 @@ classdef preProcess < handle
             setappdata(0, 'regressionModel', reg_model);
             
             if material_properties.b_active == 1.0
-                if ischar(material_properties.b)
+                if ischar(material_properties.b) == 1.0
                     b = str2double(material_properties.b);
                 else
                     b = material_properties.b;
@@ -489,61 +537,34 @@ classdef preProcess < handle
             end
             messenger.writeMessage(10.0)
             
-            %% Fatigue strength exponent above knee point
-            b2i = getappdata(0, 'b2_original');
-            b2Nfi = getappdata(0, 'b2Nf_original');
-            
-            for i = 1:length(b2i)
-                if isempty(b2i(i)) == 0.0
-                    if isnumeric(b2i(i)) == 0.0
-                        b2i(i) = [];
-                    elseif isnan(b2i(i)) == 1.0 || isinf(b2i(i)) == 1.0
-                        b2i(i) = [];
-                    elseif isreal(b2i(i)) == 0.0
-                        b2i(i) = [];
+            %% Fatigue strength exponent (beyond user-defined knee)
+            if material_properties.b_active == 1.0
+                try
+                    if ischar(material_properties.b2) == 1.0
+                        b2 = str2double(material_properties.b2);
+                        b2Nf = str2double(material_properties.b2Nf);
+                    else
+                        b2 = material_properties.b2;
+                        b2Nf = material_properties.b2Nf;
                     end
+                catch
+                    b2 = [];
+                    b2Nf = [];
                 end
-            end
-            
-            if isempty(b2i) == 0.0
-                setappdata(0, 'b2', b2i(getappdata(0, 'getMaterial_currentGroup')))
-            end
-            
-            for i = 1:length(b2Nfi)
-                if isempty(b2Nfi(i)) == 0.0
-                    if isnumeric(b2Nfi(i)) == 0.0
-                        b2Nfi(i) = [];
-                    elseif isnan(b2Nfi(i)) == 1.0 || isinf(b2Nfi(i)) == 1.0
-                        b2Nfi(i) = [];
-                    elseif b2Nfi(i) <= 0.0
-                        b2Nfi(i) = [];
-                    elseif isreal(b2Nfi(i)) == 0.0
-                        b2Nfi(i) = [];
-                    end
+                
+                if isempty(b2) == 1.0
+                    setappdata(0, 'b2', [])
+                else
+                    setappdata(0, 'b2', b2)
                 end
-            end
-            
-            if isempty(b2Nfi) == 0.0
-                setappdata(0, 'b2Nf', b2Nfi(getappdata(0, 'getMaterial_currentGroup')))
-            end
-            
-            %% UCS
-            ucsi = getappdata(0, 'ucs_original');
-            
-            for i = 1:length(ucsi)
-                if isempty(ucsi(i)) == 0.0
-                    if isnumeric(ucsi(i)) == 0.0
-                        ucsi(i) = [];
-                    elseif isnan(ucsi(i)) == 1.0 || isinf(ucsi(i)) == 1.0
-                        ucsi(i) = [];
-                    elseif isreal(ucsi(i)) == 0.0
-                        ucsi(i) = [];
-                    end
+                if isempty(b2Nf) == 1.0
+                    setappdata(0, 'b2Nf', [])
+                else
+                    setappdata(0, 'b2Nf', b2Nf)
                 end
-            end
-            
-            if isempty(ucsi) == 0.0
-                setappdata(0, 'ucs', ucsi(getappdata(0, 'getMaterial_currentGroup')))
+            else
+                setappdata(0, 'b2', [])
+                setappdata(0, 'b2Nf', [])
             end
             
             %% Fatigue strength coefficient
@@ -1253,6 +1274,436 @@ classdef preProcess < handle
             k = getappdata(0, 'k');
             setappdata(0, 'TfPrime', TfPrime)
             setappdata(0, 'Tfs', sqrt(1.0 + (k*k))*TfPrime)
+            
+            %% Fail stress parameters for composite failure
+            
+            % Tensile stress (fiber direction)
+            try
+                if ischar(material_properties.failStress_tsfd) == 1.0
+                    failStress_tsfd = str2double(material_properties.failStress_tsfd);
+                else
+                    failStress_tsfd = material_properties.failStress_tsfd;
+                end
+            catch
+                failStress_tsfd = [];
+                setappdata(0, 'failStress_tsfd', failStress_tsfd)
+            end
+            if isnan(failStress_tsfd) == 1.0
+                failStress_tsfd = [];
+            end
+            setappdata(0, 'failStress_tsfd', failStress_tsfd)
+            
+            % Compressive stress (fiber direction)
+            try
+                if ischar(material_properties.failStress_csfd) == 1.0
+                    failStress_csfd = str2double(material_properties.failStress_csfd);
+                else
+                    failStress_csfd = material_properties.failStress_csfd;
+                end
+            catch
+                failStress_csfd = [];
+                setappdata(0, 'failStress_csfd', failStress_csfd)
+            end
+            if isnan(failStress_csfd) == 1.0
+                failStress_csfd = [];
+            end
+            setappdata(0, 'failStress_csfd', failStress_csfd)
+            
+            % Tensile stress (transverse direction)
+            try
+                if ischar(material_properties.failStress_tstd) == 1.0
+                    failStress_tstd = str2double(material_properties.failStress_tstd);
+                else
+                    failStress_tstd = material_properties.failStress_tstd;
+                end
+            catch
+                failStress_tstd = [];
+                setappdata(0, 'failStress_tstd', failStress_tstd)
+            end
+            if isnan(failStress_tstd) == 1.0
+                failStress_tstd = [];
+            end
+            setappdata(0, 'failStress_tstd', failStress_tstd)
+            
+            % Compressive stress (transverse direction)
+            try
+                if ischar(material_properties.failStress_cstd) == 1.0
+                    failStress_cstd = str2double(material_properties.failStress_cstd);
+                else
+                    failStress_cstd = material_properties.failStress_cstd;
+                end
+            catch
+                failStress_cstd = [];
+                setappdata(0, 'failStress_cstd', failStress_cstd)
+            end
+            if isnan(failStress_cstd) == 1.0
+                failStress_cstd = [];
+            end
+            setappdata(0, 'failStress_cstd', failStress_cstd)
+            
+            % Tensile stress (through-thickness direction)
+            try
+                if ischar(material_properties.failStress_tsttd) == 1.0
+                    failStress_tsttd = str2double(material_properties.failStress_tsttd);
+                else
+                    failStress_tsttd = material_properties.failStress_tsttd;
+                end
+            catch
+                failStress_tsttd = [];
+                setappdata(0, 'failStress_tsttd', failStress_tsttd)
+            end
+            if isnan(failStress_tsttd) == 1.0
+                failStress_tsttd = [];
+            end
+            setappdata(0, 'failStress_tsttd', failStress_tsttd)
+            
+            % Compressive stress (through-thickness direction)
+            try
+                if ischar(material_properties.failStress_csttd) == 1.0
+                    failStress_csttd = str2double(material_properties.failStress_csttd);
+                else
+                    failStress_csttd = material_properties.failStress_csttd;
+                end
+            catch
+                failStress_csttd = [];
+                setappdata(0, 'failStress_csttd', failStress_csttd)
+            end
+            if isnan(failStress_csttd) == 1.0
+                failStress_csttd = [];
+            end
+            setappdata(0, 'failStress_csttd', failStress_csttd)
+            
+            % Shear strength
+            try
+                if ischar(material_properties.failStress_shear) == 1.0
+                    failStress_shear = str2double(material_properties.failStress_shear);
+                else
+                    failStress_shear = material_properties.failStress_shear;
+                end
+            catch
+                failStress_shear = [];
+                setappdata(0, 'failStress_shear', failStress_shear)
+            end
+            if isnan(failStress_shear) == 1.0
+                failStress_shear = [];
+            end
+            setappdata(0, 'failStress_shear', failStress_shear)
+            
+            % Cross product coefficient (12-direction)
+            try
+                if ischar(material_properties.failStress_cross12) == 1.0
+                    failStress_cross12 = str2double(material_properties.failStress_cross12);
+                else
+                    failStress_cross12 = material_properties.failStress_cross12;
+                end
+            catch
+                failStress_cross12 = [];
+                setappdata(0, 'failStress_cross12', failStress_cross12)
+            end
+            
+            if isnan(failStress_cross12) == 1.0
+                failStress_cross12 = 0.0;
+            end
+            
+            setappdata(0, 'failStress_cross12', failStress_cross12)
+            
+            % Cross product coefficient (23-direction)
+            try
+                if ischar(material_properties.failStress_cross23) == 1.0
+                    failStress_cross23 = str2double(material_properties.failStress_cross23);
+                else
+                    failStress_cross23 = material_properties.failStress_cross23;
+                end
+            catch
+                failStress_cross23 = [];
+                setappdata(0, 'failStress_cross23', failStress_cross23)
+            end
+            
+            if isnan(failStress_cross23) == 1.0
+                failStress_cross23 = 0.0;
+            end
+            
+            setappdata(0, 'failStress_cross23', failStress_cross23)
+            
+            % Limit stress (12-direction)
+            try
+                if ischar(material_properties.failStress_limit12) == 1.0
+                    failStress_limit12 = str2double(material_properties.failStress_limit12);
+                else
+                    failStress_limit12 = material_properties.failStress_limit12;
+                end
+            catch
+                failStress_limit12 = [];
+                setappdata(0, 'failStress_limit12', failStress_limit12)
+            end
+            
+            if isnan(failStress_limit12) == 1.0
+                failStress_limit12 = [];
+            end
+            
+            setappdata(0, 'failStress_limit12', failStress_limit12)
+            
+            % Limit stress (23-direction)
+            try
+                if ischar(material_properties.failStress_limit23) == 1.0
+                    failStress_limit23 = str2double(material_properties.failStress_limit23);
+                else
+                    failStress_limit23 = material_properties.failStress_limit23;
+                end
+            catch
+                failStress_limit23 = [];
+                setappdata(0, 'failStress_limit23', failStress_limit23)
+            end
+            
+            if isnan(failStress_limit23) == 1.0
+                failStress_limit23 = [];
+            end
+            
+            setappdata(0, 'failStress_limit23', failStress_limit23)
+            
+            %% Fail strain parameters for composite failure
+            
+            % Tensile strain (fiber direction)
+            try
+                if ischar(material_properties.failStrain_tsfd) == 1.0
+                    failStrain_tsfd = str2double(material_properties.failStrain_tsfd);
+                else
+                    failStrain_tsfd = material_properties.failStrain_tsfd;
+                end
+            catch
+                failStrain_tsfd = [];
+                setappdata(0, 'failStrain_tsfd', failStrain_tsfd)
+            end
+            if isnan(failStrain_tsfd) == 1.0
+                failStrain_tsfd = [];
+            end
+            setappdata(0, 'failStrain_tsfd', failStrain_tsfd)
+            
+            % Compressive strain (fiber direction)
+            try
+                if ischar(material_properties.failStrain_csfd) == 1.0
+                    failStrain_csfd = str2double(material_properties.failStrain_csfd);
+                else
+                    failStrain_csfd = material_properties.failStrain_csfd;
+                end
+            catch
+                failStrain_csfd = [];
+                setappdata(0, 'failStrain_csfd', failStrain_csfd)
+            end
+            if isnan(failStrain_csfd) == 1.0
+                failStrain_csfd = [];
+            end
+            setappdata(0, 'failStrain_csfd', failStrain_csfd)
+            
+            % Tensile strain (transverse direction)
+            try
+                if ischar(material_properties.failStrain_tstd) == 1.0
+                    failStrain_tstd = str2double(material_properties.failStrain_tstd);
+                else
+                    failStrain_tstd = material_properties.failStrain_tstd;
+                end
+            catch
+                failStrain_tstd = [];
+                setappdata(0, 'failStrain_tstd', failStrain_tstd)
+            end
+            if isnan(failStrain_tstd) == 1.0
+                failStrain_tstd = [];
+            end
+            setappdata(0, 'failStrain_tstd', failStrain_tstd)
+            
+            % Compressive strain (transverse direction)
+            try
+                if ischar(material_properties.failStrain_cstd) == 1.0
+                    failStrain_cstd = str2double(material_properties.failStrain_cstd);
+                else
+                    failStrain_cstd = material_properties.failStrain_cstd;
+                end
+            catch
+                failStrain_cstd = [];
+                setappdata(0, 'failStrain_cstd', failStrain_cstd)
+            end
+            if isnan(failStrain_cstd) == 1.0
+                failStrain_cstd = [];
+            end
+            setappdata(0, 'failStrain_cstd', failStrain_cstd)
+            
+            % Shear strain
+            try
+                if ischar(material_properties.failStrain_shear) == 1.0
+                    failStrain_shear = str2double(material_properties.failStrain_shear);
+                else
+                    failStrain_shear = material_properties.failStrain_shear;
+                end
+            catch
+                failStrain_shear = [];
+                setappdata(0, 'failStrain_shear', failStrain_shear)
+            end
+            if isnan(failStrain_shear) == 1.0
+                failStrain_shear = [];
+            end
+            setappdata(0, 'failStrain_shear', failStrain_shear)
+            
+            % Elastic modulus (fiber direction)
+            try
+                if ischar(material_properties.failStrain_e11) == 1.0
+                    failStrain_e11 = str2double(material_properties.failStrain_e11);
+                else
+                    failStrain_e11 = material_properties.failStrain_e11;
+                end
+            catch
+                failStrain_e11 = [];
+                setappdata(0, 'failStrain_e11', failStrain_e11)
+            end
+            if isnan(failStrain_e11) == 1.0
+                failStrain_e11 = [];
+            end
+            setappdata(0, 'failStrain_e11', failStrain_e11)
+            
+            % Elastic modulus (transverse direction)
+            try
+                if ischar(material_properties.failStrain_e22) == 1.0
+                    failStrain_e22 = str2double(material_properties.failStrain_e22);
+                else
+                    failStrain_e22 = material_properties.failStrain_e22;
+                end
+            catch
+                failStrain_e22 = [];
+                setappdata(0, 'failStrain_e22', failStrain_e22)
+            end
+            if isnan(failStrain_e22) == 1.0
+                failStrain_e22 = [];
+            end
+            setappdata(0, 'failStrain_e22', failStrain_e22)
+            
+            % Section Poisson's ratio
+            try
+                if ischar(material_properties.failStrain_g12) == 1.0
+                    failStrain_g12 = str2double(material_properties.failStrain_g12);
+                else
+                    failStrain_g12 = material_properties.failStrain_g12;
+                end
+            catch
+                failStrain_g12 = [];
+                setappdata(0, 'failStrain_g12', failStrain_g12)
+            end
+            if isnan(failStrain_g12) == 1.0
+                failStrain_g12 = [];
+            end
+            setappdata(0, 'failStrain_g12', failStrain_g12)
+            
+            %% Hashin parameters for composite failure
+            
+            % Alpha
+            try
+                if ischar(material_properties.hashin_alpha) == 1.0
+                    hashin_alpha = str2double(material_properties.hashin_alpha);
+                else
+                    hashin_alpha = material_properties.hashin_alpha;
+                end
+            catch
+                hashin_alpha = 0.0;
+                setappdata(0, 'hashin_alpha', hashin_alpha)
+            end
+            if isnan(hashin_alpha) == 1.0
+                hashin_alpha = [];
+            end
+            setappdata(0, 'hashin_alpha', hashin_alpha)
+            
+            % Longitudinal tensile strength
+            try
+                if ischar(material_properties.hashin_lts) == 1.0
+                    hashin_lts = str2double(material_properties.hashin_lts);
+                else
+                    hashin_lts = material_properties.hashin_lts;
+                end
+            catch
+                hashin_lts = [];
+                setappdata(0, 'hashin_lts', hashin_lts)
+            end
+            if isnan(hashin_lts) == 1.0
+                hashin_lts = [];
+            end
+            setappdata(0, 'hashin_lts', hashin_lts)
+            
+            % Longitudinal compressive strength
+            try
+                if ischar(material_properties.hashin_lcs) == 1.0
+                    hashin_lcs = str2double(material_properties.hashin_lcs);
+                else
+                    hashin_lcs = material_properties.hashin_lcs;
+                end
+            catch
+                hashin_lcs = [];
+                setappdata(0, 'hashin_lcs', hashin_lcs)
+            end
+            if isnan(hashin_lcs) == 1.0
+                hashin_lcs = [];
+            end
+            setappdata(0, 'hashin_lcs', hashin_lcs)
+            
+            % Transverse tensile strength
+            try
+                if ischar(material_properties.hashin_tts) == 1.0
+                    hashin_tts = str2double(material_properties.hashin_tts);
+                else
+                    hashin_tts = material_properties.hashin_tts;
+                end
+            catch
+                hashin_tts = [];
+                setappdata(0, 'hashin_tts', hashin_tts)
+            end
+            if isnan(hashin_tts) == 1.0
+                hashin_tts = [];
+            end
+            setappdata(0, 'hashin_tts', hashin_tts)
+            
+            % Transverse compressive strength
+            try
+                if ischar(material_properties.hashin_tcs) == 1.0
+                    hashin_tcs = str2double(material_properties.hashin_tcs);
+                else
+                    hashin_tcs = material_properties.hashin_tcs;
+                end
+            catch
+                hashin_tcs = [];
+                setappdata(0, 'hashin_tcs', hashin_tcs)
+            end
+            if isnan(hashin_tcs) == 1.0
+                hashin_tcs = [];
+            end
+            setappdata(0, 'hashin_tcs', hashin_tcs)
+            
+            % Longitudinal shear strength
+            try
+                if ischar(material_properties.hashin_lss) == 1.0
+                    hashin_lss = str2double(material_properties.hashin_lss);
+                else
+                    hashin_lss = material_properties.hashin_lss;
+                end
+            catch
+                hashin_lss = [];
+                setappdata(0, 'hashin_lss', hashin_lss)
+            end
+            if isnan(hashin_lss) == 1.0
+                hashin_lss = [];
+            end
+            setappdata(0, 'hashin_lss', hashin_lss)
+            
+            % Transverse shear strength
+            try
+                if ischar(material_properties.hashin_tss) == 1.0
+                    hashin_tss = str2double(material_properties.hashin_tss);
+                else
+                    hashin_tss = material_properties.hashin_tss;
+                end
+            catch
+                hashin_tss = [];
+                setappdata(0, 'hashin_tss', hashin_tss)
+            end
+            if isnan(hashin_tss) == 1.0
+                hashin_tss = [];
+            end
+            setappdata(0, 'hashin_tss', hashin_tss)
         end
         
         %% Approximate the yield stress:
@@ -1344,7 +1795,7 @@ classdef preProcess < handle
         
         %% Perform nodal elimination
         function [coldItems, removed, hotspotWarning] = nodalElimination(algorithm,...
-                nlMaterial, msCorrection, items)
+                msCorrection, items)
             
             % Get the number of groups for the analysis
             G = getappdata(0, 'numberOfGroups');
@@ -1399,8 +1850,6 @@ classdef preProcess < handle
                     % Calculate the fatigue limit stress (conditional stress)
                     Sf = getappdata(0, 'Sf');
                     b = getappdata(0, 'b');
-                    kp = getappdata(0, 'kp');
-                    np = getappdata(0, 'np');
                     E = getappdata(0, 'E');
                     
                     if useSN == 1.0
@@ -1428,15 +1877,6 @@ classdef preProcess < handle
                         conditionalStress = Tfs*((2.0*designLife)^b);
                     else % PS, von Mises or NASALIFE
                         conditionalStress = Sf*((2.0*designLife)^b);
-                    end
-                    
-                    % Plasticity correction if necessary
-                    if algorithm ~= 4.0 || msCorrection ~= 1.0
-                        if (nlMaterial == 1.0) && (isempty(kp) == 0.0 && isempty(np) == 0.0)
-                            [~, conditionalStress, ~] = css(conditionalStress, E, kp, np);
-                            conditionalStress(1.0) = [];
-                            conditionalStress = real(conditionalStress);
-                        end
                     end
                 else
                     conditionalStress = getappdata(0, 'fatigueLimit');
@@ -1477,8 +1917,6 @@ classdef preProcess < handle
                         b = getappdata(0, 'b');
                         Ef = getappdata(0, 'Ef');
                         c = getappdata(0, 'c');
-                        kp = getappdata(0, 'kp');
-                        np = getappdata(0, 'np');
                         
                         maxShearXY = max(0.5.*(s1_i - s2_i));
                         maxShearYZ = max(0.5.*(s2_i - s3_i));
@@ -1487,16 +1925,10 @@ classdef preProcess < handle
                         
                         morrowSf = Sf - mean_item(totalCounter);
                         
-                        if plasticSN == 1.0 && (~isempty(Ef) && ~isempty(c))
+                        if plasticSN == 1.0 && (isempty(Ef) == 0.0 && isempty(c) == 0.0)
                             conditionalStress = E*(((1.65*morrowSf)/(E))*(cael)^b + (1.75*Ef)*(cael)^c) - shear;
                         else
                             conditionalStress = ((1.65*morrowSf))*(cael)^b - shear;
-                        end
-                        
-                        if nlMaterial == 1.0 && (~isempty(kp) && ~isempty(np))
-                            [~, conditionalStress, ~] = css(conditionalStress, E, kp, np);
-                            conditionalStress(1.0) = [];
-                            conditionalStress = real(conditionalStress);
                         end
                     elseif (msCorrection < 7.0) && (algorithm ~= 6.0 && algorithm ~= 8.0 && algorithm ~= 9.0)
                         [range_item(totalCounter), ~, ~] = analysis.msc(range_item(totalCounter), [min(s3_i), max(s1_i)], msCorrection, residual);
@@ -1954,7 +2386,7 @@ classdef preProcess < handle
                 end
                 
                 % Make sure each loading is the same length
-                if range(historyLengths) ~= 0.0
+                if (max(historyLengths) - min(historyLengths)) ~= 0.0
                     % Get the length of the largest load history
                     maxLength = max(historyLengths);
                     
@@ -2020,7 +2452,7 @@ classdef preProcess < handle
                         catch unhandledException
                             error = 1.0;
                             setappdata(0, 'E045', 1.0)
-                            setappdata(0, 'error_log_045_exceptionMessage', unhandledException.identifier)
+                            setappdata(0, 'error_log_045_exceptionMessage', unhandledException)
                             mainID = -999.0;
                             subID = -999.0;
                             Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
@@ -2060,7 +2492,7 @@ classdef preProcess < handle
                 
                 %% Make sure data position is the same for all RPT files
                 dataLabel = getappdata(0, 'dataLabel');
-                if range(dataLabel) ~= 0.0
+                if (max(dataLabel) - min(dataLabel)) ~= 0.0
                     error = 1.0;
                     setappdata(0, 'E021', 1.0)
                     
@@ -2106,7 +2538,7 @@ classdef preProcess < handle
             catch unhandledException
                 error = 1.0;
                 setappdata(0, 'E022', 1.0)
-                setappdata(0, 'error_log_022_exceptionMessage', unhandledException.identifier)
+                setappdata(0, 'error_log_022_exceptionMessage', unhandledException)
                 
                 mainID = -999.0;
                 subID = -999.0;
@@ -2654,7 +3086,7 @@ classdef preProcess < handle
                 
                 %% Make sure data position is the same for all RPT files
                 dataLabel = getappdata(0, 'dataLabel');
-                if range(dataLabel) ~= 0.0
+                if (max(dataLabel) - min(dataLabel)) ~= 0.0
                     error = true;
                     setappdata(0, 'E021', 1.0)
                     
@@ -3526,13 +3958,13 @@ classdef preProcess < handle
         %% Determine if an analysis item experiences plasticity
         function [] = getPlasticItems(N, algorithm)
             % Only find yielded items if requested
-            yieldCriterion = getappdata(0, 'yieldCriterion');
+            yieldCriteria = getappdata(0, 'yieldCriteria');
             
             % Get the history gating value
             historyGate = getappdata(0, 'historyGate');
             
             % Check that the yield criterion definition is correct
-            if (yieldCriterion < 1.0) || (yieldCriterion > 2.0) || (algorithm == 8.0)
+            if (yieldCriteria < 1.0) || (yieldCriteria > 2.0) || (algorithm == 8.0)
                 setappdata(0, 'YIELD', linspace(-1.0, -1.0, N))
                 setappdata(0, 'warning_063', 0.0)
                 return
@@ -3596,7 +4028,7 @@ classdef preProcess < handle
                     messenger.writeMessage(119.0)
                     totalCounter = totalCounter + 1.0;
                     continue
-                elseif (isempty(v) == 1.0) && (yieldCriterion == 1.0)
+                elseif (isempty(v) == 1.0) && (yieldCriteria == 1.0)
                     setappdata(0, 'YIELD', linspace(-2.0, -2.0, N))
                     messenger.writeMessage(162.0)
                     totalCounter = totalCounter + 1.0;
@@ -3711,7 +4143,7 @@ classdef preProcess < handle
                     %}
                     if error == 1.0
                         yield(totalCounter:(totalCounter + N) - 1.0) = -2.0;
-                        setappdata(0, 'yieldCriterion', 0.0)
+                        setappdata(0, 'yieldCriteria', 0.0)
                         setappdata(0, 'message_214_E', E)
                         setappdata(0, 'message_214_K', kp)
                         setappdata(0, 'message_214_N', np)
@@ -3724,7 +4156,7 @@ classdef preProcess < handle
                         break
                     elseif error == 2.0
                         yield(totalCounter:(totalCounter + N) - 1.0) = -2.0;
-                        setappdata(0, 'yieldCriterion', 0.0)
+                        setappdata(0, 'yieldCriteria', 0.0)
                         setappdata(0, 'message_242_groupMaterial', groupIDBuffer(groups).material)
                         setappdata(0, 'message_242_groupName', groupIDBuffer(groups).name)
                         setappdata(0, 'message_242_groupNumber', groups)
@@ -3756,7 +4188,7 @@ classdef preProcess < handle
                         Evaluate the principal stresses based on the
                         selected yield criterion
                     %}
-                    switch yieldCriterion
+                    switch yieldCriteria
                         case 1.0 % Total strain energy theory
                             totalStrainEnergy = s1_i.^2.0 + s2_i.^2.0 + s3_i.^2.0 - (2.0*v).*((s1_i.*s2_i) + (s2_i.*s3_i) + (s1_i.*s3_i));
                             if max(totalStrainEnergy) >= strainLimitEnergy
@@ -3912,7 +4344,7 @@ classdef preProcess < handle
         end
         
         %% Get the fatigue limit stress
-        function [error] = getFatigueLimit(plasticSN, algorithm, msCorrection, nlMaterial)
+        function [error] = getFatigueLimit(plasticSN, algorithm, msCorrection)
             error = 0.0;
             %{
                 Calculate the fatigue limit stress (conditional stress) for
@@ -3983,11 +4415,13 @@ classdef preProcess < handle
                 
                 cael = getappdata(0, 'cael');
                 cael_status = getappdata(0, 'cael_status');
+                E = getappdata(0, 'E');
                 Sf = getappdata(0, 'Sf');
                 b = getappdata(0, 'b');
+                Ef = getappdata(0, 'Ef');
+                c = getappdata(0, 'c');
                 kp = getappdata(0, 'kp');
                 np = getappdata(0, 'np');
-                E = getappdata(0, 'E');
                 
                 setappdata(0, 'enduranceLimitGroupNumber', i)
                 
@@ -3997,7 +4431,7 @@ classdef preProcess < handle
                     messenger.writeMessage(88.0)
                 elseif (enduranceSource == 3.0) && (isempty(userEnduranceLimit(i)) == 0.0)
                     conditionalStress = userEnduranceLimit(i);
-                elseif getappdata(0, 'useSN') == 1.0
+                elseif (getappdata(0, 'useSN') == 1.0) && (algorithm ~= 3.0)
                     N = getappdata(0, 'n_values');
                     
                     if getappdata(0, 'nSNDatasets') > 1.0
@@ -4024,13 +4458,18 @@ classdef preProcess < handle
                         setappdata(0, 'cael', 2.0*N(end))
                     end
                 elseif enduranceSource == 1.0
-                    conditionalStress = Sf*((cael)^b);
+                    if algorithm == 3.0
+                        conditionalStress = E*((Sf/E)*((cael)^b) + Ef*((cael)^c));
+                        [~, ~, conditionalStress, ~] = css2(conditionalStress, E, kp, np);
+                        
+                        messenger.writeMessage(48.0)
+                    else
+                        conditionalStress = Sf*((cael)^b);
+                    end
                 elseif algorithm == 4.0 %SBBM
-                    Ef = getappdata(0, 'Ef');
-                    c = getappdata(0, 'c');
-                    
                     if plasticSN == 1.0 && (isempty(Ef) == 0.0 && isempty(c) == 0.0)
                         conditionalStress = E*(((1.65*Sf)/(E))*(cael)^b + (1.75*Ef)*(cael)^c);
+                        [~, ~, conditionalStress, ~] = css2(conditionalStress, E, kp, np);
                     else
                         conditionalStress = (1.65*Sf)*(cael)^b;
                     end
@@ -4040,14 +4479,6 @@ classdef preProcess < handle
                     conditionalStress = Tfs*((cael)^b);
                 else % PS, von Mises or NASALIFE
                     conditionalStress = Sf*((cael)^b);
-                end
-                
-                % Plasticity correction if necessary
-                if algorithm ~= 4.0 || msCorrection ~= 1.0
-                    if nlMaterial == 1.0 && (~isempty(kp) && ~isempty(np))
-                        [~, conditionalStress, ~] = css(conditionalStress, E, kp, np);
-                        conditionalStress(1.0) = []; conditionalStress = real(conditionalStress);
-                    end
                 end
                 
                 setappdata(0, 'fatigueLimit', conditionalStress)
@@ -4188,6 +4619,7 @@ classdef preProcess < handle
         %% Make sure the output directory exists
         function [dir, error] = checkOutput(jobName, outputField, outputHistory, outputFigure)
             error = 0.0;
+            datacheck = getappdata(0, 'dataCheck');
             
             %%  Create the output directory if it doesn't exist
             dir = sprintf('Project/output/%s/', jobName);
@@ -4222,7 +4654,7 @@ classdef preProcess < handle
                     mkdir([dir, 'Data Files'])
                 end
                 
-                if outputFigure == 1.0
+                if (outputFigure == 1.0) && (datacheck == 0.0)
                     mkdir([dir, 'MATLAB Figures'])
                 end
             elseif exist(dir, 'dir') == 7.0
@@ -4259,7 +4691,7 @@ classdef preProcess < handle
                         end
                     end
                     
-                    if outputFigure == 1.0
+                    if (outputFigure == 1.0) && (datacheck == 0.0)
                         if exist([dir, 'MATLAB Figures'], 'dir') == 0.0
                             try
                                 mkdir([dir, 'MATLAB Figures'])

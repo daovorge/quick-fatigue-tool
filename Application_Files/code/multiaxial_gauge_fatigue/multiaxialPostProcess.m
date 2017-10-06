@@ -12,8 +12,8 @@ classdef multiaxialPostProcess < handle
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.2 Multiaxial Gauge Fatigue
 %   
-%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 04-Apr-2017 13:26:59 GMT
+%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
+%   Last modified 04-Oct-2017 18:09:00 GMT
     
     %%
     
@@ -41,7 +41,7 @@ classdef multiaxialPostProcess < handle
             
             %% Header
             % Write file header
-            fprintf(fid, 'Quick Fatigue Tool 6.11-03 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
+            fprintf(fid, 'Quick Fatigue Tool 6.11-04 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
             fprintf(fid, 'Last modified 08-Feb-2017 12:23:04 GMT\r\n\r\n');
             
@@ -453,34 +453,37 @@ classdef multiaxialPostProcess < handle
             saveas(f6, fileName, 'fig')
             postProcess.makeVisible([fileName, '.fig'])
             
-            %% RHIST RAINFLOW HISTOGRAM OF CYCLES
-            pairs = getappdata(0, 'cyclesOnCP');
-            Sm = 0.5*(pairs(:, 1.0) + pairs(:, 2.0));
-            amplitudes = getappdata(0, 'amplitudesOnCP');
-            
-            f7 = figure('visible', 'off');
-            rhistData = [Sm'; 2.0.*amplitudes]';
-            hist3(rhistData, [32.0, 32.0])
-            
-            set(gcf, 'renderer', 'opengl');
-            set(get(gca, 'child'), 'FaceColor', 'interp', 'CDataMode', 'auto');
-            colorbar
-            
-            msg = sprintf('RHIST, Rainflow cycle histogram');
-            xlabel('Mean Strain', 'FontSize', 12.0)
-            ylabel('Strain Range', 'FontSize', 12.0)
-            title(msg, 'FontSize', 14.0)
-            set(gca, 'FontSize', 12.0)
-            
             try
-                axis tight
+                %% RHIST RAINFLOW HISTOGRAM OF CYCLES
+                pairs = getappdata(0, 'cyclesOnCP');
+                Sm = 0.5*(pairs(:, 1.0) + pairs(:, 2.0));
+                amplitudes = getappdata(0, 'amplitudesOnCP');
+                
+                f7 = figure('visible', 'off');
+                rhistData = [Sm'; 2.0.*amplitudes]';
+                hist3(rhistData, [32.0, 32.0])
+                
+                set(gcf, 'renderer', 'opengl');
+                set(get(gca, 'child'), 'FaceColor', 'interp', 'CDataMode', 'auto');
+                colorbar
+                
+                msg = sprintf('RHIST, Rainflow cycle histogram');
+                xlabel('Mean Strain', 'FontSize', 12.0)
+                ylabel('Strain Range', 'FontSize', 12.0)
+                title(msg, 'FontSize', 14.0)
+                set(gca, 'FontSize', 12.0)
+                
+                try
+                    axis tight
+                catch
+                    % Don't tighten the axis
+                end
+                
+                fileName = [dir, '/RHIST, Rainflow cycle histogram'];
+                saveas(f7, fileName, 'fig')
+                postProcess.makeVisible([fileName, '.fig'])
             catch
-                % Don't tighten the axis
             end
-            
-            fileName = [dir, '/RHIST, Rainflow cycle histogram'];
-            saveas(f7, fileName, 'fig')
-            postProcess.makeVisible([fileName, '.fig'])
             
             %% CN (Normal strain on critical plane)
             

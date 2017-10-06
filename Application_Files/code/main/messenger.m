@@ -6,8 +6,8 @@ classdef messenger < handle
 %   MESSENGER is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %
-%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 19-Sep-2017 14:58:20 GMT
+%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
+%   Last modified 06-Oct-2017 14:39:49 GMT
 
     %%
 
@@ -251,32 +251,28 @@ classdef messenger < handle
                     case 13.0
                         % K'
                         if getappdata(0, 'kp_status') == 1.0
-                            if getappdata(0, 'nlMaterial') == 1.0
-                                fprintf(fidType(i), [returnType{i}, '***NOTE: The cyclic strain hardening coefficient for material %s (group %.0f) was not specified', returnType{i}], getappdata(0, 'getMaterial_currentMaterial'), getappdata(0, 'getMaterial_currentGroup'));
-
-                                if isempty(getappdata(0, 'kp')) == 0.0
-                                    fprintf(fidType(i), ['-> A derived value of %.4gMPa will be used', returnType{i}], getappdata(0, 'kp'));
-                                else
-                                    fprintf(fidType(i), ['-> A value could not be derived', returnType{i}]);
-                                end
-
-                                setappdata(0, 'messageFileNotes', 1.0)
+                            fprintf(fidType(i), [returnType{i}, '***NOTE: The cyclic strain hardening coefficient for material %s (group %.0f) was not specified', returnType{i}], getappdata(0, 'getMaterial_currentMaterial'), getappdata(0, 'getMaterial_currentGroup'));
+                            
+                            if isempty(getappdata(0, 'kp')) == 0.0
+                                fprintf(fidType(i), ['-> A derived value of %.4gMPa will be used', returnType{i}], getappdata(0, 'kp'));
+                            else
+                                fprintf(fidType(i), ['-> A value could not be derived', returnType{i}]);
                             end
+                            
+                            setappdata(0, 'messageFileNotes', 1.0)
                         end
                     case 14.0
                         % n'
                         if getappdata(0, 'np_status') == 1.0
-                            if getappdata(0, 'nlMaterial') == 1.0
-                                fprintf(fidType(i), [returnType{i}, '***NOTE: The cyclic strain hardening exponent for material %s (group %.0f) was not specified', returnType{i}], getappdata(0, 'getMaterial_currentMaterial'), getappdata(0, 'getMaterial_currentGroup'));
-
-                                if isempty(getappdata(0, 'kp')) == 0.0
-                                    fprintf(fidType(i), ['-> A derived value of %.4g will be used', returnType{i}], getappdata(0, 'np'));
-                                else
-                                    fprintf(fidType(i), [returnType{i}, '-> A value could not be derived', returnType{i}]);
-                                end
-
-                                setappdata(0, 'messageFileNotes', 1.0)
+                            fprintf(fidType(i), [returnType{i}, '***NOTE: The cyclic strain hardening exponent for material %s (group %.0f) was not specified', returnType{i}], getappdata(0, 'getMaterial_currentMaterial'), getappdata(0, 'getMaterial_currentGroup'));
+                            
+                            if isempty(getappdata(0, 'kp')) == 0.0
+                                fprintf(fidType(i), ['-> A derived value of %.4g will be used', returnType{i}], getappdata(0, 'np'));
+                            else
+                                fprintf(fidType(i), [returnType{i}, '-> A value could not be derived', returnType{i}]);
                             end
+                            
+                            setappdata(0, 'messageFileNotes', 1.0)
                         end
                     case 15.0
                         % k
@@ -616,11 +612,15 @@ classdef messenger < handle
                             setappdata(0, 'messageFileWarnings', 1.0)
                         end
                     case 48.0
-                        % Check if nonlinear material data was available
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: In at least one group, nonlinear material data is not available', returnType{i}]);
-                        fprintf(fidType(i), ['-> Elastic (Hookean) material data will be used instead', returnType{i}]);
-
-                        setappdata(0, 'messageFileWarnings', 1.0)
+                        if getappdata(0, 'suppress_ID48') == 0.0
+                            fprintf(fidType(i), [returnType{i}, '***NOTE: A strain-based fatigue algorithm has been selected without a user-defined fatigue limit', returnType{i}]);
+                            fprintf(fidType(i), ['-> The fatigue limit will be approximated from the Manson-Coffin curve and the Ramberg-Osgood relationship', returnType{i}]);
+                            fprintf(fidType(i), ['-> For such analyses, the user is strongly encouraged to specify the fatigue limit directly with the environment variables ''fatigueLimitSource=3'' and ''userFatigueLimit''', returnType{i}]);
+                            
+                            if i == X
+                                setappdata(0, 'suppress_ID48', 1.0)
+                            end
+                        end
                     case 49.0
                         % Print warning(s) if there is a problem with the mean stress correction
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The Morrow mean stress correction requires a value for the fatigue strength coefficient', returnType{i}]);
@@ -756,7 +756,7 @@ classdef messenger < handle
                                 fprintf(fidType(i), ['-> Cycles at this life are dominated by plasticity', returnType{i}]);
                                 fprintf(fidType(i), ['-> The S-N methodology is not recommended for this analysis', returnType{i}]);
                                 
-                                if any (L < 1e6) && getappdata(0, 'nlMaterial') == 0.0
+                                if any(L < 1e6) == 1.0
                                     fprintf(fidType(i), ['-> Items with lives less than 1e6 %s have been written to ''%s\\Project\\output\\%s\\Data Files\\warn_lcf_items.dat''', returnType{i}], getappdata(0, 'loadEqUnits'), pwd, getappdata(0, 'jobName'));
                                 end
                                 
@@ -767,18 +767,12 @@ classdef messenger < handle
                                 
                                 setappdata(0, 'messageFileWarnings', 1.0)
                             elseif any(L < 1e6)
-                                if getappdata(0, 'nlMaterial') == 0.0
-                                    fprintf(fidType(i), [returnType{i}, '***WARNING: %.0f items have lives less than 1e+06 %s', returnType{i}], length(L (L < 1e6)), getappdata(0, 'loadEqUnits'));
-                                    fprintf(fidType(i), ['-> The S-N methodology is usually intended for high cycle fatigue problems', returnType{i}]);
-                                    fprintf(fidType(i), ['-> Please check the validity of the input data for the analysis application', returnType{i}]);
-                                    fprintf(fidType(i), ['-> These items have been written to ''%s\\Project\\output\\%s\\Data Files\\warn_lcf_items.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
-                                    
-                                    setappdata(0, 'messageFileWarnings', 1.0)
-                                else
-                                    fprintf(fidType(i), [returnType{i}, '***NOTE: After considering plasticity, %.0f items have lives less than 1e6 cycles', returnType{i}], length(L (L < 1e6)));
-                                    
-                                    setappdata(0, 'messageFileNotes', 1.0)
-                                end
+                                fprintf(fidType(i), [returnType{i}, '***WARNING: %.0f items have lives less than 1e+06 %s', returnType{i}], length(L (L < 1e6)), getappdata(0, 'loadEqUnits'));
+                                fprintf(fidType(i), ['-> The S-N methodology is usually intended for high cycle fatigue problems', returnType{i}]);
+                                fprintf(fidType(i), ['-> Please check the validity of the input data for the analysis application', returnType{i}]);
+                                fprintf(fidType(i), ['-> These items have been written to ''%s\\Project\\output\\%s\\Data Files\\warn_lcf_items.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
+                                
+                                setappdata(0, 'messageFileWarnings', 1.0)
                             end
                         end
                         
@@ -963,7 +957,7 @@ classdef messenger < handle
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 87.0
-                        fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: Consistent element-node IDs for instance ''%s'' could not', returnType{i}], getappdata(0, 'warning_067_partInstance'));
+                        fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: Consistent element-node IDs for instance ''%s'' could not', returnType{i}], getappdata(0, 'warning_087_partInstance'));
                         fprintf(fidType(i), ['be found between the model output database and the field data (matching node IDs contain zero-valued indices)', returnType{i}]);
                         fprintf(fidType(i), ['-> This can occur when an invalid part instance is specified', returnType{i}]);
                         fprintf(fidType(i), ['-> Field data will not be exported', returnType{i}]);
@@ -1196,41 +1190,24 @@ classdef messenger < handle
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 127.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The B2 option is used with %.0f values, but there is only one analysis group', returnType{i}], length(getappdata(0, 'b2')));
-                        fprintf(fidType(i), ['-> The first value of B2 will be used for the analysis', returnType{i}]);
-                        fprintf(fidType(i), ['-> Ensure that the number of values in B2 matches the number of analysis groups', returnType{i}]);
-
-                        setappdata(0, 'messageFileNotes', 1.0)
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Composite materials may not be used for fatigue analysis. The analysis will not continue beyond this point', returnType{i}]);
                     case 128.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The B2_NF option is used with %.0f values, but there is only one analysis group', returnType{i}], length(getappdata(0, 'b2Nf')));
-                        fprintf(fidType(i), ['-> The first value of B2_NF will be used for the analysis', returnType{i}]);
-                        fprintf(fidType(i), ['-> Ensure that the number of values in B2_NF matches the number of analysis groups', returnType{i}]);
-
-                        setappdata(0, 'messageFileNotes', 1.0)
+                        %_AVAILABLE_%
                     case 129.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The UCS option is used with %.0f values, but there is only one analysis group', returnType{i}], length(getappdata(0, 'ucs')));
-                        fprintf(fidType(i), ['-> The first value of UCS will be used for the analysis', returnType{i}]);
-                        fprintf(fidType(i), ['-> Ensure that the number of values in UCS matches the number of analysis groups', returnType{i}]);
-
-                        setappdata(0, 'messageFileNotes', 1.0)
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Composite criteria results have been written to ''%s\\Project\\output\\%s\\Data Files\\composite_criteria.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
                     case 130.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The B2 option is used with %.0f values, but there is only one analysis group', returnType{i}], length(getappdata(0, 'b2')));
-                        fprintf(fidType(i), ['-> The first value of B2 will be used for the analysis', returnType{i}]);
-                        fprintf(fidType(i), ['-> Ensure that the number of values in B2 matches the number of analysis groups', returnType{i}]);
-
-                        setappdata(0, 'messageFileNotes', 1.0)
+                        %_AVAILABLE_%
                     case 131.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The B2_NF option is used with %.0f values, but there is only one analysis group', returnType{i}], length(getappdata(0, 'b2Nf')));
-                        fprintf(fidType(i), ['-> The first value of B2_NF will be used for the analysis', returnType{i}]);
-                        fprintf(fidType(i), ['-> Ensure that the number of values in B2_NF matches the number of analysis groups', returnType{i}]);
-
-                        setappdata(0, 'messageFileNotes', 1.0)
+                        %_AVAILABLE_%
                     case 132.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The UCS option is used with %.0f values, but there is only one analysis group', returnType{i}], length(getappdata(0, 'ucs')));
-                        fprintf(fidType(i), ['-> The first value of UCS will be used for the analysis', returnType{i}]);
-                        fprintf(fidType(i), ['-> Ensure that the number of values in UCS matches the number of analysis groups', returnType{i}]);
-
-                        setappdata(0, 'messageFileNotes', 1.0)
+                        if getappdata(0, 'suppress_ID132') == 0.0
+                            fprintf(fidType(i), [returnType{i}, '***NOTE: Out-of-plane stresses (S33/S23/S13) were found during the composite failure/damage initiation calculation', returnType{i}]);
+                            fprintf(fidType(i), ['-> For composite materials, plane stress conditions are assumed', returnType{i}]);
+                            
+                            if i == X
+                                setappdata(0, 'suppress_ID132', 1.0)
+                            end
+                        end
                     case 133.0
                         if (ispc == 1.0) && (ismac == 0.0)
                             [userView, systemView] = memory;
@@ -2110,7 +2087,14 @@ classdef messenger < handle
                         fprintf(fidType(i), [returnType{i}, '***WARNING: User FRF diagnostic item %.0f does not exist in the model', returnType{i}], getappdata(0, 'message_264_item'));
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 265.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: Abaqus ODB field output has been exported to ''%s\\Project\\output\\%s\\Data Files''', returnType{i}], pwd, getappdata(0, 'jobName'));
+                        exportMode = getappdata(0, 'autoExport_executionMode');
+                        jobName = getappdata(0, 'jobName');
+                        
+                        if (exportMode == 1.0) || (exportMode == 2.0)
+                            fprintf(fidType(i), [returnType{i}, '***NOTE: Abaqus ODB field output has been exported to ''%s\\Project\\output\\%s\\Data Files''', returnType{i}], pwd, jobName);
+                        elseif exportMode == 3.0
+                            fprintf(fidType(i), [returnType{i}, '***NOTE: Abaqus ODB Python script has been exported to ''%s\\Project\\output\\%s\\Data Files''', returnType{i}], pwd, jobName);
+                        end
                     case 266.0
                         if getappdata(0, 'suppress_ID266') == 0.0
                             fprintf(fidType(i), [returnType{i}, '***NOTE: User-defined items were read from the file ''%s''', returnType{i}], getappdata(0, 'hotspotFile'));
@@ -2137,7 +2121,7 @@ classdef messenger < handle
                             fprintf(fidType(i), ['-> If the first job contains damaging cycles and the second job contains cycles below the endurance limit, fatigue damage may not be calculated for the small cycles', returnType{i}]);
                         end
                     case 269.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: Surface detection did not find any elements or nodes', returnType{i}]);
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The surface detection algorithm did not find any surface elements or nodes in the model', returnType{i}]);
                         fprintf(fidType(i), ['-> All items will be analysed', returnType{i}]);
                     case 270.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Surface detection is not supported for integration point stress data', returnType{i}]);
@@ -2159,6 +2143,8 @@ classdef messenger < handle
                         if isempty(strfind(message, 'The database is from a previous release of Abaqus.')) == 0.0
                             fprintf(fidType(i), ['-> The installed Abaqus API is from a more recent version of Abaqus than that which was used to generate the model ODB file', returnType{i}]);
                             fprintf(fidType(i), ['-> Set the environment variables ''autoExport_upgradeODB=1.0'' and ''autoExport_abqCmd=<abaqus-version>'', where <abaqus-version> is the identifier of the Abaqus version to which the ODB file is upgraded', returnType{i}]);
+                        elseif isempty(strfind(message, getappdata(0, 'partInstance'))) == 0.0
+                            fprintf(fidType(i), ['-> The part instance name is either spelled incorrectly or it does not exist in the model', returnType{i}]);
                         end
                             
                         fprintf(fidType(i), ['-> All items will be analysed', returnType{i}]);
@@ -2209,6 +2195,34 @@ classdef messenger < handle
                     case 287.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: Some items in the surface definition file could not be located in the stress dataset', returnType{i}]);
                         fprintf(fidType(i), ['-> Verify that the results position in the surface definition is consistent with the model definition in the job file', returnType{i}]);
+                    case 289.0
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: The following elements are not supported by the surface detection algorithm: %s', returnType{i}], getappdata(0, 'message_289_unsupportedElements'));
+                        fprintf(fidType(i), ['-> These elements have been skipped', returnType{i}]);
+                    case 290.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The maximum stress failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'MSTRS'));
+                    case 291.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Tsai-Hill failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'TSAIH'));
+                    case 292.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Tsai-Wu failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'TSAIW'));
+                    case 293.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Tsai-Wu failure criterion for closed cell PVC foam has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'TSAIWTT'));
+                    case 294.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Azzi-Tsai-Hill failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'AZZIT'));
+                    case 295.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The maximum strain failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'MSTRN'));
+                    case 296.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin damage initiation (fiber tensile) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNFTCRT'));
+                    case 297.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin damage initiation (fiber compression) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNFCCRT'));
+                    case 298.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin damage initiation (matrix tensile) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNMTCRT'));
+                    case 299.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin damage initiation (matrix compression) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNMCCRT'));
+                    case 300.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The COMPOSITE_CRITERIA job file option was specified, but composite criteria were not evaluated', returnType{i}]);
+                        fprintf(fidType(i), ['-> The specified composite properies are insufficient', returnType{i}]);
+                    case 301.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: After evaluating composite criteria, no failure/damage initiation was detected', returnType{i}]);
                 end
             end
         end
@@ -2218,6 +2232,7 @@ classdef messenger < handle
             setappdata(0, 'suppress_ID16', 0.0)
             setappdata(0, 'suppress_ID17', 0.0)
             setappdata(0, 'suppress_ID26', 0.0)
+            setappdata(0, 'suppress_ID48', 0.0)
             setappdata(0, 'suppress_ID58', 0.0)
             setappdata(0, 'suppress_ID59', 0.0)
             setappdata(0, 'suppress_ID62', 0.0)
@@ -2226,6 +2241,7 @@ classdef messenger < handle
             setappdata(0, 'suppress_ID77', 0.0)
             setappdata(0, 'suppress_ID78', 0.0)
             setappdata(0, 'suppress_ID97', 0.0)
+            setappdata(0, 'suppress_ID132', 0.0)
             setappdata(0, 'suppress_ID143', 0.0)
             setappdata(0, 'suppress_ID144', 0.0)
             setappdata(0, 'suppress_ID145', 0.0)
@@ -2246,7 +2262,7 @@ classdef messenger < handle
                 gateHistories, gateTensors, nodalElimination, planePrecision,...
                 worstAnalysisItem, thetaOnCP, phiOnCP, outputField,...
                 algorithm, nodalDamage, worstMainID, worstSubID, dir,...
-                step, cael, msCorrection, nlMaterial, removed,...
+                step, cael, msCorrection, removed,...
                 hotspotWarning, loadEqVal, loadEqUnits, elementType,...
                 offset, analysisTime)
 
@@ -2257,13 +2273,13 @@ classdef messenger < handle
 
             % Write file header
             try
-                fprintf(fid, 'Quick Fatigue Tool 6.11-03 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
+                fprintf(fid, 'Quick Fatigue Tool 6.11-04 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
             catch
-                fprintf(fid, 'Quick Fatigue Tool 6.11-03\r\n');
+                fprintf(fid, 'Quick Fatigue Tool 6.11-04\r\n');
             end
             fprintf(fid, 'MATLAB version %s\r\n', version);
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 19-Sep-2017 14:58:20 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 06-Oct-2017 14:39:49 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
@@ -2289,12 +2305,7 @@ classdef messenger < handle
                     fprintf(fid, '    Material Model: Linear Elastic (Hookean)\r\n');
                 else
                     fprintf(fid, '    Material: %s\r\n', material(1:end-4));
-
-                    if nlMaterial == 1.0
-                        fprintf(fid, '    Material Model: Nonlinear elastic (Ramberg-Osgood)\r\n');
-                    else
-                        fprintf(fid, '    Material Model: Linear Elastic (Hookean)\r\n');
-                    end
+                    fprintf(fid, '    Material Model: Linear Elastic (Hookean)\r\n');
                 end
 
                 if algorithm == 8.0
@@ -2357,11 +2368,7 @@ classdef messenger < handle
                     fprintf(fid, '    Material: Structural Steel\r\n');
                     fprintf(fid, '    Material Model: Linear Elastic (Hookean)\r\n');
                 else
-                    if nlMaterial == 1.0
-                        fprintf(fid, '    Material Model: Nonlinear elastic (Ramberg-Osgood)\r\n');
-                    else
-                        fprintf(fid, '    Material Model: Linear Elastic (Hookean)\r\n');
-                    end
+                    fprintf(fid, '    Material Model: Linear Elastic (Hookean)\r\n');
                 end
 
                 if algorithm == 8.0
@@ -3424,8 +3431,13 @@ classdef messenger < handle
                     answer = -1.0;
                 end
             else
-                fprintf('Job %s completed successfully (%s)\n\n',...
-                    jobName, datestr(datenum(c(1), c(2), c(3), c(4), c(5), c(6))))
+                if getappdata(0, 'echoMessagesToCWIN') == 1.0
+                    fprintf('Job %s completed successfully. Scroll up for details. (%s)\n\n',...
+                        jobName, datestr(datenum(c(1), c(2), c(3), c(4), c(5), c(6))))
+                else
+                    fprintf('Job %s completed successfully (%s)\n\n',...
+                        jobName, datestr(datenum(c(1), c(2), c(3), c(4), c(5), c(6))))
+                end
 
                 % Prompt user if they would like to view the analysis log
                 if (ispc == 1.0) && (ismac == 0.0)

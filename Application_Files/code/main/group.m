@@ -8,8 +8,8 @@ classdef group < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      4.6 Analysis groups
 %   
-%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 07-Apr-2017 14:38:24 GMT
+%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
+%   Last modified 03-Oct-2017 13:44:11 GMT
     
     %%
     
@@ -300,6 +300,32 @@ classdef group < handle
             group_materialProps(numberOfMaterials).goodmanLimitStress = [];
             group_materialProps(numberOfMaterials).notchSensitivityConstant = [];
             group_materialProps(numberOfMaterials).notchRootRadius = [];
+            group_materialProps(numberOfMaterials).failStress_tsfd = [];
+            group_materialProps(numberOfMaterials).failStress_csfd = [];
+            group_materialProps(numberOfMaterials).failStress_tstd = [];
+            group_materialProps(numberOfMaterials).failStress_cstd = [];
+            group_materialProps(numberOfMaterials).failStress_tsttd = [];
+            group_materialProps(numberOfMaterials).failStress_csttd = [];
+            group_materialProps(numberOfMaterials).failStress_shear = [];
+            group_materialProps(numberOfMaterials).failStress_cross12 = [];
+            group_materialProps(numberOfMaterials).failStress_cross23 = [];
+            group_materialProps(numberOfMaterials).failStress_limit12 = [];
+            group_materialProps(numberOfMaterials).failStress_limit23 = [];
+            group_materialProps(numberOfMaterials).failStrain_tsfd = [];
+            group_materialProps(numberOfMaterials).failStrain_csfd = [];
+            group_materialProps(numberOfMaterials).failStrain_tstd = [];
+            group_materialProps(numberOfMaterials).failStrain_cstd = [];
+            group_materialProps(numberOfMaterials).failStrain_shear = [];
+            group_materialProps(numberOfMaterials).failStrain_e11 = [];
+            group_materialProps(numberOfMaterials).failStrain_e22 = [];
+            group_materialProps(numberOfMaterials).failStrain_g12 = [];
+            group_materialProps(numberOfMaterials).hashin_alpha = [];
+            group_materialProps(numberOfMaterials).hashin_lts = [];
+            group_materialProps(numberOfMaterials).hashin_lcs = [];
+            group_materialProps(numberOfMaterials).hashin_tts = [];
+            group_materialProps(numberOfMaterials).hashin_tcs = [];
+            group_materialProps(numberOfMaterials).hashin_lss = [];
+            group_materialProps(numberOfMaterials).hashin_tss = [];
             
             setappdata(0, 'group_materialProps', group_materialProps)
             
@@ -831,236 +857,6 @@ classdef group < handle
             % Save the residual stresses
             setappdata(0, 'residualStress_original', residualStress)
             
-            %% Verify B2/B2_NF/UCS definition
-            b2 = getappdata(0, 'b2');
-            b2Nf = getappdata(0, 'b2Nf');
-            ucs = getappdata(0, 'ucs');
-            
-            if isempty(b2) == 1.0
-                numberOfB2 = [];
-            else
-                numberOfB2 = length(b2);
-            end
-            if isempty(b2Nf) == 1.0
-                numberOfB2Nf = [];
-            else
-                numberOfB2Nf = length(b2Nf);
-            end
-            if isempty(ucs) == 1.0
-                numberOfUCS = [];
-            else
-                numberOfUCS = length(ucs);
-            end
-            
-            if length(b2) ~= length(b2Nf)
-                error = 1.0;
-                setappdata(0, 'E095', 1.0)
-                return
-            end
-            
-            if (isempty(analysisGroups) == 1.0) || ((numberOfGroups == 1.0) && (strcmpi(analysisGroups, 'default') == 1.0))
-                %{
-                    The GROUP option is empty, so analysis groups are not
-                    being used, or the GROUP option is specified with the
-                    single argument DEFAULT, in which case analysis groups
-                    are also not to be used for the analysis
-                %}
-                
-                % Verify the definitions in case of multiple definitions
-
-                if numberOfB2 > 1.0
-                    %{
-                        There is more than one b2, making the
-                        definition ambiguous. Use only the first value
-                    %}
-                    messenger.writeMessage(127.0)
-                    setappdata(0, 'b2', b2(1.0))
-                end
-                
-                if numberOfB2Nf > 1.0
-                    %{
-                        There is more than one b2Nf, making the
-                        definition ambiguous. Use only the first value
-                    %}
-                    messenger.writeMessage(128.0)
-                    setappdata(0, 'b2Nf', b2Nf(1.0))
-                end
-                
-                if numberOfUCS > 1.0
-                    %{
-                        There is more than one UCS, making the
-                        definition ambiguous. Use only the first value
-                    %}
-                    messenger.writeMessage(129.0)
-                    setappdata(0, 'ucs', ucs(1.0))
-                end
-            elseif (numberOfGroups == 1.0) && (strcmpi(analysisGroups, 'defualt') == 0.0)
-                %{
-                    The GROUP option is specified with a single argument
-                    other than DEFAULT. Only this group is to be analysed
-                %}
-                
-                % Verify the definitions
-                if numberOfB2 > 2.0
-                    %{
-                        There are multiple B2s, making the definition
-                        ambiguous
-                    %}
-                    messenger.writeMessage(130.0)
-                    setappdata(0, 'b2', b2(1.0))
-                elseif numberOfB2 == 2.0
-                    %{
-                        There are two b2s, making the definition
-                        ambiguous. It's possible that the user meant to
-                        define a group b2 followed by a DEFAULT group, but
-                        forgot to add 'DEFAULT' to the GROUP option.
-                        Inform the user and abort the analysis
-                    %}
-                    error = 1.0;
-                    setappdata(0, 'E083', 1.0)
-                    return
-                end
-                
-                if numberOfB2Nf > 2.0
-                    %{
-                        There are multiple B2Nfs, making the definition
-                        ambiguous
-                    %}
-                    messenger.writeMessage(131.0)
-                    setappdata(0, 'b2Nf', b2Nf(1.0))
-                elseif numberOfB2Nf == 2.0
-                    %{
-                        There are two B2Nfs, making the definition
-                        ambiguous. It's possible that the user meant to
-                        define a group B2Nf followed by a DEFAULT group,
-                        but forgot to add 'DEFAULT' to the GROUP option.
-                        Inform the user and abort the analysis
-                    %}
-                    error = 1.0;
-                    setappdata(0, 'E084', 1.0)
-                    return
-                end
-                
-                if numberOfUCS > 2.0
-                    %{
-                        There are multiple B2Nfs, making the definition
-                        ambiguous
-                    %}
-                    messenger.writeMessage(132.0)
-                    setappdata(0, 'ucs', ucs(1.0))
-                elseif numberOfUCS == 2.0
-                    %{
-                        There are two UCS values, making the definition
-                        ambiguous. It's possible that the user meant to
-                        define a group UCS followed by a DEFAULT group,
-                        but forgot to add 'DEFAULT' to the GROUP option.
-                        Inform the user and abort the analysis
-                    %}
-                    error = 1.0;
-                    setappdata(0, 'E085', 1.0)
-                    return
-                end
-            elseif numberOfGroups > 1.0
-                %{
-                    The GROUP option is specified with more than one
-                    argument
-                %}
-                if numberOfB2 < numberOfGroups
-                    % There are fewer b2s than analysis groups
-                    error = 1.0;
-                    setappdata(0, 'E086', 1.0)
-                    setappdata(0, 'error_log_086_numberOfB2', numberOfB2)
-                    setappdata(0, 'error_log_086_numberOfGroups', numberOfGroups)
-                    return
-                elseif numberOfB2 == (numberOfGroups - 1.0)
-                    %{
-                        There is one more b2 than there are analysis
-                        groups
-                    %}
-                    error = 1.0;
-                    setappdata(0, 'E087', 1.0)
-                    setappdata(0, 'error_log_087_numberOfB2', numberOfB2)
-                    setappdata(0, 'error_log_087_numberOfGroups', numberOfGroups)
-                    return
-                elseif numberOfB2 > numberOfGroups
-                    %{
-                        There is greater than one b2 more than there
-                        are analysis groups
-                    %}
-                    error = 1.0;
-                    setappdata(0, 'E088', 1.0)
-                    setappdata(0, 'error_log_088_numberOfB2', numberOfB2)
-                    setappdata(0, 'error_log_088_numberOfGroups', numberOfGroups)
-                    return
-                end
-                
-                if numberOfB2Nf < numberOfGroups
-                    % There are fewer b2Nfs than analysis groups
-                    error = 1.0;
-                    setappdata(0, 'E089', 1.0)
-                    setappdata(0, 'error_log_089_numberOfB2Nf', numberOfB2Nf)
-                    setappdata(0, 'error_log_089_numberOfGroups', numberOfGroups)
-                    return
-                elseif numberOfB2Nf == (numberOfGroups - 1.0)
-                    %{
-                        There is one more b2Nf than there are analysis
-                        groups
-                    %}
-                    error = 1.0;
-                    setappdata(0, 'E090', 1.0)
-                    setappdata(0, 'error_log_090_numberOfB2Nf', numberOfB2Nf)
-                    setappdata(0, 'error_log_090_numberOfGroups', numberOfGroups)
-                    return
-                elseif numberOfB2Nf > numberOfGroups
-                    %{
-                        There is greater than one b2Nf more than there
-                        are analysis groups
-                    %}
-                    error = 1.0;
-                    setappdata(0, 'E091', 1.0)
-                    setappdata(0, 'error_log_091_numberOfB2Nf', numberOfB2Nf)
-                    setappdata(0, 'error_log_091_numberOfGroups', numberOfGroups)
-                    return
-                end
-                
-                if numberOfUCS < numberOfGroups
-                    % There are fewer UCS values than analysis groups
-                    error = 1.0;
-                    setappdata(0, 'E092', 1.0)
-                    setappdata(0, 'error_log_092_numberOfUCS', numberOfUCS)
-                    setappdata(0, 'error_log_092_numberOfGroups', numberOfGroups)
-                    return
-                elseif numberOfUCS == (numberOfGroups - 1.0)
-                    %{
-                        There is one more UCS than there are analysis
-                        groups
-                    %}
-                    error = 1.0;
-                    setappdata(0, 'E093', 1.0)
-                    setappdata(0, 'error_log_093_numberOfUCS', numberOfUCS)
-                    setappdata(0, 'error_log_093_numberOfGroups', numberOfGroups)
-                    return
-                elseif numberOfUCS > numberOfGroups
-                    %{
-                        There is greater than one UCS more than there
-                        are analysis groups
-                    %}
-                    error = 1.0;
-                    setappdata(0, 'E094', 1.0)
-                    setappdata(0, 'error_log_094_numberOfUCS', numberOfUCS)
-                    setappdata(0, 'error_log_094_numberOfGroups', numberOfGroups)
-                    return
-                end
-            end
-            
-            % Save b2
-            setappdata(0, 'b2_original', b2)
-            
-            % Save b2Nf
-            setappdata(0, 'b2Nf_original', b2Nf)
-            
-            % Save UCS
-            setappdata(0, 'ucs_original', ucs)
             
             %% Verify SN_KNOCK_DOWN definition
             snKnockDown = getappdata(0, 'snKnockDown');
@@ -2036,6 +1832,33 @@ classdef group < handle
             group_materialProps(materialNumber).goodmanLimitStress = getappdata(0, 'goodmanMeanStressLimit');
             group_materialProps(materialNumber).notchSensitivityConstant = getappdata(0, 'notchSensitivityConstant');
             group_materialProps(materialNumber).notchRootRadius = getappdata(0, 'notchRootRadius');
+            group_materialProps(materialNumber).failStress_tsfd = getappdata(0, 'failStress_tsfd');
+            group_materialProps(materialNumber).failStress_csfd = getappdata(0, 'failStress_csfd');
+            group_materialProps(materialNumber).failStress_tstd = getappdata(0, 'failStress_tstd');
+            group_materialProps(materialNumber).failStress_cstd = getappdata(0, 'failStress_cstd');
+            group_materialProps(materialNumber).failStress_tsttd = getappdata(0, 'failStress_tsttd');
+            group_materialProps(materialNumber).failStress_csttd = getappdata(0, 'failStress_csttd');
+            group_materialProps(materialNumber).failStress_shear = getappdata(0, 'failStress_shear');
+            group_materialProps(materialNumber).failStress_cross12 = getappdata(0, 'failStress_cross12');
+            group_materialProps(materialNumber).failStress_cross23 = getappdata(0, 'failStress_cross23');
+            group_materialProps(materialNumber).failStress_limit12 = getappdata(0, 'failStress_limit12');
+            group_materialProps(materialNumber).failStress_limit23 = getappdata(0, 'failStress_limit23');
+            group_materialProps(materialNumber).failStrain_tsfd = getappdata(0, 'failStrain_tsfd');
+            group_materialProps(materialNumber).failStrain_csfd = getappdata(0, 'failStrain_csfd');
+            group_materialProps(materialNumber).failStrain_tstd = getappdata(0, 'failStrain_tstd');
+            group_materialProps(materialNumber).failStrain_cstd = getappdata(0, 'failStrain_cstd');
+            group_materialProps(materialNumber).failStrain_shear = getappdata(0, 'failStrain_shear');
+            group_materialProps(materialNumber).failStrain_e11 = getappdata(0, 'failStrain_e11');
+            group_materialProps(materialNumber).failStrain_e22 = getappdata(0, 'failStrain_e22');
+            group_materialProps(materialNumber).failStrain_g12 = getappdata(0, 'failStrain_g12');
+            group_materialProps(materialNumber).hashin_alpha = getappdata(0, 'hashin_alpha');
+            group_materialProps(materialNumber).hashin_lts = getappdata(0, 'hashin_lts');
+            group_materialProps(materialNumber).hashin_lcs = getappdata(0, 'hashin_lcs');
+            group_materialProps(materialNumber).hashin_tts = getappdata(0, 'hashin_tts');
+            group_materialProps(materialNumber).hashin_tcs = getappdata(0, 'hashin_tcs');
+            group_materialProps(materialNumber).hashin_lss = getappdata(0, 'hashin_lss');
+            group_materialProps(materialNumber).hashin_tss = getappdata(0, 'hashin_tss');
+            
             
             setappdata(0, 'group_materialProps', group_materialProps)
         end
@@ -2096,6 +1919,32 @@ classdef group < handle
             setappdata(0, 'goodmanMeanStressLimit', group_materialProps(materialNumber).goodmanLimitStress)
             setappdata(0, 'notchSensitivityConstant', group_materialProps(materialNumber).notchSensitivityConstant)
             setappdata(0, 'notchRootRadius', group_materialProps(materialNumber).notchRootRadius)
+            setappdata(0, 'failStress_tsfd', group_materialProps(materialNumber).failStress_tsfd)
+            setappdata(0, 'failStress_csfd', group_materialProps(materialNumber).failStress_csfd)
+            setappdata(0, 'failStress_tstd', group_materialProps(materialNumber).failStress_tstd)
+            setappdata(0, 'failStress_cstd', group_materialProps(materialNumber).failStress_cstd)
+            setappdata(0, 'failStress_tsttd', group_materialProps(materialNumber).failStress_tsttd)
+            setappdata(0, 'failStress_csttd', group_materialProps(materialNumber).failStress_csttd)
+            setappdata(0, 'failStress_shear', group_materialProps(materialNumber).failStress_shear)
+            setappdata(0, 'failStress_cross12', group_materialProps(materialNumber).failStress_cross12)
+            setappdata(0, 'failStress_cross23', group_materialProps(materialNumber).failStress_cross23)
+            setappdata(0, 'failStress_limit12', group_materialProps(materialNumber).failStress_limit12)
+            setappdata(0, 'failStress_limit23', group_materialProps(materialNumber).failStress_limit23)
+            setappdata(0, 'failStrain_tsfd', group_materialProps(materialNumber).failStrain_tsfd)
+            setappdata(0, 'failStrain_csfd', group_materialProps(materialNumber).failStrain_csfd)
+            setappdata(0, 'failStrain_tstd', group_materialProps(materialNumber).failStrain_tstd)
+            setappdata(0, 'failStrain_cstd', group_materialProps(materialNumber).failStrain_cstd)
+            setappdata(0, 'failStrain_shear', group_materialProps(materialNumber).failStrain_shear)
+            setappdata(0, 'failStrain_e11', group_materialProps(materialNumber).failStrain_e11)
+            setappdata(0, 'failStrain_e22', group_materialProps(materialNumber).failStrain_e22)
+            setappdata(0, 'failStrain_g12', group_materialProps(materialNumber).failStrain_g12)
+            setappdata(0, 'hashin_alpha', group_materialProps(materialNumber).hashin_alpha)
+            setappdata(0, 'hashin_lts', group_materialProps(materialNumber).hashin_lts)
+            setappdata(0, 'hashin_lcs', group_materialProps(materialNumber).hashin_lcs)
+            setappdata(0, 'hashin_tts', group_materialProps(materialNumber).hashin_tts)
+            setappdata(0, 'hashin_tcs', group_materialProps(materialNumber).hashin_tcs)
+            setappdata(0, 'hashin_lss', group_materialProps(materialNumber).hashin_lss)
+            setappdata(0, 'hashin_tss', group_materialProps(materialNumber).hashin_tss)
         end
         
         %% READ A GROUP FILE

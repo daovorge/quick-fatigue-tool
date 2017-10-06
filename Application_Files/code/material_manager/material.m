@@ -28,8 +28,8 @@ classdef material < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials
 %   
-%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 08-Sep-2017 134302:48 GMT
+%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
+%   Last modified 23-Sep-2017 15:01:48 GMT
     
     %%
     
@@ -157,10 +157,20 @@ classdef material < handle
                     fprintf('ERROR: Unable to save material ''%s''. Make sure the material save location has read/write access.\n', materialName)
                     return
                 end
-                
-                % List materials in the local database
-                material.list()
+            elseif error == 0.0
+                % Save the material
+                try
+                    save([localPath, '\', materialName], 'material_properties')
+                catch
+                    fprintf('ERROR: Unable to save material ''%s''. Make sure the material save location has read/write access.\n', materialName)
+                    return
+                end
+            else
+                return
             end
+            
+            % List materials in the local database
+            material.list()
         end
         
         %% Fetch material from system database
@@ -625,7 +635,11 @@ classdef material < handle
             end
             
             % Remove '.mat' extension
-            userMaterial(end - 3.0:end) = [];
+            [~, ~, ext] = fileparts(userMaterial);
+            
+            if isempty(ext) == 0.0
+                userMaterial(end - 3.0:end) = [];
+            end
             
             % Create file name
             fileName = sprintf('Project/output/material_reports/%s_report.dat', userMaterial);

@@ -12,8 +12,8 @@
 %   Reference section in Quick Fatigue Tool User Settings Reference Guide
 %      2 Environment variables
 %   
-%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 18-Sep-2017 17:44:24 GMT
+%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
+%   Last modified 26-Sep-2017 21:01:00 GMT
 
 %% GATE TENSORS
 %{
@@ -119,15 +119,6 @@ setappdata(0, 'rainflowMode', 1.0)
 %}
 setappdata(0, 'shellLocation', 1.0)
 
-%% NON-LINEAR MATERIAL PROPERTIES
-%{
-    0: Linear (Hookean) material model
-    1: Nonlinear elastic (Ramberg-Osgood) material model
-%}
-setappdata(0, 'nlMaterial', 0.0)
-setappdata(0, 'cssTolerance', 3e-04)
-setappdata(0, 'cssMaxIterations', 5.5e+06)
-
 %% NODAL ELIMINATION
 %{
     0: Analyse all nodes
@@ -138,14 +129,6 @@ setappdata(0, 'nodalElimination', 1.0)
 
 % ELIMINATION THRESHOLD SCALE FACTOR
 setappdata(0, 'thresholdScaleFactor', 0.8)
-
-%% YIELD CALCULATION
-%{
-    0: Do not perform yield calculations
-    1: Perform yield calculations based on the total strain energy theory
-    2: Perform yield calculations based on the shear strain energy theory
-%}
-setappdata(0, 'yieldCriterion', 0.0)
 
 %% CRITICAL PLANE (CP) ANALYSIS
 
@@ -183,10 +166,10 @@ setappdata(0, 'importMaterialState', 1.0)
 
 %% ALGORITHM SETTINGS FOR STRESS-BASED BROWN-MILLER
 
-% S-N CURVE
+% FATIGUE DATA
 %{
-    0: Use elastic region of S-N curve only (Sf' and b)
-    1: Include plastic region of S-N curve (Ef' and c)
+    0: Use elastic fatigue properties only
+    1: Include the effect of fatigue ductility (if applicable)
 %}
 setappdata(0, 'plasticSN', 0.0)
 
@@ -235,13 +218,13 @@ setappdata(0, 'ndCompression', 0.0)
 
 % FATIGUE LIMIT DERIVATION
 %{
-    1: Calculate the fatigue limit from S-N (Basquin) material coefficients
+    1: Calculate the fatigue limit from the standard curve
     2: Calculate the fatigue limit from algorithm-specific equation (if applicable)
     3: User-defined
 %}
 setappdata(0, 'fatigueLimitSource', 1.0)
 
-% USER-DEFINED FATIGUE LIMIT
+% USER-DEFINED FATIGUE LIMIT (MPA)
 setappdata(0, 'userFatigueLimit', [])
 
 % DAMAGE BELOW ENDURANCE LIMIT
@@ -488,7 +471,7 @@ setappdata(0, 'autoExport_LL', 1.0)     % LOG10(Life)
 setappdata(0, 'autoExport_L', 0.0)      % Life
 setappdata(0, 'autoExport_D', 0.0)      % Damage
 setappdata(0, 'autoExport_DDL', 0.0)    % Damage at design life
-setappdata(0, 'autoExport_FOS', 0.0)    % Factor of strength
+setappdata(0, 'autoExport_FOS', 1.0)    % Factor of strength
 setappdata(0, 'autoExport_SFA', 0.0)    % Endurance safety factor
 setappdata(0, 'autoExport_FRFR', 1.0)   % Radial fatigue reserve factor
 setappdata(0, 'autoExport_FRFV', 1.0)   % Vertical fatigue reserve factor

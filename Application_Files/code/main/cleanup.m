@@ -5,8 +5,8 @@ function [] = cleanup(status)
 %   CLEANUP is used internally by Quick Fatigue Tool. The user
 %   is not required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 19-Sep-2017 14:58:20 GMT
+%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
+%   Last modified 06-Oct-2017 14:39:49 GMT
     
     %%
     
@@ -51,7 +51,8 @@ if status == 1.0
     errLogFile = [dir, sprintf('%s.log', job)];
     
     %{
-    	Available error codes: E009, E010, E011
+    	Available error codes: E009, E010, E011, E083, E084, E085, E086,
+    	E087, E088, E089, E090, E091, E092, E093, E094, E095
     %}
     
     % Remove the DATA and MATLAB FIGURES directories if applicable
@@ -73,9 +74,9 @@ if status == 1.0
     fid = fopen(errLogFile, 'w');
     
     % Write file header
-    fprintf(fid, 'Quick Fatigue Tool 6.11-03\r\n');
+    fprintf(fid, 'Quick Fatigue Tool 6.11-04\r\n');
     fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-    fprintf(fid, 'Last modified 19-Sep-2017 14:58:20 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 06-Oct-2017 14:39:49 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');
@@ -149,7 +150,7 @@ if status == 1.0
             fprintf(fid, '\r\n\r\n***ERROR: The stress dataset ''%s'' could not be found',...
             missingChannel);
         end
-        fprintf(fid, '\r\n-> Make sure the file is spelled correctly and is located in Project/input');
+        fprintf(fid, '\r\n-> Make sure the file is spelled correctly');
         fprintf(fid, '\r\n\r\nError code: E035');
         rmappdata(0, 'E035')
     end
@@ -169,7 +170,7 @@ if status == 1.0
     if getappdata(0, 'E036') == 1.0
         fprintf(fid, '\r\n\r\n***ERROR: The load history ''%s'' could not be found',...
             getappdata(0, 'errorMissingScale'));
-        fprintf(fid, '\r\n-> Make sure the file is spelled correctly and is located in Project/input');
+        fprintf(fid, '\r\n-> Make sure the file is spelled correctly');
         fprintf(fid, '\r\n\r\nError code: E036');
         rmappdata(0, 'E036')
     end
@@ -194,7 +195,7 @@ if status == 1.0
     % Insufficient material data for analysis
     if getappdata(0, 'E005') == 1.0
         fprintf(fid, '\r\n\r\n***ERROR: The material definition is insufficient. In at least one group:');
-        if getappdata(0, 'useSN') == 1.0
+        if (getappdata(0, 'useSN') == 1.0) && (getappdata(0, 'algorithm') ~= 3.0)
             fprintf(fid, '\r\n-> S-N data points are not available');
             fprintf(fid, '\r\n-> Fatigue coefficients could not be derived');
         else
@@ -420,25 +421,59 @@ if status == 1.0
         rmappdata(0, 'E021')
     end
     if getappdata(0, 'E022') == 1.0
+        exception = getappdata(0, 'error_log_022_exceptionMessage');
+        
         fprintf(fid, '\r\n\r\n***ERROR: An unhandled exception was encountered while combining the loading data');
-        fprintf(fid, '\r\n-> MException ID: %s', getappdata(0, 'error_log_022_exceptionMessage'));
-        fprintf(fid, '\r\n-> Please contact the developer for further assistance: louisvallance@hotmail.co.uk');
+        
+        % Print the error stack
+        fprintf(fid, '\r\n-> MException ID: %s', exception.identifier);
+        fprintf(fid, '\r\n-> MException Message: %s', exception.message);
+        if isempty(exception.cause) == 0.0
+            fprintf(fid, '\r\n-> MException cause: %s', exception.cause);
+        end
+        fprintf(fid, '\r\n');
+        stack = exception.stack;
+        for i = 1:length(stack)
+            fprintf(fid, '\r\n<Level %.0f>\r\n', i);
+            fprintf(fid, 'File: ''%s''\r\n', stack(i).file);
+            fprintf(fid, 'Name: %s\r\n', stack(i).name);
+            fprintf(fid, 'Line: %.0f\r\n', stack(i).line);
+        end
+        fprintf(fid, '\r\nPLEASE SAVE THIS FILE AND CONTACT THE DEVELOPER FOR FURTHER ASSISTANCE: LOUISVALLANCE@HOTMAIL.CO.UK');
+        
         fprintf(fid, '\r\n\r\nError code: E022');
         rmappdata(0, 'E022')
     end
     if getappdata(0, 'E045') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: An unhandled exception was encountered while scaling a dataset with its respective channel');
-        fprintf(fid, '\r\n-> MException ID: %s', getappdata(0, 'error_log_045_exceptionMessage'));
-        fprintf(fid, '\r\n-> There is not enough memory for analysis. Increase system memory or reduce the size of the model and/or loading');
-        fprintf(fid, '\r\n-> Please contact the developer for further assistance: louisvallance@hotmail.co.uk');
-        [userView, systemView] = memory;
+        exception = getappdata(0, 'error_log_045_exceptionMessage');
         
+        fprintf(fid, '\r\n\r\n***ERROR: An unhandled exception was encountered while scaling a dataset with its respective channel');
+        
+        % Print the error stack
+        fprintf(fid, '\r\n-> MException ID: %s', exception.identifier);
+        fprintf(fid, '\r\n-> MException Message: %s', exception.message);
+        if isempty(exception.cause) == 0.0
+            fprintf(fid, '\r\n-> MException cause: %s', exception.cause);
+        end
+        fprintf(fid, '\r\n');
+        stack = exception.stack;
+        for i = 1:length(stack)
+            fprintf(fid, '\r\n<Level %.0f>\r\n', i);
+            fprintf(fid, 'File: ''%s''\r\n', stack(i).file);
+            fprintf(fid, 'Name: %s\r\n', stack(i).name);
+            fprintf(fid, 'Line: %.0f\r\n', stack(i).line);
+        end
+        
+        fprintf(fid, '\r\n-> THERE IS NOT ENOUGH MEMORY FOR ANALYSIS. INCREASE SYSTEM MEMORY OR REDUCE THE SIZE OF THE MODEL AND/OR LOADING');
+        [userView, systemView] = memory;
         fprintf(fid, '\r\n\r\n***MEMORY INFORMATION');
         fprintf(fid, '\r\n                 Physical memory:');
         fprintf(fid, '\r\n                     Available: %.0f bytes', systemView.PhysicalMemory.Available);
         fprintf(fid, '\r\n                     Total: %.0f bytes', systemView.PhysicalMemory.Total);
         fprintf(fid, '\r\n                 Available memory for data: %.0f bytes', userView.MemAvailableAllArrays);
         fprintf(fid, '\r\n                 Reserved system memory for MATLAB: %.0f bytes', userView.MemUsedMATLAB);
+        
+        fprintf(fid, '\r\nPLEASE SAVE THIS FILE AND CONTACT THE DEVELOPER FOR FURTHER ASSISTANCE: LOUISVALLANCE@HOTMAIL.CO.UK');
         fprintf(fid, '\r\n\r\nError code: E045');
         rmappdata(0, 'E045')
     end
@@ -799,119 +834,6 @@ if status == 1.0
         fprintf(fid, '\r\n-> For multiple analysis groups, FATIGUE_RESERVE_FACTOR must either be a numerical array of envelope numbers, or a cell array of envelope numbers and/or user defined FRF files');
         fprintf(fid, '\r\n\r\nError code: E082');
         rmappdata(0, 'E082')
-    end
-    if getappdata(0, 'E083') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: Two values of b2 are specified, but only one analysis group was defined');
-        fprintf(fid, '\r\n-> The b2 definition is ambiguous');
-        fprintf(fid, '\r\n-> Either modify the b2 definition so that only one b2 value is specified, or modify the group');
-        fprintf(fid, '\r\n   defintion so that the number of groups and b2 values agree with each other');
-        fprintf(fid, '\r\n-> If you wish to define b2 values for a single analysis group, followed by analysis of the');
-        fprintf(fid, '\r\n   remainder of the model, specify GROUP as {<sub_group>, ''DEFAULT''}, where the first b2 value is used');
-        fprintf(fid, '\r\n   to analyse <sub_group> and the second b2 is used to analyse the rest of the model');
-        fprintf(fid, '\r\n\r\nError code: E083');
-        rmappdata(0, 'E083')
-    end
-    if getappdata(0, 'E084') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: Two values of b2Nf are specified, but only one analysis group was defined');
-        fprintf(fid, '\r\n-> The b2Nf definition is ambiguous');
-        fprintf(fid, '\r\n-> Either modify the b2Nf definition so that only one b2Nf value is specified, or modify the group');
-        fprintf(fid, '\r\n   defintion so that the number of groups and b2Nf values agree with each other');
-        fprintf(fid, '\r\n-> If you wish to define b2Nf values for a single analysis group, followed by analysis of the');
-        fprintf(fid, '\r\n   remainder of the model, specify GROUP as {<sub_group>, ''DEFAULT''}, where the first b2Nf value is used');
-        fprintf(fid, '\r\n   to analyse <sub_group> and the second b2Nf is used to analyse the rest of the model');
-        fprintf(fid, '\r\n\r\nError code: E084');
-        rmappdata(0, 'E084')
-    end
-    if getappdata(0, 'E085') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: Two values of ucs are specified, but only one analysis group was defined');
-        fprintf(fid, '\r\n-> The ucs definition is ambiguous');
-        fprintf(fid, '\r\n-> Either modify the ucs definition so that only one ucs value is specified, or modify the group');
-        fprintf(fid, '\r\n   defintion so that the number of groups and ucs values agree with each other');
-        fprintf(fid, '\r\n-> If you wish to define ucs values for a single analysis group, followed by analysis of the');
-        fprintf(fid, '\r\n   remainder of the model, specify GROUP as {<sub_group>, ''DEFAULT''}, where the first ucs value is used');
-        fprintf(fid, '\r\n   to analyse <sub_group> and the second ucs is used to analyse the rest of the model');
-        fprintf(fid, '\r\n\r\nError code: E085');
-        rmappdata(0, 'E085')
-    end
-    if getappdata(0, 'E086') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: There are %.0f analysis groups but only %.0f b2 values', getappdata(0, 'error_log_086_numberOfGroups'), getappdata(0, 'error_log_086_numberOfB2'));
-        fprintf(fid, '\r\n-> Modify the group and/or b2 defintions so that the number of groups and b2 values agree with each other');
-        fprintf(fid, '\r\n\r\nError code: E086');
-        rmappdata(0, 'E086')
-    end
-    if getappdata(0, 'E087') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: There are %.0f b2 values but only %.0f analysis groups', getappdata(0, 'error_log_087_numberOfB2'), getappdata(0, 'error_log_087_numberOfGroups'));
-        fprintf(fid, '\r\n-> The b2 definition is ambiguous');
-        fprintf(fid, '\r\n-> Either modify the b2 values so that only one b2 value is specified, or modify the group');
-        fprintf(fid, '\r\n   defintion so that the number of groups and b2 values agree with each other');
-        fprintf(fid, '\r\n-> If you wish to define b2 values for multiple analysis groups, followed by analysis of the');
-        fprintf(fid, '\r\n   remainder of the model, specify GROUP as {<sub_group_1>,..., <sub_group_n>, ''DEFAULT''}, where the');
-        fprintf(fid, '\r\n   last b2 value is used to analyse the rest of the model');
-        fprintf(fid, '\r\n\r\nError code: E087');
-        rmappdata(0, 'E087')
-    end
-    if getappdata(0, 'E088') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: There are %.0f b2 values but only %.0f analysis groups', getappdata(0, 'error_log_088_numberOfB2'), getappdata(0, 'error_log_088_numberOfGroups'));
-        fprintf(fid, '\r\n-> The b2 definition is ambiguous');
-        fprintf(fid, '\r\n-> Either modify the b2 values so that only one b2 value is specified, or modify the group');
-        fprintf(fid, '\r\n   defintion so that the number of groups and b2 values agree with each other');
-        fprintf(fid, '\r\n\r\nError code: E088');
-        rmappdata(0, 'E088')
-    end
-    if getappdata(0, 'E089') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: There are %.0f analysis groups but only %.0f b2Nf values', getappdata(0, 'error_log_089_numberOfGroups'), getappdata(0, 'error_log_089_numberOfB2Nf'));
-        fprintf(fid, '\r\n-> Modify the group and/or b2Nf defintions so that the number of groups and b2 values agree with each other');
-        fprintf(fid, '\r\n\r\nError code: E089');
-        rmappdata(0, 'E089')
-    end
-    if getappdata(0, 'E090') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: There are %.0f b2Nf values but only %.0f analysis groups', getappdata(0, 'error_log_090_numberOfB2Nf'), getappdata(0, 'error_log_090_numberOfGroups'));
-        fprintf(fid, '\r\n-> The b2Nf definition is ambiguous');
-        fprintf(fid, '\r\n-> Either modify the b2Nf values so that only one b2Nf value is specified, or modify the group');
-        fprintf(fid, '\r\n   defintion so that the number of groups and b2Nf values agree with each other');
-        fprintf(fid, '\r\n-> If you wish to define b2Nf values for multiple analysis groups, followed by analysis of the');
-        fprintf(fid, '\r\n   remainder of the model, specify GROUP as {<sub_group_1>,..., <sub_group_n>, ''DEFAULT''}, where the');
-        fprintf(fid, '\r\n   last b2Nf value is used to analyse the rest of the model');
-        fprintf(fid, '\r\n\r\nError code: E090');
-        rmappdata(0, 'E090')
-    end
-    if getappdata(0, 'E091') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: There are %.0f b2Nf values but only %.0f analysis groups', getappdata(0, 'error_log_091_numberOfB2Nf'), getappdata(0, 'error_log_091_numberOfGroups'));
-        fprintf(fid, '\r\n-> The b2Nf definition is ambiguous');
-        fprintf(fid, '\r\n-> Either modify the b2Nf values so that only one b2Nf value is specified, or modify the group');
-        fprintf(fid, '\r\n   defintion so that the number of groups and b2Nf values agree with each other');
-        fprintf(fid, '\r\n\r\nError code: E091');
-        rmappdata(0, 'E091')
-    end
-    if getappdata(0, 'E092') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: There are %.0f analysis groups but only %.0f UCS values', getappdata(0, 'error_log_092_numberOfGroups'), getappdata(0, 'error_log_092_numberOfUCS'));
-        fprintf(fid, '\r\n-> Modify the group and/or UCS defintions so that the number of groups and UCS values agree with each other');
-        fprintf(fid, '\r\n\r\nError code: E092');
-        rmappdata(0, 'E092')
-    end
-    if getappdata(0, 'E093') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: There are %.0f UCS values but only %.0f analysis groups', getappdata(0, 'error_log_093_numberOfUCS'), getappdata(0, 'error_log_093_numberOfGroups'));
-        fprintf(fid, '\r\n-> The UCS definition is ambiguous');
-        fprintf(fid, '\r\n-> Either modify the UCS values so that only one UCS value is specified, or modify the group');
-        fprintf(fid, '\r\n   defintion so that the number of groups and UCS values agree with each other');
-        fprintf(fid, '\r\n-> If you wish to define UCS values for multiple analysis groups, followed by analysis of the');
-        fprintf(fid, '\r\n   remainder of the model, specify GROUP as {<sub_group_1>,..., <sub_group_n>, ''DEFAULT''}, where the');
-        fprintf(fid, '\r\n   last UCS value is used to analyse the rest of the model');
-        fprintf(fid, '\r\n\r\nError code: E093');
-        rmappdata(0, 'E093')
-    end
-    if getappdata(0, 'E094') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: There are %.0f UCS values but only %.0f analysis groups', getappdata(0, 'error_log_094_numberOfUCS'), getappdata(0, 'error_log_094_numberOfGroups'));
-        fprintf(fid, '\r\n-> The UCS definition is ambiguous');
-        fprintf(fid, '\r\n-> Either modify the UCS values so that only one UCS value is specified, or modify the group');
-        fprintf(fid, '\r\n   defintion so that the number of groups and UCS values agree with each other');
-        fprintf(fid, '\r\n\r\nError code: E094');
-        rmappdata(0, 'E094')
-    end
-    if getappdata(0, 'E095') == 1.0
-        fprintf(fid, '\r\n\r\n***ERROR: The number of values in B2 and B2_NF do not agree');
-        fprintf(fid, '\r\n\r\nError code: E095');
-        rmappdata(0, 'E095')
     end
     if getappdata(0, 'E096') == 1.0
         fprintf(fid, '\r\n\r\n***ERROR: The number of endurance limit definitions does not match the number of analysis groups');

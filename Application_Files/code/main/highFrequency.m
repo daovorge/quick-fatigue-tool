@@ -6,8 +6,8 @@ classdef highFrequency < handle
 %   HIGHFREQUENCY is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 19-Sep-2017 14:07:49 GMT
+%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
+%   Last modified 04-Oct-2017 18:09:00 GMT
     
     %%
     
@@ -422,7 +422,7 @@ classdef highFrequency < handle
                 end
                 
                 % Make sure each loading is the same length
-                if range(historyLengths) ~= 0.0
+                if (max(historyLengths) - min(historyLengths)) ~= 0.0
                     % Get the length of the largest load history
                     maxLength = max(historyLengths);
                     

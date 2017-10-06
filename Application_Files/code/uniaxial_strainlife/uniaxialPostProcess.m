@@ -11,8 +11,8 @@ classdef uniaxialPostProcess < handle
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.6 Uniaxial Strain-Life
 %   
-%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 19-Jun-2017 13:56:11 GMT
+%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
+%   Last modified 21-Sep-2017 09:00:05 GMT
     
     %%
     
@@ -38,9 +38,9 @@ classdef uniaxialPostProcess < handle
             
             %% Header
             % Write file header
-            fprintf(fid, 'Quick Fatigue Tool 6.11-03 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
+            fprintf(fid, 'Quick Fatigue Tool 6.11-04 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-            fprintf(fid, 'Last modified 08-Feb-2017 12:23:04 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 21-Sep-2017 09:00:05 GMT\r\n\r\n');
             
             fprintf(fid, 'UNIAXIAL STRAIN-LIFE RESULTS (%s)\r\n', dateString);
             
@@ -54,7 +54,7 @@ classdef uniaxialPostProcess < handle
                 if get(handles.rButton_typeElastic, 'value') == 1.0
                     fprintf(fid, 'Input quantity: Strain (elastic)\r\n');
                 else
-                    fprintf(fid, 'Input quantity: Strain (inelastic)\r\n');
+                    fprintf(fid, 'Input quantity: Strain (total)\r\n');
                 end
                 
                 if get(handles.rButon_strainUnitsStrain, 'value') == 1.0

@@ -16,8 +16,8 @@ function [] = template_job()
 %   Reference section in Quick Fatigue Tool User Settings Reference Guide
 %      1 Job file options
 %   
-%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 15-Sep-2017 07:55:43 GMT
+%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
+%   Last modified 03-Oct-2017 13:44:11 GMT
 
 %% JOB
 
@@ -145,7 +145,7 @@ MS_CORRECTION = 0.0;
 
 % ANALYSIS REGION
 %{
-    'ALL': Whole model
+    'ALL': Whole model (default)
     'SURFACE': ODB element surface
     'MAXPS': Item with largest (S1-S3)
     'file-name.*': Items defined in text file
@@ -247,27 +247,30 @@ CHARACTERISTIC_LENGTH = [];
 
 SEA_WATER = 0.0;
 
-%% ADDITIONAL MATERIAL DATA
+%% SUPPLEMENTARY ANALYSIS OPTIONS
 
-% BASQUIN FATIGUE STRENGTH EXPONENT AT LIVES ABOVE S-N KNEE POINT
-B2 = [];
+% YIELD CRITERIA
+%{
+    0: Do not perform yield calculations
+    1: Perform yield calculations based on the total strain energy theory
+    2: Perform yield calculations based on the shear strain energy theory
+%}
+YIELD_CRITERIA = 0.0;
 
-% LIFE ABOVE WHICH TO USE B2
-B2_NF = [];
-
-% ULTIMATE COMPRESSIVE STRENGTH
-UCS = [];
+% COMPOSITE FAILURE/DAMAGE INITIATION CRITERIA
+COMPOSITE_CRITERIA = 0.0;
 
 %% - DO NOT EDIT
 flags = {ITEMS, UNITS, SCALE, REPEATS, USE_SN, DESIGN_LIFE, ALGORITHM,...
     MS_CORRECTION, LOAD_EQ, PLANE_STRESS, SN_SCALE, OUTPUT_FIELD,...
-    OUTPUT_HISTORY, OUTPUT_FIGURE, B2, B2_NF, KT_DEF, KT_CURVE, RESIDUAL,...
+    OUTPUT_HISTORY, OUTPUT_FIGURE, KT_DEF, KT_CURVE, RESIDUAL,...
     WELD_CLASS, DEVIATIONS_BELOW_MEAN, CHARACTERISTIC_LENGTH, SEA_WATER,...
     YIELD_STRENGTH, FAILURE_MODE, UTS, CONV, OUTPUT_DATABASE, PART_INSTANCE,...
-    UCS, OFFSET, STEP_NAME, FACTOR_OF_STRENGTH, GROUP, HOTSPOT, SN_KNOCK_DOWN,...
+    OFFSET, STEP_NAME, FACTOR_OF_STRENGTH, GROUP, HOTSPOT, SN_KNOCK_DOWN,...
     EXPLICIT_FEA, RESULT_POSITION, CONTINUE_FROM, DATA_CHECK, NOTCH_CONSTANT,...
     NOTCH_RADIUS, GAUGE_LOCATION, GAUGE_ORIENTATION, JOB_NAME,...
     JOB_DESCRIPTION, MATERIAL, DATASET, HISTORY, HF_DATASET, HF_HISTORY,...
-    HF_TIME, HF_SCALE, FATIGUE_RESERVE_FACTOR};
+    HF_TIME, HF_SCALE, FATIGUE_RESERVE_FACTOR, COMPOSITE_CRITERIA,...
+    YIELD_CRITERIA};
 
 main(flags)

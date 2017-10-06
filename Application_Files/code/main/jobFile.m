@@ -5,8 +5,8 @@ classdef jobFile < handle
 %   JOBFILE is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-%   Last modified 11-Sep-2017 21:49:25 GMT
+%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
+%   Last modified 04-Oct-2017 18:09:00 GMT
     
     %%
     
@@ -41,46 +41,45 @@ classdef jobFile < handle
             outputField = flags{12};   setappdata(0, 'outputField', outputField)
             outputHistory = flags{13};   setappdata(0, 'outputHistory', outputHistory)
             outputFigure = flags{14};   setappdata(0, 'outputFigure', outputFigure)
-            b2 = flags{15};   setappdata(0, 'b2', b2)
-            b2Nf = flags{16};   setappdata(0, 'b2Nf', b2Nf)
-            ktDef = flags{17};   setappdata(0, 'ktDef', ktDef)
-            ktCurve = flags{18};   setappdata(0, 'ktCurve', ktCurve)
-            residualStress = flags{19};   setappdata(0, 'residualStress', residualStress)
-            weldClass = flags{20};   setappdata(0, 'weldClass', weldClass)
-            devsBelowMean = flags{21};   setappdata(0, 'devsBelowMean', devsBelowMean)
-            plateThickness = flags{22};   setappdata(0, 'plateThickness', plateThickness)
-            seaWater = flags{23};   setappdata(0, 'seaWater', seaWater)
-            yieldStrength = flags{24};   setappdata(0, 'bs7608Twops', yieldStrength)
-            failureMode = flags{25};   setappdata(0, 'bs7608FailureMode', failureMode)
-            bsUTS = flags{26};   setappdata(0, 'bs7608UTS', bsUTS)
-            userUnits = flags{27};  setappdata(0, 'userUnits', userUnits)
-            outputDatabase = flags{28};  setappdata(0, 'outputDatabase', outputDatabase)
-            partInstance = flags{29};  setappdata(0, 'partInstance', partInstance)
-            ucs = flags{30};  setappdata(0, 'ucs', ucs)
-            offset = flags{31};  setappdata(0, 'offset', offset)
-            stepName = flags{32};   setappdata(0, 'stepName', stepName)
-            enableFOS = flags{33};  setappdata(0, 'enableFOS', enableFOS)
-            analysisGroups = flags{34}; setappdata(0, 'analysisGroups', analysisGroups)
-            getHotSpots = flags{35}; setappdata(0, 'getHotSpots', getHotSpots)
-            snKnockDown = flags{36}; setappdata(0, 'snKnockDown', snKnockDown)
-            isExplicit = flags{37}; setappdata(0, 'isExplicit', isExplicit)
-            odbResultPosition = flags{38}; setappdata(0, 'odbResultPosition', odbResultPosition)
-            continueFrom = flags{39}; setappdata(0, 'continueFrom', continueFrom)
-            dataCheck = flags{40};  setappdata(0, 'dataCheck', dataCheck)
-            notchSensitivityConstant = flags{41};  setappdata(0, 'notchSensitivityConstant', notchSensitivityConstant)
-            notchRootRadius = flags{42};  setappdata(0, 'notchRootRadius', notchRootRadius)
-            vGaugeLoc = flags{43};  setappdata(0, 'vGaugeLoc', vGaugeLoc)
-            vGaugeOri = flags{44};  setappdata(0, 'vGaugeOri', vGaugeOri)
-            jobName = flags{45};  setappdata(0, 'jobName', jobName)
-            jobDescription = flags{46};  setappdata(0, 'jobDescription', jobDescription)
-            material = flags{47};  setappdata(0, 'material', material)
-            dataset = flags{48};  setappdata(0, 'dataset', dataset)
-            history = flags{49};  setappdata(0, 'history', history)
-            hfDataset = flags{50};  setappdata(0, 'hfDataset', hfDataset)
-            hfHistory = flags{51};  setappdata(0, 'hfHistory', hfHistory)
-            hfTime = flags{52};  setappdata(0, 'hfTime', hfTime)
-            hfScales = flags{53};  setappdata(0, 'hfScales', hfScales)
-            frfEnvelope = flags{54};    setappdata(0, 'frfEnvelope', frfEnvelope)
+            ktDef = flags{15};   setappdata(0, 'ktDef', ktDef)
+            ktCurve = flags{16};   setappdata(0, 'ktCurve', ktCurve)
+            residualStress = flags{17};   setappdata(0, 'residualStress', residualStress)
+            weldClass = flags{18};   setappdata(0, 'weldClass', weldClass)
+            devsBelowMean = flags{19};   setappdata(0, 'devsBelowMean', devsBelowMean)
+            plateThickness = flags{20};   setappdata(0, 'plateThickness', plateThickness)
+            seaWater = flags{21};   setappdata(0, 'seaWater', seaWater)
+            yieldStrength = flags{22};   setappdata(0, 'bs7608Twops', yieldStrength)
+            failureMode = flags{23};   setappdata(0, 'bs7608FailureMode', failureMode)
+            bsUTS = flags{24};   setappdata(0, 'bs7608UTS', bsUTS)
+            userUnits = flags{25};  setappdata(0, 'userUnits', userUnits)
+            outputDatabase = flags{26};  setappdata(0, 'outputDatabase', outputDatabase)
+            partInstance = flags{27};  setappdata(0, 'partInstance', partInstance)
+            offset = flags{28};  setappdata(0, 'offset', offset)
+            stepName = flags{29};   setappdata(0, 'stepName', stepName)
+            enableFOS = flags{30};  setappdata(0, 'enableFOS', enableFOS)
+            analysisGroups = flags{31}; setappdata(0, 'analysisGroups', analysisGroups)
+            getHotSpots = flags{32}; setappdata(0, 'getHotSpots', getHotSpots)
+            snKnockDown = flags{33}; setappdata(0, 'snKnockDown', snKnockDown)
+            isExplicit = flags{34}; setappdata(0, 'isExplicit', isExplicit)
+            odbResultPosition = flags{35}; setappdata(0, 'odbResultPosition', odbResultPosition)
+            continueFrom = flags{36}; setappdata(0, 'continueFrom', continueFrom)
+            dataCheck = flags{37};  setappdata(0, 'dataCheck', dataCheck)
+            notchSensitivityConstant = flags{38};  setappdata(0, 'notchSensitivityConstant', notchSensitivityConstant)
+            notchRootRadius = flags{39};  setappdata(0, 'notchRootRadius', notchRootRadius)
+            vGaugeLoc = flags{40};  setappdata(0, 'vGaugeLoc', vGaugeLoc)
+            vGaugeOri = flags{41};  setappdata(0, 'vGaugeOri', vGaugeOri)
+            jobName = flags{42};  setappdata(0, 'jobName', jobName)
+            jobDescription = flags{43};  setappdata(0, 'jobDescription', jobDescription)
+            material = flags{44};  setappdata(0, 'material', material)
+            dataset = flags{45};  setappdata(0, 'dataset', dataset)
+            history = flags{46};  setappdata(0, 'history', history)
+            hfDataset = flags{47};  setappdata(0, 'hfDataset', hfDataset)
+            hfHistory = flags{48};  setappdata(0, 'hfHistory', hfHistory)
+            hfTime = flags{49};  setappdata(0, 'hfTime', hfTime)
+            hfScales = flags{50};  setappdata(0, 'hfScales', hfScales)
+            frfEnvelope = flags{51};    setappdata(0, 'frfEnvelope', frfEnvelope)
+            compositeCriteria = flags{52};   setappdata(0, 'compositeCriteria', compositeCriteria)
+            yieldCriteria = flags{53};   setappdata(0, 'yieldCriteria', yieldCriteria)
             
             %% DEFAULT FLAGS
             if isempty(jobName) == 1.0
@@ -228,6 +227,33 @@ classdef jobFile < handle
                     end
                 end
                 setappdata(0, 'frfEnvelope', frfEnvelope)
+            end
+            
+            if isempty(outputDatabase) == 1.0
+                outputDatabase = '';
+                setappdata(0, 'outputDatabase', outputDatabase)
+            end
+            
+            if isempty(compositeCriteria) == 1.0
+                compositeCriteria = 0.0;
+                setappdata(0, 'compositeCriteria', compositeCriteria)
+            elseif compositeCriteria > 0.0
+                setappdata(0, 'useSN', 0.0)
+                setappdata(0, 'dataCheck', 1.0)
+                
+                if algorithm == 0.0
+                    algorithm = 4.0;
+                    setappdata(0, 'algorithm', 7.0)
+                end
+                if msCorrection == 0.0
+                    msCorrection = 2.0;
+                    setappdata(0, 'msCorrection', 2.0)
+                end
+            end
+            
+            if isempty(yieldCriteria) == 1.0
+                yieldCriteria = 0.0;
+                setappdata(0, 'yieldCriteria', yieldCriteria)
             end
             
             %% CHECK CERTAIN FLAGS FOR STRING INPUT
@@ -482,7 +508,7 @@ classdef jobFile < handle
                             elseif (useSN == 0.0) && (isempty(getappdata(0, 's_values')) == 0.0)
                                 setappdata(0, 'useSN', 1.0)
                                 messenger.writeMessage(36.0)
-                            elseif (useSN == 1) && (isempty(getappdata(0, 's_values')) == 1.0)
+                            elseif (useSN == 1.0) && (isempty(getappdata(0, 's_values')) == 1.0)
                                 setappdata(0, 'E006', 1.0)
                                 
                                 cleanExit = 1.0;
@@ -508,9 +534,8 @@ classdef jobFile < handle
         end
         
         %% DETERMINE THE ALGORITHM AND MEAN STRESS CORRECTION TO BE USED FOR THE ANALYSIS
-        function [algorithm, msCorrection, nlMaterial, useSN, error] = getAlgorithmAndMSC(algorithm, msCorrection, useSN)
+        function [algorithm, msCorrection, useSN, error] = getAlgorithmAndMSC(algorithm, msCorrection, useSN)
             % Initialite output
-            nlMaterial = -1.0;
             error = 0.0;
             
             %% DETERMINE THE ANALYSIS ALGORITHM TO BE USED FOR THE ANALYSIS
@@ -910,14 +935,6 @@ classdef jobFile < handle
                     considered in the analysis
                 %}
                 messenger.writeMessage(175.0)
-            end
-            
-            % Check if nonlinear material data is available
-            nlMaterial = getappdata(0, 'nlMaterial');
-            if nlMaterial == 1.0 && (EWarn == 1.0 || kpWarn == 1.0 || npWarn == 1.0) && algorithm ~= 8.0
-                nlMaterial = 0.0;
-                setappdata(0, 'nlMaterial', 0.0)
-                messenger.writeMessage(48.0)
             end
             
             % If the stress-based Brown-Miller algorithm is being used, check that the modulus of
@@ -1554,7 +1571,7 @@ classdef jobFile < handle
             end
             
             values = [fosMaxValue, fosMaxFine, fosMinFine, fosMinValue];
-            if range(values) == 0.0
+            if (max(values) - min(values)) == 0.0
                 error = 1.0;
             end
             
@@ -1570,7 +1587,7 @@ classdef jobFile < handle
         %% SCALE AND COMBINE THE LOADING
         function [scale, offset, repeats, units, N, signalLength, Sxx, Syy, Szz, Txy, Tyz, Txz, mainID, subID, gateHistories, gateTensors, tensorGate, error] =...
                 getLoading(units, scale, algorithm, msCorrection,...
-                nlMaterial, userUnits, hfDataset, hfHistory, hfTime,...
+                userUnits, hfDataset, hfHistory, hfTime,...
                 hfScales, items, dataset, history, elementType, offset)
             
             N = [];
@@ -1763,7 +1780,7 @@ classdef jobFile < handle
             % Only if BS 7608 is not being used for analysis
             if algorithm ~= 8.0
                 plasticSN = getappdata(0, 'plasticSN');
-                error = preProcess.getFatigueLimit(plasticSN, algorithm, msCorrection, nlMaterial);
+                error = preProcess.getFatigueLimit(plasticSN, algorithm, msCorrection);
                 
                 if error == 1.0
                     return
