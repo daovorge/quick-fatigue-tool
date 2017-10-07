@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="3575492035" file="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox\Multiaxial Gauge Fatigue.prj" location="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox" name="Multiaxial Gauge Fatigue" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="500120131" file="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox\Multiaxial Gauge Fatigue.prj" location="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox" name="Multiaxial Gauge Fatigue" target="target.mlapps" target-name="Package App">
     <param.appname>Multiaxial Gauge Fatigue</param.appname>
     <param.authnamewatermark>Louis Vallance</param.authnamewatermark>
     <param.email>louisvallance@hotmail.co.uk</param.email>
@@ -13,7 +13,7 @@
     <param.summary>Calculate fatigue lives from measured strain gauge data</param.summary>
     <param.description>Multiaxial Gauge Fatigue allows the user to calculate the fatigue life of a set of time histories from measured strain gauge data. The application enables the selection of user-defined mean stress corrections and material data. For guidance on using Multiaxial Gauge Fatigue, please refer to Appendix A3.2 of the Quick Fatigue Tool Appendices.</param.description>
     <param.screenshot />
-    <param.version>6.11.04</param.version>
+    <param.version>6.11.05</param.version>
     <param.products.name>
       <item>MATLAB</item>
       <item>Image Processing Toolbox</item>
@@ -61,7 +61,7 @@
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\main\applySignConvention.m</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\main\CardanRoots.m</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\main\cleanup.m</file>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\main\css.m</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\main\css2.m</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\main\css2b.m</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\main\css2c.m</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\main\css2d.m</file>
@@ -117,7 +117,16 @@
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\common\gauge_arbitrary.png</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\common\icoR_bulb.jpg</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\common\icoR_fileOpen.jpg</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\common\icoR_knee.jpg</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\common\icoR_options.jpg</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\material_manager\failStrain.fig</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\material_manager\failStrain.m</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\material_manager\failStress.fig</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\material_manager\failStress.m</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\material_manager\hashin.fig</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\material_manager\hashin.m</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\material_manager\insertKnee.fig</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\material_manager\insertKnee.m</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\material_manager\material.m</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Data\kt</file>
     </fileset.resources>
