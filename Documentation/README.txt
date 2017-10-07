@@ -227,6 +227,16 @@ Quick Fatigue Tool User Guide.
 %		- YIELD, Yielding items
 %		- TSE, Total strain energy per unit volume
 %		- PSE, Plastic strain energy per unit volume
+%		- MSTRS, Maximum stress theory failure measure
+%		- MSTRN, Maximum strain theory failure measure
+%		- TSAIH, Tsai-Hill theory failure measure
+%		- TSAIW, Tsai-Wu theory failure measure
+%		- TSAIWTT, Tsai-Wu theory failure measure for closed-cell PVC foam
+%		- AZZIT, Azzi-Tsai-Hill theory failure measure
+%		- HSNFTCRT, Hashin's fiber tensile damage initiation criterion
+%		- HSNFCCRT, Hashin's fiber compression damage initiation criterion
+%		- HSNMTCRT, Hashin's matrix tensile damage initiation criterion
+%		- HSNMCCRT, Hashin's matrix compression damage initiation criterion
 %
 %   HISTORY VARIABLES
 %   A history of results for the most damaged analysis item in the model
