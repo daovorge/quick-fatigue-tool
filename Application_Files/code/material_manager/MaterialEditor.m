@@ -12,8 +12,8 @@ function varargout = MaterialEditor(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials
 %   
-%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 03-Oct-2017 13:44:11 GMT
+%   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
+%   Last modified 07-Oct-2017 13:46:24 GMT
     
     %%
     
@@ -1400,7 +1400,7 @@ if isempty(properties.material_properties.s_values) == 0.0
     set(handles.pButton_viewSNData, 'enable', 'on')
     set(handles.pButton_rmSNData, 'enable', 'on')
     
-    set(handles.edit_snData, 'backgroundColor', [(204/255), 1, (204/255)])
+    set(handles.edit_snData, 'backgroundColor', [(204/255), 1.0, (204/255)])
     
     setappdata(gcf, 'S_values', properties.material_properties.s_values)
     setappdata(gcf, 'N_values', properties.material_properties.n_values)
@@ -2592,10 +2592,14 @@ set(handles.edit_rValues, 'backgroundColor', [242/255, 242/255, 242/255])
 if strncmpi(get(handles.edit_snData, 'string'), 'undefined', 9.0) == 1.0
     set(handles.pButton_rmSNData, 'enable', 'off')
     set(handles.pButton_viewSNData, 'enable', 'off')
+else
+    set(handles.edit_snData, 'backgroundColor', [(204/255), 1.0, (204/255)])
 end
 if strncmpi(get(handles.edit_rValues, 'string'), 'undefined', 9.0) == 1.0
     set(handles.pButton_rmRValues, 'enable', 'off')
     set(handles.pButton_viewRValues, 'enable', 'off')
+else
+    set(handles.edit_rValues, 'backgroundColor', [(204/255), 1.0, (204/255)])
 end
 if get(handles.check_sf, 'value') == 0.0
     set(handles.edit_sf, 'enable', 'inactive', 'backgroundColor', simuliaBlue)

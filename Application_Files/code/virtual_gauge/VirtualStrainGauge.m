@@ -11,7 +11,7 @@ function varargout = VirtualStrainGauge(varargin)
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.4 Virtual Strain Gauge
 %   
-%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
 %   Last modified 24-Jun-2017 11:06:56 GMT
     
     %%

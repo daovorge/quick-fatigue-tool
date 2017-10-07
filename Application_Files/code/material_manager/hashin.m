@@ -9,7 +9,7 @@ function varargout = hashin(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials
 %   
-%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
 %   Last modified 01-Oct-2017 14:09:15 GMT
 
 % Begin initialization code - DO NOT EDIT
