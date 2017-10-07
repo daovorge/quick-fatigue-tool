@@ -134,18 +134,6 @@ if isappdata(0, 'panel_multiaxialFatigue_edit_gauge_0') == 1.0
         set(handles.text_msc_user, 'enable', 'on')
         set(handles.edit_msc_user, 'enable', 'on')
         set(handles.pButton_msc_user, 'enable', 'on')
-        set(handles.check_ucs, 'enable', 'on')
-        set(handles.edit_ucs, 'string', getappdata(0, 'panel_multiaxialFatigue_edit_ucs'))
-        if getappdata(0, 'panel_multiaxialFatigue_check_ucs') == 1.0
-            set(handles.edit_ucs, 'enable', 'on', 'backgroundColor', 'white')
-            set(handles.text_mpa, 'enable', 'on')
-        end
-    end
-    
-    if getappdata(0, 'panel_multiaxialFatigue_check_ucs') == 1.0
-        set(handles.check_ucs, 'value', 1.0)
-        set(handles.edit_ucs, 'backgroundColor', 'white')
-        set(handles.text_mpa, 'enable', 'on')
     end
         
     set(handles.edit_msc_user, 'string', getappdata(0, 'panel_multiaxialFatigue_edit_msc_user'))
@@ -547,7 +535,7 @@ elseif get(handles.rButton_msc_morrow, 'value') == 1.0
 elseif get(handles.rButton_msc_user, 'value') == 1.0
     msCorrection = get(handles.edit_msc_user, 'string');
     
-    mscError = multiaxialPreProcess.getUserMSC(handles, msCorrection);
+    mscError = multiaxialPreProcess.getUserMSC(msCorrection);
     
     if mscError == 1.0
         %% Re-enable the GUI
@@ -579,11 +567,7 @@ E = getappdata(0, 'E');
 kp = getappdata(0, 'kp');
 np = getappdata(0, 'np');
 uts = getappdata(0, 'uts');
-if isempty(getappdata(0, 'ucs')) == 1.0
-    ucs = uts;
-else
-    ucs = getappdata(0, 'ucs');
-end
+ucs = getappdata(0, 'uts');
 
 % Life values for E-N curve
 Nf = linspace(1.0, cael, 1e2);
@@ -1144,28 +1128,14 @@ switch get(eventdata.NewValue, 'tag')
         set(handles.text_msc_user, 'enable', 'on')
         set(handles.edit_msc_user, 'enable', 'on')
         set(handles.pButton_msc_user, 'enable', 'on')
-        set(handles.check_ucs, 'enable', 'on')
-        if get(handles.check_ucs, 'value') == 1.0
-            set(handles.edit_ucs, 'enable', 'on')
-            set(handles.text_mpa, 'enable', 'on')
-        else
-            set(handles.edit_ucs, 'enable', 'inactive')
-            set(handles.text_mpa, 'enable', 'off')
-        end
     case 'rButton_msc_morrow'
-        set(handles.text_mpa, 'enable', 'off')
         set(handles.text_msc_user, 'enable', 'off')
         set(handles.edit_msc_user, 'enable', 'off')
         set(handles.pButton_msc_user, 'enable', 'off')
-        set(handles.check_ucs, 'enable', 'off')
-        set(handles.edit_ucs, 'enable', 'off')
     otherwise
-        set(handles.text_mpa, 'enable', 'off')
         set(handles.text_msc_user, 'enable', 'off')
         set(handles.edit_msc_user, 'enable', 'off')
         set(handles.pButton_msc_user, 'enable', 'off')
-        set(handles.check_ucs, 'enable', 'off')
-        set(handles.edit_ucs, 'enable', 'off')
 end
 
 
@@ -1275,8 +1245,6 @@ setappdata(0, 'panel_multiaxialFatigue_rButton_algorithm_ps', get(handles.rButto
 setappdata(0, 'panel_multiaxialFatigue_rButton_msc_none', get(handles.rButton_msc_none, 'value'))
 setappdata(0, 'panel_multiaxialFatigue_rButton_msc_morrow', get(handles.rButton_msc_morrow, 'value'))
 setappdata(0, 'panel_multiaxialFatigue_rButton_msc_user', get(handles.rButton_msc_user, 'value'))
-setappdata(0, 'panel_multiaxialFatigue_check_ucs', get(handles.check_ucs, 'value'))
-setappdata(0, 'panel_multiaxialFatigue_edit_ucs', get(handles.edit_ucs, 'string'))
 
 setappdata(0, 'panel_multiaxialFatigue_edit_msc_user', get(handles.edit_msc_user, 'string'))
 setappdata(0, 'panel_multiaxialFatigue_edit_precision', get(handles.edit_precision, 'string'))
@@ -1382,9 +1350,6 @@ set(handles.text_msc_user, 'enable', 'off')
 set(handles.edit_msc_user, 'enable', 'off')
 set(handles.edit_msc_user, 'string', [])
 set(handles.pButton_msc_user, 'enable', 'off')
-set(handles.check_ucs, 'enable', 'off', 'value', 0.0)
-set(handles.edit_ucs, 'enable', 'off', 'string', [])
-set(handles.text_mpa, 'enable', 'off')
 setappdata(0, 'panel_multiaxialFatigue_msc_path', [pwd, '/Data/msc'])
 set(handles.text_defineSurfaceFinish, 'enable', 'on')
 set(handles.rButton_kt_list, 'value', 1.0)
@@ -1526,39 +1491,6 @@ function edit_precision_Callback(~, ~, ~)
 % --- Executes during object creation, after setting all properties.
 function edit_precision_CreateFcn(hObject, ~, ~)
 % hObject    handle to edit_precision (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on button press in check_ucs.
-function check_ucs_Callback(hObject, ~, handles)
-if get(hObject, 'value') == 1.0
-    set(handles.edit_ucs, 'enable', 'on', 'backgroundColor', 'white')
-    set(handles.text_mpa, 'enable', 'on')
-else
-    set(handles.edit_ucs, 'enable', 'inactive', 'backgroundColor', [177/255, 206/255, 237/255])
-    set(handles.text_mpa, 'enable', 'off')
-end
-
-
-function edit_ucs_Callback(~, ~, ~)
-% hObject    handle to edit_ucs (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit_ucs as text
-%        str2double(get(hObject,'String')) returns contents of edit_ucs as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function edit_ucs_CreateFcn(hObject, ~, ~)
-% hObject    handle to edit_ucs (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
