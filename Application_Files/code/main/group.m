@@ -1954,7 +1954,7 @@ classdef group < handle
             
             %% Open the .rpt file:
             
-            fid = fopen(['input/', FILENAME], 'r');
+            fid = fopen(FILENAME, 'r');
             setappdata(0, 'FOPEN_error_file', FILENAME)
             
             if fid == -1.0
