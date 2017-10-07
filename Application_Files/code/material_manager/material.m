@@ -29,7 +29,7 @@ classdef material < handle
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 23-Sep-2017 15:01:48 GMT
+%   Last modified 07-Oct-2017 20:22:46 GMT
     
     %%
     
@@ -487,7 +487,7 @@ classdef material < handle
                 return
             end
             
-            if strcmpi(userMaterial(end - 3.0:end), '.mat') == 1.0
+            if (length(userMaterial) > 3.0) && (strcmpi(userMaterial(end - 3.0:end), '.mat') == 1.0)
                 userMaterial = userMaterial(1.0:end - 4.0);
             end
             
