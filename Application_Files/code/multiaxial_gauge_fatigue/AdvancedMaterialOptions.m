@@ -13,7 +13,7 @@ function varargout = AdvancedMaterialOptions(varargin)
 %      A3.2 Multiaxial Gauge Fatigue
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 12-Apr-2017 12:25:20 GMT
+%   Last modified 08-Oct-2017 12:50:10 GMT
     
     %%
     
@@ -54,8 +54,7 @@ handles.output = hObject;
 % Update handles structure
 guidata(hObject, handles);
 
-if isappdata(0, 'materialOptions_check_ndCompression') == 1.0
-    set(handles.check_ndCompression, 'value', getappdata(0, 'materialOptions_check_ndCompression'))
+if isappdata(0, 'materialOptions_check_outOfPlane') == 1.0
     set(handles.check_outOfPlane, 'value', getappdata(0, 'materialOptions_check_outOfPlane'))
     
     set(handles.check_ndEndurance, 'value', getappdata(0, 'materialOptions_check_ndEndurance'))
@@ -161,13 +160,11 @@ else
     setappdata(0, 'multiaxialFatigue_cyclesToRecover', 50.0)
 end
 
-setappdata(0, 'multiaxialFatigue_ndCompression', get(handles.check_ndCompression, 'value'))
 setappdata(0, 'multiaxialFatigue_outOfPlane', get(handles.check_outOfPlane, 'value'))
 setappdata(0, 'multiaxialFatigue_ndEndurance', get(handles.check_ndEndurance, 'value'))
 setappdata(0, 'multiaxialFatigue_modifyEnduranceLimit', get(handles.check_modifyEnduranceLimit, 'value'))
 
 % Save the GUI state
-setappdata(0, 'materialOptions_check_ndCompression', get(handles.check_ndCompression, 'value'))
 setappdata(0, 'materialOptions_check_outOfPlane', get(handles.check_outOfPlane, 'value'))
 
 setappdata(0, 'materialOptions_check_ndEndurance', get(handles.check_ndEndurance, 'value'))
@@ -361,15 +358,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in check_ndCompression.
-function check_ndCompression_Callback(~, ~, ~)
-% hObject    handle to check_ndCompression (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of check_ndCompression
-
-
 % --- Executes on button press in check_outOfPlane.
 function check_outOfPlane_Callback(~, ~, ~)
 % hObject    handle to check_outOfPlane (see GCBO)
@@ -387,7 +375,6 @@ function AdvancedMaterialOptions_ResizeFcn(~, ~, ~)
 
 
 function blank(handles)
-set(handles.check_ndCompression, 'enable', 'off')
 set(handles.check_outOfPlane, 'enable', 'off')
 
 set(handles.check_ndEndurance, 'enable', 'off')
@@ -409,7 +396,6 @@ set(handles.pButton_cancel, 'enable', 'off')
 
 
 function show(handles)
-set(handles.check_ndCompression, 'enable', 'on')
 set(handles.check_outOfPlane, 'enable', 'on')
 
 set(handles.check_ndEndurance, 'enable', 'on')

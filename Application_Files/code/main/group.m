@@ -258,6 +258,7 @@ classdef group < handle
             group_materialProps(numberOfMaterials).fsc = [];
             group_materialProps(numberOfMaterials).cael = [];
             group_materialProps(numberOfMaterials).cael_status = [];
+            group_materialProps(numberOfMaterials).ndCompression = [];
             group_materialProps(numberOfMaterials).E = [];
             group_materialProps(numberOfMaterials).uts = [];
             group_materialProps(numberOfMaterials).ucs = [];
@@ -1790,6 +1791,7 @@ classdef group < handle
             group_materialProps(materialNumber).fsc = getappdata(0, 'fsc');
             group_materialProps(materialNumber).cael = getappdata(0, 'cael');
             group_materialProps(materialNumber).cael_status = getappdata(0, 'cael_status');
+            group_materialProps(materialNumber).ndCompression = getappdata(0, 'ndCompression');
             group_materialProps(materialNumber).E = getappdata(0, 'E');
             group_materialProps(materialNumber).uts = getappdata(0, 'uts');
             group_materialProps(materialNumber).ucs = getappdata(0, 'ucs');
@@ -1877,6 +1879,7 @@ classdef group < handle
             setappdata(0, 'fsc', group_materialProps(materialNumber).fsc)
             setappdata(0, 'cael', group_materialProps(materialNumber).cael)
             setappdata(0, 'cael_status', group_materialProps(materialNumber).cael_status)
+            setappdata(0, 'ndCompression', group_materialProps(materialNumber).ndCompression)
             setappdata(0, 'E', group_materialProps(materialNumber).E)
             setappdata(0, 'uts', group_materialProps(materialNumber).uts)
             setappdata(0, 'ucs', group_materialProps(materialNumber).ucs)

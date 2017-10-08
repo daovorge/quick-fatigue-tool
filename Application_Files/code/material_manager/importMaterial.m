@@ -9,7 +9,7 @@ classdef importMaterial < handle
 %   LocalMaterialDatabase, material, MaterialEditor, MaterialManager.
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 03-Oct-2017 13:44:11 GMT
+%   Last modified 08-Oct-2017 12:50:10 GMT
     
     %%
     
@@ -25,6 +25,7 @@ classdef importMaterial < handle
                 'reg_model', 1.0,...
                 'cael', 2e+07,...
                 'cael_active', 0.0,...
+                'ndCompression', 0.0,...
                 'e', [],...
                 'e_active', 0.0,...
                 'uts', [],...
@@ -85,12 +86,12 @@ classdef importMaterial < handle
             kwStr = {'USERMATERIAL', 'DESCRIPTION', 'DEFAULTALGORITHM',...
                 'DEFAULTMSC', 'CAEL', 'REGRESSION', 'MECHANICAL',...
                 'FATIGUE', 'CYCLIC', 'NORMALSTRESSSENSITIVITY', 'CLASS',...
-                'COMPOSITE', 'KNEE', 'ENDMATERIAL'};
+                'COMPOSITE', 'KNEE', 'NOCOMPRESSION', 'ENDMATERIAL'};
             
             kwStrSp = {'USER MATERIAL', 'DESCRIPTION', 'DEFAULT ALGORITHM',...
                 'DEFAULT MSC', 'CAEL', 'REGRESSION', 'MECHANICAL',...
                 'FATIGUE', 'CYCLIC', 'NORMAL STRESS SENSITIVITY', 'CLASS',...
-                'COMPOSITE', 'KNEE', 'END MATERIAL'};
+                'COMPOSITE', 'KNEE', 'NO COMPRESSION', 'END MATERIAL'};
             
             % ALGORITHM STRINGS
             algStr = {'UNIAXIALSTRESS', 'UNIAXIALSTRAIN', 'SBBM', 'NORMAL', 'FINDLEY', 'INVARIANT', 'NASALIFE'};
@@ -1532,7 +1533,16 @@ classdef importMaterial < handle
                             
                             % Get the next line
                             TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
-                        case 14.0 % *END MATERIAL
+                        case 14.0 % *NO COMPRESSION
+                            %{
+                                This keyword is declared without a
+                                parameter or datalines
+                            %}
+                            material_properties.ndCompression = 1.0;
+                            
+                            % Get the next line
+                            TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
+                        case 15.0 % *END MATERIAL
                             %{
                                 The user has manually declared the end of
                                 the material definition. Stop processing

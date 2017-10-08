@@ -13,7 +13,7 @@ function varargout = MaterialEditor(varargin)%#ok<*DEFNU>
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 07-Oct-2017 13:46:24 GMT
+%   Last modified 08-Oct-2017 12:50:10 GMT
     
     %%
     
@@ -1102,12 +1102,12 @@ else
     end
     set(handles.check_location, 'value', 0.0)
     set(handles.pButton_changeLocation, 'enable', 'off')
-    set(handles.pMenu_monoResponse, 'value', 1.0)
     set(handles.pMenu_algorithm, 'value', 6.0)
     set(handles.pMenu_msc, 'value', 1.0, 'enable', 'on', 'backgroundColor', 'white')
     set(handles.pMenu_class, 'value', 1.0)
     set(handles.edit_cael, 'string', '2e+07', 'enable', 'inactive', 'backgroundColor', simulia_blue)
     set(handles.check_cael, 'value', 0.0)
+    set(handles.check_ndCompression, 'value', 0.0)
     set(handles.pMenu_matBehaviour, 'value', 1.0)
     set(handles.pMenu_regModel, 'value', 1.0)
     set(handles.edit_e, 'string', '', 'enable', 'inactive', 'backgroundColor', [241/255, 241/255, 241/255])
@@ -1274,6 +1274,7 @@ material_properties = struct(...
 'reg_model', get(handles.pMenu_regModel, 'value'),...
 'cael', get(handles.edit_cael, 'string'),...
 'cael_active', get(handles.check_cael, 'value'),...
+'ndCompression', get(handles.check_ndCompression, 'value'),...
 'e', get(handles.edit_e, 'string'),...
 'e_active', get(handles.check_e, 'value'),...
 'uts', get(handles.edit_uts, 'string'),...
@@ -1344,6 +1345,16 @@ if properties.material_properties.cael_active == 1.0
     set(handles.text_cael_units, 'enable', 'on')
 else
     set(handles.edit_cael, 'string', '2e+07')
+end
+
+try
+    if isempty(properties.material_properties.ndCompression) == 1.0
+        set(handles.check_ndCompression, 'value', 0.0)
+    else
+        set(handles.check_ndCompression, 'value', properties.material_properties.ndCompression)
+    end
+catch
+    set(handles.check_ndCompression, 'value', 0.0)
 end
 
 if properties.material_properties.behavior == 3.0
@@ -2100,35 +2111,6 @@ if isappdata(0, 'k_solution_model')
 end
 
 
-% --- Executes on selection change in pMenu_monoResponse.
-function pMenu_monoResponse_Callback(hObject, ~, handles)
-switch get(hObject, 'value')
-    case 1.0
-        set(handles.pMenu_algorithm, 'value', 6.0)
-        set(handles.pMenu_msc, 'value', 1.0, 'backgroundColor', 'white',...
-            'enable', 'on')
-    case 2.0
-        set(handles.pMenu_algorithm, 'value', 7.0)
-        set(handles.pMenu_msc, 'value', 2.0, 'backgroundColor', 'white',...
-            'enable', 'on')
-    otherwise
-end
-set(handles.text_algorithmUnavailable, 'visible', 'off')
-
-
-% --- Executes during object creation, after setting all properties.
-function pMenu_monoResponse_CreateFcn(hObject, ~, ~)
-% hObject    handle to pMenu_monoResponse (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
 % --- Executes on button press in pButton_rValues.
 function pButton_rValues_Callback(hObject, eventdata, handles)
 % Blank the GUI
@@ -2708,3 +2690,12 @@ uiwait
 
 % Enable the GUI
 enable(handles)
+
+
+% --- Executes on button press in check_ndCompression.
+function check_ndCompression_Callback(~, ~, ~)
+% hObject    handle to check_ndCompression (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of check_ndCompression

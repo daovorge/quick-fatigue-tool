@@ -13,7 +13,7 @@ function varargout = MultiaxialGaugeFatigue(varargin)%#ok<*DEFNU>
 %      A3.2 Multiaxial Gauge Fatigue
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 05-Jul-2017 08:25:58 GMT
+%   Last modified 08-Oct-2017 12:50:10 GMT
     
     %%
     
@@ -263,10 +263,9 @@ if isappdata(0, 'multiaxialFatigue_alpha') == 0.0
 end
 
 %% Initialize the material options
-if isappdata(0, 'multiaxialFatigue_ndCompression') == 0.0
+if isappdata(0, 'multiaxialFatigue_outOfPlane') == 0.0
     setappdata(0, 'multiaxialFatigue_enduranceScaleFactor', 0.25)
     setappdata(0, 'multiaxialFatigue_cyclesToRecover', 50.0)
-    setappdata(0, 'multiaxialFatigue_ndCompression', 0.0)
     setappdata(0, 'multiaxialFatigue_outOfPlane', 0.0)
     setappdata(0, 'multiaxialFatigue_ndEndurance', 0.0)
     setappdata(0, 'multiaxialFatigue_modifyEnduranceLimit', 1.0)
@@ -499,9 +498,6 @@ tic
 multiaxialPreProcess.blank(handles)
 pause(1e-6)
 
-%% Get the criterion for fully-compressive cycles
-ndCompression = getappdata(0, 'multiaxialFatigue_ndCompression');
-
 %% Get the out-of-plane variable
 outOfPlane = getappdata(0, 'multiaxialFatigue_outOfPlane');
 
@@ -568,6 +564,7 @@ kp = getappdata(0, 'kp');
 np = getappdata(0, 'np');
 uts = getappdata(0, 'uts');
 ucs = getappdata(0, 'uts');
+ndCompression = getappdata(0, 'ndCompression');
 
 % Life values for E-N curve
 Nf = linspace(1.0, cael, 1e2);
@@ -1291,12 +1288,10 @@ setappdata(0, 'gaugeOrientation_edit_gamma', '45')
 %% Material Options
 setappdata(0, 'multiaxialFatigue_enduranceScaleFactor', 0.25)
 setappdata(0, 'multiaxialFatigue_cyclesToRecover', 50.0)
-setappdata(0, 'multiaxialFatigue_ndCompression', 0.0)
 setappdata(0, 'multiaxialFatigue_outOfPlane', 0.0)
 setappdata(0, 'multiaxialFatigue_ndEndurance', 0.0)
 setappdata(0, 'multiaxialFatigue_modifyEnduranceLimit', 1.0)
 
-setappdata(0, 'materialOptions_check_ndCompression', 0.0)
 setappdata(0, 'materialOptions_check_outOfPlane', 0.0)
 
 setappdata(0, 'materialOptions_check_ndEndurance',0.0)

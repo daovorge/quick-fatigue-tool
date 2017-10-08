@@ -190,6 +190,18 @@ classdef preProcess < handle
                 setappdata(0, 'cael_status', 2.0)
             end
             
+            %% No damage in compression
+            try
+                if ischar(material_properties.ndCompression) == 1.0
+                    ndCompression = str2double(material_properties.failStress_shear);
+                else
+                    ndCompression = material_properties.ndCompression;
+                end
+            catch
+                ndCompression = 0.0;
+            end
+            setappdata(0, 'ndCompression', ndCompression)
+            
             %% Modulus of elasticity
             if material_properties.e_active == 1.0
                 if ischar(material_properties.e)
