@@ -112,7 +112,7 @@ classdef importMaterial < handle
             classStr = {'WROUGHTSTEEL', 'DUCTILEIRON', 'MALLEABLEIRON', 'WROUGHTIRON', 'CASTIRON', 'ALUMINIUM', 'OTHER'};
             
             % COMPOSITE FAILURE STRINGS
-            compositeStr = {'STRESS', 'STRAIN', 'HASHIN'};
+            compositeStr = {'STRESS', 'STRAIN', 'HASHIN', 'LARC05'};
         end
         
         %% PROCESS THE MATERIAL FILE
@@ -1376,9 +1376,9 @@ classdef importMaterial < handle
                                         % Process the data line
                                         nProperties = length(properties);
                                         if nProperties > 8.0
-                                            properties = properties(1.0:5.0);
+                                            properties = properties(1.0:8.0);
                                         elseif nProperties < 8.0
-                                            properties(nProperties + 1.0:5.0) = -9e100;
+                                            properties(nProperties + 1.0:8.0) = -9e100;
                                         end
                                         
                                         % Tensile strain (fiber direction)
@@ -1485,6 +1485,82 @@ classdef importMaterial < handle
                                         % Transverse shear strength
                                         if properties(7.0) ~= -9e100
                                             material_properties.hashin_tss = properties(7.0);
+                                        end
+                                    case 4.0 % LaRC05
+                                        TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
+                                        
+                                        TLINE(ismember(TLINE,' ')) = [];
+                                        
+                                        index = 1.0;
+                                        while 1.0 == 1.0
+                                            if index == length(TLINE)
+                                                break
+                                            elseif (index == 1.0) && (strcmp(TLINE(length(TLINE) - length(strtrim(TLINE)) + 1.0), ',') == 1.0)
+                                                TLINE = ['-9e100', TLINE]; %#ok<AGROW>
+                                                index = index + 6.0;
+                                            elseif strcmp(TLINE(index:index + 1.0), ',,') == 1.0
+                                                % This value is undefined
+                                                TLINE = [TLINE(1.0: index), '-9e100', TLINE(index + 1.0:end)];
+                                                index = index + 7.0;
+                                            else
+                                                index = index + 1.0;
+                                            end
+                                        end
+                                        
+                                        % Get the numeric value of the data line
+                                        properties = str2num(TLINE); %#ok<ST2NM>
+                                        
+                                        % Process the data line
+                                        nProperties = length(properties);
+                                        if nProperties > 9.0
+                                            properties = properties(1.0:9.0);
+                                        elseif nProperties < 9.0
+                                            properties(nProperties + 1.0:9.0) = -9e100;
+                                        end
+                                        
+                                        % Longitudinal tensile strength
+                                        if properties(1.0) ~= -9e100
+                                            material_properties.larc05_lts = properties(1.0);
+                                        end
+                                        
+                                        % Longitudinal compressive strength
+                                        if properties(2.0) ~= -9e100
+                                            material_properties.larc05_lcs = properties(2.0);
+                                        end
+                                        
+                                        % Transverse tensile strength
+                                        if properties(3.0) ~= -9e100
+                                            material_properties.larc05_tts = properties(3.0);
+                                        end
+                                        
+                                        % Longitudinal shear strength
+                                        if properties(4.0) ~= -9e100
+                                            material_properties.larc05_lss = properties(4.0);
+                                        end
+                                        
+                                        % Transverse shear strength
+                                        if properties(5.0) ~= -9e100
+                                            material_properties.larc05_tss = properties(5.0);
+                                        end
+                                        
+                                        % Shear modulus
+                                        if properties(6.0) ~= -9e100
+                                            material_properties.larc05_shear = properties(6.0);
+                                        end
+                                        
+                                        % Longitudinal slope coefficient
+                                        if properties(7.0) ~= -9e100
+                                            material_properties.larc05_nl = properties(7.0);
+                                        end
+                                        
+                                        % Transverse slope coefficient
+                                        if properties(8.0) ~= -9e100
+                                            material_properties.larc05_nt = properties(8.0);
+                                        end
+                                        
+                                        % Initial fier misalignment angle
+                                        if properties(9.0) ~= -9e100
+                                            material_properties.larc05_phi0 = properties(9.0);
                                         end
                                 end
                             end
