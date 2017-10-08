@@ -31,9 +31,21 @@ HSNFTCRT = linspace(-1.0, -1.0, N);
 HSNFCCRT = linspace(-1.0, -1.0, N);
 HSNMTCRT = linspace(-1.0, -1.0, N);
 HSNMCCRT = linspace(-1.0, -1.0, N);
+LARPFCRT = linspace(-1.0, -1.0, N);
+LARMFCRT = linspace(-1.0, -1.0, N);
+LARKFCRT = linspace(-1.0, -1.0, N);
+LARTFCRT = linspace(-1.0, -1.0, N);
 
 startID = 1.0;
 totalCounter = 1.0;
+
+% Get stress tensor
+S11 = getappdata(0, 'Sxx');
+S22 = getappdata(0, 'Syy');
+S33 = getappdata(0, 'Szz');
+S12 = getappdata(0, 'Txy');
+S13 = getappdata(0, 'Txz');
+S23 = getappdata(0, 'Tyz');
 
 for groups = 1:G
     if strcmpi(groupIDBuffer(1.0).name, 'default') == 1.0
@@ -81,6 +93,17 @@ for groups = 1:G
     Sl = getappdata(0, 'hashin_lss');
     St = getappdata(0, 'hashin_tss');
     
+    % Get LaRC05 properties
+    Xlt = getappdata(0, 'larc05_lts');
+    Xlc = getappdata(0, 'larc05_lcs');
+    Ylt = getappdata(0, 'larc05_tts');
+    Sll = getappdata(0, 'larc05_lss');
+    Slt = getappdata(0, 'larc05_tss');
+    larc_G12 = getappdata(0, 'larc05_shear');
+    nl = getappdata(0, 'larc05_nl');
+    nt = getappdata(0, 'larc05_nt');
+    phi0 = getappdata(0, 'larc05_phi0');
+    
     % Check if there is enough data for maximum stress, Tsai-Hill, Tsai-Wu and Azzi-Tsai-Hill theory
     if isempty(Xt) == 1.0 || isempty(Xc) == 1.0 || isempty(Yt) == 1.0 || isempty(Yc) == 1.0 || isempty(S) == 1.0
         failStressGeneral = -1.0;
@@ -110,25 +133,24 @@ for groups = 1:G
         hashin = 1.0;
     end
     
-    if failStressGeneral == -1.0 && tsaiWuTT == -1.0 && failStrain == -1.0 && hashin == -1.0
+    % Check if there is enough data for LaRC05
+    if isempty(larc_G12) == 1.0 || isempty(Xlt) == 1.0 || isempty(Xlc) == 1.0 || isempty(Ylt) == 1.0 || isempty(Sll) == 1.0 || isempty(Slt) == 1.0 || isempty(phi0) == 1.0 || isempty(nl) == 1.0 || isempty(nt) == 1.0
+        larc05 = -1.0;
+    else
+        larc05 = 1.0;
+    end
+    
+    if failStressGeneral == -1.0 && tsaiWuTT == -1.0 && failStrain == -1.0 && hashin == -1.0 && larc05 == -1.0
         totalCounter = totalCounter + N;
         continue
     end
     
-    % Get stress tensor
-    S11 = getappdata(0, 'Sxx');
-    S22 = getappdata(0, 'Syy');
-    S33 = getappdata(0, 'Szz');
-    S12 = getappdata(0, 'Txy');
-    S13 = getappdata(0, 'Txz');
-    S23 = getappdata(0, 'Tyz');
-    
-    S11 = S11(startID:(startID + N) - 1.0, :);
-    S22 = S22(startID:(startID + N) - 1.0, :);
-    S33 = S33(startID:(startID + N) - 1.0, :);
-    S12 = S12(startID:(startID + N) - 1.0, :);
-    S13 = S13(startID:(startID + N) - 1.0, :);
-    S23 = S23(startID:(startID + N) - 1.0, :);
+    S11_group = S11(startID:(startID + N) - 1.0, :);
+    S22_group = S22(startID:(startID + N) - 1.0, :);
+    S33_group = S33(startID:(startID + N) - 1.0, :);
+    S12_group = S12(startID:(startID + N) - 1.0, :);
+    S13_group = S13(startID:(startID + N) - 1.0, :);
+    S23_group = S23(startID:(startID + N) - 1.0, :);
     
     X = zeros(1.0, L);
     Y = zeros(1.0, L);
@@ -165,14 +187,25 @@ for groups = 1:G
         end
     end
     
+    % Initialize LaRC05 parameters
+    if larc05 == 1.0
+        S1 = getappdata(0, 'S1');
+        S2 = getappdata(0, 'S2');
+        S3 = getappdata(0, 'S3');
+        
+        S1_group = S1(startID:(startID + N) - 1.0, :);
+        S2_group = S2(startID:(startID + N) - 1.0, :);
+        S3_group = S3(startID:(startID + N) - 1.0, :);
+    end
+    
     for i = 1:N
         %% Get the stresses at the current item
-        S11i = S11(i, :);
-        S22i = S22(i, :);
-        S33i = S33(i, :);
-        S12i = S12(i, :);
-        S13i = S13(i, :);
-        S23i = S23(i, :);
+        S11i = S11_group(i, :);
+        S22i = S22_group(i, :);
+        S33i = S33_group(i, :);
+        S12i = S12_group(i, :);
+        S13i = S13_group(i, :);
+        S23i = S23_group(i, :);
         
         %% Check for out-of-plane stress components
         if any(S33i) == 1.0 || any(S13i) == 1.0 || any(S23i) == 1.0
@@ -253,6 +286,19 @@ for groups = 1:G
             HSNMCCRT(totalCounter) = max(HSNMCCRTi);
         end
         
+        %% LARC05 CALCULATION
+        if larc05 == 1.0
+            S1i = S1_group(i, :);
+            S2i = S2_group(i, :);
+            S3i = S3_group(i, :);
+            
+            [LARPFCRT, LARMFCRT, LARKFCRT, LARTFCRT] =...
+                LaRC05(S11i, S22i, S33i, S12i, S13i, S23i, S1i, S2i, S3i,...
+                larc_G12, Xlt, Xlc, Ylt, Sll, Slt, phi0, nl, nt,...
+                LARPFCRT, LARMFCRT, LARKFCRT, LARTFCRT, totalCounter);
+        end
+        
+        %% UPDATE COUNTER
         totalCounter = totalCounter + 1.0;
     end
     
@@ -274,6 +320,10 @@ N_HSNFTCRT = length(HSNFTCRT(HSNFTCRT >= 1.0));
 N_HSNFCCRT = length(HSNFCCRT(HSNFCCRT >= 1.0));
 N_HSNMTCRT = length(HSNMTCRT(HSNMTCRT >= 1.0));
 N_HSNMCCRT = length(HSNMCCRT(HSNMCCRT >= 1.0));
+N_LARPFCRT = length(LARPFCRT(LARPFCRT >= 1.0));
+N_LARMFCRT = length(LARMFCRT(LARMFCRT >= 1.0));
+N_LARKFCRT = length(LARKFCRT(LARKFCRT >= 1.0));
+N_LARTFCRT = length(LARTFCRT(LARTFCRT >= 1.0));
 
 setappdata(0, 'MSTRS', N_MSTRS)
 setappdata(0, 'MSTRN', N_MSTRN)
@@ -285,6 +335,10 @@ setappdata(0, 'HSNFTCRT', N_HSNFTCRT)
 setappdata(0, 'HSNFCCRT', N_HSNFCCRT)
 setappdata(0, 'HSNMTCRT', N_HSNMTCRT)
 setappdata(0, 'HSNMCCRT', N_HSNMCCRT)
+setappdata(0, 'LARPFCRT', N_LARPFCRT)
+setappdata(0, 'LARMFCRT', N_LARMFCRT)
+setappdata(0, 'LARKFCRT', N_LARKFCRT)
+setappdata(0, 'LARTFCRT', N_LARTFCRT)
 
 if N_MSTRS > 0.0
     messenger.writeMessage(290.0)
@@ -316,11 +370,23 @@ end
 if N_HSNMCCRT > 0.0
     messenger.writeMessage(299.0)
 end
+if N_LARPFCRT > 0.0
+    messenger.writeMessage(302.0)
+end
+if N_LARMFCRT > 0.0
+    messenger.writeMessage(303.0)
+end
+if N_LARKFCRT > 0.0
+    messenger.writeMessage(304.0)
+end
+if N_LARTFCRT > 0.0
+    messenger.writeMessage(305.0)
+end
 
 %% Write output to file
-if (failStressGeneral ~= -1.0) || (tsaiWuTT ~= -1.0) || (failStrain ~= -1.0) || (hashin ~= -1.0)
+if (failStressGeneral ~= -1.0) || (tsaiWuTT ~= -1.0) || (failStrain ~= -1.0) || (hashin ~= -1.0) || (larc05 ~= -1.0)
     % Check if there is failure 
-    FAIL_ALL = [N_MSTRS, N_TSAIH, N_TSAIW, N_TSAIWTT, N_AZZIT, N_MSTRN, N_HSNFTCRT, N_HSNFCCRT, N_HSNMTCRT, N_HSNMCCRT];
+    FAIL_ALL = [N_MSTRS, N_TSAIH, N_TSAIW, N_TSAIWTT, N_AZZIT, N_MSTRN, N_HSNFTCRT, N_HSNFCCRT, N_HSNMTCRT, N_HSNMCCRT, N_LARPFCRT, N_LARMFCRT, N_LARKFCRT, N_LARTFCRT];
     if any(FAIL_ALL) == 0.0
         messenger.writeMessage(301.0)
     end
@@ -328,7 +394,7 @@ if (failStressGeneral ~= -1.0) || (tsaiWuTT ~= -1.0) || (failStrain ~= -1.0) || 
     mainIDs = getappdata(0, 'mainID');
     subIDs = getappdata(0, 'subID');
     
-    data = [mainIDs'; subIDs'; MSTRS; MSTRN; TSAIH; TSAIW; TSAIWTT; AZZIT; HSNFTCRT; HSNFCCRT; HSNMTCRT; HSNMCCRT]';
+    data = [mainIDs'; subIDs'; MSTRS; MSTRN; TSAIH; TSAIW; TSAIWTT; AZZIT; HSNFTCRT; HSNFCCRT; HSNMTCRT; HSNMCCRT; LARPFCRT; LARMFCRT; LARKFCRT; LARTFCRT]';
     
     % Print information to file
     root = getappdata(0, 'outputDirectory');
@@ -344,8 +410,8 @@ if (failStressGeneral ~= -1.0) || (tsaiWuTT ~= -1.0) || (failStrain ~= -1.0) || 
     fprintf(fid, 'COMPOSITE FAILURE\r\n');
     fprintf(fid, 'Job:\t%s\r\nLoading:\t%.3g\t%s\r\n', getappdata(0, 'jobName'), getappdata(0, 'loadEqVal'), getappdata(0, 'loadEqUnits'));
     
-    fprintf(fid, 'Main ID\tSub ID\tMSTRS\tMSTRN\tTSAIH\tTSAIW\tTSAIWTT\tAZZIT\tHSNFTCRT\tHSNFCCRT\tHSNMTCRT\tHSNMCCRT\r\n');
-    fprintf(fid, '%.0f\t%.0f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\r\n', data');
+    fprintf(fid, 'Main ID\tSub ID\tMSTRS\tMSTRN\tTSAIH\tTSAIW\tTSAIWTT\tAZZIT\tHSNFTCRT\tHSNFCCRT\tHSNMTCRT\tHSNMCCRT\tLARPFCRT\tLARMFCRT\tLARKFCRT\tLARTFCRT\r\n');
+    fprintf(fid, '%.0f\t%.0f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\r\n', data');
     
     fclose(fid);
     

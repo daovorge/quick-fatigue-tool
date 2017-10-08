@@ -1,4 +1,5 @@
-function [FI_p, FI_m, FI_k, FI_t] = LaRC05()
+function [LARPFCRT, LARMFCRT, LARKFCRT, LARTFCRT] = LaRC05(S11, S22, S33, S12, S13, S23, S1, S2, S3,...
+                G12, Xt, Xc, Yt, Sl, St, phi0, nl, nt, LARPFCRT, LARMFCRT, LARKFCRT, LARTFCRT, index)
 %LARC05    QFT function to calculate LaRC05 composite failure criteria.
 %   
 %   LARC05 is used internally by Quick Fatigue Tool. The user is
@@ -10,56 +11,10 @@ function [FI_p, FI_m, FI_k, FI_t] = LaRC05()
     
     %%
 
-% Material
-%E11 = 200e3;
-%E22 = 200e3;
-%v12 = 0.3;
-%v23 = 0.3;
-G12 = 120e3;
-Xt = 400.0;
-Xc = 200.0;
-Yt = 300.0;
-%Yc = 150.0;
-Sl = 120.0;
-St = 120.0;
-phi0 = 0.0;
-nl = 0.1;
-nt = 0.2867;
-
-% Load
-S11 = [200.0, -200.0, 50.0, -25.0];
-S22 = [100.0, -200.0, 200.0, 150.0];
-S33 = [-100.0, 100.0, 0.0, 50.0];
-S12 = [50.0, -50.0, 50.0, -50.0];
-S13 = [-50.0, 0.0, 100.0, 0.0];
-S23 = [100.0, -100.0, 50.0, 0.0];
-
-L = length(S11);
-
-% Principals
-S1 = zeros(1.0, L);
-S2 = zeros(1.0, L);
-S3 = zeros(1.0, L);
-
-for i = 1:L
-    S = [S11(i), S12(i), S13(i); S12(i), S22(i), S23(i); S13(i), S23(i), S33(i)];
-    eigenvalues = eig(S);
-    S1(i) = max(eigenvalues);
-    S2(i) = median(eigenvalues);
-    S3(i) = min(eigenvalues);
-end
-
-% Additional material parameters
-%phi_c = atand((1.0 - sqrt(1.0 - 4.0*((Sl/Xc) + nl)*(Sl/Xc))) / (2.0*((Sl/Xc) + nl)));
-%E33 = E22;
-%v13 = v12;
-%G23 = E22/(2.0*(1.0 + v23));
-%G13 = G12;
-
 %% Polymer
 Sh = (1.0/3.0).*(S11 + S22 + S33);
-k = (1.0/6.0).*((S1 - S2).^2.0 + (S2 - S3).^2.0 + (S3 - S1).^2.0);
-FI_p = (3.0*(k - (Xt - Xc)*Sh)) / (Xt*Xc);
+k2 = (1.0/6.0).*((S1 - S2).^2.0 + (S2 - S3).^2.0 + (S3 - S1).^2.0);
+LARPFCRT(index) = max((3.0*(k2 - (Xt - Xc)*Sh)) / (Xt*Xc));
 
 %% Matrix
 FI_mi = zeros(1.0, 181.0);
@@ -75,17 +30,13 @@ for i = 1:181
     SnNeg = Sn <= 0.0;
     
     FI_mi_pos = max(((Tt(SnPos)) ./ (St - (nt*Sn(SnPos)))).^2.0 + ((Tl(SnPos)) ./ (Sl - (nl*Sn(SnPos)))).^2.0 + ((Sn(SnPos)) ./ (Yt)).^2.0);
-    FI_mi_neg = max(((Tt(SnNeg)) / (St - (nt*Sn(SnNeg))))^2.0 + ((Tl(SnNeg)) / (Sl - (nl*Sn(SnNeg))))^2.0);
+    FI_mi_neg = max(((Tt(SnNeg)) ./ (St - (nt*Sn(SnNeg)))).^2.0 + ((Tl(SnNeg)) ./ (Sl - (nl*Sn(SnNeg)))).^2.0);
     
     FI_mi(i) = max([FI_mi_pos, FI_mi_neg]);
 end
 
 FI_m_max = FI_mi == max(FI_mi);
-%a_max = a(FI_m_max);
-FI_m = FI_mi(FI_m_max);
-
-%subplot(1.0, 2.0, 1.0)
-%plot(a, FI_mi)
+LARMFCRT(index) = FI_mi(FI_m_max);
 
 %% Fiber Kink/Split
 FI_ki = zeros(1.0, 181.0);
@@ -100,7 +51,7 @@ for i = 1:181
     
     phi = phi0*sign(Tau12_psi) + (Tau12_psi/G12);
     
-    S2_m = sind(phi+S1).^2.0 + cosd(phi.*S2_psi).^2.0 - 2.0.*sind(phi).*cosd(phi.*Tau12_psi);
+    S2_m = sind(phi.*S1).^2.0 + cosd(phi.*S2_psi).^2.0 - 2.0.*sind(phi).*cosd(phi.*Tau12_psi);
     Tau12_m = -sind(phi).*cosd(phi.*S1) + sind(phi).*cosd(phi.*S2_psi) + (cosd(phi).^2.0 - sind(phi).^2.0).*Tau12_psi;
     Tau23_m = Tau23_psi.*cosd(phi) - Tau13_psi.*sind(phi);
     
@@ -114,15 +65,11 @@ for i = 1:181
 end
 
 FI_k_max = FI_ki == max(FI_ki);
-%psi_max = psi(FI_m_max);
-FI_k = FI_ki(FI_k_max);
-
-%subplot(1.0, 2.0, 2.0)
-%plot(psi, FI_ki)
+LARKFCRT(index) = FI_ki(FI_k_max);
 
 %% Fire tensile failure
 if S1 > 0.0
-    FI_t = max(S1/Xt);
+    LARTFCRT(index) = max(S1/Xt);
 else
-    FI_t = 0.0;
+    LARTFCRT(index) = 0.0;
 end

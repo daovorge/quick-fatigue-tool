@@ -1260,6 +1260,35 @@ else
     if isappdata(0, 'hashin_tss') == 1.0
         rmappdata(0, 'hashin_tss')
     end
+    
+    % LaRC05
+    if isappdata(0, 'larc05_lts') == 1.0
+        rmappdata(0, 'larc05_lts')
+    end
+    if isappdata(0, 'larc05_lcs') == 1.0
+        rmappdata(0, 'larc05_lcs')
+    end
+    if isappdata(0, 'larc05_tts') == 1.0
+        rmappdata(0, 'larc05_tts')
+    end
+    if isappdata(0, 'larc05_lss') == 1.0
+        rmappdata(0, 'larc05_lss')
+    end
+    if isappdata(0, 'larc05_tss') == 1.0
+        rmappdata(0, 'larc05_tss')
+    end
+    if isappdata(0, 'larc05_shear') == 1.0
+        rmappdata(0, 'larc05_shear')
+    end
+    if isappdata(0, 'larc05_nl') == 1.0
+        rmappdata(0, 'larc05_nl')
+    end
+    if isappdata(0, 'larc05_nr') == 1.0
+        rmappdata(0, 'larc05_nr')
+    end
+    if isappdata(0, 'larc05_phi0') == 1.0
+        rmappdata(0, 'larc05_phi0')
+    end
 end
 
 % Enable the GUI
@@ -1327,9 +1356,18 @@ material_properties = struct(...
 'hashin_lts', getappdata(0, 'hashin_lts'),...
 'hashin_lcs', getappdata(0, 'hashin_lcs'),...
 'hashin_tts', getappdata(0, 'hashin_tts'),...
-'hashin_tcs', getappdata(0, 'hashin_lcs'),...
-'hashin_lss', getappdata(0, 'hashin_tss'),...
-'hashin_tss', getappdata(0, 'hashin_tss'));
+'hashin_tcs', getappdata(0, 'hashin_tcs'),...
+'hashin_lss', getappdata(0, 'hashin_lss'),...
+'hashin_tss', getappdata(0, 'hashin_tss'),...
+'larc05_lts', getappdata(0, 'larc05_lts'),...
+'larc05_lcs', getappdata(0, 'larc05_lcs'),...
+'larc05_tts', getappdata(0, 'larc05_tts'),...
+'larc05_lss', getappdata(0, 'larc05_lss'),...
+'larc05_tss', getappdata(0, 'larc05_tss'),...
+'larc05_shear', getappdata(0, 'larc05_shear'),...
+'larc05_nl', getappdata(0, 'larc05_nl'),...
+'larc05_nt', getappdata(0, 'larc05_nt'),...
+'larc05_phi0', getappdata(0, 'larc05_phi0'));
 
 
 function [] = populateGUI(handles, properties, materialToEdit)
@@ -1731,6 +1769,89 @@ try
     end
 catch
     setappdata(0, 'hashin_tss', [])
+end
+
+% Initliaize LaRC05 properties
+try
+    if isempty(properties.material_properties.larc05_lts) == 1.0
+        setappdata(0, 'larc05_lts', [])
+    else
+        setappdata(0, 'larc05_lts', properties.material_properties.larc05_lts)
+    end
+catch
+    setappdata(0, 'larc05_lts', [])
+end
+try
+    if isempty(properties.material_properties.larc05_lcs) == 1.0
+        setappdata(0, 'larc05_lcs', [])
+    else
+        setappdata(0, 'larc05_lcs', properties.material_properties.larc05_lcs)
+    end
+catch
+    setappdata(0, 'larc05_lcs', [])
+end
+try
+    if isempty(properties.material_properties.larc05_tts) == 1.0
+        setappdata(0, 'larc05_tts', [])
+    else
+        setappdata(0, 'larc05_tts', properties.material_properties.larc05_tts)
+    end
+catch
+    setappdata(0, 'larc05_tts', [])
+end
+try
+    if isempty(properties.material_properties.larc05_lss) == 1.0
+        setappdata(0, 'larc05_lss', [])
+    else
+        setappdata(0, 'larc05_lss', properties.material_properties.larc05_lss)
+    end
+catch
+    setappdata(0, 'larc05_lss', [])
+end
+try
+    if isempty(properties.material_properties.larc05_tss) == 1.0
+        setappdata(0, 'larc05_tss', [])
+    else
+        setappdata(0, 'larc05_tss', properties.material_properties.larc05_tss)
+    end
+catch
+    setappdata(0, 'larc05_tss', [])
+end
+try
+    if isempty(properties.material_properties.larc05_shear) == 1.0
+        setappdata(0, 'larc05_shear', [])
+    else
+        setappdata(0, 'larc05_shear', properties.material_properties.larc05_shear)
+    end
+catch
+    setappdata(0, 'larc05_shear', [])
+end
+try
+    if isempty(properties.material_properties.larc05_nl) == 1.0
+        setappdata(0, 'larc05_nl', [])
+    else
+        setappdata(0, 'larc05_nl', properties.material_properties.larc05_nl)
+    end
+catch
+    setappdata(0, 'larc05_nl', [])
+end
+try
+    if isempty(properties.material_properties.larc05_nt) == 1.0
+        setappdata(0, 'larc05_nt', [])
+    else
+        setappdata(0, 'larc05_nt', properties.material_properties.larc05_nt)
+    end
+catch
+    setappdata(0, 'larc05_nt', [])
+end
+try
+    if isempty(properties.material_properties.larc05_phi0) == 1.0
+        setappdata(0, 'larc05_phi0', [])
+    else
+        setappdata(0, 'larc05_phi0', properties.material_properties.larc05_phi0)
+    end
+catch
+    setappdata(0, 'larc05_phi0', [])
 end
 
 % --- Executes on button press in pButton_manager.
@@ -2526,6 +2647,35 @@ if isappdata(0, 'hashin_tss') == 1.0
     rmappdata(0, 'hashin_tss')
 end
 
+% LaRC05
+if isappdata(0, 'larc05_lts') == 1.0
+    rmappdata(0, 'larc05_lts')
+end
+if isappdata(0, 'larc05_lcs') == 1.0
+    rmappdata(0, 'larc05_lcs')
+end
+if isappdata(0, 'larc05_tts') == 1.0
+    rmappdata(0, 'larc05_tts')
+end
+if isappdata(0, 'larc05_lss') == 1.0
+    rmappdata(0, 'larc05_lss')
+end
+if isappdata(0, 'larc05_tss') == 1.0
+    rmappdata(0, 'larc05_tss')
+end
+if isappdata(0, 'larc05_shear') == 1.0
+    rmappdata(0, 'larc05_shear')
+end
+if isappdata(0, 'larc05_nl') == 1.0
+    rmappdata(0, 'larc05_nl')
+end
+if isappdata(0, 'larc05_nt') == 1.0
+    rmappdata(0, 'larc05_nt')
+end
+if isappdata(0, 'larc05_phi0') == 1.0
+    rmappdata(0, 'larc05_phi0')
+end
+
 delete(hObject);
 
 function blank(handles)
@@ -2699,3 +2849,15 @@ function check_ndCompression_Callback(~, ~, ~)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of check_ndCompression
+
+
+% --- Executes on button press in pButton_larc05.
+function pButton_larc05_Callback(~, ~, handles)
+% Blank the GUI
+blank(handles)
+
+larc05
+uiwait
+
+% Enable the GUI
+enable(handles)

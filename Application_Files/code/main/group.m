@@ -327,6 +327,15 @@ classdef group < handle
             group_materialProps(numberOfMaterials).hashin_tcs = [];
             group_materialProps(numberOfMaterials).hashin_lss = [];
             group_materialProps(numberOfMaterials).hashin_tss = [];
+            group_materialProps(numberOfMaterials).larc05_lts = [];
+            group_materialProps(numberOfMaterials).larc05_lcs = [];
+            group_materialProps(numberOfMaterials).larc05_tts = [];
+            group_materialProps(numberOfMaterials).larc05_lss = [];
+            group_materialProps(numberOfMaterials).larc05_tss = [];
+            group_materialProps(numberOfMaterials).larc05_shear = [];
+            group_materialProps(numberOfMaterials).larc05_nl = [];
+            group_materialProps(numberOfMaterials).larc05_nt = [];
+            group_materialProps(numberOfMaterials).larc05_phi0 = [];
             
             setappdata(0, 'group_materialProps', group_materialProps)
             
@@ -1860,6 +1869,15 @@ classdef group < handle
             group_materialProps(materialNumber).hashin_tcs = getappdata(0, 'hashin_tcs');
             group_materialProps(materialNumber).hashin_lss = getappdata(0, 'hashin_lss');
             group_materialProps(materialNumber).hashin_tss = getappdata(0, 'hashin_tss');
+            group_materialProps(materialNumber).larc05_lts = getappdata(0, 'larc05_lts');
+            group_materialProps(materialNumber).larc05_lcs = getappdata(0, 'larc05_lcs');
+            group_materialProps(materialNumber).larc05_tts = getappdata(0, 'larc05_tts');
+            group_materialProps(materialNumber).larc05_lss = getappdata(0, 'larc05_lss');
+            group_materialProps(materialNumber).larc05_tss = getappdata(0, 'larc05_tss');
+            group_materialProps(materialNumber).larc05_shear = getappdata(0, 'larc05_shear');
+            group_materialProps(materialNumber).larc05_nl = getappdata(0, 'larc05_nl');
+            group_materialProps(materialNumber).larc05_nt = getappdata(0, 'larc05_nt');
+            group_materialProps(materialNumber).larc05_phi0 = getappdata(0, 'larc05_phi0');
             
             
             setappdata(0, 'group_materialProps', group_materialProps)
@@ -1948,6 +1966,15 @@ classdef group < handle
             setappdata(0, 'hashin_tcs', group_materialProps(materialNumber).hashin_tcs)
             setappdata(0, 'hashin_lss', group_materialProps(materialNumber).hashin_lss)
             setappdata(0, 'hashin_tss', group_materialProps(materialNumber).hashin_tss)
+            setappdata(0, 'larc05_lts', group_materialProps(materialNumber).larc05_lts)
+            setappdata(0, 'larc05_lcs', group_materialProps(materialNumber).larc05_lcs)
+            setappdata(0, 'larc05_tts', group_materialProps(materialNumber).larc05_tts)
+            setappdata(0, 'larc05_lss', group_materialProps(materialNumber).larc05_lss)
+            setappdata(0, 'larc05_tss', group_materialProps(materialNumber).larc05_tss)
+            setappdata(0, 'larc05_shear', group_materialProps(materialNumber).larc05_shear)
+            setappdata(0, 'larc05_nl', group_materialProps(materialNumber).larc05_nl)
+            setappdata(0, 'larc05_nt', group_materialProps(materialNumber).larc05_nt)
+            setappdata(0, 'larc05_phi0', group_materialProps(materialNumber).larc05_phi0)
         end
         
         %% READ A GROUP FILE
