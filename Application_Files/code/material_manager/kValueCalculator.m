@@ -122,7 +122,7 @@ varargout{1} = handles.output;
 
 
 % --- Executes on selection change in pMenu_solution.
-function pMenu_solution_Callback(hObject, ~, handles)
+function pMenu_solution_Callback(hObject, eventdata, handles)
 blue = getappdata(0, 'simulia_blue');
 grey = getappdata(0, 'grey');
 switch get(hObject, 'Value')
@@ -138,7 +138,7 @@ switch get(hObject, 'Value')
         catch
             errordlg('The General Formula derivation method requires the Symbolic Math Toolbox.', 'Quick Fatigue Tool')
             uiwait; set(handles.pMenu_solution, 'value', 1.0)
-            
+            pMenu_solution_Callback(hObject, eventdata, handles)
             return
         end
         
