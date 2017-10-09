@@ -8,7 +8,7 @@ function [] = compositeFailure(N, L)
 %
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 02-Oct-2017 13:11:53 GMT
+%   Last modified 09-Oct-2017 11:03:00 GMT
     
     %%
 
@@ -97,11 +97,13 @@ for groups = 1:G
     Xlt = getappdata(0, 'larc05_lts');
     Xlc = getappdata(0, 'larc05_lcs');
     Ylt = getappdata(0, 'larc05_tts');
+    Ylc = getappdata(0, 'larc05_tcs');
     Sll = getappdata(0, 'larc05_lss');
     Slt = getappdata(0, 'larc05_tss');
     larc_G12 = getappdata(0, 'larc05_shear');
     nl = getappdata(0, 'larc05_nl');
     nt = getappdata(0, 'larc05_nt');
+    alpha0 = getappdata(0, 'larc05_alpha0');
     phi0 = getappdata(0, 'larc05_phi0');
     
     % Check if there is enough data for maximum stress, Tsai-Hill, Tsai-Wu and Azzi-Tsai-Hill theory
@@ -134,7 +136,7 @@ for groups = 1:G
     end
     
     % Check if there is enough data for LaRC05
-    if isempty(larc_G12) == 1.0 || isempty(Xlt) == 1.0 || isempty(Xlc) == 1.0 || isempty(Ylt) == 1.0 || isempty(Sll) == 1.0 || isempty(Slt) == 1.0 || isempty(phi0) == 1.0 || isempty(nl) == 1.0 || isempty(nt) == 1.0
+    if (isempty(Xlt) == 1.0 || isempty(Xlc) == 1.0 || isempty(Ylt) == 1.0 || isempty(Sll) == 1.0 || isempty(larc_G12) == 1.0 || isempty(nl) == 1.0) || (isempty(Ylc) == 1.0 && isempty(Slt) == 1.0)
         larc05 = -1.0;
     else
         larc05 = 1.0;
@@ -294,7 +296,7 @@ for groups = 1:G
             
             [LARPFCRT, LARMFCRT, LARKFCRT, LARTFCRT] =...
                 LaRC05(S11i, S22i, S33i, S12i, S13i, S23i, S1i, S2i, S3i,...
-                larc_G12, Xlt, Xlc, Ylt, Sll, Slt, phi0, nl, nt,...
+                larc_G12, Xlt, Xlc, Ylt, Ylc, Sll, Slt, alpha0, phi0, nl, nt,...
                 LARPFCRT, LARMFCRT, LARKFCRT, LARTFCRT, totalCounter);
         end
         

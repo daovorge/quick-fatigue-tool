@@ -10,7 +10,7 @@ function varargout = failStress(varargin)%#ok<*DEFNU>
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 02-Oct-2017 13:11:53 GMT
+%   Last modified 09-Oct-2017 11:03:00 GMT
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -386,12 +386,12 @@ setappdata(0, 'failStress_cross23', get(handles.edit_cross23, 'string'))
 setappdata(0, 'failStress_limit12', get(handles.edit_limit12, 'string'))
 setappdata(0, 'failStress_limit23', get(handles.edit_limit23, 'string'))
 
-close 'Fail Stress'
+close 'Fail Stress Parameters'
 
 
 % --- Executes on button press in pButton_cancel.
 function pButton_cancel_Callback(~, ~, ~)
-close 'Fail Stress'
+close 'Fail Stress Parameters'
 
 
 % --- Executes when failStress is resized.

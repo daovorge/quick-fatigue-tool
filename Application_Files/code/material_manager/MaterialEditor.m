@@ -13,7 +13,7 @@ function varargout = MaterialEditor(varargin)%#ok<*DEFNU>
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 08-Oct-2017 12:50:10 GMT
+%   Last modified 09-Oct-2017 11:03:00 GMT
     
     %%
     
@@ -1271,6 +1271,9 @@ else
     if isappdata(0, 'larc05_tts') == 1.0
         rmappdata(0, 'larc05_tts')
     end
+    if isappdata(0, 'larc05_tcs') == 1.0
+        rmappdata(0, 'larc05_tcs')
+    end
     if isappdata(0, 'larc05_lss') == 1.0
         rmappdata(0, 'larc05_lss')
     end
@@ -1285,6 +1288,9 @@ else
     end
     if isappdata(0, 'larc05_nr') == 1.0
         rmappdata(0, 'larc05_nr')
+    end
+    if isappdata(0, 'larc05_alpha0') == 1.0
+        rmappdata(0, 'larc05_alpha0')
     end
     if isappdata(0, 'larc05_phi0') == 1.0
         rmappdata(0, 'larc05_phi0')
@@ -1362,11 +1368,13 @@ material_properties = struct(...
 'larc05_lts', getappdata(0, 'larc05_lts'),...
 'larc05_lcs', getappdata(0, 'larc05_lcs'),...
 'larc05_tts', getappdata(0, 'larc05_tts'),...
+'larc05_tcs', getappdata(0, 'larc05_tcs'),...
 'larc05_lss', getappdata(0, 'larc05_lss'),...
 'larc05_tss', getappdata(0, 'larc05_tss'),...
 'larc05_shear', getappdata(0, 'larc05_shear'),...
 'larc05_nl', getappdata(0, 'larc05_nl'),...
 'larc05_nt', getappdata(0, 'larc05_nt'),...
+'larc05_alpha0', getappdata(0, 'larc05_alpha0'),...
 'larc05_phi0', getappdata(0, 'larc05_phi0'));
 
 
@@ -1800,6 +1808,15 @@ catch
     setappdata(0, 'larc05_tts', [])
 end
 try
+    if isempty(properties.material_properties.larc05_tcs) == 1.0
+        setappdata(0, 'larc05_tcs', [])
+    else
+        setappdata(0, 'larc05_tcs', properties.material_properties.larc05_tcs)
+    end
+catch
+    setappdata(0, 'larc05_tcs', [])
+end
+try
     if isempty(properties.material_properties.larc05_lss) == 1.0
         setappdata(0, 'larc05_lss', [])
     else
@@ -1843,6 +1860,15 @@ try
     end
 catch
     setappdata(0, 'larc05_nt', [])
+end
+try
+    if isempty(properties.material_properties.larc05_alpha0) == 1.0
+        setappdata(0, 'larc05_alpha0', [])
+    else
+        setappdata(0, 'larc05_alpha0', properties.material_properties.larc05_alpha0)
+    end
+catch
+    setappdata(0, 'larc05_alpha0', [])
 end
 try
     if isempty(properties.material_properties.larc05_phi0) == 1.0
@@ -2657,6 +2683,9 @@ end
 if isappdata(0, 'larc05_tts') == 1.0
     rmappdata(0, 'larc05_tts')
 end
+if isappdata(0, 'larc05_tcs') == 1.0
+    rmappdata(0, 'larc05_tcs')
+end
 if isappdata(0, 'larc05_lss') == 1.0
     rmappdata(0, 'larc05_lss')
 end
@@ -2671,6 +2700,9 @@ if isappdata(0, 'larc05_nl') == 1.0
 end
 if isappdata(0, 'larc05_nt') == 1.0
     rmappdata(0, 'larc05_nt')
+end
+if isappdata(0, 'larc05_alpha0') == 1.0
+    rmappdata(0, 'larc05_alpha0')
 end
 if isappdata(0, 'larc05_phi0') == 1.0
     rmappdata(0, 'larc05_phi0')

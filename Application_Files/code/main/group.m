@@ -9,7 +9,7 @@ classdef group < handle
 %      4.6 Analysis groups
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 03-Oct-2017 13:44:11 GMT
+%   Last modified 09-Oct-2017 11:03:00 GMT
     
     %%
     
@@ -330,11 +330,13 @@ classdef group < handle
             group_materialProps(numberOfMaterials).larc05_lts = [];
             group_materialProps(numberOfMaterials).larc05_lcs = [];
             group_materialProps(numberOfMaterials).larc05_tts = [];
+            group_materialProps(numberOfMaterials).larc05_tcs = [];
             group_materialProps(numberOfMaterials).larc05_lss = [];
             group_materialProps(numberOfMaterials).larc05_tss = [];
             group_materialProps(numberOfMaterials).larc05_shear = [];
             group_materialProps(numberOfMaterials).larc05_nl = [];
             group_materialProps(numberOfMaterials).larc05_nt = [];
+            group_materialProps(numberOfMaterials).larc05_alpha0 = [];
             group_materialProps(numberOfMaterials).larc05_phi0 = [];
             
             setappdata(0, 'group_materialProps', group_materialProps)
@@ -1872,11 +1874,13 @@ classdef group < handle
             group_materialProps(materialNumber).larc05_lts = getappdata(0, 'larc05_lts');
             group_materialProps(materialNumber).larc05_lcs = getappdata(0, 'larc05_lcs');
             group_materialProps(materialNumber).larc05_tts = getappdata(0, 'larc05_tts');
+            group_materialProps(materialNumber).larc05_tcs = getappdata(0, 'larc05_tcs');
             group_materialProps(materialNumber).larc05_lss = getappdata(0, 'larc05_lss');
             group_materialProps(materialNumber).larc05_tss = getappdata(0, 'larc05_tss');
             group_materialProps(materialNumber).larc05_shear = getappdata(0, 'larc05_shear');
             group_materialProps(materialNumber).larc05_nl = getappdata(0, 'larc05_nl');
             group_materialProps(materialNumber).larc05_nt = getappdata(0, 'larc05_nt');
+            group_materialProps(materialNumber).larc05_alpha0 = getappdata(0, 'larc05_alpha0');
             group_materialProps(materialNumber).larc05_phi0 = getappdata(0, 'larc05_phi0');
             
             
@@ -1969,11 +1973,13 @@ classdef group < handle
             setappdata(0, 'larc05_lts', group_materialProps(materialNumber).larc05_lts)
             setappdata(0, 'larc05_lcs', group_materialProps(materialNumber).larc05_lcs)
             setappdata(0, 'larc05_tts', group_materialProps(materialNumber).larc05_tts)
+            setappdata(0, 'larc05_tcs', group_materialProps(materialNumber).larc05_tcs)
             setappdata(0, 'larc05_lss', group_materialProps(materialNumber).larc05_lss)
             setappdata(0, 'larc05_tss', group_materialProps(materialNumber).larc05_tss)
             setappdata(0, 'larc05_shear', group_materialProps(materialNumber).larc05_shear)
             setappdata(0, 'larc05_nl', group_materialProps(materialNumber).larc05_nl)
             setappdata(0, 'larc05_nt', group_materialProps(materialNumber).larc05_nt)
+            setappdata(0, 'larc05_alpha0', group_materialProps(materialNumber).larc05_alpha0)
             setappdata(0, 'larc05_phi0', group_materialProps(materialNumber).larc05_phi0)
         end
         

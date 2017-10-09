@@ -10,7 +10,7 @@ function varargout = larc05(varargin)%#ok<*DEFNU>
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 01-Oct-2017 14:09:15 GMT
+%   Last modified 09-Oct-2017 11:03:00 GMT
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -61,6 +61,9 @@ end
 if isappdata(0, 'larc05_tts')
     set(handles.edit_tts, 'string', getappdata(0, 'larc05_tts'))
 end
+if isappdata(0, 'larc05_tcs')
+    set(handles.edit_tcs, 'string', getappdata(0, 'larc05_tcs'))
+end
 if isappdata(0, 'larc05_lss')
     set(handles.edit_lss, 'string', getappdata(0, 'larc05_lss'))
 end
@@ -75,6 +78,9 @@ if isappdata(0, 'larc05_nl')
 end
 if isappdata(0, 'larc05_nt')
     set(handles.edit_nt, 'string', getappdata(0, 'larc05_nt'))
+end
+if isappdata(0, 'larc05_alpha0')
+    set(handles.edit_alpha0, 'string', getappdata(0, 'larc05_alpha0'))
 end
 if isappdata(0, 'larc05_phi0')
     set(handles.edit_phi0, 'string', getappdata(0, 'larc05_phi0'))
@@ -252,6 +258,13 @@ if isempty(get(handles.edit_tts, 'string')) == 0.0
     end
 end
 
+larc05_tcs = str2double(get(handles.edit_tcs, 'string'));
+if isempty(get(handles.edit_tcs, 'string')) == 0.0
+    if isnan(larc05_tcs) == 1.0 || isinf(larc05_tcs) == 1.0 || isreal(larc05_tcs) == 0.0
+        error = 1.0;
+    end
+end
+
 larc05_lss = str2double(get(handles.edit_lss, 'string'));
 if isempty(get(handles.edit_lss, 'string')) == 0.0
     if isnan(larc05_lss) == 1.0 || isinf(larc05_lss) == 1.0 || isreal(larc05_lss) == 0.0
@@ -287,10 +300,27 @@ if isempty(get(handles.edit_nt, 'string')) == 0.0
     end
 end
 
+if isempty(get(handles.edit_alpha0, 'string')) == 1.0
+    set(handles.edit_alpha0, 'string', '53')
+else
+    larc05_alpha0 = str2double(get(handles.edit_alpha0, 'string'));
+    if isnan(larc05_alpha0) == 1.0 || isinf(larc05_alpha0) == 1.0 || isreal(larc05_alpha0) == 0.0
+        error = 1.0;
+    elseif larc05_alpha0 < -0.0 || larc05_alpha0 > 180.0
+        errordlg('Alpha must be in the range (0 <= alpha <= 180.0).', 'Quick Fatigue Tool')
+        uiwait; enable(handles)
+        return
+    end
+end
+
 larc05_phi0 = str2double(get(handles.edit_phi0, 'string'));
 if isempty(get(handles.edit_phi0, 'string')) == 0.0
     if isnan(larc05_phi0) == 1.0 || isinf(larc05_phi0) == 1.0 || isreal(larc05_phi0) == 0.0
         error = 1.0;
+    elseif larc05_phi0 < 0.0 || larc05_phi0 > 180.0
+        errordlg('Phi must be in the range (0 <= phi <= 180.0).', 'Quick Fatigue Tool')
+        uiwait; enable(handles)
+        return
     end
 end
 
@@ -304,19 +334,21 @@ end
 setappdata(0, 'larc05_lts', get(handles.edit_lts, 'string'))
 setappdata(0, 'larc05_lcs', get(handles.edit_lcs, 'string'))
 setappdata(0, 'larc05_tts', get(handles.edit_tts, 'string'))
+setappdata(0, 'larc05_tcs', get(handles.edit_tcs, 'string'))
 setappdata(0, 'larc05_lss', get(handles.edit_lss, 'string'))
 setappdata(0, 'larc05_tss', get(handles.edit_tss, 'string'))
 setappdata(0, 'larc05_shear', get(handles.edit_shear, 'string'))
 setappdata(0, 'larc05_nl', get(handles.edit_nl, 'string'))
 setappdata(0, 'larc05_nt', get(handles.edit_nt, 'string'))
+setappdata(0, 'larc05_alpha0', get(handles.edit_alpha0, 'string'))
 setappdata(0, 'larc05_phi0', get(handles.edit_phi0, 'string'))
 
-close 'LaRC05 Damage'
+close 'LaRC05 Parameters'
 
 
 % --- Executes on button press in pButton_cancel.
 function pButton_cancel_Callback(~, ~, ~)
-close 'LaRC05 Damage'
+close 'LaRC05 Parameters'
 
 
 % --- Executes when larc05 is resized.
@@ -412,6 +444,28 @@ function edit_phi0_Callback(~, ~, ~)
 % --- Executes during object creation, after setting all properties.
 function edit_phi0_CreateFcn(hObject, ~, ~)
 % hObject    handle to edit_phi0 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+function edit_alpha0_Callback(~, ~, ~)
+% hObject    handle to edit_alpha0 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_alpha0 as text
+%        str2double(get(hObject,'String')) returns contents of edit_alpha0 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_alpha0_CreateFcn(hObject, ~, ~)
+% hObject    handle to edit_alpha0 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 

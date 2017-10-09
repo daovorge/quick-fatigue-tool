@@ -10,7 +10,7 @@ function varargout = failStrain(varargin)%#ok<*DEFNU>
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 01-Oct-2017 14:09:15 GMT
+%   Last modified 09-Oct-2017 11:03:00 GMT
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -335,12 +335,12 @@ setappdata(0, 'failStrain_e11', get(handles.edit_e11, 'string'))
 setappdata(0, 'failStrain_e22', get(handles.edit_e22, 'string'))
 setappdata(0, 'failStrain_g12', get(handles.edit_g12, 'string'))
 
-close 'Fail Strain'
+close 'Fail Strain Parameters'
 
 
 % --- Executes on button press in pButton_cancel.
 function pButton_cancel_Callback(~, ~, ~)
-close 'Fail Strain'
+close 'Fail Strain Parameters'
 
 
 % --- Executes when failStrain is resized.

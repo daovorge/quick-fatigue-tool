@@ -6,7 +6,7 @@ function [] = cleanup(status)
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 08-Oct-2017 12:50:10 GMT
+%   Last modified 09-Oct-2017 11:03:00 GMT
     
     %%
     
@@ -76,7 +76,7 @@ if status == 1.0
     % Write file header
     fprintf(fid, 'Quick Fatigue Tool 6.11-05\r\n');
     fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-    fprintf(fid, 'Last modified 08-Oct-2017 12:50:10 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 09-Oct-2017 11:03:00 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');

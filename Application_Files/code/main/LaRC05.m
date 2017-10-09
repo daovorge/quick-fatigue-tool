@@ -1,5 +1,5 @@
 function [LARPFCRT, LARMFCRT, LARKFCRT, LARTFCRT] = LaRC05(S11, S22, S33, S12, S13, S23, S1, S2, S3,...
-                G12, Xt, Xc, Yt, Sl, St, phi0, nl, nt, LARPFCRT, LARMFCRT, LARKFCRT, LARTFCRT, index)
+                G12, Xt, Xc, Yt, Yc, Sl, St, alpha0, phi0, nl, nt, LARPFCRT, LARMFCRT, LARKFCRT, LARTFCRT, index)
 %LARC05    QFT function to calculate LaRC05 composite failure criteria.
 %   
 %   LARC05 is used internally by Quick Fatigue Tool. The user is
@@ -7,9 +7,27 @@ function [LARPFCRT, LARMFCRT, LARKFCRT, LARTFCRT] = LaRC05(S11, S22, S33, S12, S
 %
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 07-Oct-2017 13:46:24 GMT
+%   Last modified 09-Oct-2017 11:03:00 GMT
     
     %%
+
+%% Initialise St/nt/phi0 if applicable
+if isempty(St) == 1.0
+    St = Yc*cosd(alpha0)*(sind(alpha0) + ((cosd(alpha0)) / (tand(2.0*(alpha0)))));
+end
+
+if isempty(nt) == 1.0
+    nt = -1.0 / (tand(2.0*(alpha0)));
+end
+
+if isempty(phi0) == 1.0
+    phic = atand((1.0 - sqrt(1.0 - 4.0*((Sl/Xc) + nl)*(Sl/Xc))) / (2.0*((Sl/Xc) + nl)));
+    L = length(S11);
+    syms phi0sym
+    phi0j = zeros(1.0, L);
+else
+    phi0j = phi0;
+end
 
 %% Polymer
 Sh = (1.0/3.0).*(S11 + S22 + S33);
@@ -36,9 +54,9 @@ for i = 1:181
 end
 
 FI_m_max = FI_mi == max(FI_mi);
-LARMFCRT(index) = FI_mi(FI_m_max);
+LARMFCRT(index) = max(FI_mi(FI_m_max));
 
-%% Fiber Kink/Split
+%% Fibre Kink/Split
 FI_ki = zeros(1.0, 181.0);
 psi = linspace(0.0, 180.0, 181.0);
 for i = 1:181
@@ -49,7 +67,15 @@ for i = 1:181
     Tau23_psi = -sind(psii)*cosd(psii*S2) + sind(psii)*cosd(psii*S3) + (cosd(psii)^2.0 - sind(psii)^2.0)*S23;
     Tau13_psi = S13*cosd(psii) - S12*sind(psii);
     
-    phi = phi0*sign(Tau12_psi) + (Tau12_psi/G12);
+    gamma0 = (Tau12_psi/G12);
+    
+    if isempty(phi0) == 1.0
+        for j = 1:L
+            phi0j(j) = eval(solve(phi0sym == phic - gamma0(j)*sin(2.0*phi0sym*(pi/180.0))*Xc, 'phi0sym'));
+        end
+    end
+    
+    phi = phi0j.*sign(Tau12_psi) + gamma0;
     
     S2_m = sind(phi.*S1).^2.0 + cosd(phi.*S2_psi).^2.0 - 2.0.*sind(phi).*cosd(phi.*Tau12_psi);
     Tau12_m = -sind(phi).*cosd(phi.*S1) + sind(phi).*cosd(phi.*S2_psi) + (cosd(phi).^2.0 - sind(phi).^2.0).*Tau12_psi;
@@ -65,9 +91,9 @@ for i = 1:181
 end
 
 FI_k_max = FI_ki == max(FI_ki);
-LARKFCRT(index) = FI_ki(FI_k_max);
+LARKFCRT(index) = max(FI_ki(FI_k_max));
 
-%% Fire tensile failure
+%% Fibre tensile failure
 if S1 > 0.0
     LARTFCRT(index) = max(S1/Xt);
 else

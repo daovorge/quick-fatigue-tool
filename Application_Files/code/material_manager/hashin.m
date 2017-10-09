@@ -10,7 +10,7 @@ function varargout = hashin(varargin)%#ok<*DEFNU>
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 01-Oct-2017 14:09:15 GMT
+%   Last modified 09-Oct-2017 11:03:00 GMT
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -252,7 +252,7 @@ function pButton_ok_Callback(~, ~, handles)
 blank(handles)
 error = 0.0;
 
-if isempty(get(handles.edit_alpha, 'string')) ==1.0
+if isempty(get(handles.edit_alpha, 'string')) == 1.0
     set(handles.edit_alpha, 'string', '0')
 else
     hashin_alpha = str2double(get(handles.edit_alpha, 'string'));
@@ -322,12 +322,12 @@ setappdata(0, 'hashin_tcs', get(handles.edit_tcs, 'string'))
 setappdata(0, 'hashin_lss', get(handles.edit_lss, 'string'))
 setappdata(0, 'hashin_tss', get(handles.edit_tss, 'string'))
 
-close 'Hashin Damage'
+close 'Hashin Parameters'
 
 
 % --- Executes on button press in pButton_cancel.
 function pButton_cancel_Callback(~, ~, ~)
-close 'Hashin Damage'
+close 'Hashin Parameters'
 
 
 % --- Executes when hashinDamage is resized.
