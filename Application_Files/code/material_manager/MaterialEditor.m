@@ -1863,12 +1863,12 @@ catch
 end
 try
     if isempty(properties.material_properties.larc05_alpha0) == 1.0
-        setappdata(0, 'larc05_alpha0', [])
+        setappdata(0, 'larc05_alpha0', 53.0)
     else
         setappdata(0, 'larc05_alpha0', properties.material_properties.larc05_alpha0)
     end
 catch
-    setappdata(0, 'larc05_alpha0', [])
+    setappdata(0, 'larc05_alpha0', 53.0)
 end
 try
     if isempty(properties.material_properties.larc05_phi0) == 1.0
