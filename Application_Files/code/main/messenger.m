@@ -2211,9 +2211,9 @@ classdef messenger < handle
                     case 295.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The maximum strain failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'MSTRN'));
                     case 296.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin damage initiation (fiber tensile) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNFTCRT'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin damage initiation (fibre tensile) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNFTCRT'));
                     case 297.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin damage initiation (fiber compression) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNFCCRT'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin damage initiation (fibre compression) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNFCCRT'));
                     case 298.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin damage initiation (matrix tensile) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNMTCRT'));
                     case 299.0
@@ -2228,9 +2228,11 @@ classdef messenger < handle
                     case 303.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The LaRC05 damage initiation (matrix) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'LARMFCRT'));
                     case 304.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The LaRC05 damage initiation (kink/split) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'LARKFCRT'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The LaRC05 damage initiation (fibre kink) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'LARKFCRT'));
                     case 305.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The LaRC05 damage initiation (tensile) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'LARTFCRT'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The LaRC05 damage initiation (fibre split) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'LARSFCRT'));
+                    case 306.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The LaRC05 damage initiation (fibre tensile) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'LARTFCRT'));
                 end
             end
         end

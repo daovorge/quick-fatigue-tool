@@ -1,5 +1,5 @@
-function [LARPFCRT, LARMFCRT, LARKFCRT, LARTFCRT] = LaRC05(S11, S22, S33, S12, S13, S23, S1, S2, S3,...
-                G12, Xt, Xc, Yt, Yc, Sl, St, alpha0, phi0, nl, nt, LARPFCRT, LARMFCRT, LARKFCRT, LARTFCRT, index)
+function [LARPFCRT, LARMFCRT, LARKFCRT, LARSFCRT, LARTFCRT] = LaRC05(S11, S22, S33, S12, S13, S23, S1, S2, S3,...
+                G12, Xt, Xc, Yt, Yc, Sl, St, alpha0, phi0, nl, nt, LARPFCRT, LARMFCRT, LARKFCRT, LARSFCRT, LARTFCRT, index)
 %LARC05    QFT function to calculate LaRC05 composite failure criteria.
 %   
 %   LARC05 is used internally by Quick Fatigue Tool. The user is
@@ -47,8 +47,17 @@ for i = 1:181
     SnPos = Sn > 0.0;
     SnNeg = Sn <= 0.0;
     
-    FI_mi_pos = max(((Tt(SnPos)) ./ (St - (nt*Sn(SnPos)))).^2.0 + ((Tl(SnPos)) ./ (Sl - (nl*Sn(SnPos)))).^2.0 + ((Sn(SnPos)) ./ (Yt)).^2.0);
-    FI_mi_neg = max(((Tt(SnNeg)) ./ (St - (nt*Sn(SnNeg)))).^2.0 + ((Tl(SnNeg)) ./ (Sl - (nl*Sn(SnNeg)))).^2.0);
+    if any(SnPos) == 0.0
+        FI_mi_pos = 0.0;
+    else
+        FI_mi_pos = max(((Tt(SnPos)) ./ (St - (nt*Sn(SnPos)))).^2.0 + ((Tl(SnPos)) ./ (Sl - (nl*Sn(SnPos)))).^2.0 + ((Sn(SnPos)) ./ (Yt)).^2.0);
+    end
+    
+    if any(SnNeg) == 0.0
+        FI_mi_neg = 0.0;
+    else
+        FI_mi_neg = max(((Tt(SnNeg)) ./ (St - (nt*Sn(SnNeg)))).^2.0 + ((Tl(SnNeg)) ./ (Sl - (nl*Sn(SnNeg)))).^2.0);
+    end
     
     FI_mi(i) = max([FI_mi_pos, FI_mi_neg]);
 end
@@ -57,6 +66,7 @@ FI_m_max = FI_mi == max(FI_mi);
 LARMFCRT(index) = max(FI_mi(FI_m_max));
 
 %% Fibre Kink/Split
+FI_si = zeros(1.0, 181.0);
 FI_ki = zeros(1.0, 181.0);
 psi = linspace(0.0, 180.0, 181.0);
 for i = 1:181
@@ -84,14 +94,26 @@ for i = 1:181
     S2Pos = S2 > 0.0;
     S2Neg = S2 <= 0.0;
     
-    FI_ki_pos = max(((Tau23_m(S2Pos)) / (St - (nt*S2_m(S2Pos)))).^2.0 + ((Tau12_m(S2Pos)) / (Sl - (nl*S2_m(S2Pos)))).^2.0 + ((S2_m(S2Pos)) / (Yt)).^2.0);
-    FI_ki_neg = max(((Tau23_m(S2Neg)) / (St - (nt*S2_m(S2Neg)))).^2.0 + ((Tau12_m(S2Neg)) / (Sl - (nl*S2_m(S2Neg)))).^2.0);
+    if any(S2Neg) == 0.0
+        FI_ki(i) = 0.0;
+    else
+        FI_ki(i) = max(((Tau23_m(S2Neg)) / (St - (nt*S2_m(S2Neg)))).^2.0 + ((Tau12_m(S2Neg)) / (Sl - (nl*S2_m(S2Neg)))).^2.0);
+    end
     
-    FI_ki(i) = max([FI_ki_pos, FI_ki_neg]);
+    if any(S2Pos) == 0.0
+        FI_si(i) = 0.0;
+    else
+        FI_si(i) = max(((Tau23_m(S2Pos)) / (St - (nt*S2_m(S2Pos)))).^2.0 + ((Tau12_m(S2Pos)) / (Sl - (nl*S2_m(S2Pos)))).^2.0 + ((S2_m(S2Pos)) / (Yt)).^2.0);
+    end
 end
 
+% Kink
 FI_k_max = FI_ki == max(FI_ki);
 LARKFCRT(index) = max(FI_ki(FI_k_max));
+
+% Split
+FI_s_max = FI_si == max(FI_si);
+LARSFCRT(index) = max(FI_si(FI_s_max));
 
 %% Fibre tensile failure
 if S1 > 0.0
