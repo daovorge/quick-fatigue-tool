@@ -7,7 +7,7 @@ function [LARPFCRT, LARMFCRT, LARKFCRT, LARSFCRT, LARTFCRT] = LaRC05(S11, S22, S
 %
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 09-Oct-2017 11:03:00 GMT
+%   Last modified 09-Oct-2017 19:38:38 GMT
     
     %%
 
@@ -21,10 +21,15 @@ if isempty(nt) == 1.0
 end
 
 if isempty(phi0) == 1.0
-    phic = atand((1.0 - sqrt(1.0 - 4.0*((Sl/Xc) + nl)*(Sl/Xc))) / (2.0*((Sl/Xc) + nl)));
-    L = length(S11);
-    syms phi0sym
-    phi0j = zeros(1.0, L);
+    if getappdata(0, 'noSyms') == 0.0
+        phic = atand((1.0 - sqrt(1.0 - 4.0*((Sl/Xc) + nl)*(Sl/Xc))) / (2.0*((Sl/Xc) + nl)));
+        L = length(S11);
+        syms phi0sym
+        phi0j = zeros(1.0, L);
+    else
+        phi0 = 0.0;
+        phi0j = phi0;
+    end
 else
     phi0j = phi0;
 end

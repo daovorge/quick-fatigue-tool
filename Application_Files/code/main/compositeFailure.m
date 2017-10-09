@@ -8,10 +8,9 @@ function [] = compositeFailure(N, L)
 %
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 09-Oct-2017 11:03:00 GMT
+%   Last modified 09-Oct-2017 19:38:38 GMT
     
     %%
-
 
 % Get the number of groups for the analysis
 G = getappdata(0, 'numberOfGroups');
@@ -47,6 +46,14 @@ S33 = getappdata(0, 'Szz');
 S12 = getappdata(0, 'Txy');
 S13 = getappdata(0, 'Txz');
 S23 = getappdata(0, 'Tyz');
+
+% Check if SYMS works
+try
+    setappdata(0, 'noSyms', 0.0)
+    syms x
+catch
+    setappdata(0, 'noSyms', 1.0)
+end
 
 for groups = 1:G
     if strcmpi(groupIDBuffer(1.0).name, 'default') == 1.0
@@ -432,5 +439,6 @@ else
     messenger.writeMessage(300.0)
 end
 
-% Print footer to message file
+% Cleanup
 messenger.writeMessage(127.0)
+rmappdata(0, 'noSyms')

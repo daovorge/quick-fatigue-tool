@@ -15,7 +15,7 @@ function varargout = kValueCalculator(varargin)%#ok<*DEFNU>
 %      6.4 Findley's Method
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 04-Apr-2017 13:26:59 GMT
+%   Last modified 09-Oct-2017 19:38:38 GMT
     
     %%
     
@@ -126,29 +126,39 @@ function pMenu_solution_Callback(hObject, ~, handles)
 blue = getappdata(0, 'simulia_blue');
 grey = getappdata(0, 'grey');
 switch get(hObject, 'Value')
-    case 1 % Default
+    case 1.0 % Default
         set(handles.text_r, 'enable', 'off');    set(handles.edit_r, 'enable', 'inactive', 'BackgroundColor', grey)
         set(handles.text_fi, 'enable', 'off');    set(handles.edit_fi, 'enable', 'inactive', 'BackgroundColor', grey);  set(handles.text_units_fi, 'enable', 'off')
         set(handles.text_t, 'enable', 'off');    set(handles.edit_t, 'enable', 'inactive', 'BackgroundColor', grey);  set(handles.text_units_t, 'enable', 'off')
         set(handles.text_uts, 'enable', 'off');    set(handles.edit_uts, 'enable', 'inactive', 'BackgroundColor', grey);  set(handles.text_units_uts, 'enable', 'off')
-    case 2 % General formula
+    case 2.0 % General formula
+        % Check if SYMS works
+        try
+            syms x
+        catch
+            errordlg('The General Formula derivation method requires the Symbolic Math Toolbox.', 'Quick Fatigue Tool')
+            uiwait; set(handles.pMenu_solution, 'value', 1.0)
+            
+            return
+        end
+        
         set(handles.text_r, 'enable', 'on');    set(handles.edit_r, 'enable', 'on', 'BackgroundColor', 'White')
         set(handles.text_fi, 'enable', 'on');    set(handles.edit_fi, 'enable', 'on', 'BackgroundColor', 'White');  set(handles.text_units_fi, 'enable', 'on')
         set(handles.text_t, 'enable', 'on');    set(handles.edit_t, 'enable', 'on', 'BackgroundColor', 'White');  set(handles.text_units_t, 'enable', 'on')
         set(handles.text_uts, 'enable', 'off');    set(handles.edit_uts, 'enable', 'inactive', 'BackgroundColor', grey);  set(handles.text_units_uts, 'enable', 'off')
-    case 3 % Dang van
+    case 3.0 % Dang van
         set(handles.text_r, 'enable', 'on');    set(handles.edit_r, 'enable', 'inactive', 'BackgroundColor', blue, 'String', '-1')
         set(handles.text_fi, 'enable', 'on');    set(handles.edit_fi, 'enable', 'on', 'BackgroundColor', 'White');  set(handles.text_units_fi, 'enable', 'on')
         set(handles.text_t, 'enable', 'on');    set(handles.edit_t, 'enable', 'on', 'BackgroundColor', 'White');  set(handles.text_units_t, 'enable', 'on')
         set(handles.text_uts, 'enable', 'off');    set(handles.edit_uts, 'enable', 'inactive', 'BackgroundColor', grey);  set(handles.text_units_uts, 'enable', 'off')
-    case 4 % Sines
+    case 4.0 % Sines
         set(handles.text_r, 'enable', 'on');    set(handles.edit_r, 'enable', 'inactive', 'BackgroundColor', blue, 'String', '-1')
         set(handles.text_fi, 'enable', 'on');    set(handles.edit_fi, 'enable', 'on', 'BackgroundColor', 'White');  set(handles.text_units_fi, 'enable', 'on')
         set(handles.text_t, 'enable', 'on');    set(handles.edit_t, 'enable', 'on', 'BackgroundColor', 'White');  set(handles.text_units_t, 'enable', 'on')
         set(handles.text_uts, 'enable', 'on');    set(handles.edit_uts, 'enable', 'on', 'BackgroundColor', 'White');  set(handles.text_units_uts, 'enable', 'on')
         
         set(handles.edit_uts, 'string', getappdata(0, 'k_solution_uts'))
-    case 5 % Crossland
+    case 5.0 % Crossland
         set(handles.text_r, 'enable', 'on');    set(handles.edit_r, 'enable', 'inactive', 'BackgroundColor', blue, 'String', '-1')
         set(handles.text_fi, 'enable', 'on');    set(handles.edit_fi, 'enable', 'on', 'BackgroundColor', 'White');  set(handles.text_units_fi, 'enable', 'on')
         set(handles.text_t, 'enable', 'on');    set(handles.edit_t, 'enable', 'on', 'BackgroundColor', 'White');  set(handles.text_units_t, 'enable', 'on')
