@@ -1546,7 +1546,7 @@ classdef importMaterial < handle
                                         
                                         % Transverse compressive strength
                                         if properties(4.0) ~= -9e100
-                                            material_properties.larc05_tts = properties(4.0);
+                                            material_properties.larc05_tcs = properties(4.0);
                                         end
                                         
                                         % Longitudinal shear strength
@@ -1580,7 +1580,7 @@ classdef importMaterial < handle
                                         end
                                         
                                         % Initial fier misalignment angle
-                                        if properties(10.0) ~= -9e100
+                                        if properties(11.0) ~= -9e100
                                             material_properties.larc05_phi0 = properties(11.0);
                                         end
                                 end

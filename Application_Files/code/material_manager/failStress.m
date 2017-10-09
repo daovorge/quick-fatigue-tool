@@ -52,37 +52,45 @@ movegui(hObject, 'center')
 % UIWAIT makes failStress wait for user response (see UIRESUME)
 % uiwait(handles.failStress);
 
-if isappdata(0, 'failStress_tsfd')
+if isappdata(0, 'failStress_tsfd') == 1.0
     set(handles.edit_tsfd, 'string', getappdata(0, 'failStress_tsfd'))
 end
-if isappdata(0, 'failStress_csfd')
+if isappdata(0, 'failStress_csfd') == 1.0
     set(handles.edit_csfd, 'string', getappdata(0, 'failStress_csfd'))
 end
-if isappdata(0, 'failStress_tstd')
+if isappdata(0, 'failStress_tstd') == 1.0
     set(handles.edit_tstd, 'string', getappdata(0, 'failStress_tstd'))
 end
-if isappdata(0, 'failStress_cstd')
+if isappdata(0, 'failStress_cstd') == 1.0
     set(handles.edit_cstd, 'string', getappdata(0, 'failStress_cstd'))
 end
-if isappdata(0, 'failStress_tsttd')
+if isappdata(0, 'failStress_tsttd') == 1.0
     set(handles.edit_tsttd, 'string', getappdata(0, 'failStress_tsttd'))
 end
-if isappdata(0, 'failStress_csttd')
+if isappdata(0, 'failStress_csttd') == 1.0
     set(handles.edit_csttd, 'string', getappdata(0, 'failStress_csttd'))
 end
-if isappdata(0, 'failStress_shear')
+if isappdata(0, 'failStress_shear') == 1.0
     set(handles.edit_shear, 'string', getappdata(0, 'failStress_shear'))
 end
-if isappdata(0, 'failStress_cross12')
-    set(handles.edit_cross12, 'string', getappdata(0, 'failStress_cross12'))
+if isappdata(0, 'failStress_cross12') == 1.0
+    if isempty(getappdata(0, 'failStress_cross12')) == 1.0
+        set(handles.edit_cross12, 'string', '0')
+    else
+        set(handles.edit_cross12, 'string', getappdata(0, 'failStress_cross12'))
+    end
 end
-if isappdata(0, 'failStress_cross23')
-    set(handles.edit_cross23, 'string', getappdata(0, 'failStress_cross23'))
+if isappdata(0, 'failStress_cross23') == 1.0
+    if isempty(getappdata(0, 'failStress_cross23')) == 1.0
+        set(handles.edit_cross23, 'string', '0')
+    else
+        set(handles.edit_cross23, 'string', getappdata(0, 'failStress_cross23'))
+    end
 end
-if isappdata(0, 'failStress_limit12')
+if isappdata(0, 'failStress_limit12') == 1.0
     set(handles.edit_limit12, 'string', getappdata(0, 'failStress_limit12'))
 end
-if isappdata(0, 'failStress_limit23')
+if isappdata(0, 'failStress_limit23') == 1.0
     set(handles.edit_limit23, 'string', getappdata(0, 'failStress_limit23'))
 end
 

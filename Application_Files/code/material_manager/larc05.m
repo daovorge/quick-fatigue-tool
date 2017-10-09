@@ -52,37 +52,41 @@ movegui(hObject, 'center')
 % UIWAIT makes larc05 wait for user response (see UIRESUME)
 % uiwait(handles.larc05);
 
-if isappdata(0, 'larc05_lts')
+if isappdata(0, 'larc05_lts') == 1.0
     set(handles.edit_lts, 'string', getappdata(0, 'larc05_lts'))
 end
-if isappdata(0, 'larc05_lcs')
+if isappdata(0, 'larc05_lcs') == 1.0
     set(handles.edit_lcs, 'string', getappdata(0, 'larc05_lcs'))
 end
-if isappdata(0, 'larc05_tts')
+if isappdata(0, 'larc05_tts') == 1.0
     set(handles.edit_tts, 'string', getappdata(0, 'larc05_tts'))
 end
-if isappdata(0, 'larc05_tcs')
+if isappdata(0, 'larc05_tcs') == 1.0
     set(handles.edit_tcs, 'string', getappdata(0, 'larc05_tcs'))
 end
-if isappdata(0, 'larc05_lss')
+if isappdata(0, 'larc05_lss') == 1.0
     set(handles.edit_lss, 'string', getappdata(0, 'larc05_lss'))
 end
-if isappdata(0, 'larc05_tss')
+if isappdata(0, 'larc05_tss') == 1.0
     set(handles.edit_tss, 'string', getappdata(0, 'larc05_tss'))
 end
-if isappdata(0, 'larc05_shear')
+if isappdata(0, 'larc05_shear') == 1.0
     set(handles.edit_shear, 'string', getappdata(0, 'larc05_shear'))
 end
-if isappdata(0, 'larc05_nl')
+if isappdata(0, 'larc05_nl') == 1.0
     set(handles.edit_nl, 'string', getappdata(0, 'larc05_nl'))
 end
-if isappdata(0, 'larc05_nt')
+if isappdata(0, 'larc05_nt') == 1.0
     set(handles.edit_nt, 'string', getappdata(0, 'larc05_nt'))
 end
-if isappdata(0, 'larc05_alpha0')
-    set(handles.edit_alpha0, 'string', getappdata(0, 'larc05_alpha0'))
+if isappdata(0, 'larc05_alpha0') == 1.0
+    if isempty(getappdata(0, 'larc05_alpha0')) == 1.0
+        set(handles.edit_alpha0, 'string', '53')
+    else
+        set(handles.edit_alpha0, 'string', getappdata(0, 'larc05_alpha0'))
+    end
 end
-if isappdata(0, 'larc05_phi0')
+if isappdata(0, 'larc05_phi0') == 1.0
     set(handles.edit_phi0, 'string', getappdata(0, 'larc05_phi0'))
 end
 
@@ -290,6 +294,10 @@ larc05_nl = str2double(get(handles.edit_nl, 'string'));
 if isempty(get(handles.edit_nl, 'string')) == 0.0
     if isnan(larc05_nl) == 1.0 || isinf(larc05_nl) == 1.0 || isreal(larc05_nl) == 0.0
         error = 1.0;
+    elseif larc05_nl < 0.0 || larc05_nl > 1.0
+        errordlg('nl must be in the range (0 <= nl <= 1.0).', 'Quick Fatigue Tool')
+        uiwait; enable(handles)
+        return
     end
 end
 
@@ -297,6 +305,10 @@ larc05_nt = str2double(get(handles.edit_nt, 'string'));
 if isempty(get(handles.edit_nt, 'string')) == 0.0
     if isnan(larc05_nt) == 1.0 || isinf(larc05_nt) == 1.0 || isreal(larc05_nt) == 0.0
         error = 1.0;
+    elseif larc05_nt < 0.0 || larc05_nt > 1.0
+        errordlg('nt must be in the range (0 <= nt <= 1.0).', 'Quick Fatigue Tool')
+        uiwait; enable(handles)
+        return
     end
 end
 
@@ -306,7 +318,7 @@ else
     larc05_alpha0 = str2double(get(handles.edit_alpha0, 'string'));
     if isnan(larc05_alpha0) == 1.0 || isinf(larc05_alpha0) == 1.0 || isreal(larc05_alpha0) == 0.0
         error = 1.0;
-    elseif larc05_alpha0 < -0.0 || larc05_alpha0 > 180.0
+    elseif larc05_alpha0 < 0.0 || larc05_alpha0 > 180.0
         errordlg('Alpha must be in the range (0 <= alpha <= 180.0).', 'Quick Fatigue Tool')
         uiwait; enable(handles)
         return

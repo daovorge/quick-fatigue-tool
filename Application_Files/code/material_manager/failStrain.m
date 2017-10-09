@@ -52,28 +52,28 @@ movegui(hObject, 'center')
 % UIWAIT makes failStrain wait for user response (see UIRESUME)
 % uiwait(handles.failStrain);
 
-if isappdata(0, 'failStrain_tsfd')
+if isappdata(0, 'failStrain_tsfd') == 1.0
     set(handles.edit_tsfd, 'string', getappdata(0, 'failStrain_tsfd'))
 end
-if isappdata(0, 'failStrain_csfd')
+if isappdata(0, 'failStrain_csfd') == 1.0
     set(handles.edit_csfd, 'string', getappdata(0, 'failStrain_csfd'))
 end
-if isappdata(0, 'failStrain_tstd')
+if isappdata(0, 'failStrain_tstd') == 1.0
     set(handles.edit_tstd, 'string', getappdata(0, 'failStrain_tstd'))
 end
-if isappdata(0, 'failStrain_cstd')
+if isappdata(0, 'failStrain_cstd') == 1.0
     set(handles.edit_cstd, 'string', getappdata(0, 'failStrain_cstd'))
 end
-if isappdata(0, 'failStrain_shear')
+if isappdata(0, 'failStrain_shear') == 1.0
     set(handles.edit_shear, 'string', getappdata(0, 'failStrain_shear'))
 end
-if isappdata(0, 'failStrain_e11')
+if isappdata(0, 'failStrain_e11') == 1.0
     set(handles.edit_e11, 'string', getappdata(0, 'failStrain_e11'))
 end
-if isappdata(0, 'failStrain_e22')
+if isappdata(0, 'failStrain_e22') == 1.0
     set(handles.edit_e22, 'string', getappdata(0, 'failStrain_e22'))
 end
-if isappdata(0, 'failStrain_g12')
+if isappdata(0, 'failStrain_g12') == 1.0
     set(handles.edit_g12, 'string', getappdata(0, 'failStrain_g12'))
 end
 
