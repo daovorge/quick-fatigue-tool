@@ -1286,8 +1286,8 @@ else
     if isappdata(0, 'larc05_nl') == 1.0
         rmappdata(0, 'larc05_nl')
     end
-    if isappdata(0, 'larc05_nr') == 1.0
-        rmappdata(0, 'larc05_nr')
+    if isappdata(0, 'larc05_nt') == 1.0
+        rmappdata(0, 'larc05_nt')
     end
     if isappdata(0, 'larc05_alpha0') == 1.0
         rmappdata(0, 'larc05_alpha0')
