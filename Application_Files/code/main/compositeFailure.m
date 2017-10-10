@@ -210,10 +210,6 @@ for groups = 1:G
     end
     
     for i = 1:N
-		%
-		clc
-		fprintf('%.0f/%.0f\n', i, N)
-	
         %% Get the stresses at the current item
         S11i = S11_group(i, :);
         S22i = S22_group(i, :);
