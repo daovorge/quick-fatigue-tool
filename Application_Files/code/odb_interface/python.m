@@ -11,7 +11,7 @@ classdef python < handle
 %      10.4 The ODB Interface
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 28-Sep-2017 10:31:34 GMT
+%   Last modified 10-Oct-2017 14:19:47 GMT
     
     %%
     
@@ -914,15 +914,15 @@ classdef python < handle
                     
                     % Get the associated energies as well
                     fieldDataFile_energy = importdata(energyFile, '\t');
-                    energyMainIDs = fieldDataFile_energy.data(:, 1.0);
-                    totalStrainEnergy_i = fieldDataFile_energy.data(:, 3.0);
-                    plasticStrainEnergy_i = fieldDataFile_energy.data(:, 4.0);
+                    energyMainIDs = fieldDataFile_energy.data(:, 2.0);
+                    totalStrainEnergy_i = fieldDataFile_energy.data(:, 4.0);
+                    plasticStrainEnergy_i = fieldDataFile_energy.data(:, 5.0);
                     totalStrainEnergy = zeros(1.0, length(mainIDs));
                     plasticStrainEnergy = totalStrainEnergy;
                     
-                    commonIDs = ismember(energyMainIDs, mainIDs);
-                    totalStrainEnergy(commonIDs) = totalStrainEnergy_i(commonIDs);
-                    plasticStrainEnergy(commonIDs) = plasticStrainEnergy_i(commonIDs);
+                    commonIDs = ismember(mainIDs, energyMainIDs);
+                    totalStrainEnergy(commonIDs) = totalStrainEnergy_i;
+                    plasticStrainEnergy(commonIDs) = plasticStrainEnergy_i;
                     
                     fieldData(:, index + 1.0) = totalStrainEnergy';
                     fieldData(:, index + 2.0) = plasticStrainEnergy';
@@ -1058,7 +1058,7 @@ classdef python < handle
             fprintf(fid, '\r\n#   louisvallance@hotmail.co.uk');
             fprintf(fid, '\r\n#');
             fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017');
-            fprintf(fid, '\r\n#   Last modified 28-Sep-2017 10:31:34 GMT');
+            fprintf(fid, '\r\n#   Last modified 10-Oct-2017 14:19:47 GMT');
             
             % Write Abaqus import header
             fprintf(fid, '\r\n\r\nfrom odbAccess import *');
@@ -1447,7 +1447,7 @@ classdef python < handle
             fprintf(fid, '\r\n#   louisvallance@hotmail.co.uk');
             fprintf(fid, '\r\n#');
             fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017');
-            fprintf(fid, '\r\n#   Last modified 28-Sep-2017 10:31:34 GMT');
+            fprintf(fid, '\r\n#   Last modified 10-Oct-2017 14:19:47 GMT');
             
             % Write Abaqus import header
             fprintf(fid, '\r\n\r\nfrom odbAccess import *');
@@ -1676,7 +1676,7 @@ classdef python < handle
             fprintf(fid, '\r\n#   louisvallance@hotmail.co.uk');
             fprintf(fid, '\r\n#');
             fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017');
-            fprintf(fid, '\r\n#   Last modified 28-Sep-2017 10:31:34 GMT');
+            fprintf(fid, '\r\n#   Last modified 10-Oct-2017 14:19:47 GMT');
             
             % Write Abaqus import header
             fprintf(fid, '\r\n\r\nfrom odbAccess import *');
