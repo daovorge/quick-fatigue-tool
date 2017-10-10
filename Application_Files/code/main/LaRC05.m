@@ -121,8 +121,8 @@ FI_s_max = FI_si == max(FI_si);
 LARSFCRT(index) = max(FI_si(FI_s_max));
 
 %% Fibre tensile failure
-if S1 > 0.0
-    LARTFCRT(index) = max(S1/Xt);
-else
+if any(S1 > 0.0) == 0.0
     LARTFCRT(index) = 0.0;
+else
+    LARTFCRT(index) = max(S1(S1 > 0.0)/Xt);
 end
