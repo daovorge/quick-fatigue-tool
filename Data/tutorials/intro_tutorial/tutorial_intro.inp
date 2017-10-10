@@ -1,0 +1,58 @@
+**TUTORIAL_INTRO    Introductory fatigue analysis.
+**   This function contains a list of job file options to configure a
+**   user-defined fatigue analysis using the text file processor.
+**
+**   Execute the command
+**   >> job tutorial_intro
+**   to start the fatigue analysis.
+**   
+**   Please refer to the Quick Fatigue Tool User Guide for detailed
+**   instructions on creating an analysis job.
+**
+**   Reference section in Quick Fatigue Tool User Guide
+**      2.4 Configuring and running an analysis
+**   
+**   Reference section in Quick Fatigue Tool User Settings Reference Guide
+**      1 Job file options
+**      3 Material keywords
+**   
+**   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
+**   Last modified 20-Aug-2017 18:25:05 GMT
+**
+**Material data
+*USER MATERIAL, steel
+*MECHANICAL
+200e3, 0.33, 400, 400, 325
+*FATIGUE, constants
+930, -0.095, , ,
+*FATIGUE, test data
+1e4, 363
+1e7, 188.3
+*END MATERIAL
+**
+**Job definition
+*JOB NAME = tutorial_intro
+*JOB DESCRIPTION = Demonstration of a simple loading
+**Material definition
+*MATERIAL = steel
+*USE SN = 1
+**
+**Loading definition
+*DATASET = stress_uni.dat
+*HISTORY = [1, -1]
+*SCALE = 0.8285
+*UNITS = MPa
+**
+**Analysis definition
+*ALGORITHM = sbbm
+*MS CORRECTION = none
+*FACTOR OF STRENGTH = 1
+**
+**Surface finish
+*KT DEF = 'default.kt'
+*KT CURVE = 1
+**
+**Output requests
+*OUTPUT FIELD = 1
+*OUTPUT HISTORY = 0
+*OUTPUT FIGURE = 0

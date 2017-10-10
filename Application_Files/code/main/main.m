@@ -357,7 +357,13 @@ end
 
 %% PERFORM COMPOSITE FAILURE CALCULATION IF REQUESTED
 if getappdata(0, 'compositeCriteria') == 1.0
+    fprintf('\n[NOTICE] Begin composite failure assessment')
+    fprintf(fid_status, '\n[NOTICE] Begin composite failure assessment');
+    
     compositeFailure(N, signalLength)
+    
+    fprintf('\n[NOTICE] End composite failure assessment')
+    fprintf(fid_status, '\n[NOTICE] End composite failure assessment');
     
     %{
         Composite/foam materials cannot be used for fatigue analysis. Abort
