@@ -1,5 +1,7 @@
 function [LARPFCRT, LARMFCRT, LARKFCRT, LARSFCRT, LARTFCRT] = LaRC05(S11, S22, S33, S12, S13, S23, S1, S2, S3,...
-                G12, Xt, Xc, Yt, Yc, Sl, St, alpha0, phi0, nl, nt, LARPFCRT, LARMFCRT, LARKFCRT, LARSFCRT, LARTFCRT, index, noSyms)
+                G12, Xt, Xc, Yt, Yc, Sl, St, alpha0, phi0, nl, nt,...
+                LARPFCRT, LARMFCRT, LARKFCRT, LARSFCRT, LARTFCRT,...
+                index, noSyms, step)
 %LARC05    QFT function to calculate LaRC05 composite failure criteria.
 %   
 %   LARC05 is used internally by Quick Fatigue Tool. The user is
@@ -7,7 +9,7 @@ function [LARPFCRT, LARMFCRT, LARKFCRT, LARSFCRT, LARTFCRT] = LaRC05(S11, S22, S
 %
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 09-Oct-2017 19:38:38 GMT
+%   Last modified 10-Oct-2017 14:19:47 GMT
     
     %%
 
@@ -42,7 +44,7 @@ LARPFCRT(index) = max((3.0*(k2 - (Xt - Xc)*Sh)) / (Xt*Xc));
 %% Matrix
 FI_mi = zeros(1.0, 181.0);
 a = linspace(0.0, 180.0, 181.0);
-for i = 1:181
+for i = 1:step:181
     ai = a(i);
     
     Sn = 0.5*(S2 + S3) + 0.5*(S2 - S3)*cosd(2.0*ai) + S23*sind(2.0*ai);
@@ -74,7 +76,7 @@ LARMFCRT(index) = max(FI_mi(FI_m_max));
 FI_si = zeros(1.0, 181.0);
 FI_ki = zeros(1.0, 181.0);
 psi = linspace(0.0, 180.0, 181.0);
-for i = 1:181
+for i = 1:step:181
     psii = psi(i);
     
     S2_psi = cosd(psii*S2).^2.0 + sind(psii*S3).^2.0 + 2.0*sind(psii)*cosd(psii*S23);

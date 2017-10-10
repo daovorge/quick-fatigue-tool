@@ -8,7 +8,7 @@ function [] = compositeFailure(N, L)
 %
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 09-Oct-2017 19:38:38 GMT
+%   Last modified 10-Oct-2017 14:19:47 GMT
     
     %%
 
@@ -54,7 +54,6 @@ try
 catch
     noSyms = 1.0;
 end
-clear x
 
 for groups = 1:G
     if strcmpi(groupIDBuffer(1.0).name, 'default') == 1.0
@@ -114,6 +113,7 @@ for groups = 1:G
     nt = getappdata(0, 'larc05_nt');
     alpha0 = getappdata(0, 'larc05_alpha0');
     phi0 = getappdata(0, 'larc05_phi0');
+    step = getappdata(0, 'stepSize');
     
     % Check if there is enough data for maximum stress, Tsai-Hill, Tsai-Wu and Azzi-Tsai-Hill theory
     if isempty(Xt) == 1.0 || isempty(Xc) == 1.0 || isempty(Yt) == 1.0 || isempty(Yc) == 1.0 || isempty(S) == 1.0
@@ -210,6 +210,10 @@ for groups = 1:G
     end
     
     for i = 1:N
+		%
+		clc
+		fprintf('%.0f/%.0f\n', i, N)
+	
         %% Get the stresses at the current item
         S11i = S11_group(i, :);
         S22i = S22_group(i, :);
@@ -310,7 +314,8 @@ for groups = 1:G
             [LARPFCRT, LARMFCRT, LARKFCRT, LARSFCRT, LARTFCRT] =...
                 LaRC05(S11i, S22i, S33i, S12i, S13i, S23i, S1i, S2i, S3i,...
                 larc_G12, Xlt, Xlc, Ylt, Ylc, Sll, Slt, alpha0, phi0, nl, nt,...
-                LARPFCRT, LARMFCRT, LARKFCRT, LARSFCRT, LARTFCRT, totalCounter, noSyms);
+                LARPFCRT, LARMFCRT, LARKFCRT, LARSFCRT, LARTFCRT,...
+                totalCounter, noSyms, step);
         end
         
         %% UPDATE COUNTER
