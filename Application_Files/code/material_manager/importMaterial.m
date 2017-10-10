@@ -1072,6 +1072,15 @@ classdef importMaterial < handle
                                         % Get the next line in the file
                                         TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
                                         
+                                        % Check if SYMS works
+                                        try
+                                            %syms x
+                                            gfsfdgerg
+                                        catch
+                                            keywordWarnings(10.0) = 1.0;
+                                            continue
+                                        end
+                                        
                                         if isempty(TLINE) == 1.0
                                             keywordWarnings(10.0) = 1.0;
                                             continue

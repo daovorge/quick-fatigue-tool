@@ -49,11 +49,12 @@ S23 = getappdata(0, 'Tyz');
 
 % Check if SYMS works
 try
-    setappdata(0, 'noSyms', 0.0)
+    noSyms = 0.0;
     syms x
 catch
-    setappdata(0, 'noSyms', 1.0)
+    noSyms = 1.0;
 end
+clear x
 
 for groups = 1:G
     if strcmpi(groupIDBuffer(1.0).name, 'default') == 1.0
@@ -309,7 +310,7 @@ for groups = 1:G
             [LARPFCRT, LARMFCRT, LARKFCRT, LARSFCRT, LARTFCRT] =...
                 LaRC05(S11i, S22i, S33i, S12i, S13i, S23i, S1i, S2i, S3i,...
                 larc_G12, Xlt, Xlc, Ylt, Ylc, Sll, Slt, alpha0, phi0, nl, nt,...
-                LARPFCRT, LARMFCRT, LARKFCRT, LARSFCRT, LARTFCRT, totalCounter);
+                LARPFCRT, LARMFCRT, LARKFCRT, LARSFCRT, LARTFCRT, totalCounter, noSyms);
         end
         
         %% UPDATE COUNTER
@@ -441,4 +442,3 @@ end
 
 % Cleanup
 messenger.writeMessage(127.0)
-rmappdata(0, 'noSyms')

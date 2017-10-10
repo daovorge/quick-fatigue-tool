@@ -1,5 +1,5 @@
 function [LARPFCRT, LARMFCRT, LARKFCRT, LARSFCRT, LARTFCRT] = LaRC05(S11, S22, S33, S12, S13, S23, S1, S2, S3,...
-                G12, Xt, Xc, Yt, Yc, Sl, St, alpha0, phi0, nl, nt, LARPFCRT, LARMFCRT, LARKFCRT, LARSFCRT, LARTFCRT, index)
+                G12, Xt, Xc, Yt, Yc, Sl, St, alpha0, phi0, nl, nt, LARPFCRT, LARMFCRT, LARKFCRT, LARSFCRT, LARTFCRT, index, noSyms)
 %LARC05    QFT function to calculate LaRC05 composite failure criteria.
 %   
 %   LARC05 is used internally by Quick Fatigue Tool. The user is
@@ -21,7 +21,7 @@ if isempty(nt) == 1.0
 end
 
 if isempty(phi0) == 1.0
-    if getappdata(0, 'noSyms') == 0.0
+    if noSyms == 0.0
         phic = atand((1.0 - sqrt(1.0 - 4.0*((Sl/Xc) + nl)*(Sl/Xc))) / (2.0*((Sl/Xc) + nl)));
         L = length(S11);
         syms phi0sym

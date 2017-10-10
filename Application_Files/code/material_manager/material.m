@@ -54,7 +54,7 @@ classdef material < handle
             %   Reference section in Quick Fatigue Tool User Guide
             %      5 Materials
             
-            clc
+%             clc
             
             % Check the local database
             [error, localPath] = material.checkDatabase();
