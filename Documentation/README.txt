@@ -237,6 +237,11 @@ Quick Fatigue Tool User Guide.
 %		- HSNFCCRT, Hashin's fiber compression damage initiation criterion
 %		- HSNMTCRT, Hashin's matrix tensile damage initiation criterion
 %		- HSNMCCRT, Hashin's matrix compression damage initiation criterion
+%		- LARPFCRT, LaRC05 polymer failure measure
+%		- LARMFCRT, LaRC05 matrix failure measure
+%		- LARKFCRT, LaRC05 fibre kinking failure measure
+%		- LARSFCRT, LaRC05 fibre splitting failure measure
+%		- LARTFCRT, LaRC05 fibre tensile failure measure
 %
 %   HISTORY VARIABLES
 %   A history of results for the most damaged analysis item in the model
