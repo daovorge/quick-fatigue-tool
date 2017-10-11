@@ -370,3 +370,5 @@ set(findall(handles.hashinDamage, '-property', 'Enable'), 'Enable', 'off')
 
 function enable(handles)
 set(findall(handles.hashinDamage, '-property', 'Enable'), 'Enable', 'on')
+set(handles.edit_alpha, 'backgroundColor', 'white')
+set(handles.edit_alpha, 'backgroundColor', [177/255, 206/255, 237/255])

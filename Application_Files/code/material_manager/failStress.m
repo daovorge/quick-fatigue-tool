@@ -321,15 +321,19 @@ if isempty(get(handles.edit_shear, 'string')) == 0.0
     end
 end
 
-failStress_cross12 = str2double(get(handles.edit_cross12, 'string'));
-if isempty(get(handles.edit_cross12, 'string')) == 0.0
+if isempty(get(handles.edit_cross12, 'string')) == 1.0
+    set(handles.edit_cross12, 'string', '0')
+else
+    failStress_cross12 = str2double(get(handles.edit_cross12, 'string'));
     if isnan(failStress_cross12) == 1.0 || isinf(failStress_cross12) == 1.0 || isreal(failStress_cross12) == 0.0
         error = 1.0;
     end
 end
 
-failStress_cross23 = str2double(get(handles.edit_cross23, 'string'));
-if isempty(get(handles.edit_cross23, 'string')) == 0.0
+if isempty(get(handles.edit_cross23, 'string')) == 1.0
+    set(handles.edit_cross23, 'string', '0')
+else
+    failStress_cross23 = str2double(get(handles.edit_cross23, 'string'));
     if isnan(failStress_cross23) == 1.0 || isinf(failStress_cross23) == 1.0 || isreal(failStress_cross23) == 0.0
         error = 1.0;
     end
@@ -415,7 +419,10 @@ set(findall(handles.failStress, '-property', 'Enable'), 'Enable', 'off')
 
 function enable(handles)
 set(findall(handles.failStress, '-property', 'Enable'), 'Enable', 'on')
-
+set(handles.edit_cross12, 'backgroundColor', 'white')
+set(handles.edit_cross12, 'backgroundColor', [177/255, 206/255, 237/255])
+set(handles.edit_cross23, 'backgroundColor', 'white')
+set(handles.edit_cross23, 'backgroundColor', [177/255, 206/255, 237/255])
 
 
 function edit_tsttd_Callback(~, ~, ~)
