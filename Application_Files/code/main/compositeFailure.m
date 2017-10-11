@@ -8,7 +8,7 @@ function [] = compositeFailure(N, L)
 %
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 10-Oct-2017 14:19:47 GMT
+%   Last modified 11-Oct-2017 13:08:05 GMT
     
     %%
 
@@ -113,6 +113,7 @@ for groups = 1:G
     nt = getappdata(0, 'larc05_nt');
     alpha0 = getappdata(0, 'larc05_alpha0');
     phi0 = getappdata(0, 'larc05_phi0');
+    iterate = getappdata(0, 'larc05_iterate');
     step = getappdata(0, 'stepSize');
     
     % Check if there is enough data for maximum stress, Tsai-Hill, Tsai-Wu and Azzi-Tsai-Hill theory
@@ -311,7 +312,7 @@ for groups = 1:G
                 LaRC05(S11i, S22i, S33i, S12i, S13i, S23i, S1i, S2i, S3i,...
                 larc_G12, Xlt, Xlc, Ylt, Ylc, Sll, Slt, alpha0, phi0, nl, nt,...
                 LARPFCRT, LARMFCRT, LARKFCRT, LARSFCRT, LARTFCRT,...
-                totalCounter, noSyms, step);
+                totalCounter, noSyms, step, iterate);
         end
         
         %% UPDATE COUNTER

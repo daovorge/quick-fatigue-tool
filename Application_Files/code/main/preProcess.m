@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 09-Oct-2017 11:03:00 GMT
+%   Last modified 11-Oct-2017 13:08:05 GMT
     
     %%
     
@@ -1894,6 +1894,24 @@ classdef preProcess < handle
                 larc05_phi0 = [];
             end
             setappdata(0, 'larc05_phi0', larc05_phi0)
+            
+            % Allow iterative solution for initial fibre misalignment angle
+            try
+                if ischar(material_properties.larc05_iterate) == 1.0
+                    larc05_iterate = str2double(material_properties.larc05_iterate);
+                else
+                    larc05_iterate = material_properties.larc05_iterate;
+                end
+            catch
+                larc05_iterate = 0.0;
+                setappdata(0, 'larc05_iterate', larc05_iterate)
+            end
+            if isnan(larc05_iterate) == 1.0
+                larc05_iterate = 0.0;
+            elseif (larc05_iterate ~= 0.0) && (larc05_iterate ~= 1.0)
+                larc05_iterate = 0.0;
+            end
+            setappdata(0, 'larc05_iterate', larc05_iterate)
         end
         
         %% Approximate the yield stress:

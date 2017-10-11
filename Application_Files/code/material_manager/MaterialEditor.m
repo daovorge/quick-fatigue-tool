@@ -13,7 +13,7 @@ function varargout = MaterialEditor(varargin)%#ok<*DEFNU>
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 09-Oct-2017 11:03:00 GMT
+%   Last modified 11-Oct-2017 13:08:05 GMT
     
     %%
     
@@ -1295,6 +1295,9 @@ else
     if isappdata(0, 'larc05_phi0') == 1.0
         rmappdata(0, 'larc05_phi0')
     end
+    if isappdata(0, 'larc05_iterate') == 1.0
+        rmappdata(0, 'larc05_iterate')
+    end
 end
 
 % Enable the GUI
@@ -1375,7 +1378,8 @@ material_properties = struct(...
 'larc05_nl', getappdata(0, 'larc05_nl'),...
 'larc05_nt', getappdata(0, 'larc05_nt'),...
 'larc05_alpha0', getappdata(0, 'larc05_alpha0'),...
-'larc05_phi0', getappdata(0, 'larc05_phi0'));
+'larc05_phi0', getappdata(0, 'larc05_phi0'),...
+'larc05_iterate', getappdata(0, 'larc05_iterate'));
 
 
 function [] = populateGUI(handles, properties, materialToEdit)
@@ -1881,6 +1885,15 @@ try
     end
 catch
     setappdata(0, 'larc05_phi0', [])
+end
+try
+    if isempty(properties.material_properties.larc05_iterate) == 1.0
+        setappdata(0, 'larc05_iterate', 0.0)
+    else
+        setappdata(0, 'larc05_iterate', properties.material_properties.larc05_iterate)
+    end
+catch
+    setappdata(0, 'larc05_iterate', 0.0)
 end
 
 % --- Executes on button press in pButton_manager.
@@ -2709,6 +2722,9 @@ if isappdata(0, 'larc05_alpha0') == 1.0
 end
 if isappdata(0, 'larc05_phi0') == 1.0
     rmappdata(0, 'larc05_phi0')
+end
+if isappdata(0, 'larc05_iterate') == 1.0
+    rmappdata(0, 'larc05_iterate')
 end
 
 delete(hObject);

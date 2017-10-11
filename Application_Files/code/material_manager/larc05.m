@@ -10,7 +10,7 @@ function varargout = larc05(varargin)%#ok<*DEFNU>
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 09-Oct-2017 11:03:00 GMT
+%   Last modified 11-Oct-2017 13:08:05 GMT
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -88,6 +88,9 @@ if isappdata(0, 'larc05_alpha0') == 1.0
 end
 if isappdata(0, 'larc05_phi0') == 1.0
     set(handles.edit_phi0, 'string', getappdata(0, 'larc05_phi0'))
+end
+if isappdata(0, 'larc05_iterate') == 1.0
+    set(handles.check_iterate, 'value', getappdata(0, 'larc05_iterate'))
 end
 
 
@@ -354,6 +357,7 @@ setappdata(0, 'larc05_nl', get(handles.edit_nl, 'string'))
 setappdata(0, 'larc05_nt', get(handles.edit_nt, 'string'))
 setappdata(0, 'larc05_alpha0', get(handles.edit_alpha0, 'string'))
 setappdata(0, 'larc05_phi0', get(handles.edit_phi0, 'string'))
+setappdata(0, 'larc05_iterate', get(handles.check_iterate, 'value'))
 
 close 'LaRC05 Parameters'
 
@@ -486,3 +490,12 @@ function edit_alpha0_CreateFcn(hObject, ~, ~)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in check_iterate.
+function check_iterate_Callback(~, ~, ~)
+% hObject    handle to check_iterate (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of check_iterate

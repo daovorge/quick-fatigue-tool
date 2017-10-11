@@ -13,7 +13,7 @@ function varargout = MaterialManager(varargin)%#ok<*DEFNU>
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 09-Oct-2017 19:38:38 GMT
+%   Last modified 11-Oct-2017 13:08:05 GMT
     
     %%
     

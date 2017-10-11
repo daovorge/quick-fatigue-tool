@@ -9,7 +9,7 @@ classdef group < handle
 %      4.6 Analysis groups
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 09-Oct-2017 11:03:00 GMT
+%   Last modified 11-Oct-2017 13:08:05 GMT
     
     %%
     
@@ -338,6 +338,7 @@ classdef group < handle
             group_materialProps(numberOfMaterials).larc05_nt = [];
             group_materialProps(numberOfMaterials).larc05_alpha0 = [];
             group_materialProps(numberOfMaterials).larc05_phi0 = [];
+            group_materialProps(numberOfMaterials).larc05_iterate = [];
             
             setappdata(0, 'group_materialProps', group_materialProps)
             
@@ -1882,6 +1883,7 @@ classdef group < handle
             group_materialProps(materialNumber).larc05_nt = getappdata(0, 'larc05_nt');
             group_materialProps(materialNumber).larc05_alpha0 = getappdata(0, 'larc05_alpha0');
             group_materialProps(materialNumber).larc05_phi0 = getappdata(0, 'larc05_phi0');
+            group_materialProps(materialNumber).larc05_iterate = getappdata(0, 'larc05_iterate');
             
             
             setappdata(0, 'group_materialProps', group_materialProps)
@@ -1981,6 +1983,7 @@ classdef group < handle
             setappdata(0, 'larc05_nt', group_materialProps(materialNumber).larc05_nt)
             setappdata(0, 'larc05_alpha0', group_materialProps(materialNumber).larc05_alpha0)
             setappdata(0, 'larc05_phi0', group_materialProps(materialNumber).larc05_phi0)
+            setappdata(0, 'larc05_iterate', group_materialProps(materialNumber).larc05_iterate)
         end
         
         %% READ A GROUP FILE
