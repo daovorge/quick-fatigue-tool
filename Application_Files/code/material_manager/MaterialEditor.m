@@ -1403,7 +1403,10 @@ catch
     set(handles.check_ndCompression, 'value', 0.0)
 end
 
-if properties.material_properties.behavior == 3.0
+if properties.material_properties.reg_model == 5.0
+    set(handles.pMenu_matBehaviour, 'value', properties.material_properties.behavior)
+    set(handles.pMenu_regModel, 'value', properties.material_properties.reg_model)
+elseif properties.material_properties.behavior == 3.0
     set(handles.pMenu_matBehaviour, 'value', properties.material_properties.behavior)
     
     set(handles.pMenu_regModel, 'value', 2.0)
