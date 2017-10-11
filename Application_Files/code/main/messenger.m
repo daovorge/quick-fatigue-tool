@@ -2287,8 +2287,8 @@ classdef messenger < handle
             catch
                 fprintf(fid, 'Quick Fatigue Tool 6.11-05\r\n');
             end
-            fprintf(fid, 'MATLAB version %s\r\n', version);
-            fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
+            fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
+            fprintf(fid, 'Copyright Louis Vallance 2017\r\n');
             fprintf(fid, 'Last modified 11-Oct-2017 13:08:05 GMT\r\n\r\n');
 
             %% Write the input summary

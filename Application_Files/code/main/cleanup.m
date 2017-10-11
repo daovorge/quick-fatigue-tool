@@ -74,8 +74,13 @@ if status == 1.0
     fid = fopen(errLogFile, 'w');
     
     % Write file header
-    fprintf(fid, 'Quick Fatigue Tool 6.11-05\r\n');
-    fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
+    try
+        fprintf(fid, 'Quick Fatigue Tool 6.11-05 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
+    catch
+        fprintf(fid, 'Quick Fatigue Tool 6.11-05\r\n');
+    end
+    fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
+    fprintf(fid, 'Copyright Louis Vallance 2017\r\n');
     fprintf(fid, 'Last modified 11-Oct-2017 13:08:05 GMT\r\n\r\n');
     
     % Continue writing the file
