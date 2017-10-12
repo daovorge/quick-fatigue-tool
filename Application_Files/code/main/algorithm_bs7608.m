@@ -14,7 +14,7 @@ classdef algorithm_bs7608 < handle
 %      6.6 BS 7608 Fatigue of Welded Steel Joints
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 04-Oct-2017 18:09:00 GMT
+%   Last modified 12-Oct-2017 11:51:09 GMT
     
     %%
     
@@ -523,9 +523,7 @@ classdef algorithm_bs7608 < handle
             weldClassInt = getappdata(0, 'weldClassInt');
                 
             for index = 1:numberOfCycles
-                if ((min(pairs(index, :)) < 0.0 && max(pairs(index, :)) <= 0.0) &&...
-                        (getappdata(0, 'ndCompression') == 1.0)) ||...
-                        (2.0*cycles(index) < S0)
+                if ((min(pairs(index, :)) < 0.0 && max(pairs(index, :)) <= 0.0)) || (2.0*cycles(index) < S0)
                     %{
                         If the stress range is purely compressive, or the
                         stress range falls below the non-propagating stress
