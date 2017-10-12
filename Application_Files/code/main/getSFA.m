@@ -6,12 +6,15 @@ function SFA = getSFA(WCA, WCDP, N)
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 04-Apr-2017 13:26:59 GMT
+%   Last modified 12-Oct-2017 11:51:09 GMT
     
     %%
     
 % Get the number of groups
 G = getappdata(0, 'numberOfGroups');
+
+% Get the algorithm
+algorithm = getappdata(0, 'algorithm');
 
 % Get the group ID buffer
 groupIDBuffer = getappdata(0, 'groupIDBuffer');
@@ -47,7 +50,11 @@ for groups = 1:G
     WCA_GROUP = parameter(startID:(startID + N) - 1.0);
     
     % SFA (Fatigue limit / stress amplitude)
-    SFA(startID:(startID + N) - 1.0) = fatigueLimit./WCA_GROUP;
+    if algorithm == 3.0
+        SFA(startID:(startID + N) - 1.0) = (fatigueLimit/getappdata(0, 'E'))./WCA_GROUP;
+    else
+        SFA(startID:(startID + N) - 1.0) = fatigueLimit./WCA_GROUP;
+    end
     
     % Update the start ID
     startID = startID + N;
