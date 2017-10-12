@@ -134,8 +134,6 @@ if isappdata(0, 'rosette_edit_gaugeA') == 1.0
     set(handles.check_referenceStrain, 'string', getappdata(0, 'rosette_text_referenceStrain'))
 end
 
-setappdata(0, 'rosette_pMenu_outputType', 1.0)
-
 %% Check screen resolution
 if isappdata(0, 'checkScreenResolution') == 0.0
     resolution = get(0, 'Screensize');
