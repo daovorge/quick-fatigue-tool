@@ -13,7 +13,7 @@ function varargout = MaterialEditor(varargin)%#ok<*DEFNU>
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 11-Oct-2017 13:08:05 GMT
+%   Last modified 13-Oct-2017 10:55:47 GMT
     
     %%
     
@@ -125,6 +125,9 @@ movegui(hObject, 'center')
 
 % Define SIMULIA blue color
 setappdata(0, 'simulia_blue', [177/255, 206/255, 237/255])
+
+% Initialize APPDATA properties
+initializeMaterial
 
 %% Populate dialogue box with user material for editing if user pressed
 % "EDIT" in the material manager
@@ -2912,3 +2915,10 @@ uiwait
 
 % Enable the GUI
 enable(handles)
+
+function initializeMaterial
+setappdata(0, 'failStress_cross12', 0.0)
+setappdata(0, 'failStress_cross23', 0.0)
+setappdata(0, 'hashin_alpha', 0.0)
+setappdata(0, 'larc05_alpha0', 53.0)
+setappdata(0, 'larc05_iterate', 0.0)

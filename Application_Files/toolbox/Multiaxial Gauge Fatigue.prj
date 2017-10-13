@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="854439165" file="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox\Multiaxial Gauge Fatigue.prj" location="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox" name="Multiaxial Gauge Fatigue" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="3816892561" file="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox\Multiaxial Gauge Fatigue.prj" location="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox" name="Multiaxial Gauge Fatigue" target="target.mlapps" target-name="Package App">
     <param.appname>Multiaxial Gauge Fatigue</param.appname>
     <param.authnamewatermark>Louis Vallance</param.authnamewatermark>
     <param.email>louisvallance@hotmail.co.uk</param.email>
@@ -37,7 +37,7 @@
     </param.products.version>
     <param.platforms />
     <param.output>${PROJECT_ROOT}\Multiaxial Gauge Fatigue.mlappinstall</param.output>
-    <param.guid>98bdf5fa-a83b-42db-9bf5-15a4a195dca3</param.guid>
+    <param.guid>6880972f-d514-4d4e-b4ed-6655040ff694</param.guid>
     <unset>
       <param.authnamewatermark />
       <param.email />
@@ -127,6 +127,11 @@
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\odb_interface\python.m</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\virtual_gauge\RosetteDiagram.fig</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\code\virtual_gauge\RosetteDiagram.m</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Data\material\composites\A-S carbon (epoxy).mat</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Data\material\composites\E-glass (MY750 epoxy).mat</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Data\material\composites\IM7 (8551-7).mat</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Data\material\composites\S-glass (epoxy).mat</file>
+      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Data\material\composites\T300 (PR319).mat</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Data\material\dnv\B1-air.mat</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Data\material\dnv\B1-cath.mat</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Data\material\dnv\B2-air.mat</file>
@@ -155,11 +160,6 @@
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Data\material\dnv\W2-cath.mat</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Data\material\dnv\W3-air.mat</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Data\material\dnv\W3-cath.mat</file>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Data\material\LaRC05\A-S carbon (epoxy).mat</file>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Data\material\LaRC05\E-glass (MY750 epoxy).mat</file>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Data\material\LaRC05\IM7 (8551-7).mat</file>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Data\material\LaRC05\S-glass (epoxy).mat</file>
-      <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Data\material\LaRC05\T300 (PR319).mat</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Data\material\local\qft-local-material.txt</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Data\material\local\SAE-950C (R).mat</file>
       <file>E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Data\material\local\SAE-950C.mat</file>
