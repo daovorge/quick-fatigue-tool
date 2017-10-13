@@ -11,7 +11,7 @@ classdef virtualGaugeUtils < handle
 %      A3.4 Virtual Strain Gauge
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 04-Apr-2017 13:26:59 GMT
+%   Last modified 13-Oct-2017 10:55:47 GMT
     
     %%
     
@@ -26,10 +26,13 @@ classdef virtualGaugeUtils < handle
         function [] = enable(handles)
             set(findall(handles.VirtualStrainGauge, '-property', 'Enable'), 'Enable', 'on')
             
+            set(handles.edit_alpha, 'backgroundColor', 'white')
+            set(handles.edit_alpha, 'backgroundColor', [177/255, 206/255, 237/255])
+            
             set(handles.pButton_strainUnits, 'enable', 'inactive')
             
             if get(handles.radiobutton_arbitrary, 'value') == 0.0
-                set(handles.check_alpha, 'enable', 'off')
+                set(handles.text_alpha, 'enable', 'off')
                 set(handles.text_beta, 'enable', 'off')
                 set(handles.text_gamma, 'enable', 'off')
                 set(handles.text_alphaUnits, 'enable', 'off')
@@ -38,11 +41,6 @@ classdef virtualGaugeUtils < handle
                 set(handles.edit_alpha, 'enable', 'off')
                 set(handles.edit_beta, 'enable', 'off')
                 set(handles.edit_gamma, 'enable', 'off')
-            else
-                if get(handles.check_alpha, 'value') == 0.0
-                    set(handles.text_alphaUnits, 'enable', 'off')
-                    set(handles.edit_alpha, 'enable', 'inactive', 'backgroundColor', [177/255, 206/255, 237/255])
-                end
             end
             
             if get(handles.check_resultsLocation, 'value') == 0.0
@@ -89,21 +87,17 @@ classdef virtualGaugeUtils < handle
             
             % Check the gauge orientation defintition
             if get(handles.radiobutton_arbitrary, 'value') == 1.0
-                if get(handles.check_alpha, 'value') == 1.0
-                    alpha = str2double(get(handles.edit_alpha, 'string'));
-                    
-                    if isempty(get(handles.edit_alpha, 'string')) == 1.0
-                        error = 1.0;
-                        errorMessage = 'Please specify a value of Alpha.';
-                    elseif (isnumeric(alpha) == 0.0) || (isinf(alpha) == 1.0) || (isnan(alpha) == 1.0)
-                        error = 1.0;
-                        errorMessage = 'An invalid Alpha value was specified.';
-                    elseif (alpha < 0.0) || (alpha >= 180.0)
-                        error = 1.0;
-                        errorMessage = 'Alpha must be in the range (0 <= Alpha < 180).';
-                    end
-                else
+                alpha = str2double(get(handles.edit_alpha, 'string'));
+                
+                if isempty(get(handles.edit_alpha, 'string')) == 1.0
+                    set(handles.edit_alpha, 'string', '0')
                     alpha = 0.0;
+                elseif (isnumeric(alpha) == 0.0) || (isinf(alpha) == 1.0) || (isnan(alpha) == 1.0)
+                    error = 1.0;
+                    errorMessage = 'An invalid Alpha value was specified.';
+                elseif (alpha < 0.0) || (alpha >= 180.0)
+                    error = 1.0;
+                    errorMessage = 'Alpha must be in the range (0 <= Alpha < 180).';
                 end
                 
                 if error == 1.0
