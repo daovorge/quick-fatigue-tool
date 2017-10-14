@@ -100,6 +100,8 @@ if isAvailable == 0.0
     set(handles.pButton_showDiagram, 'enable', 'off')
 end
 
+[~] = checkToolbox('Symbolic Math Toolbox');
+
 %% Load the panel state
 if isappdata(0, 'rosette_edit_gaugeA') == 1.0
     if (strcmpi(getappdata(0, 'rosette_edit_gaugeA'), sprintf('Strain history file or numerical expression...')) == 0.0) && (isempty(getappdata(0, 'rosette_edit_gaugeA')) == 0.0)
@@ -186,8 +188,9 @@ end
 %% Calculate E1 and E2:
 referenceStrain = get(handles.check_referenceStrain, 'value');
 referenceOrientation = get(handles.check_referenceOrientation, 'value');
+noSMT = getappdata(0, 'noSMT');
 
-[E1, E2, E12M, thetaP, thetaS, E11, E22, E12, S1, S2, S12M, S11, S22, S12, error, errorMessage] = rosetteTools.processGauges(gaugeA, gaugeB, gaugeC, alpha, beta, gamma, E, v, referenceStrain, referenceOrientation);
+[E1, E2, E12M, thetaP, thetaS, E11, E22, E12, S1, S2, S12M, S11, S22, S12, error, errorMessage] = rosetteTools.processGauges(gaugeA, gaugeB, gaugeC, alpha, beta, gamma, E, v, referenceStrain, referenceOrientation, noSMT);
 
 if error == 1.0
     errordlg(errorMessage, 'Quick Fatigue Tool')
