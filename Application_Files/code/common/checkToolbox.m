@@ -19,6 +19,8 @@ function [isAvailable] = checkToolbox(toolboxName)
             tag = 'noIPT';
         case 'Symbolic Math Toolbox'
             tag = 'noSMT';
+        case 'Statistics and Machine Learning Toolbox'
+            tag = 'noSMLT';
     end
     
     % Set the appdata flag accordingly
