@@ -6,9 +6,8 @@ function [] = compositeFailure(N, L)
 %   COMPOSITEFAILURE is used internally by Quick Fatigue Tool. The user is
 %   not required to run this file.
 %
-%   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 11-Oct-2017 13:08:05 GMT
+%   Last modified 14-Oct-2017 18:15:15 GMT
     
     %%
 
@@ -47,13 +46,8 @@ S12 = getappdata(0, 'Txy');
 S13 = getappdata(0, 'Txz');
 S23 = getappdata(0, 'Tyz');
 
-% Check if SYMS works
-try
-    noSyms = 0.0;
-    syms x
-catch
-    noSyms = 1.0;
-end
+% Check if the symbolic math toolbox is available
+symsAvailable = checkToolbox('Symbolic Math Toolbox');
 
 for groups = 1:G
     if strcmpi(groupIDBuffer(1.0).name, 'default') == 1.0
@@ -312,7 +306,7 @@ for groups = 1:G
                 LaRC05(S11i, S22i, S33i, S12i, S13i, S23i, S1i, S2i, S3i,...
                 larc_G12, Xlt, Xlc, Ylt, Ylc, Sll, Slt, alpha0, phi0, nl, nt,...
                 LARPFCRT, LARMFCRT, LARKFCRT, LARSFCRT, LARTFCRT,...
-                totalCounter, noSyms, step, iterate);
+                totalCounter, symsAvailable, step, iterate);
         end
         
         %% UPDATE COUNTER

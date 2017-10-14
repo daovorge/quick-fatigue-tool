@@ -15,7 +15,7 @@ function varargout = kValueCalculator(varargin)%#ok<*DEFNU>
 %      6.4 Findley's Method
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 09-Oct-2017 19:38:38 GMT
+%   Last modified 14-Oct-2017 18:15:15 GMT
     
     %%
     
@@ -106,6 +106,9 @@ if isappdata(0, 'k_solution_uts') && get(handles.pMenu_solution, 'value') == 4
     set(handles.edit_uts, 'string', getappdata(0, 'k_solution_uts'))
 end
 
+% Check if the symbolic math toolbox is available
+[~] = checkToolbox('Symbolic Math Toolbox');
+
 % UIWAIT makes kValueCalculator wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
@@ -133,9 +136,7 @@ switch get(hObject, 'Value')
         set(handles.text_uts, 'enable', 'off');    set(handles.edit_uts, 'enable', 'inactive', 'BackgroundColor', grey);  set(handles.text_units_uts, 'enable', 'off')
     case 2.0 % General formula
         % Check if SYMS works
-        try
-            syms x
-        catch
+        if getappdata(0, 'noSMT') == 1.0
             errordlg('The General Formula derivation method requires the Symbolic Math Toolbox.', 'Quick Fatigue Tool')
             uiwait; set(handles.pMenu_solution, 'value', 1.0)
             pMenu_solution_Callback(hObject, eventdata, handles)
@@ -501,3 +502,15 @@ end
 % --- Executes on button press in pButton_close.
 function pButton_close_Callback(~, ~, ~)
 close 'k-Value Calculator'
+
+
+% --- Executes when user attempts to close kValueCalculator.
+function kValueCalculator_CloseRequestFcn(hObject, ~, ~)
+% hObject    handle to kValueCalculator (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+rmappdata(0, 'noSMT')
+
+% Hint: delete(hObject) closes the figure
+delete(hObject);

@@ -12,7 +12,7 @@ function varargout = VirtualStrainGauge(varargin)
 %      A3.4 Virtual Strain Gauge
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 13-Oct-2017 10:55:47 GMT
+%   Last modified 14-Oct-2017 18:15:15 GMT
     
     %%
     
@@ -144,6 +144,12 @@ if isappdata(0, 'checkScreenResolution') == 0.0
         uiwait(warndlg([msg1, msg2, msg3], 'Quick Fatigue Tool', 'modal'));
     end
     setappdata(0, 'checkScreenResolution', 1.0)
+end
+
+% Check if the image processing toolbox is available
+isAvailable = checkToolbox('Image Processing Toolbox');
+if isAvailable == 0.0
+    set(handles.pButton_showDiagram, 'enable', 'off')
 end
 
 
@@ -481,6 +487,8 @@ setappdata(0, 'panel_virtual_gauge_edit_gamma', get(handles.edit_gamma, 'string'
 
 setappdata(0, 'panel_virtual_gauge_check_resultsLocation', get(handles.check_resultsLocation, 'value'))
 setappdata(0, 'panel_virtual_gauge_edit_output', get(handles.edit_output, 'string'))
+
+rmappdata(0, 'noIPT')
 
 delete(hObject);
 

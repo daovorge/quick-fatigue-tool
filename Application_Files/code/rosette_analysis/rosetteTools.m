@@ -11,7 +11,7 @@ classdef rosetteTools < handle
 %      A3.3 Rosette Analysis
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 23-Jun-2017 08:19:31 GMT
+%   Last modified 14-Oct-2017 18:15:15 GMT
     
     %%
     
@@ -38,6 +38,11 @@ classdef rosetteTools < handle
             if get(handles.check_outputLocation, 'value') == 0.0
                 set(handles.edit_outputLocation, 'enable', 'inactive', 'backgroundColor', [177/255, 206/255, 237/255])
                 set(handles.pButton_outputLocation, 'enable', 'off') 
+            end
+            
+            if getappdata(0, 'noIPT') == 1.0
+                set(handles.text_gaugeDiagram, 'enable', 'off')
+                set(handles.pButton_showDiagram, 'enable', 'off')
             end
         end
         

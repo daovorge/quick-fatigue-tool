@@ -11,7 +11,7 @@ classdef virtualGaugeUtils < handle
 %      A3.4 Virtual Strain Gauge
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 13-Oct-2017 10:55:47 GMT
+%   Last modified 14-Oct-2017 18:15:15 GMT
     
     %%
     
@@ -46,6 +46,10 @@ classdef virtualGaugeUtils < handle
             if get(handles.check_resultsLocation, 'value') == 0.0
                 set(handles.edit_output, 'enable', 'inactive', 'backgroundColor', [177/255, 206/255, 237/255])
                 set(handles.pButton_browseOutput, 'enable', 'off')
+            end
+            
+            if getappdata(0, 'noIPT') == 1.0
+                set(handles.pButton_showDiagram, 'enable', 'off')
             end
         end
 

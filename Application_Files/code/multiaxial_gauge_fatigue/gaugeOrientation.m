@@ -13,7 +13,7 @@ function varargout = gaugeOrientation(varargin)
 %      A3.2 Multiaxial Gauge Fatigue
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 12-Apr-2017 12:25:20 GMT
+%   Last modified 14-Oct-2017 18:15:15 GMT
     
     %%
     
@@ -87,6 +87,12 @@ if get(handles.rButton_user, 'value') == 1.0
     set(handles.text_unitsAlpha, 'enable', 'on')
     set(handles.text_unitsBeta, 'enable', 'on')
     set(handles.text_unitsGamma, 'enable', 'on')
+end
+
+% Check if the image processing toolbox is available
+isAvailable = checkToolbox('Image Processing Toolbox');
+if isAvailable == 0.0
+    set(handles.pButton_diagram, 'enable', 'off')
 end
 
 
@@ -313,6 +319,10 @@ if get(handles.rButton_user, 'value') == 0.0
     set(handles.text_unitsGamma, 'enable', 'off')
 end
 
+if getappdata(0, 'noIPT') == 1.0
+    set(handles.pButton_diagram, 'enable', 'off')
+end
+
 set(handles.pButton_ok, 'enable', 'on')
 set(handles.pButton_cancel, 'enable', 'on')
 
@@ -358,6 +368,8 @@ function GaugeOrientation_CloseRequestFcn(hObject, ~, ~)
 % hObject    handle to GaugeOrientation (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+rmappdata(0, 'noIPT')
 
 % Hint: delete(hObject) closes the figure
 delete(hObject);

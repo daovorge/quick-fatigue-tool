@@ -12,7 +12,7 @@ function varargout = RosetteAnalysis(varargin)%#ok<*DEFNU>
 %      A3.3 rosetteanalysis Analysis
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 24-Jun-2017 11:06:56 GMT
+%   Last modified 14-Oct-2017 18:15:15 GMT
     
     %%
     
@@ -92,6 +92,13 @@ set(handles.pButton_outputLocation, 'CData', g);
 setInitialHelp(handles.edit_gaugeA, 'Strain history file or numerical expression...')
 setInitialHelp(handles.edit_gaugeB, 'Strain history file or numerical expression...')
 setInitialHelp(handles.edit_gaugeC, 'Strain history file or numerical expression...')
+
+% Check if the image processing toolbox is available
+isAvailable = checkToolbox('Image Processing Toolbox');
+if isAvailable == 0.0
+    set(handles.text_gaugeDiagram, 'enable', 'off')
+    set(handles.pButton_showDiagram, 'enable', 'off')
+end
 
 %% Load the panel state
 if isappdata(0, 'rosette_edit_gaugeA') == 1.0
@@ -488,6 +495,8 @@ setappdata(0, 'rosette_edit_outputLocation', get(handles.edit_outputLocation, 's
 setappdata(0, 'rosette_check_referenceStrain', get(handles.check_referenceStrain, 'value'))
 setappdata(0, 'rosette_check_referenceOrientation', get(handles.check_referenceOrientation, 'value'))
 setappdata(0, 'rosette_text_referenceStrain', get(handles.check_referenceStrain, 'string'))
+
+rmappdata(0, 'noIPT')
 
 delete(hObject);
 
