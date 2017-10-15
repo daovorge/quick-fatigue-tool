@@ -95,6 +95,13 @@ if isAvailable == 0.0
     set(handles.pButton_diagram, 'enable', 'off')
 end
 
+% Check if the symbolic math toolbox is available
+isAvailable = checkToolbox('Symbolic Math Toolbox');
+if isAvailable == 0.0
+    set(handles.rButton_user, 'enable', 'off')
+    set(handles.rButton_rectangular, 'value', 1.0)
+end
+
 
 % --- Outputs from this function are returned to the command line.
 function varargout = gaugeOrientation_OutputFcn(~, ~, handles) 
