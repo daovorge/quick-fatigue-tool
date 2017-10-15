@@ -2772,7 +2772,9 @@ end
 % Fatigue
 set(handles.edit_snData, 'enable', 'inactive')
 set(handles.edit_rValues, 'enable', 'inactive')
+set(handles.edit_snData, 'backgroundColor', 'white')
 set(handles.edit_snData, 'backgroundColor', [242/255, 242/255, 242/255])
+set(handles.edit_rValues, 'backgroundColor', 'white')
 set(handles.edit_rValues, 'backgroundColor', [242/255, 242/255, 242/255])
 
 if strncmpi(get(handles.edit_snData, 'string'), 'undefined', 9.0) == 1.0
