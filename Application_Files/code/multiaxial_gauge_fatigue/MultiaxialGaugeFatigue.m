@@ -1257,6 +1257,9 @@ setappdata(0, 'panel_multiaxialFatigue_edit_kt', get(handles.edit_kt, 'string'))
 setappdata(0, 'panel_multiaxialFatigue_check_location', get(handles.check_location, 'value'))
 setappdata(0, 'panel_multiaxialFatigue_edit_location', get(handles.edit_location, 'string'))
 
+% Make sure any open files are closed
+fclose('all');
+
 delete(hObject);
 
 

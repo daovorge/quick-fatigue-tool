@@ -43,6 +43,9 @@ try %#ok<TRYNC>
     fclose(fid_status);
 end
 
+%% Close any other open files
+fclose('all');
+
 %% If the analysis exited with errors, create error log
 if status == 1.0
     % Create an error log file

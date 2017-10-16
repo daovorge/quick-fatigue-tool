@@ -12,7 +12,7 @@ function varargout = LocalMaterialDatabase(varargin)%#ok<*DEFNU>
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 23-Sep-2017 18:38:59 GMT
+%   Last modified 16-Oct-2017 09:28:25 GMT
     
     %%
 
@@ -345,10 +345,13 @@ setappdata(0, 'qft_suppressDataPath', 1.0)
 setappdata(0, 'defaultDataPath_check_defaultDataDirectory', get(handles.check_defaultDataDirectory, 'value'))
 setappdata(0, 'defaultDataPath_check_saveLocalPath', get(handles.check_saveLocalPath, 'value'))
 
-% Hint: delete(hObject) closes the figure
-delete(hObject);
+% Make sure any open files are closed
+fclose('all');
 
 rmappdata(0, 'missingDefaultLocalDatabase')
+
+% Hint: delete(hObject) closes the figure
+delete(hObject);
 
 
 % --- Executes on button press in check_defaultDataDirectory.

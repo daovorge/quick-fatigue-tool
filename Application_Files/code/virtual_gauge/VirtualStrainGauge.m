@@ -12,7 +12,7 @@ function varargout = VirtualStrainGauge(varargin)
 %      A3.4 Virtual Strain Gauge
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 14-Oct-2017 18:15:15 GMT
+%   Last modified 16-Oct-2017 09:28:25 GMT
     
     %%
     
@@ -489,6 +489,9 @@ setappdata(0, 'panel_virtual_gauge_check_resultsLocation', get(handles.check_res
 setappdata(0, 'panel_virtual_gauge_edit_output', get(handles.edit_output, 'string'))
 
 rmappdata(0, 'noIPT')
+
+% Make sure any open files are closed
+fclose('all');
 
 delete(hObject);
 

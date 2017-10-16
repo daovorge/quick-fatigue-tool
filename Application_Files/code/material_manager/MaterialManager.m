@@ -13,7 +13,7 @@ function varargout = MaterialManager(varargin)%#ok<*DEFNU>
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 13-Oct-2017 10:55:47 GMT
+%   Last modified 16-Oct-2017 09:28:25 GMT
     
     %%
     
@@ -1013,6 +1013,9 @@ function MaterialManager_CloseRequestFcn(hObject, ~, ~)
 % hObject    handle to MaterialManager (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+% Make sure any open files are closed
+fclose('all');
 
 % Hint: delete(hObject) closes the figure
 delete(hObject);

@@ -13,7 +13,7 @@ function varargout = MaterialEditor(varargin)%#ok<*DEFNU>
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 13-Oct-2017 10:55:47 GMT
+%   Last modified 16-Oct-2017 09:28:25 GMT
     
     %%
     
@@ -2729,6 +2729,9 @@ end
 if isappdata(0, 'larc05_iterate') == 1.0
     rmappdata(0, 'larc05_iterate')
 end
+
+% Make sure any open files are closed
+fclose('all');
 
 delete(hObject);
 

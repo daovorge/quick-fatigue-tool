@@ -723,6 +723,9 @@ if isappdata(0, 'uniaxialStrainLifeMessenger') == 1.0
     rmappdata(0, 'uniaxialStrainLifeMessenger')
 end
 
+% Make sure any open files are closed
+fclose('all');
+
 delete(hObject);
 
 function blank(handles)

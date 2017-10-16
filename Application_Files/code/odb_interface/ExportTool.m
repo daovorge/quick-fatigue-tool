@@ -12,7 +12,7 @@ function varargout = ExportTool(varargin)%#ok<*DEFNU>
 %      10.4 The ODB Interface
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 28-Sep-2017 10:31:34 GMT
+%   Last modified 16-Oct-2017 09:28:25 GMT
     
     %%
     
@@ -1255,6 +1255,9 @@ setappdata(0, 'panel_exportTool_check_WCDP', get(handles.check_WCDP, 'value'))
 setappdata(0, 'panel_exportTool_check_WCATAN', get(handles.check_WCATAN, 'value'))
 
 setappdata(0, 'panel_exportTool_check_copyToClipboard', get(handles.check_copyToClipboard, 'value'))
+
+% Make sure any open files are closed
+fclose('all');
 
 delete(hObject);
 
