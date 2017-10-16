@@ -523,11 +523,10 @@ classdef algorithm_bs7608 < handle
             weldClassInt = getappdata(0, 'weldClassInt');
                 
             for index = 1:numberOfCycles
-                if ((min(pairs(index, :)) < 0.0 && max(pairs(index, :)) <= 0.0)) || (2.0*cycles(index) < S0)
+                if 2.0*cycles(index) < S0
                     %{
-                        If the stress range is purely compressive, or the
-                        stress range falls below the non-propagating stress
-                        range, assume no damage
+                        If the stress range falls below the non-propagating
+                        stress range, assume no damage
                     %}
                     cumulativeDamage(index) = 0.0;
                     continue
