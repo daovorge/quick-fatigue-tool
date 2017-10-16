@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 11-Oct-2017 13:08:05 GMT
+%   Last modified 16-Oct-2017 09:28:25 GMT
     
     %%
     
@@ -4011,6 +4011,14 @@ classdef preProcess < handle
                         s1(totalCounter, :) = max(real(eigenvalues));
                         s2(totalCounter, :) = median(real(eigenvalues));
                         s3(totalCounter, :) = min(real(eigenvalues));
+                        
+                        %{
+                            Remove near-zero values which can arise due to
+                            numerical artifacting
+                        %}
+                        s1(totalCounter, abs(s1(totalCounter, :)) < 1e-6) = 0.0;
+                        s2(totalCounter, abs(s2(totalCounter, :)) < 1e-6) = 0.0;
+                        s3(totalCounter, abs(s3(totalCounter, :)) < 1e-6) = 0.0;
                     end
                 end
                 
