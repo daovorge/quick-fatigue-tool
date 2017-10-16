@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 14-Oct-2017 18:15:15 GMT
+%   Last modified 16-Oct-2017 09:28:25 GMT
 
     %%
 
@@ -1193,7 +1193,7 @@ classdef messenger < handle
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Composite materials may not be used for fatigue analysis. The analysis will not continue beyond this point', returnType{i}]);
                         rmappdata(0, 'noSMT')
                     case 128.0
-                        %_AVAILABLE_%
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The output variables RHIST and RC require the Statistics and Machine Learning Toolbox.', returnType{i}]);
                     case 129.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Composite criteria results have been written to ''%s\\Project\\output\\%s\\Data Files\\composite_criteria.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
                     case 130.0
@@ -2290,7 +2290,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2017\r\n');
-            fprintf(fid, 'Last modified 14-Oct-2017 18:15:15 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 16-Oct-2017 09:28:25 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

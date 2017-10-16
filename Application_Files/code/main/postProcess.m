@@ -11,7 +11,7 @@ classdef postProcess < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 04-Oct-2017 18:09:00 GMT
+%   Last modified 16-Oct-2017 09:28:25 GMT
     
     %%
     
@@ -1098,9 +1098,12 @@ classdef postProcess < handle
                 end
             end
             
-            try
-                %% RHIST RAINFLOW HISTOGRAM OF CYCLES
-                
+            %% RHIST RAINFLOW HISTOGRAM OF CYCLES
+            
+            % This MATLAB figure requires the Statistics Toolbox
+            isAvailable = checkToolbox('Statistics Toolbox');
+            
+            if isAvailable == 1.0
                 if outputFigure == 1.0 && outputField == 1.0 && getappdata(0, 'figure_RHIST') == 1.0
                     f11 = figure('visible', figureVisibility);
                     rhistData = [Sm'; 2.*amplitudes]';
@@ -1161,7 +1164,8 @@ classdef postProcess < handle
                         postProcess.makeVisible([dir, '.fig'])
                     end
                 end
-            catch
+            else
+                messenger.writeMessage(128.0)
             end
             
             %% SIG UNIAXIAL STRESS HISTORY (BEFORE AND AFTER FILTERING *)

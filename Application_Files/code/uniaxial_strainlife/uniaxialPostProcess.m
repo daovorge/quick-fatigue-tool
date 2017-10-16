@@ -12,7 +12,7 @@ classdef uniaxialPostProcess < handle
 %      A3.6 Uniaxial Strain-Life
 %   
 %   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 21-Sep-2017 09:00:05 GMT
+%   Last modified 16-Oct-2017 09:28:25 GMT
     
     %%
     
@@ -438,33 +438,39 @@ classdef uniaxialPostProcess < handle
             postProcess.makeVisible([fileName, '.fig'])
             
             %% RHIST RAINFLOW HISTOGRAM OF CYCLES
-            pairs = getappdata(0, 'cyclesOnCP');
-            Sm = 0.5*(pairs(:, 1.0) + pairs(:, 2.0));
-            amplitudes = getappdata(0, 'amplitudesOnCP');
             
-            f7 = figure('visible', 'off');
-            rhistData = [Sm'; 2.0.*amplitudes]';
-            hist3(rhistData, [32.0, 32.0])
+            % This MATLAB figure requires the Statistics Toolbox
+            isAvailable = checkToolbox('Statistics Toolbox');
             
-            set(gcf, 'renderer', 'opengl');
-            set(get(gca, 'child'), 'FaceColor', 'interp', 'CDataMode', 'auto');
-            colorbar
-            
-            msg = sprintf('RHIST, Rainflow cycle histogram');
-            xlabel('Mean Strain', 'FontSize', 12.0)
-            ylabel('Strain Range', 'FontSize', 12.0)
-            title(msg, 'FontSize', 14.0)
-            set(gca, 'FontSize', 12.0)
-            
-            try
-                axis tight
-            catch
-                % Don't tighten the axis
+            if isAvailable == 1.0
+                pairs = getappdata(0, 'cyclesOnCP');
+                Sm = 0.5*(pairs(:, 1.0) + pairs(:, 2.0));
+                amplitudes = getappdata(0, 'amplitudesOnCP');
+                
+                f7 = figure('visible', 'off');
+                rhistData = [Sm'; 2.0.*amplitudes]';
+                hist3(rhistData, [32.0, 32.0])
+                
+                set(gcf, 'renderer', 'opengl');
+                set(get(gca, 'child'), 'FaceColor', 'interp', 'CDataMode', 'auto');
+                colorbar
+                
+                msg = sprintf('RHIST, Rainflow cycle histogram');
+                xlabel('Mean Strain', 'FontSize', 12.0)
+                ylabel('Strain Range', 'FontSize', 12.0)
+                title(msg, 'FontSize', 14.0)
+                set(gca, 'FontSize', 12.0)
+                
+                try
+                    axis tight
+                catch
+                    % Don't tighten the axis
+                end
+                
+                fileName = [dir, '/RHIST, Rainflow cycle histogram'];
+                saveas(f7, fileName, 'fig')
+                postProcess.makeVisible([fileName, '.fig'])
             end
-            
-            fileName = [dir, '/RHIST, Rainflow cycle histogram'];
-            saveas(f7, fileName, 'fig')
-            postProcess.makeVisible([fileName, '.fig'])
             
             %% CN (Normal strain on critical plane)
             
