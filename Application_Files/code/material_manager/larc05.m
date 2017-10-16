@@ -93,6 +93,12 @@ if isappdata(0, 'larc05_iterate') == 1.0
     set(handles.check_iterate, 'value', getappdata(0, 'larc05_iterate'))
 end
 
+% Check if the symbolic math toolbox is available
+isAvailable = checkToolbox('Symbolic Math Toolbox');
+if isAvailable == 0.0
+    set(handles.check_iterate, 'enable', 'off')
+end
+
 
 % --- Outputs from this function are returned to the command line.
 function varargout = larc05_OutputFcn(~, ~, handles) 
@@ -383,6 +389,10 @@ set(findall(handles.larc05, '-property', 'Enable'), 'Enable', 'on')
 set(handles.edit_alpha0, 'backgroundColor', 'white')
 set(handles.edit_alpha0, 'backgroundColor', [177/255, 206/255, 237/255])
 
+if getappdata(0, 'noSMT') == 1.0
+    set(handles.check_iterate, 'enable', 'off')
+end
+
 
 function edit_shear_Callback(~, ~, ~)
 % hObject    handle to edit_shear (see GCBO)
@@ -501,3 +511,15 @@ function check_iterate_Callback(~, ~, ~)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of check_iterate
+
+
+% --- Executes when user attempts to close larc05.
+function larc05_CloseRequestFcn(hObject, ~, ~)
+% hObject    handle to larc05 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+rmappdata(0, 'noSMT')
+
+% Hint: delete(hObject) closes the figure
+delete(hObject);
