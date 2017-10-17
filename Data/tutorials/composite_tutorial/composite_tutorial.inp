@@ -1,0 +1,9 @@
+*JOB NAME = composite_tutorial
+*JOB DESCRIPTION = Unidirectional IM7 carbon fibre composite laminate subjected to multiaxial load
+*MATERIAL = IM7 (8551-7)
+*DATASET = composite_dataset.dat
+*HISTORY = [0, 1, -0.2, 0.5]
+*ALGORITHM = default
+*SCALE = 1.3
+*PLANE STRESS = 1
+*COMPOSITE CRITERIA = 1

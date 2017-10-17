@@ -11,8 +11,8 @@ function varargout = RosetteAnalysis(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.3 rosetteanalysis Analysis
 %   
-%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 24-Jun-2017 11:06:56 GMT
+%   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
+%   Last modified 16-Oct-2017 09:28:25 GMT
     
     %%
     
@@ -93,6 +93,18 @@ setInitialHelp(handles.edit_gaugeA, 'Strain history file or numerical expression
 setInitialHelp(handles.edit_gaugeB, 'Strain history file or numerical expression...')
 setInitialHelp(handles.edit_gaugeC, 'Strain history file or numerical expression...')
 
+% Check if the image processing toolbox is available
+isAvailable = checkToolbox('Image Processing Toolbox');
+if isAvailable == 0.0
+    set(handles.text_gaugeDiagram, 'enable', 'off')
+    set(handles.pButton_showDiagram, 'enable', 'off')
+end
+
+[~] = checkToolbox('Symbolic Math Toolbox');
+
+% Save output definition type
+setappdata(0, 'rosette_pMenu_outputType', get(handles.pMenu_outputType, 'value'))
+
 %% Load the panel state
 if isappdata(0, 'rosette_edit_gaugeA') == 1.0
     if (strcmpi(getappdata(0, 'rosette_edit_gaugeA'), sprintf('Strain history file or numerical expression...')) == 0.0) && (isempty(getappdata(0, 'rosette_edit_gaugeA')) == 0.0)
@@ -133,8 +145,6 @@ if isappdata(0, 'rosette_edit_gaugeA') == 1.0
     set(handles.check_referenceOrientation, 'value', getappdata(0, 'rosette_check_referenceOrientation'))
     set(handles.check_referenceStrain, 'string', getappdata(0, 'rosette_text_referenceStrain'))
 end
-
-setappdata(0, 'rosette_pMenu_outputType', 1.0)
 
 %% Check screen resolution
 if isappdata(0, 'checkScreenResolution') == 0.0
@@ -181,8 +191,9 @@ end
 %% Calculate E1 and E2:
 referenceStrain = get(handles.check_referenceStrain, 'value');
 referenceOrientation = get(handles.check_referenceOrientation, 'value');
+noSMT = getappdata(0, 'noSMT');
 
-[E1, E2, E12M, thetaP, thetaS, E11, E22, E12, S1, S2, S12M, S11, S22, S12, error, errorMessage] = rosetteTools.processGauges(gaugeA, gaugeB, gaugeC, alpha, beta, gamma, E, v, referenceStrain, referenceOrientation);
+[E1, E2, E12M, thetaP, thetaS, E11, E22, E12, S1, S2, S12M, S11, S22, S12, error, errorMessage] = rosetteTools.processGauges(gaugeA, gaugeB, gaugeC, alpha, beta, gamma, E, v, referenceStrain, referenceOrientation, noSMT);
 
 if error == 1.0
     errordlg(errorMessage, 'Quick Fatigue Tool')
@@ -490,6 +501,11 @@ setappdata(0, 'rosette_edit_outputLocation', get(handles.edit_outputLocation, 's
 setappdata(0, 'rosette_check_referenceStrain', get(handles.check_referenceStrain, 'value'))
 setappdata(0, 'rosette_check_referenceOrientation', get(handles.check_referenceOrientation, 'value'))
 setappdata(0, 'rosette_text_referenceStrain', get(handles.check_referenceStrain, 'string'))
+
+rmappdata(0, 'noIPT')
+
+% Make sure any open files are closed
+fclose('all');
 
 delete(hObject);
 

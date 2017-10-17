@@ -10,8 +10,8 @@ classdef rosetteTools < handle
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.3 Rosette Analysis
 %   
-%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 23-Jun-2017 08:19:31 GMT
+%   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
+%   Last modified 14-Oct-2017 18:15:15 GMT
     
     %%
     
@@ -38,6 +38,11 @@ classdef rosetteTools < handle
             if get(handles.check_outputLocation, 'value') == 0.0
                 set(handles.edit_outputLocation, 'enable', 'inactive', 'backgroundColor', [177/255, 206/255, 237/255])
                 set(handles.pButton_outputLocation, 'enable', 'off') 
+            end
+            
+            if getappdata(0, 'noIPT') == 1.0
+                set(handles.text_gaugeDiagram, 'enable', 'off')
+                set(handles.pButton_showDiagram, 'enable', 'off')
             end
         end
         
@@ -407,7 +412,7 @@ classdef rosetteTools < handle
         end
         
         %% Calcualte strain from gauge data
-        function [E1, E2, E12M, thetaP, thetaS, E11, E22, E12, S1, S2, S12M, S11, S22, S12, error, errorMessage] = processGauges(gaugeA, gaugeB, gaugeC, alpha, beta, gamma, E, v, referenceStrain, referenceOrientation)
+        function [E1, E2, E12M, thetaP, thetaS, E11, E22, E12, S1, S2, S12M, S11, S22, S12, error, errorMessage] = processGauges(gaugeA, gaugeB, gaugeC, alpha, beta, gamma, E, v, referenceStrain, referenceOrientation, noSMT)
             %% Initialize output variables
             E1 = -1.0;
             E2 = -1.0;
@@ -446,37 +451,43 @@ classdef rosetteTools < handle
                 E1 = (1.0/3.0).*(gaugeA + gaugeB + gaugeC) + (sqrt(2.0)./3.0).*sqrt((gaugeA - gaugeB).^2 + (gaugeB - gaugeC).^2 + (gaugeC - gaugeA).^2);
                 E2 = (1.0/3.0)*(gaugeA + gaugeB + gaugeC) - (sqrt(2.0)/3.0).*sqrt((gaugeA - gaugeB).^2 + (gaugeB - gaugeC).^2 + (gaugeC - gaugeA).^2);
             else
-                syms Exx Eyy Exy
-                
-                % Make rosette angles relative to reference x-axis
-                theta1 = alpha;
-                theta2 = (alpha + beta);
-                theta3 = beta + gamma;
-                
-                % Reference strain
-                eqn1 = 0.5*(Exx + Eyy) + 0.5*(Exx - Eyy)*cosd(2.0*theta1) + (0.5*Exy)*sind(2.0*theta1) == 0.0;
-                eqn2 = 0.5*(Exx + Eyy) + 0.5*(Exx - Eyy)*cosd(2.0*theta2) + (0.5*Exy)*sind(2.0*theta2) == 0.0;
-                eqn3 = 0.5*(Exx + Eyy) + 0.5*(Exx - Eyy)*cosd(2.0*theta3) + (0.5*Exy)*sind(2.0*theta3) == 0.0;
-                
-                A = equationsToMatrix([eqn1, eqn2, eqn3], [Exx ,Eyy, Exy]);
-                B = [gaugeA; gaugeB; gaugeC];
-                
-                X = linsolve(A, B);
-                
-                E11 = double(X(1.0, :));
-                E22 = double(X(2.0, :));
-                E12 = double(X(3.0, :));
-                
-                % Check validity of solution
-                if (any(isinf(E11)) == 1.0 || any(isnan(E11)) == 1.0) || (any(isinf(E22)) == 1.0 || any(isnan(E22)) == 1.0) || (any(isinf(E12)) == 1.0 || any(isnan(E12)) == 1.0)
+                if noSMT == 1.0
                     error = 1.0;
-                    errorMessage = 'A solution could not be found for the specified strain gauge orientation.';
+                    errorMessage = sprintf('The specified gauge orientation requires the Symbolic Math Toolbox. The following orientations are supported:\r\n\r\nAlpha = 0, Beta = 45, Gamma = 45\r\nAlpha = 30, Beta = 60, Gamma = 60');
                     return
+                else
+                    syms Exx Eyy Exy
+                    
+                    % Make rosette angles relative to reference x-axis
+                    theta1 = alpha;
+                    theta2 = (alpha + beta);
+                    theta3 = beta + gamma;
+                    
+                    % Reference strain
+                    eqn1 = 0.5*(Exx + Eyy) + 0.5*(Exx - Eyy)*cosd(2.0*theta1) + (0.5*Exy)*sind(2.0*theta1) == 0.0;
+                    eqn2 = 0.5*(Exx + Eyy) + 0.5*(Exx - Eyy)*cosd(2.0*theta2) + (0.5*Exy)*sind(2.0*theta2) == 0.0;
+                    eqn3 = 0.5*(Exx + Eyy) + 0.5*(Exx - Eyy)*cosd(2.0*theta3) + (0.5*Exy)*sind(2.0*theta3) == 0.0;
+                    
+                    A = equationsToMatrix([eqn1, eqn2, eqn3], [Exx ,Eyy, Exy]);
+                    B = [gaugeA; gaugeB; gaugeC];
+                    
+                    X = linsolve(A, B);
+                    
+                    E11 = double(X(1.0, :));
+                    E22 = double(X(2.0, :));
+                    E12 = double(X(3.0, :));
+                    
+                    % Check validity of solution
+                    if (any(isinf(E11)) == 1.0 || any(isnan(E11)) == 1.0) || (any(isinf(E22)) == 1.0 || any(isnan(E22)) == 1.0) || (any(isinf(E12)) == 1.0 || any(isnan(E12)) == 1.0)
+                        error = 1.0;
+                        errorMessage = 'A solution could not be found for the specified strain gauge orientation.';
+                        return
+                    end
+                    
+                    % Principal strains
+                    E1 = 0.5.*(E11 + E22) + sqrt((0.5.*(E11 - E22)).^2 + (0.5.*E12).^2);
+                    E2 = 0.5.*(E11 + E22) - sqrt((0.5.*(E11 - E22)).^2 + (0.5.*E12).^2);
                 end
-                
-                % Principal strains
-                E1 = 0.5.*(E11 + E22) + sqrt((0.5.*(E11 - E22)).^2 + (0.5.*E12).^2);
-                E2 = 0.5.*(E11 + E22) - sqrt((0.5.*(E11 - E22)).^2 + (0.5.*E12).^2);
             end
             
             %% Get principal stresses if requested:

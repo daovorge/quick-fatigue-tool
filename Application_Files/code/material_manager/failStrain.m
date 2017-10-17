@@ -9,8 +9,8 @@ function varargout = failStrain(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials
 %   
-%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 01-Oct-2017 14:09:15 GMT
+%   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
+%   Last modified 09-Oct-2017 11:03:00 GMT
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -52,28 +52,28 @@ movegui(hObject, 'center')
 % UIWAIT makes failStrain wait for user response (see UIRESUME)
 % uiwait(handles.failStrain);
 
-if isappdata(0, 'failStrain_tsfd')
+if isappdata(0, 'failStrain_tsfd') == 1.0
     set(handles.edit_tsfd, 'string', getappdata(0, 'failStrain_tsfd'))
 end
-if isappdata(0, 'failStrain_csfd')
+if isappdata(0, 'failStrain_csfd') == 1.0
     set(handles.edit_csfd, 'string', getappdata(0, 'failStrain_csfd'))
 end
-if isappdata(0, 'failStrain_tstd')
+if isappdata(0, 'failStrain_tstd') == 1.0
     set(handles.edit_tstd, 'string', getappdata(0, 'failStrain_tstd'))
 end
-if isappdata(0, 'failStrain_cstd')
+if isappdata(0, 'failStrain_cstd') == 1.0
     set(handles.edit_cstd, 'string', getappdata(0, 'failStrain_cstd'))
 end
-if isappdata(0, 'failStrain_shear')
+if isappdata(0, 'failStrain_shear') == 1.0
     set(handles.edit_shear, 'string', getappdata(0, 'failStrain_shear'))
 end
-if isappdata(0, 'failStrain_e11')
+if isappdata(0, 'failStrain_e11') == 1.0
     set(handles.edit_e11, 'string', getappdata(0, 'failStrain_e11'))
 end
-if isappdata(0, 'failStrain_e22')
+if isappdata(0, 'failStrain_e22') == 1.0
     set(handles.edit_e22, 'string', getappdata(0, 'failStrain_e22'))
 end
-if isappdata(0, 'failStrain_g12')
+if isappdata(0, 'failStrain_g12') == 1.0
     set(handles.edit_g12, 'string', getappdata(0, 'failStrain_g12'))
 end
 
@@ -335,12 +335,12 @@ setappdata(0, 'failStrain_e11', get(handles.edit_e11, 'string'))
 setappdata(0, 'failStrain_e22', get(handles.edit_e22, 'string'))
 setappdata(0, 'failStrain_g12', get(handles.edit_g12, 'string'))
 
-close 'Fail Strain'
+close 'Fail Strain Parameters'
 
 
 % --- Executes on button press in pButton_cancel.
 function pButton_cancel_Callback(~, ~, ~)
-close 'Fail Strain'
+close 'Fail Strain Parameters'
 
 
 % --- Executes when failStrain is resized.

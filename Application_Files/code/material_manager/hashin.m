@@ -9,8 +9,8 @@ function varargout = hashin(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials
 %   
-%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 01-Oct-2017 14:09:15 GMT
+%   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
+%   Last modified 09-Oct-2017 11:03:00 GMT
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -52,25 +52,29 @@ movegui(hObject, 'center')
 % UIWAIT makes hashinDamage wait for user response (see UIRESUME)
 % uiwait(handles.hashinDamage);
 
-if isappdata(0, 'hashin_alpha')
-    set(handles.edit_alpha, 'string', getappdata(0, 'hashin_alpha'))
+if isappdata(0, 'hashin_alpha') == 1.0
+    if isempty(getappdata(0, 'hashin_alpha')) == 1.0
+        set(handles.edit_alpha, 'string', '0')
+    else
+        set(handles.edit_alpha, 'string', getappdata(0, 'hashin_alpha'))
+    end
 end
-if isappdata(0, 'hashin_lts')
+if isappdata(0, 'hashin_lts') == 1.0
     set(handles.edit_lts, 'string', getappdata(0, 'hashin_lts'))
 end
-if isappdata(0, 'hashin_lcs')
+if isappdata(0, 'hashin_lcs') == 1.0
     set(handles.edit_lcs, 'string', getappdata(0, 'hashin_lcs'))
 end
-if isappdata(0, 'hashin_tts')
+if isappdata(0, 'hashin_tts') == 1.0
     set(handles.edit_tts, 'string', getappdata(0, 'hashin_tts'))
 end
-if isappdata(0, 'hashin_tcs')
+if isappdata(0, 'hashin_tcs') == 1.0
     set(handles.edit_tcs, 'string', getappdata(0, 'hashin_tcs'))
 end
-if isappdata(0, 'hashin_lss')
+if isappdata(0, 'hashin_lss') == 1.0
     set(handles.edit_lss, 'string', getappdata(0, 'hashin_lss'))
 end
-if isappdata(0, 'hashin_tss')
+if isappdata(0, 'hashin_tss') == 1.0
     set(handles.edit_tss, 'string', getappdata(0, 'hashin_tss'))
 end
 
@@ -252,7 +256,7 @@ function pButton_ok_Callback(~, ~, handles)
 blank(handles)
 error = 0.0;
 
-if isempty(get(handles.edit_alpha, 'string')) ==1.0
+if isempty(get(handles.edit_alpha, 'string')) == 1.0
     set(handles.edit_alpha, 'string', '0')
 else
     hashin_alpha = str2double(get(handles.edit_alpha, 'string'));
@@ -322,12 +326,12 @@ setappdata(0, 'hashin_tcs', get(handles.edit_tcs, 'string'))
 setappdata(0, 'hashin_lss', get(handles.edit_lss, 'string'))
 setappdata(0, 'hashin_tss', get(handles.edit_tss, 'string'))
 
-close 'Hashin Damage'
+close 'Hashin Parameters'
 
 
 % --- Executes on button press in pButton_cancel.
 function pButton_cancel_Callback(~, ~, ~)
-close 'Hashin Damage'
+close 'Hashin Parameters'
 
 
 % --- Executes when hashinDamage is resized.
@@ -366,3 +370,5 @@ set(findall(handles.hashinDamage, '-property', 'Enable'), 'Enable', 'off')
 
 function enable(handles)
 set(findall(handles.hashinDamage, '-property', 'Enable'), 'Enable', 'on')
+set(handles.edit_alpha, 'backgroundColor', 'white')
+set(handles.edit_alpha, 'backgroundColor', [177/255, 206/255, 237/255])

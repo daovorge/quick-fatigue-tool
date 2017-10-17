@@ -12,8 +12,8 @@ classdef multiaxialPostProcess < handle
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.2 Multiaxial Gauge Fatigue
 %   
-%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 04-Oct-2017 18:09:00 GMT
+%   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
+%   Last modified 16-Oct-2017 09:28:25 GMT
     
     %%
     
@@ -41,7 +41,7 @@ classdef multiaxialPostProcess < handle
             
             %% Header
             % Write file header
-            fprintf(fid, 'Quick Fatigue Tool 6.11-04 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
+            fprintf(fid, 'Quick Fatigue Tool 6.11-05 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
             fprintf(fid, 'Last modified 08-Feb-2017 12:23:04 GMT\r\n\r\n');
             
@@ -453,8 +453,12 @@ classdef multiaxialPostProcess < handle
             saveas(f6, fileName, 'fig')
             postProcess.makeVisible([fileName, '.fig'])
             
-            try
-                %% RHIST RAINFLOW HISTOGRAM OF CYCLES
+            %% RHIST RAINFLOW HISTOGRAM OF CYCLES
+            
+            % This MATLAB figure requires the Statistics Toolbox
+            isAvailable = checkToolbox('Statistics Toolbox');
+            
+            if isAvailable == 1.0
                 pairs = getappdata(0, 'cyclesOnCP');
                 Sm = 0.5*(pairs(:, 1.0) + pairs(:, 2.0));
                 amplitudes = getappdata(0, 'amplitudesOnCP');
@@ -482,7 +486,6 @@ classdef multiaxialPostProcess < handle
                 fileName = [dir, '/RHIST, Rainflow cycle histogram'];
                 saveas(f7, fileName, 'fig')
                 postProcess.makeVisible([fileName, '.fig'])
-            catch
             end
             
             %% CN (Normal strain on critical plane)

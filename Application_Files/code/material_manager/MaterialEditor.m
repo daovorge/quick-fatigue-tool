@@ -12,8 +12,8 @@ function varargout = MaterialEditor(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials
 %   
-%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 03-Oct-2017 13:44:11 GMT
+%   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
+%   Last modified 16-Oct-2017 09:28:25 GMT
     
     %%
     
@@ -125,6 +125,9 @@ movegui(hObject, 'center')
 
 % Define SIMULIA blue color
 setappdata(0, 'simulia_blue', [177/255, 206/255, 237/255])
+
+% Initialize APPDATA properties
+initializeMaterial
 
 %% Populate dialogue box with user material for editing if user pressed
 % "EDIT" in the material manager
@@ -1102,12 +1105,12 @@ else
     end
     set(handles.check_location, 'value', 0.0)
     set(handles.pButton_changeLocation, 'enable', 'off')
-    set(handles.pMenu_monoResponse, 'value', 1.0)
     set(handles.pMenu_algorithm, 'value', 6.0)
     set(handles.pMenu_msc, 'value', 1.0, 'enable', 'on', 'backgroundColor', 'white')
     set(handles.pMenu_class, 'value', 1.0)
     set(handles.edit_cael, 'string', '2e+07', 'enable', 'inactive', 'backgroundColor', simulia_blue)
     set(handles.check_cael, 'value', 0.0)
+    set(handles.check_ndCompression, 'value', 0.0)
     set(handles.pMenu_matBehaviour, 'value', 1.0)
     set(handles.pMenu_regModel, 'value', 1.0)
     set(handles.edit_e, 'string', '', 'enable', 'inactive', 'backgroundColor', [241/255, 241/255, 241/255])
@@ -1260,6 +1263,44 @@ else
     if isappdata(0, 'hashin_tss') == 1.0
         rmappdata(0, 'hashin_tss')
     end
+    
+    % LaRC05
+    if isappdata(0, 'larc05_lts') == 1.0
+        rmappdata(0, 'larc05_lts')
+    end
+    if isappdata(0, 'larc05_lcs') == 1.0
+        rmappdata(0, 'larc05_lcs')
+    end
+    if isappdata(0, 'larc05_tts') == 1.0
+        rmappdata(0, 'larc05_tts')
+    end
+    if isappdata(0, 'larc05_tcs') == 1.0
+        rmappdata(0, 'larc05_tcs')
+    end
+    if isappdata(0, 'larc05_lss') == 1.0
+        rmappdata(0, 'larc05_lss')
+    end
+    if isappdata(0, 'larc05_tss') == 1.0
+        rmappdata(0, 'larc05_tss')
+    end
+    if isappdata(0, 'larc05_shear') == 1.0
+        rmappdata(0, 'larc05_shear')
+    end
+    if isappdata(0, 'larc05_nl') == 1.0
+        rmappdata(0, 'larc05_nl')
+    end
+    if isappdata(0, 'larc05_nt') == 1.0
+        rmappdata(0, 'larc05_nt')
+    end
+    if isappdata(0, 'larc05_alpha0') == 1.0
+        rmappdata(0, 'larc05_alpha0')
+    end
+    if isappdata(0, 'larc05_phi0') == 1.0
+        rmappdata(0, 'larc05_phi0')
+    end
+    if isappdata(0, 'larc05_iterate') == 1.0
+        rmappdata(0, 'larc05_iterate')
+    end
 end
 
 % Enable the GUI
@@ -1274,6 +1315,7 @@ material_properties = struct(...
 'reg_model', get(handles.pMenu_regModel, 'value'),...
 'cael', get(handles.edit_cael, 'string'),...
 'cael_active', get(handles.check_cael, 'value'),...
+'ndCompression', get(handles.check_ndCompression, 'value'),...
 'e', get(handles.edit_e, 'string'),...
 'e_active', get(handles.check_e, 'value'),...
 'uts', get(handles.edit_uts, 'string'),...
@@ -1326,9 +1368,21 @@ material_properties = struct(...
 'hashin_lts', getappdata(0, 'hashin_lts'),...
 'hashin_lcs', getappdata(0, 'hashin_lcs'),...
 'hashin_tts', getappdata(0, 'hashin_tts'),...
-'hashin_tcs', getappdata(0, 'hashin_lcs'),...
-'hashin_lss', getappdata(0, 'hashin_tss'),...
-'hashin_tss', getappdata(0, 'hashin_tss'));
+'hashin_tcs', getappdata(0, 'hashin_tcs'),...
+'hashin_lss', getappdata(0, 'hashin_lss'),...
+'hashin_tss', getappdata(0, 'hashin_tss'),...
+'larc05_lts', getappdata(0, 'larc05_lts'),...
+'larc05_lcs', getappdata(0, 'larc05_lcs'),...
+'larc05_tts', getappdata(0, 'larc05_tts'),...
+'larc05_tcs', getappdata(0, 'larc05_tcs'),...
+'larc05_lss', getappdata(0, 'larc05_lss'),...
+'larc05_tss', getappdata(0, 'larc05_tss'),...
+'larc05_shear', getappdata(0, 'larc05_shear'),...
+'larc05_nl', getappdata(0, 'larc05_nl'),...
+'larc05_nt', getappdata(0, 'larc05_nt'),...
+'larc05_alpha0', getappdata(0, 'larc05_alpha0'),...
+'larc05_phi0', getappdata(0, 'larc05_phi0'),...
+'larc05_iterate', getappdata(0, 'larc05_iterate'));
 
 
 function [] = populateGUI(handles, properties, materialToEdit)
@@ -1346,7 +1400,20 @@ else
     set(handles.edit_cael, 'string', '2e+07')
 end
 
-if properties.material_properties.behavior == 3.0
+try
+    if isempty(properties.material_properties.ndCompression) == 1.0
+        set(handles.check_ndCompression, 'value', 0.0)
+    else
+        set(handles.check_ndCompression, 'value', properties.material_properties.ndCompression)
+    end
+catch
+    set(handles.check_ndCompression, 'value', 0.0)
+end
+
+if properties.material_properties.reg_model == 5.0
+    set(handles.pMenu_matBehaviour, 'value', properties.material_properties.behavior)
+    set(handles.pMenu_regModel, 'value', properties.material_properties.reg_model)
+elseif properties.material_properties.behavior == 3.0
     set(handles.pMenu_matBehaviour, 'value', properties.material_properties.behavior)
     
     set(handles.pMenu_regModel, 'value', 2.0)
@@ -1400,7 +1467,7 @@ if isempty(properties.material_properties.s_values) == 0.0
     set(handles.pButton_viewSNData, 'enable', 'on')
     set(handles.pButton_rmSNData, 'enable', 'on')
     
-    set(handles.edit_snData, 'backgroundColor', [(204/255), 1, (204/255)])
+    set(handles.edit_snData, 'backgroundColor', [(204/255), 1.0, (204/255)])
     
     setappdata(gcf, 'S_values', properties.material_properties.s_values)
     setappdata(gcf, 'N_values', properties.material_properties.n_values)
@@ -1720,6 +1787,116 @@ try
     end
 catch
     setappdata(0, 'hashin_tss', [])
+end
+
+% Initliaize LaRC05 properties
+try
+    if isempty(properties.material_properties.larc05_lts) == 1.0
+        setappdata(0, 'larc05_lts', [])
+    else
+        setappdata(0, 'larc05_lts', properties.material_properties.larc05_lts)
+    end
+catch
+    setappdata(0, 'larc05_lts', [])
+end
+try
+    if isempty(properties.material_properties.larc05_lcs) == 1.0
+        setappdata(0, 'larc05_lcs', [])
+    else
+        setappdata(0, 'larc05_lcs', properties.material_properties.larc05_lcs)
+    end
+catch
+    setappdata(0, 'larc05_lcs', [])
+end
+try
+    if isempty(properties.material_properties.larc05_tts) == 1.0
+        setappdata(0, 'larc05_tts', [])
+    else
+        setappdata(0, 'larc05_tts', properties.material_properties.larc05_tts)
+    end
+catch
+    setappdata(0, 'larc05_tts', [])
+end
+try
+    if isempty(properties.material_properties.larc05_tcs) == 1.0
+        setappdata(0, 'larc05_tcs', [])
+    else
+        setappdata(0, 'larc05_tcs', properties.material_properties.larc05_tcs)
+    end
+catch
+    setappdata(0, 'larc05_tcs', [])
+end
+try
+    if isempty(properties.material_properties.larc05_lss) == 1.0
+        setappdata(0, 'larc05_lss', [])
+    else
+        setappdata(0, 'larc05_lss', properties.material_properties.larc05_lss)
+    end
+catch
+    setappdata(0, 'larc05_lss', [])
+end
+try
+    if isempty(properties.material_properties.larc05_tss) == 1.0
+        setappdata(0, 'larc05_tss', [])
+    else
+        setappdata(0, 'larc05_tss', properties.material_properties.larc05_tss)
+    end
+catch
+    setappdata(0, 'larc05_tss', [])
+end
+try
+    if isempty(properties.material_properties.larc05_shear) == 1.0
+        setappdata(0, 'larc05_shear', [])
+    else
+        setappdata(0, 'larc05_shear', properties.material_properties.larc05_shear)
+    end
+catch
+    setappdata(0, 'larc05_shear', [])
+end
+try
+    if isempty(properties.material_properties.larc05_nl) == 1.0
+        setappdata(0, 'larc05_nl', [])
+    else
+        setappdata(0, 'larc05_nl', properties.material_properties.larc05_nl)
+    end
+catch
+    setappdata(0, 'larc05_nl', [])
+end
+try
+    if isempty(properties.material_properties.larc05_nt) == 1.0
+        setappdata(0, 'larc05_nt', [])
+    else
+        setappdata(0, 'larc05_nt', properties.material_properties.larc05_nt)
+    end
+catch
+    setappdata(0, 'larc05_nt', [])
+end
+try
+    if isempty(properties.material_properties.larc05_alpha0) == 1.0
+        setappdata(0, 'larc05_alpha0', 53.0)
+    else
+        setappdata(0, 'larc05_alpha0', properties.material_properties.larc05_alpha0)
+    end
+catch
+    setappdata(0, 'larc05_alpha0', 53.0)
+end
+try
+    if isempty(properties.material_properties.larc05_phi0) == 1.0
+        setappdata(0, 'larc05_phi0', [])
+    else
+        setappdata(0, 'larc05_phi0', properties.material_properties.larc05_phi0)
+    end
+catch
+    setappdata(0, 'larc05_phi0', [])
+end
+try
+    if isempty(properties.material_properties.larc05_iterate) == 1.0
+        setappdata(0, 'larc05_iterate', 0.0)
+    else
+        setappdata(0, 'larc05_iterate', properties.material_properties.larc05_iterate)
+    end
+catch
+    setappdata(0, 'larc05_iterate', 0.0)
 end
 
 % --- Executes on button press in pButton_manager.
@@ -2097,35 +2274,6 @@ if isappdata(0, 'k_solution_model')
     rmappdata(0, 'k_solution_fi')
     rmappdata(0, 'k_solution_t')
     rmappdata(0, 'k_solution_uts')
-end
-
-
-% --- Executes on selection change in pMenu_monoResponse.
-function pMenu_monoResponse_Callback(hObject, ~, handles)
-switch get(hObject, 'value')
-    case 1.0
-        set(handles.pMenu_algorithm, 'value', 6.0)
-        set(handles.pMenu_msc, 'value', 1.0, 'backgroundColor', 'white',...
-            'enable', 'on')
-    case 2.0
-        set(handles.pMenu_algorithm, 'value', 7.0)
-        set(handles.pMenu_msc, 'value', 2.0, 'backgroundColor', 'white',...
-            'enable', 'on')
-    otherwise
-end
-set(handles.text_algorithmUnavailable, 'visible', 'off')
-
-
-% --- Executes during object creation, after setting all properties.
-function pMenu_monoResponse_CreateFcn(hObject, ~, ~)
-% hObject    handle to pMenu_monoResponse (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
 end
 
 
@@ -2544,6 +2692,47 @@ if isappdata(0, 'hashin_tss') == 1.0
     rmappdata(0, 'hashin_tss')
 end
 
+% LaRC05
+if isappdata(0, 'larc05_lts') == 1.0
+    rmappdata(0, 'larc05_lts')
+end
+if isappdata(0, 'larc05_lcs') == 1.0
+    rmappdata(0, 'larc05_lcs')
+end
+if isappdata(0, 'larc05_tts') == 1.0
+    rmappdata(0, 'larc05_tts')
+end
+if isappdata(0, 'larc05_tcs') == 1.0
+    rmappdata(0, 'larc05_tcs')
+end
+if isappdata(0, 'larc05_lss') == 1.0
+    rmappdata(0, 'larc05_lss')
+end
+if isappdata(0, 'larc05_tss') == 1.0
+    rmappdata(0, 'larc05_tss')
+end
+if isappdata(0, 'larc05_shear') == 1.0
+    rmappdata(0, 'larc05_shear')
+end
+if isappdata(0, 'larc05_nl') == 1.0
+    rmappdata(0, 'larc05_nl')
+end
+if isappdata(0, 'larc05_nt') == 1.0
+    rmappdata(0, 'larc05_nt')
+end
+if isappdata(0, 'larc05_alpha0') == 1.0
+    rmappdata(0, 'larc05_alpha0')
+end
+if isappdata(0, 'larc05_phi0') == 1.0
+    rmappdata(0, 'larc05_phi0')
+end
+if isappdata(0, 'larc05_iterate') == 1.0
+    rmappdata(0, 'larc05_iterate')
+end
+
+% Make sure any open files are closed
+fclose('all');
+
 delete(hObject);
 
 function blank(handles)
@@ -2586,16 +2775,22 @@ end
 % Fatigue
 set(handles.edit_snData, 'enable', 'inactive')
 set(handles.edit_rValues, 'enable', 'inactive')
+set(handles.edit_snData, 'backgroundColor', 'white')
 set(handles.edit_snData, 'backgroundColor', [242/255, 242/255, 242/255])
+set(handles.edit_rValues, 'backgroundColor', 'white')
 set(handles.edit_rValues, 'backgroundColor', [242/255, 242/255, 242/255])
 
 if strncmpi(get(handles.edit_snData, 'string'), 'undefined', 9.0) == 1.0
     set(handles.pButton_rmSNData, 'enable', 'off')
     set(handles.pButton_viewSNData, 'enable', 'off')
+else
+    set(handles.edit_snData, 'backgroundColor', [(204/255), 1.0, (204/255)])
 end
 if strncmpi(get(handles.edit_rValues, 'string'), 'undefined', 9.0) == 1.0
     set(handles.pButton_rmRValues, 'enable', 'off')
     set(handles.pButton_viewRValues, 'enable', 'off')
+else
+    set(handles.edit_rValues, 'backgroundColor', [(204/255), 1.0, (204/255)])
 end
 if get(handles.check_sf, 'value') == 0.0
     set(handles.edit_sf, 'enable', 'inactive', 'backgroundColor', simuliaBlue)
@@ -2704,3 +2899,31 @@ uiwait
 
 % Enable the GUI
 enable(handles)
+
+
+% --- Executes on button press in check_ndCompression.
+function check_ndCompression_Callback(~, ~, ~)
+% hObject    handle to check_ndCompression (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of check_ndCompression
+
+
+% --- Executes on button press in pButton_larc05.
+function pButton_larc05_Callback(~, ~, handles)
+% Blank the GUI
+blank(handles)
+
+larc05
+uiwait
+
+% Enable the GUI
+enable(handles)
+
+function initializeMaterial
+setappdata(0, 'failStress_cross12', 0.0)
+setappdata(0, 'failStress_cross23', 0.0)
+setappdata(0, 'hashin_alpha', 0.0)
+setappdata(0, 'larc05_alpha0', 53.0)
+setappdata(0, 'larc05_iterate', 0.0)

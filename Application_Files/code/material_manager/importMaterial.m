@@ -8,8 +8,8 @@ classdef importMaterial < handle
 %   See also checkDataPath, evaluateMaterial, kValueCalculator,
 %   LocalMaterialDatabase, material, MaterialEditor, MaterialManager.
 %   
-%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 03-Oct-2017 13:44:11 GMT
+%   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
+%   Last modified 11-Oct-2017 13:08:05 GMT
     
     %%
     
@@ -25,6 +25,7 @@ classdef importMaterial < handle
                 'reg_model', 1.0,...
                 'cael', 2e+07,...
                 'cael_active', 0.0,...
+                'ndCompression', 0.0,...
                 'e', [],...
                 'e_active', 0.0,...
                 'uts', [],...
@@ -61,8 +62,8 @@ classdef importMaterial < handle
                 'failStress_tsttd', [],...
                 'failStress_csttd', [],...
                 'failStress_shear', [],...
-                'failStress_cross12', [],...
-                'failStress_cross23', [],...
+                'failStress_cross12', 0.0,...
+                'failStress_cross23', 0.0,...
                 'failStress_limit12', [],...
                 'failStress_limit23', [],...
                 'failStrain_tsfd', [],...
@@ -73,24 +74,36 @@ classdef importMaterial < handle
                 'failStrain_e11', [],...
                 'failStrain_e22', [],...
                 'failStrain_g12', [],...
-                'hashin_alpha', [],...
+                'hashin_alpha', 0.0,...
                 'hashin_lts', [],...
                 'hashin_lcs', [],...
                 'hashin_tts', [],...
                 'hashin_tcs', [],...
                 'hashin_lss', [],...
-                'hashin_tss', []);
+                'hashin_tss', [],...
+                'larc05_lts', [],...
+                'larc05_lcs', [],...
+                'larc05_tts', [],...
+                'larc05_tcs', [],...
+                'larc05_lss', [],...
+                'larc05_tss', [],...
+                'larc05_shear', [],...
+                'larc05_nl', [],...
+                'larc05_nt', [],...
+                'larc05_alpha0', 53.0,...
+                'larc05_phi0', [],...
+                'larc05_iterate', 0.0);
             
             % KEYWORD STRINGS
             kwStr = {'USERMATERIAL', 'DESCRIPTION', 'DEFAULTALGORITHM',...
                 'DEFAULTMSC', 'CAEL', 'REGRESSION', 'MECHANICAL',...
                 'FATIGUE', 'CYCLIC', 'NORMALSTRESSSENSITIVITY', 'CLASS',...
-                'COMPOSITE', 'KNEE', 'ENDMATERIAL'};
+                'COMPOSITE', 'KNEE', 'NOCOMPRESSION', 'ENDMATERIAL'};
             
             kwStrSp = {'USER MATERIAL', 'DESCRIPTION', 'DEFAULT ALGORITHM',...
                 'DEFAULT MSC', 'CAEL', 'REGRESSION', 'MECHANICAL',...
                 'FATIGUE', 'CYCLIC', 'NORMAL STRESS SENSITIVITY', 'CLASS',...
-                'COMPOSITE', 'KNEE', 'END MATERIAL'};
+                'COMPOSITE', 'KNEE', 'NO COMPRESSION', 'END MATERIAL'};
             
             % ALGORITHM STRINGS
             algStr = {'UNIAXIALSTRESS', 'UNIAXIALSTRAIN', 'SBBM', 'NORMAL', 'FINDLEY', 'INVARIANT', 'NASALIFE'};
@@ -111,7 +124,7 @@ classdef importMaterial < handle
             classStr = {'WROUGHTSTEEL', 'DUCTILEIRON', 'MALLEABLEIRON', 'WROUGHTIRON', 'CASTIRON', 'ALUMINIUM', 'OTHER'};
             
             % COMPOSITE FAILURE STRINGS
-            compositeStr = {'STRESS', 'STRAIN', 'HASHIN'};
+            compositeStr = {'STRESS', 'STRAIN', 'HASHIN', 'LARC05'};
         end
         
         %% PROCESS THE MATERIAL FILE
@@ -1060,6 +1073,15 @@ classdef importMaterial < handle
                                         % Get the next line in the file
                                         TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
                                         
+                                        % Check if SYMS works
+                                        try
+                                            %syms x
+                                            gfsfdgerg
+                                        catch
+                                            keywordWarnings(10.0) = 1.0;
+                                            continue
+                                        end
+                                        
                                         if isempty(TLINE) == 1.0
                                             keywordWarnings(10.0) = 1.0;
                                             continue
@@ -1375,9 +1397,9 @@ classdef importMaterial < handle
                                         % Process the data line
                                         nProperties = length(properties);
                                         if nProperties > 8.0
-                                            properties = properties(1.0:5.0);
+                                            properties = properties(1.0:8.0);
                                         elseif nProperties < 8.0
-                                            properties(nProperties + 1.0:5.0) = -9e100;
+                                            properties(nProperties + 1.0:8.0) = -9e100;
                                         end
                                         
                                         % Tensile strain (fiber direction)
@@ -1485,6 +1507,97 @@ classdef importMaterial < handle
                                         if properties(7.0) ~= -9e100
                                             material_properties.hashin_tss = properties(7.0);
                                         end
+                                    case 4.0 % LaRC05
+                                        TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
+                                        
+                                        TLINE(ismember(TLINE,' ')) = [];
+                                        
+                                        index = 1.0;
+                                        while 1.0 == 1.0
+                                            if index == length(TLINE)
+                                                break
+                                            elseif (index == 1.0) && (strcmp(TLINE(length(TLINE) - length(strtrim(TLINE)) + 1.0), ',') == 1.0)
+                                                TLINE = ['-9e100', TLINE]; %#ok<AGROW>
+                                                index = index + 6.0;
+                                            elseif strcmp(TLINE(index:index + 1.0), ',,') == 1.0
+                                                % This value is undefined
+                                                TLINE = [TLINE(1.0: index), '-9e100', TLINE(index + 1.0:end)];
+                                                index = index + 7.0;
+                                            else
+                                                index = index + 1.0;
+                                            end
+                                        end
+                                        
+                                        % Get the numeric value of the data line
+                                        properties = str2num(TLINE); %#ok<ST2NM>
+                                        
+                                        % Process the data line
+                                        nProperties = length(properties);
+                                        if nProperties > 12.0
+                                            properties = properties(1.0:12.0);
+                                        elseif nProperties < 12.0
+                                            properties(nProperties + 1.0:12.0) = -9e100;
+                                        end
+                                        
+                                        % Longitudinal tensile strength
+                                        if properties(1.0) ~= -9e100
+                                            material_properties.larc05_lts = properties(1.0);
+                                        end
+                                        
+                                        % Longitudinal compressive strength
+                                        if properties(2.0) ~= -9e100
+                                            material_properties.larc05_lcs = properties(2.0);
+                                        end
+                                        
+                                        % Transverse tensile strength
+                                        if properties(3.0) ~= -9e100
+                                            material_properties.larc05_tts = properties(3.0);
+                                        end
+                                        
+                                        % Transverse compressive strength
+                                        if properties(4.0) ~= -9e100
+                                            material_properties.larc05_tcs = properties(4.0);
+                                        end
+                                        
+                                        % Longitudinal shear strength
+                                        if properties(5.0) ~= -9e100
+                                            material_properties.larc05_lss = properties(5.0);
+                                        end
+                                        
+                                        % Transverse shear strength
+                                        if properties(6.0) ~= -9e100
+                                            material_properties.larc05_tss = properties(6.0);
+                                        end
+                                        
+                                        % Shear modulus
+                                        if properties(7.0) ~= -9e100
+                                            material_properties.larc05_shear = properties(7.0);
+                                        end
+                                        
+                                        % Longitudinal slope coefficient
+                                        if properties(8.0) ~= -9e100
+                                            material_properties.larc05_nl = properties(8.0);
+                                        end
+                                        
+                                        % Transverse slope coefficient
+                                        if properties(9.0) ~= -9e100
+                                            material_properties.larc05_nt = properties(9.0);
+                                        end
+                                        
+                                        % Fracture plane angle for pure compression
+                                        if properties(10.0) ~= -9e100
+                                            material_properties.larc05_alpha0 = properties(10.0);
+                                        end
+                                        
+                                        % Initial fier misalignment angle
+                                        if properties(11.0) ~= -9e100
+                                            material_properties.larc05_phi0 = properties(11.0);
+                                        end
+                                        
+                                        % Allow iterative solution for initial fibre misalignment angle
+                                        if properties(12.0) ~= -9e100
+                                            material_properties.larc05_iterate = properties(12.0);
+                                        end
                                 end
                             end
                             
@@ -1532,7 +1645,16 @@ classdef importMaterial < handle
                             
                             % Get the next line
                             TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
-                        case 14.0 % *END MATERIAL
+                        case 14.0 % *NO COMPRESSION
+                            %{
+                                This keyword is declared without a
+                                parameter or datalines
+                            %}
+                            material_properties.ndCompression = 1.0;
+                            
+                            % Get the next line
+                            TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
+                        case 15.0 % *END MATERIAL
                             %{
                                 The user has manually declared the end of
                                 the material definition. Stop processing

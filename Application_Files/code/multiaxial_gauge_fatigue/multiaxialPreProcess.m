@@ -12,8 +12,8 @@ classdef multiaxialPreProcess < handle
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.2 Multiaxial Gauge Fatigue
 %   
-%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 09-Jun-2017 11:59:15 GMT
+%   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
+%   Last modified 08-Oct-2017 12:50:10 GMT
     
     %%
     
@@ -37,15 +37,6 @@ classdef multiaxialPreProcess < handle
                 set(handles.text_msc_user, 'enable', 'off')
                 set(handles.edit_msc_user, 'enable', 'off')
                 set(handles.pButton_msc_user, 'enable', 'off')
-                set(handles.check_ucs, 'enable', 'off')
-                set(handles.check_ucs, 'enable', 'off')
-                set(handles.edit_ucs, 'enable', 'off')
-                set(handles.text_mpa, 'enable', 'off')
-            else
-                if get(handles.check_ucs, 'value') == 0.0
-                    set(handles.edit_ucs, 'enable', 'inactive', 'backgroundColor', [177/255, 206/255, 237/255])
-                    set(handles.text_mpa, 'enable', 'off')
-                end
             end
             
             if get(handles.check_kt_direct, 'value') == 0.0
@@ -909,7 +900,7 @@ classdef multiaxialPreProcess < handle
         end
         
         %% Read the user-defined mean stress correction file
-        function [mscError] = getUserMSC(handles, msCorrection)
+        function [mscError] = getUserMSC(msCorrection)
             mscError = 0.0;
             
             % Try to open the .msc file
@@ -945,27 +936,6 @@ classdef multiaxialPreProcess < handle
                     uiwait
                     mscError = 1.0;
                     return
-                end
-            end
-            
-            % Check the value of the UCS
-            if get(handles.check_ucs, 'value') == 1.0
-                ucs = str2double(get(handles.edit_ucs, 'string'));
-                
-                if isempty(get(handles.edit_ucs, 'string')) == 1.0
-                    errordlg('No value for the ultimate compressive strength was specified.',...
-                        'Quick Fatigue Tool')
-                    uiwait
-                    mscError = 1.0;
-                    return
-                elseif isnan(ucs) == 1.0 || isinf(ucs) == 1.0 || isreal(ucs) == 0.0 || ucs <= 0.0
-                    errordlg('An invalid value of ultimate compressive strength was specified.',...
-                        'Quick Fatigue Tool')
-                    uiwait
-                    mscError = 1.0;
-                    return
-                else
-                    setappdata(0, 'ucs', ucs)
                 end
             end
             

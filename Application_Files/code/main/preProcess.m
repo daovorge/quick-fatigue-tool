@@ -7,8 +7,8 @@ classdef preProcess < handle
 %
 %   See also postProcess.
 %
-%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 06-Oct-2017 14:39:49 GMT
+%   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
+%   Last modified 16-Oct-2017 09:28:25 GMT
     
     %%
     
@@ -189,6 +189,18 @@ classdef preProcess < handle
                 setappdata(0, 'cael', 2e7)
                 setappdata(0, 'cael_status', 2.0)
             end
+            
+            %% No damage in compression
+            try
+                if ischar(material_properties.ndCompression) == 1.0
+                    ndCompression = str2double(material_properties.failStress_shear);
+                else
+                    ndCompression = material_properties.ndCompression;
+                end
+            catch
+                ndCompression = 0.0;
+            end
+            setappdata(0, 'ndCompression', ndCompression)
             
             %% Modulus of elasticity
             if material_properties.e_active == 1.0
@@ -1397,7 +1409,7 @@ classdef preProcess < handle
                     failStress_cross12 = material_properties.failStress_cross12;
                 end
             catch
-                failStress_cross12 = [];
+                failStress_cross12 = 0.0;
                 setappdata(0, 'failStress_cross12', failStress_cross12)
             end
             
@@ -1415,7 +1427,7 @@ classdef preProcess < handle
                     failStress_cross23 = material_properties.failStress_cross23;
                 end
             catch
-                failStress_cross23 = [];
+                failStress_cross23 = 0.0;
                 setappdata(0, 'failStress_cross23', failStress_cross23)
             end
             
@@ -1605,7 +1617,7 @@ classdef preProcess < handle
                 setappdata(0, 'hashin_alpha', hashin_alpha)
             end
             if isnan(hashin_alpha) == 1.0
-                hashin_alpha = [];
+                hashin_alpha = 0.0;
             end
             setappdata(0, 'hashin_alpha', hashin_alpha)
             
@@ -1704,6 +1716,202 @@ classdef preProcess < handle
                 hashin_tss = [];
             end
             setappdata(0, 'hashin_tss', hashin_tss)
+            
+            %% LaRC05 parameters for composite failure
+            
+            % Longitudinal tensile strength
+            try
+                if ischar(material_properties.larc05_lts) == 1.0
+                    larc05_lts = str2double(material_properties.larc05_lts);
+                else
+                    larc05_lts = material_properties.larc05_lts;
+                end
+            catch
+                larc05_lts = [];
+                setappdata(0, 'larc05_lts', larc05_lts)
+            end
+            if isnan(larc05_lts) == 1.0
+                larc05_lts = [];
+            end
+            setappdata(0, 'larc05_lts', larc05_lts)
+            
+            % Longitudinal compressive strength
+            try
+                if ischar(material_properties.larc05_lcs) == 1.0
+                    larc05_lcs = str2double(material_properties.larc05_lcs);
+                else
+                    larc05_lcs = material_properties.larc05_lcs;
+                end
+            catch
+                larc05_lcs = [];
+                setappdata(0, 'larc05_lcs', larc05_lcs)
+            end
+            if isnan(larc05_lcs) == 1.0
+                larc05_lcs = [];
+            end
+            setappdata(0, 'larc05_lcs', larc05_lcs)
+            
+            % Transverse tensile strength
+            try
+                if ischar(material_properties.larc05_tts) == 1.0
+                    larc05_tts = str2double(material_properties.larc05_tts);
+                else
+                    larc05_tts = material_properties.larc05_tts;
+                end
+            catch
+                larc05_tts = [];
+                setappdata(0, 'larc05_tts', larc05_tts)
+            end
+            if isnan(larc05_tts) == 1.0
+                larc05_tts = [];
+            end
+            setappdata(0, 'larc05_tts', larc05_tts)
+            
+            % Transverse compressive strength
+            try
+                if ischar(material_properties.larc05_tcs) == 1.0
+                    larc05_tcs = str2double(material_properties.larc05_tcs);
+                else
+                    larc05_tcs = material_properties.larc05_tcs;
+                end
+            catch
+                larc05_tcs = [];
+                setappdata(0, 'larc05_tcs', larc05_tcs)
+            end
+            if isnan(larc05_tcs) == 1.0
+                larc05_tcs = [];
+            end
+            setappdata(0, 'larc05_tcs', larc05_tcs)
+            
+            % Longitudinal shear strength
+            try
+                if ischar(material_properties.larc05_lss) == 1.0
+                    larc05_lss = str2double(material_properties.larc05_lss);
+                else
+                    larc05_lss = material_properties.larc05_lss;
+                end
+            catch
+                larc05_lss = [];
+                setappdata(0, 'larc05_lss', larc05_lss)
+            end
+            if isnan(larc05_lss) == 1.0
+                larc05_lss = [];
+            end
+            setappdata(0, 'larc05_lss', larc05_lss)
+            
+            % Transverse shear strength
+            try
+                if ischar(material_properties.larc05_tss) == 1.0
+                    larc05_tss = str2double(material_properties.larc05_tss);
+                else
+                    larc05_tss = material_properties.larc05_tss;
+                end
+            catch
+                larc05_tss = [];
+                setappdata(0, 'larc05_tss', larc05_tss)
+            end
+            if isnan(larc05_tss) == 1.0
+                larc05_tss = [];
+            end
+            setappdata(0, 'larc05_tss', larc05_tss)
+            
+            % Shear modulus
+            try
+                if ischar(material_properties.larc05_shear) == 1.0
+                    larc05_shear = str2double(material_properties.larc05_shear);
+                else
+                    larc05_shear = material_properties.larc05_shear;
+                end
+            catch
+                larc05_shear = [];
+                setappdata(0, 'larc05_shear', larc05_shear)
+            end
+            if isnan(larc05_shear) == 1.0
+                larc05_shear = [];
+            end
+            setappdata(0, 'larc05_shear', larc05_shear)
+            
+            % Longitudinal slope coefficient
+            try
+                if ischar(material_properties.larc05_nl) == 1.0
+                    larc05_nl = str2double(material_properties.larc05_nl);
+                else
+                    larc05_nl = material_properties.larc05_nl;
+                end
+            catch
+                larc05_nl = [];
+                setappdata(0, 'larc05_nl', larc05_nl)
+            end
+            if isnan(larc05_nl) == 1.0
+                larc05_nl = [];
+            end
+            setappdata(0, 'larc05_nl', larc05_nl)
+            
+            % Transverse slope coefficient
+            try
+                if ischar(material_properties.larc05_nt) == 1.0
+                    larc05_nt = str2double(material_properties.larc05_nt);
+                else
+                    larc05_nt = material_properties.larc05_nt;
+                end
+            catch
+                larc05_nt = [];
+                setappdata(0, 'larc05_nt', larc05_nt)
+            end
+            if isnan(larc05_nt) == 1.0
+                larc05_nt = [];
+            end
+            setappdata(0, 'larc05_nt', larc05_nt)
+            
+            % Fracture angle for pure compression
+            try
+                if ischar(material_properties.larc05_alpha0) == 1.0
+                    larc05_alpha0 = str2double(material_properties.larc05_alpha0);
+                else
+                    larc05_alpha0 = material_properties.larc05_alpha0;
+                end
+            catch
+                larc05_alpha0 = 53.0;
+                setappdata(0, 'larc05_alpha0', larc05_alpha0)
+            end
+            if isnan(larc05_alpha0) == 1.0
+                larc05_alpha0 = 53.0;
+            end
+            setappdata(0, 'larc05_alpha0', larc05_alpha0)
+            
+            % Initial fiber misalignment angle
+            try
+                if ischar(material_properties.larc05_phi0) == 1.0
+                    larc05_phi0 = str2double(material_properties.larc05_phi0);
+                else
+                    larc05_phi0 = material_properties.larc05_phi0;
+                end
+            catch
+                larc05_phi0 = [];
+                setappdata(0, 'larc05_phi0', larc05_phi0)
+            end
+            if isnan(larc05_phi0) == 1.0
+                larc05_phi0 = [];
+            end
+            setappdata(0, 'larc05_phi0', larc05_phi0)
+            
+            % Allow iterative solution for initial fibre misalignment angle
+            try
+                if ischar(material_properties.larc05_iterate) == 1.0
+                    larc05_iterate = str2double(material_properties.larc05_iterate);
+                else
+                    larc05_iterate = material_properties.larc05_iterate;
+                end
+            catch
+                larc05_iterate = 0.0;
+                setappdata(0, 'larc05_iterate', larc05_iterate)
+            end
+            if isnan(larc05_iterate) == 1.0
+                larc05_iterate = 0.0;
+            elseif (larc05_iterate ~= 0.0) && (larc05_iterate ~= 1.0)
+                larc05_iterate = 0.0;
+            end
+            setappdata(0, 'larc05_iterate', larc05_iterate)
         end
         
         %% Approximate the yield stress:
@@ -3803,6 +4011,14 @@ classdef preProcess < handle
                         s1(totalCounter, :) = max(real(eigenvalues));
                         s2(totalCounter, :) = median(real(eigenvalues));
                         s3(totalCounter, :) = min(real(eigenvalues));
+                        
+                        %{
+                            Remove near-zero values which can arise due to
+                            numerical artifacting
+                        %}
+                        s1(totalCounter, abs(s1(totalCounter, :)) < 1e-6) = 0.0;
+                        s2(totalCounter, abs(s2(totalCounter, :)) < 1e-6) = 0.0;
+                        s3(totalCounter, abs(s3(totalCounter, :)) < 1e-6) = 0.0;
                     end
                 end
                 

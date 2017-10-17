@@ -12,8 +12,8 @@
 %   Reference section in Quick Fatigue Tool User Settings Reference Guide
 %      2 Environment variables
 %   
-%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 26-Sep-2017 21:01:00 GMT
+%   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
+%   Last modified 08-Oct-2017 12:50:10 GMT
 
 %% GATE TENSORS
 %{
@@ -206,13 +206,6 @@ setappdata(0, 'stressInvariantParameter', 0.0)
     5: Effective
 %}
 setappdata(0, 'nasalifeParameter', 1.0)
-
-%% TREATMENT OF COMPRESSIVE CYCLES
-%{
-    0: Calculate damage for fully compressive cycles
-    1: Assume no damage for fully compressive cycles
-%}
-setappdata(0, 'ndCompression', 0.0)
 
 %% FATIGUE/ENDURANCE LIMIT
 

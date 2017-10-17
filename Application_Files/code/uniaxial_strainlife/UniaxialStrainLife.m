@@ -11,8 +11,8 @@ function varargout = UniaxialStrainLife(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.6 Uniaxial Strain-Life
 %   
-%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 21-Sep-2017 09:00:05 GMT
+%   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
+%   Last modified 16-Oct-2017 09:28:25 GMT
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -722,6 +722,9 @@ setappdata(0, 'panel_uniaxialStrainLife_edit_resultsLocation', get(handles.edit_
 if isappdata(0, 'uniaxialStrainLifeMessenger') == 1.0
     rmappdata(0, 'uniaxialStrainLifeMessenger')
 end
+
+% Make sure any open files are closed
+fclose('all');
 
 delete(hObject);
 

@@ -25,7 +25,7 @@ function [] = job(varargin)
 %   Reference section in Quick Fatigue Tool User Settings Reference Guide
 %      1 Job file options
 %   
-%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
 %   Last modified 24-Sep-2017 10:42:46 GMT
     
     %%

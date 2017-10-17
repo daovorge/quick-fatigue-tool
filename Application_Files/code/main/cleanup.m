@@ -5,8 +5,8 @@ function [] = cleanup(status)
 %   CLEANUP is used internally by Quick Fatigue Tool. The user
 %   is not required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 06-Oct-2017 14:39:49 GMT
+%   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
+%   Last modified 16-Oct-2017 09:28:25 GMT
     
     %%
     
@@ -43,6 +43,9 @@ try %#ok<TRYNC>
     fclose(fid_status);
 end
 
+%% Close any other open files
+fclose('all');
+
 %% If the analysis exited with errors, create error log
 if status == 1.0
     % Create an error log file
@@ -74,9 +77,14 @@ if status == 1.0
     fid = fopen(errLogFile, 'w');
     
     % Write file header
-    fprintf(fid, 'Quick Fatigue Tool 6.11-04\r\n');
-    fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
-    fprintf(fid, 'Last modified 06-Oct-2017 14:39:49 GMT\r\n\r\n');
+    try
+        fprintf(fid, 'Quick Fatigue Tool 6.11-05 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
+    catch
+        fprintf(fid, 'Quick Fatigue Tool 6.11-05\r\n');
+    end
+    fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
+    fprintf(fid, 'Copyright Louis Vallance 2017\r\n');
+    fprintf(fid, 'Last modified 16-Oct-2017 09:28:25 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');

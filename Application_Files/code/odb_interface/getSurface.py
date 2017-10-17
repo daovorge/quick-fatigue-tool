@@ -1,6 +1,24 @@
-#PYTHON SCRIPT FOR THE QUICK FATIGUE TOOL ODB INTERFACE
+#GETSURFACE Python script to extract the surface elements/nodes from an Abaqus ODB file.
+#	<abaqus-id> python getSurface.py -- ODB_NAME POSITION SEARCH_REGION SHELL_FACES PART_INSTANCES
+#   N_INSTANCES searches an Abaqus ODB file for the free surface at a given element position,
+#   search region and part instance.
 #
-#   Find surface elements and nodes from an Abaqus ODB file.
+#   ODB_NAME: Full path to the output databse file
+#   POSITION: Element position
+#   SEARCH_REGION: Search either the part instance or a list of element IDs
+#   SHELL_FACES: Treat shell surface as whole shell or free shell faces
+#   PART_INSTANCES: Part instance list
+#   N_INSTANCES: Number of part instances
+#
+#	The script is called as follows:
+#	<abaqus-id> python getSurface.py -- "\..\model-name.odb" {ELEMENTAL | NODAL | CENTROIDAL}
+#   {INSTANCE | DATASET} {YES | NO} "PART-1-1" 1
+#
+#	Example using a single part instance:
+#	abaqus python \..\getSurface.py -- {preceeding arguments} "PART-1-1" 1
+#
+#	Example using N part instances:
+#	abaqus python \..\getSurface.py -- {preceeding arguments} "PART-1-1" "PART-2-1" ... "PART-N-1" N
 #
 #	This surface detection algorithm relies on the principle
 #	that, if the set of nodes of element face A does not have
@@ -13,13 +31,14 @@
 #	numbering information was taken from "Part IV: Elements" of
 #	the Abaqus Analysis User's Guide.
 #
-#   Author contact:
+#   GETSURFACE.py is used internally by Quick Fatigue Tool. The user is not required to run this
+#   file.
 #
-#   M.Sc. Louis Vallance
-#   louisvallance@hotmail.co.uk
+#   Reference sextion in Quick Fatigue Tool User Guide
+#      4.5.3 Custom analysis items
 #
 #   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-#   Last modified 27-Sep-2017 16:13:56 GMT
+#   Last modified 17-Oct-2017 15:37:38 GMT
 
 import os
 from odbAccess import *

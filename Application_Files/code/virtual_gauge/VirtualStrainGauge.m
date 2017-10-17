@@ -11,8 +11,8 @@ function varargout = VirtualStrainGauge(varargin)
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.4 Virtual Strain Gauge
 %   
-%   Quick Fatigue Tool 6.11-04 Copyright Louis Vallance 2017
-%   Last modified 24-Jun-2017 11:06:56 GMT
+%   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
+%   Last modified 16-Oct-2017 09:28:25 GMT
     
     %%
     
@@ -104,8 +104,6 @@ if isappdata(0, 'panel_virtual_gauge_editTensor') == 1.0
     set(handles.rButton_rows, 'value', getappdata(0, 'panel_virtual_gauge_radioButton_rows'))
     set(handles.rButton_cols, 'value', getappdata(0, 'panel_virtual_gauge_radioButton_cols'))
     
-    set(handles.check_alpha, 'value', getappdata(0, 'panel_virtual_gauge_check_alpha'))
-    
     if getappdata(0, 'panel_virtual_gauge_radiobutton_45') == 1.0
         set(handles.radiobutton_45, 'value', 1.0)
     elseif getappdata(0, 'panel_virtual_gauge_radiobutton_60') == 1.0
@@ -113,20 +111,15 @@ if isappdata(0, 'panel_virtual_gauge_editTensor') == 1.0
     else
         set(handles.radiobutton_arbitrary, 'value', 1.0)
         
-        set(handles.check_alpha, 'enable', 'on')
+        set(handles.text_alpha, 'enable', 'on')
         set(handles.text_beta, 'enable', 'on')
         set(handles.text_gamma, 'enable', 'on')
+        set(handles.edit_alpha, 'enable', 'on')
         set(handles.edit_beta, 'enable', 'on')
         set(handles.edit_gamma, 'enable', 'on')
+        set(handles.text_alphaUnits, 'enable', 'on')
         set(handles.text_betaUnits, 'enable', 'on')
         set(handles.text_gammaUnits, 'enable', 'on')
-        
-        if get(handles.check_alpha, 'value') == 1.0
-            set(handles.text_alphaUnits, 'enable', 'on')
-            set(handles.edit_alpha, 'backgroundColor', 'white', 'enable', 'on')
-        else
-            set(handles.edit_alpha, 'enable', 'inactive', 'backgroundColor', [177/255, 206/255, 237/255])
-        end
     end
     
     set(handles.edit_alpha, 'string', getappdata(0, 'panel_virtual_gauge_edit_alpha'))
@@ -151,6 +144,12 @@ if isappdata(0, 'checkScreenResolution') == 0.0
         uiwait(warndlg([msg1, msg2, msg3], 'Quick Fatigue Tool', 'modal'));
     end
     setappdata(0, 'checkScreenResolution', 1.0)
+end
+
+% Check if the image processing toolbox is available
+isAvailable = checkToolbox('Image Processing Toolbox');
+if isAvailable == 0.0
+    set(handles.pButton_showDiagram, 'enable', 'off')
 end
 
 
@@ -188,7 +187,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-
 function edit_beta_Callback(~, ~, ~)
 % hObject    handle to edit_beta (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -211,7 +209,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-
 function edit_gamma_Callback(~, ~, ~)
 % hObject    handle to edit_gamma (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -232,7 +229,6 @@ function edit_gamma_CreateFcn(hObject, ~, ~)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
 
 
 function edit_tensor_Callback(~, ~, ~)
@@ -346,7 +342,7 @@ function uipanel_rosetteLayout_SelectionChangeFcn(~, eventdata, handles)
 % Get the tag of the selected radio button
 switch get(eventdata.NewValue,'Tag')
     case 'radiobutton_45'
-        set(handles.check_alpha, 'enable', 'off')
+        set(handles.text_alpha, 'enable', 'off')
         set(handles.text_beta, 'enable', 'off')
         set(handles.text_gamma, 'enable', 'off')
         
@@ -358,7 +354,7 @@ switch get(eventdata.NewValue,'Tag')
         set(handles.text_betaUnits, 'enable', 'off')
         set(handles.text_gammaUnits, 'enable', 'off')
     case 'radiobutton_60'
-        set(handles.check_alpha, 'enable', 'off')
+        set(handles.text_alpha, 'enable', 'off')
         set(handles.text_beta, 'enable', 'off')
         set(handles.text_gamma, 'enable', 'off')
         
@@ -370,33 +366,17 @@ switch get(eventdata.NewValue,'Tag')
         set(handles.text_betaUnits, 'enable', 'off')
         set(handles.text_gammaUnits, 'enable', 'off')
     case 'radiobutton_arbitrary'
-        set(handles.check_alpha, 'enable', 'on')
+        set(handles.text_alpha, 'enable', 'on')
         set(handles.text_beta, 'enable', 'on')
         set(handles.text_gamma, 'enable', 'on')
         
-        if get(handles.check_alpha, 'value') == 1.0
-            set(handles.text_alphaUnits, 'enable', 'on')
-            set(handles.edit_alpha, 'enable', 'on', 'backgroundColor', 'white')
-        else
-            set(handles.edit_alpha, 'enable', 'inactive', 'backgroundColor', [177/255, 206/255, 237/255])
-        end
-        
+        set(handles.edit_alpha, 'enable', 'on')
         set(handles.edit_beta, 'enable', 'on')
         set(handles.edit_gamma, 'enable', 'on')
         
+        set(handles.text_alphaUnits, 'enable', 'on')
         set(handles.text_betaUnits, 'enable', 'on')
         set(handles.text_gammaUnits, 'enable', 'on')
-end
-
-
-% --- Executes on button press in check_alpha.
-function check_alpha_Callback(hObject, ~, handles)
-if get(hObject, 'value') == 1.0
-    set(handles.text_alphaUnits, 'enable', 'on')
-    set(handles.edit_alpha, 'enable', 'on', 'backgroundColor', 'white')
-else
-    set(handles.text_alphaUnits, 'enable', 'off')
-    set(handles.edit_alpha, 'enable', 'inactive', 'backgroundColor', [177/255, 206/255, 237/255])
 end
 
 
@@ -496,13 +476,22 @@ setappdata(0, 'panel_virtual_gauge_radioButton_cols', get(handles.rButton_cols, 
 setappdata(0, 'panel_virtual_gauge_radiobutton_45', get(handles.radiobutton_45, 'value'))
 setappdata(0, 'panel_virtual_gauge_radiobutton_60', get(handles.radiobutton_60, 'value'))
 
-setappdata(0, 'panel_virtual_gauge_check_alpha', get(handles.check_alpha, 'value'))
-setappdata(0, 'panel_virtual_gauge_edit_alpha', get(handles.edit_alpha, 'string'))
+if isempty(get(handles.edit_alpha, 'string')) == 1.0
+    setappdata(0, 'panel_virtual_gauge_edit_alpha', '0')
+else
+    setappdata(0, 'panel_virtual_gauge_edit_alpha', get(handles.edit_alpha, 'string'))
+end
+
 setappdata(0, 'panel_virtual_gauge_edit_beta', get(handles.edit_beta, 'string'))
 setappdata(0, 'panel_virtual_gauge_edit_gamma', get(handles.edit_gamma, 'string'))
 
 setappdata(0, 'panel_virtual_gauge_check_resultsLocation', get(handles.check_resultsLocation, 'value'))
 setappdata(0, 'panel_virtual_gauge_edit_output', get(handles.edit_output, 'string'))
+
+rmappdata(0, 'noIPT')
+
+% Make sure any open files are closed
+fclose('all');
 
 delete(hObject);
 
