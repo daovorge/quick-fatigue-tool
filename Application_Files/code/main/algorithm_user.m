@@ -84,7 +84,7 @@ classdef algorithm_user < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.10 User-defined algorithms
 %   
-%   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
 %   Last modified 19-May-2017 16:27:36 GMT
     
     %%
