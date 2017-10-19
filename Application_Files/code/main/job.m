@@ -26,7 +26,7 @@ function [] = job(varargin)
 %      1 Job file options
 %   
 %   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
-%   Last modified 19-Oct-2017 09:52:05 GMT
+%   Last modified 19-Oct-2017 15:47:11 GMT
     
     %%
     
@@ -150,6 +150,7 @@ while feof(fid) == 0.0
         % Isolate the keyword
         TOKEN = strtok(TLINE, '=');
         
+        %%
         %{
             If the current token is *USER MATERIAL, process this material
             and add it to the local database
@@ -190,19 +191,23 @@ while feof(fid) == 0.0
             end
             
             % Save the material in the local database
-            try
-                save(['Data/material/local/', materialName], 'material_properties')
-            catch
-                fprintf('ERROR: The material ''%s'' could not be saved to the local database. Make sure the material save location has read/write access\n', materialName);
-                return
+            if error == 0.0
+                try
+                    save(['Data/material/local/', materialName], 'material_properties')
+                catch
+                    fprintf('ERROR: The material ''%s'' could not be saved to the local database. Make sure the material save location has read/write access\n', materialName);
+                    return
+                end
             end
             
             % Advance the file by nTLINE to get past the material definition
-            for i = 1:nTLINE_material
+            for i = 1:nTLINE_material - 1.0
                 TLINE = fgetl(fid);
-            end 
+            end
             TOKEN = strtok(TLINE, '=');
         end
+        
+        %%
         
         % Check if the current line is a comment
         if (length(TLINE) > 1.0) && (strcmp(TLINE(1.0:2.0), '**') == 1.0)
