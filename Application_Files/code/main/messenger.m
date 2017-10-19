@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
-%   Last modified 16-Oct-2017 09:28:25 GMT
+%   Last modified 19-Oct-2017 09:52:05 GMT
 
     %%
 
@@ -1878,7 +1878,7 @@ classdef messenger < handle
                     case 230.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: Virtual strain gauge locations must be defiend as a cell', returnType{i}]);
                         fprintf(fidType(i), ['-> e.g. GAUGE_LOCATION = {''<mainID_1>.<subID_1>'', ''<mainID_2>.<subID_2>'',..., ''<mainID_n>.<subID_n>''}', returnType{i}]);
-                        fprintf(fidType(i), ['-> Virtual strain auges will not be analysed', returnType{i}]);
+                        fprintf(fidType(i), ['-> Virtual strain gauges will not be analysed', returnType{i}]);
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 231.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Out-of-plane stresses were found at virtual strain gauge #%.0f (item %.0f.%.0f)', returnType{i}], getappdata(0, 'vGaugeNumber'), getappdata(0, 'vGaugeMainID'),getappdata(0, 'vGaugeSubID'));
@@ -2290,7 +2290,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2017\r\n');
-            fprintf(fid, 'Last modified 16-Oct-2017 09:28:25 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 19-Oct-2017 09:52:05 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

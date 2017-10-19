@@ -26,7 +26,7 @@ function [] = job(varargin)
 %      1 Job file options
 %   
 %   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
-%   Last modified 24-Sep-2017 10:42:46 GMT
+%   Last modified 19-Oct-2017 09:52:05 GMT
     
     %%
     
@@ -78,7 +78,7 @@ inputFile = varargin{1.0};
 [kwStr, kwStrSp, kwData] = keywords.initialize();
 
 if datacheck == 1.0
-    kwData{40.0} = 1.0;
+    kwData{37.0} = 1.0;
 end
 
 % Flag indicating that text file processor was used
