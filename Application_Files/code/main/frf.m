@@ -10,7 +10,7 @@ function [] = frf(algorithm, msCorrection, N, mainID, subID, use_sn)
 %      8.2 Fatigue Reserve Factor
 %   
 %   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
-%   Last modified 04-Apr-2017 13:26:59 GMT
+%   Last modified 23-Oct-2017 14:37:35 GMT
     
     %%
     
@@ -137,6 +137,9 @@ for groups = 1:G
     % Get the current UTS
     uts = getappdata(0, 'uts');
     ucs = getappdata(0, 'ucs');
+    
+    % Get NdCompression flag
+    ndCompression = getappdata(0, 'ndCompression');
     
     % Get the residual stress for the group
     residual = getappdata(0, 'residualStress');
@@ -981,7 +984,7 @@ for groups = 1:G
                         Interpolate to find the cycle coordinate on the
                         user-defined FRF data
                     %}
-                    if Smi >= 0.0
+                    if Smi >= 0.0 || ndCompression == 1.0
                         positiveM = frfData_m >= 0.0;
                         frfData_a_side = frfData_a(positiveM);
                         frfData_m_side = frfData_m(frfData_m >= 0.0);
@@ -1017,6 +1020,11 @@ for groups = 1:G
                 
                 % Horizontal FRF calculation
                 frfHi = Ah/Bh;
+                
+                if ndCompression == 1.0
+                    frfHi = abs(frfHi);
+                end
+                
                 if frfHi > frfMaxValue
                     frfHi = frfMaxValue;
                 elseif (frfHi < frfMinValue) && (frfHi ~= -1.0)
