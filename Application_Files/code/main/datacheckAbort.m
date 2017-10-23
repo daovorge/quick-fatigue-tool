@@ -5,7 +5,7 @@ function [] = datacheckAbort(Sxx, Syy, Szz, Txy, Tyz, Txz, tic_pre, outputField,
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
-%   Last modified 03-Oct-2017 13:44:11 GMT
+%   Last modified 23-Oct-2017 14:37:35 GMT
     
     %%
     
@@ -14,6 +14,8 @@ if outputField == 1.0
 end
 
 setappdata(0, 'dataCheck_time', toc(tic_pre))
+
+fprintf('\n[NOTICE] Results have been written to %s', [pwd, '\Project\output\', getappdata(0, 'jobName')])
 
 if getappdata(0, 'echoMessagesToCWIN') == 1.0
     fprintf('\n[NOTICE] Data Check complete. Scroll up for details (%fs)\n', toc(tic_pre))

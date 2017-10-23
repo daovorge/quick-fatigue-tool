@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
-%   Last modified 19-Oct-2017 15:47:11 GMT
+%   Last modified 23-Oct-2017 14:37:35 GMT
 
     %%
 
@@ -2290,7 +2290,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2017\r\n');
-            fprintf(fid, 'Last modified 19-Oct-2017 15:47:11 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 23-Oct-2017 14:37:35 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
@@ -3422,31 +3422,33 @@ classdef messenger < handle
 
             % Close the log file
             fclose(fid);
+            
+            fprintf('[NOTICE] Results have been written to %s\n', [pwd, '\Project\output\', jobName])
 
             if getappdata(0, 'messageFileWarnings') == 1.0
                 if getappdata(0, 'echoMessagesToCWIN') == 1.0
-                    fprintf('Job %s completed with warnings. Scroll up for details. (%s)\n\n',...
+                    fprintf('[NOTICE] Job %s completed with warnings. Scroll up for details. (%s)\n\n',...
                         jobName, datestr(datenum(c(1), c(2), c(3), c(4), c(5), c(6))))
                 else
-                    fprintf('Job %s completed with warnings. See message file for details. (%s)\n\n',...
+                    fprintf('[NOTICE] Job %s completed with warnings. See message file for details. (%s)\n\n',...
                         jobName, datestr(datenum(c(1), c(2), c(3), c(4), c(5), c(6))))
                 end
 
                 % Prompt user if they would like to view the analysis log
                 if (ispc == 1.0) && (ismac == 0.0)
-                    answer = questdlg('Analysis completed with warnings.', 'Quick Fatigue Tool', 'View log', 'Open results folder', 'Close', 'View log');
+                    answer = questdlg('[NOTICE] Analysis completed with warnings.', 'Quick Fatigue Tool', 'View log', 'Open results folder', 'Close', 'View log');
                     delete(answer)
                 elseif (ispc == 0.0) && (ismac == 1.0)
-                    answer = msgbox('Analysis completed with warnings.', 'Quick Fatigue Tool');
+                    answer = msgbox('[NOTICE] Analysis completed with warnings.', 'Quick Fatigue Tool');
                 else
                     answer = -1.0;
                 end
             else
                 if getappdata(0, 'echoMessagesToCWIN') == 1.0
-                    fprintf('Job %s completed successfully. Scroll up for details. (%s)\n\n',...
+                    fprintf('[NOTICE] Job %s completed successfully. Scroll up for details. (%s)\n\n',...
                         jobName, datestr(datenum(c(1), c(2), c(3), c(4), c(5), c(6))))
                 else
-                    fprintf('Job %s completed successfully (%s)\n\n',...
+                    fprintf('[NOTICE] Job %s completed successfully (%s)\n\n',...
                         jobName, datestr(datenum(c(1), c(2), c(3), c(4), c(5), c(6))))
                 end
 
