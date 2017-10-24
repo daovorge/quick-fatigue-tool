@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
-%   Last modified 23-Oct-2017 14:37:35 GMT
+%   Last modified 24-Oct-2017 13:58:55 GMT
 
     %%
 
@@ -2290,7 +2290,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2017\r\n');
-            fprintf(fid, 'Last modified 23-Oct-2017 14:37:35 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 24-Oct-2017 13:58:55 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
@@ -3436,10 +3436,10 @@ classdef messenger < handle
 
                 % Prompt user if they would like to view the analysis log
                 if (ispc == 1.0) && (ismac == 0.0)
-                    answer = questdlg('[NOTICE] Analysis completed with warnings.', 'Quick Fatigue Tool', 'View log', 'Open results folder', 'Close', 'View log');
+                    answer = questdlg('Analysis completed with warnings.', 'Quick Fatigue Tool', 'View log', 'Open results folder', 'Close', 'View log');
                     delete(answer)
                 elseif (ispc == 0.0) && (ismac == 1.0)
-                    answer = msgbox('[NOTICE] Analysis completed with warnings.', 'Quick Fatigue Tool');
+                    answer = msgbox('Analysis completed with warnings.', 'Quick Fatigue Tool');
                 else
                     answer = -1.0;
                 end
