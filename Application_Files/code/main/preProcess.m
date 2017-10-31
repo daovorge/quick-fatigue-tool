@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
-%   Last modified 16-Oct-2017 09:28:25 GMT
+%   Last modified 31-Oct-2017 09:12:00 GMT
     
     %%
     
@@ -5710,7 +5710,7 @@ classdef preProcess < handle
         
         %% READ DATA FILE FOR ITEMS JOB FILE OPTION
         function [items, error, mainIDs, subIDs, readUserItems] = readItemsFile(items, R, mainIDs, subIDs, error)
-            % error
+            % Error indicators
             %{
                 1: More items than exist in the model
                 2: Some items don't exist in the model
