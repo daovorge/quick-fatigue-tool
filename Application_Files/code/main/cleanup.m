@@ -6,7 +6,7 @@ function [] = cleanup(status)
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
-%   Last modified 31-Oct-2017 16:10:34 GMT
+%   Last modified 01-Nov-2017 14:46:47 GMT
     
     %%
     
@@ -61,7 +61,7 @@ if status == 1.0
     end
     fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
     fprintf(fid, 'Copyright Louis Vallance 2017\r\n');
-    fprintf(fid, 'Last modified 31-Oct-2017 16:10:34 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 01-Nov-2017 14:46:47 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');

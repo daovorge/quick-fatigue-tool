@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
-%   Last modified 31-Oct-2017 16:10:34 GMT
+%   Last modified 01-Nov-2017 14:46:47 GMT
     
     %%
     
@@ -4261,6 +4261,13 @@ classdef preProcess < handle
                 s1 = s1(startID:(startID + N) - 1.0, :);
                 s2 = s2(startID:(startID + N) - 1.0, :);
                 s3 = s3(startID:(startID + N) - 1.0, :);
+                
+                % Remove compressive stresses if ndCompression=1
+                if getappdata(0, 'ndCompression') == 1.0
+                    s1(s1 < 0.0) = 0.0;
+                    s2(s2 < 0.0) = 0.0;
+                    s3(s3 < 0.0) = 0.0;
+                end
                 
                 % Correct the principal stresses for the effect of nonlinearity
                 for i = 1:N
