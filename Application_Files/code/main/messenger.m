@@ -6,8 +6,8 @@ classdef messenger < handle
 %   MESSENGER is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %
-%   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 16-Oct-2017 09:28:25 GMT
+%   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
+%   Last modified 01-Nov-2017 14:46:47 GMT
 
     %%
 
@@ -1197,7 +1197,8 @@ classdef messenger < handle
                     case 129.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Composite criteria results have been written to ''%s\\Project\\output\\%s\\Data Files\\composite_criteria.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
                     case 130.0
-                        %_AVAILABLE_%
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The surface definition file ''%s'' is inconsistent with the dataset', returnType{i}], getappdata(0, 'hotspotFile'));
+                        fprintf(fidType(i), ['-> The surface will be re-read from the output database', returnType{i}]);
                     case 131.0
                         %_AVAILABLE_%
                     case 132.0
@@ -1878,7 +1879,7 @@ classdef messenger < handle
                     case 230.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: Virtual strain gauge locations must be defiend as a cell', returnType{i}]);
                         fprintf(fidType(i), ['-> e.g. GAUGE_LOCATION = {''<mainID_1>.<subID_1>'', ''<mainID_2>.<subID_2>'',..., ''<mainID_n>.<subID_n>''}', returnType{i}]);
-                        fprintf(fidType(i), ['-> Virtual strain auges will not be analysed', returnType{i}]);
+                        fprintf(fidType(i), ['-> Virtual strain gauges will not be analysed', returnType{i}]);
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 231.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Out-of-plane stresses were found at virtual strain gauge #%.0f (item %.0f.%.0f)', returnType{i}], getappdata(0, 'vGaugeNumber'), getappdata(0, 'vGaugeMainID'),getappdata(0, 'vGaugeSubID'));
@@ -2190,8 +2191,7 @@ classdef messenger < handle
                         fprintf(fidType(i), ['-> The results position in the surface definition must be consistent with the model definition in the job file', returnType{i}]);
                     case 286.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The surface definition file ''%s'' is invalid', returnType{i}], getappdata(0, 'hotspotFile'));
-                        fprintf(fidType(i), ['-> The number of items in the surface definition is greater than the number of items in the stress dataset', returnType{i}]);
-                        fprintf(fidType(i), ['-> Verify that the results position in the surface definition is consistent with the model definition in the job file', returnType{i}]);
+                        fprintf(fidType(i), ['-> The whole model will be analysed', returnType{i}]);
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 287.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: Some items in the surface definition file could not be located in the stress dataset', returnType{i}]);
@@ -2284,13 +2284,13 @@ classdef messenger < handle
 
             % Write file header
             try
-                fprintf(fid, 'Quick Fatigue Tool 6.11-05 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
+                fprintf(fid, 'Quick Fatigue Tool 6.11-06 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
             catch
-                fprintf(fid, 'Quick Fatigue Tool 6.11-05\r\n');
+                fprintf(fid, 'Quick Fatigue Tool 6.11-06\r\n');
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2017\r\n');
-            fprintf(fid, 'Last modified 16-Oct-2017 09:28:25 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 01-Nov-2017 14:46:47 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
@@ -3422,13 +3422,15 @@ classdef messenger < handle
 
             % Close the log file
             fclose(fid);
+            
+            fprintf('[NOTICE] Results have been written to %s\n', [pwd, '\Project\output\', jobName])
 
             if getappdata(0, 'messageFileWarnings') == 1.0
                 if getappdata(0, 'echoMessagesToCWIN') == 1.0
-                    fprintf('Job %s completed with warnings. Scroll up for details. (%s)\n\n',...
+                    fprintf('[NOTICE] Job %s completed with warnings. Scroll up for details. (%s)\n\n',...
                         jobName, datestr(datenum(c(1), c(2), c(3), c(4), c(5), c(6))))
                 else
-                    fprintf('Job %s completed with warnings. See message file for details. (%s)\n\n',...
+                    fprintf('[NOTICE] Job %s completed with warnings. See message file for details. (%s)\n\n',...
                         jobName, datestr(datenum(c(1), c(2), c(3), c(4), c(5), c(6))))
                 end
 
@@ -3443,10 +3445,10 @@ classdef messenger < handle
                 end
             else
                 if getappdata(0, 'echoMessagesToCWIN') == 1.0
-                    fprintf('Job %s completed successfully. Scroll up for details. (%s)\n\n',...
+                    fprintf('[NOTICE] Job %s completed successfully. Scroll up for details. (%s)\n\n',...
                         jobName, datestr(datenum(c(1), c(2), c(3), c(4), c(5), c(6))))
                 else
-                    fprintf('Job %s completed successfully (%s)\n\n',...
+                    fprintf('[NOTICE] Job %s completed successfully (%s)\n\n',...
                         jobName, datestr(datenum(c(1), c(2), c(3), c(4), c(5), c(6))))
                 end
 

@@ -7,8 +7,8 @@ classdef preProcess < handle
 %
 %   See also postProcess.
 %
-%   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 16-Oct-2017 09:28:25 GMT
+%   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
+%   Last modified 01-Nov-2017 14:46:47 GMT
     
     %%
     
@@ -4262,6 +4262,13 @@ classdef preProcess < handle
                 s2 = s2(startID:(startID + N) - 1.0, :);
                 s3 = s3(startID:(startID + N) - 1.0, :);
                 
+                % Remove compressive stresses if ndCompression=1
+                if getappdata(0, 'ndCompression') == 1.0
+                    s1(s1 < 0.0) = 0.0;
+                    s2(s2 < 0.0) = 0.0;
+                    s3(s3 < 0.0) = 0.0;
+                end
+                
                 % Correct the principal stresses for the effect of nonlinearity
                 for i = 1:N
                     s1_i = s1(i, :);
@@ -5710,7 +5717,7 @@ classdef preProcess < handle
         
         %% READ DATA FILE FOR ITEMS JOB FILE OPTION
         function [items, error, mainIDs, subIDs, readUserItems] = readItemsFile(items, R, mainIDs, subIDs, error)
-            % error
+            % Error indicators
             %{
                 1: More items than exist in the model
                 2: Some items don't exist in the model

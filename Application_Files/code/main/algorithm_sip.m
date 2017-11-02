@@ -13,7 +13,7 @@ classdef algorithm_sip < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.5 Stress Invariant Parameter
 %   
-%   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
 %   Last modified 04-Oct-2017 18:09:00 GMT
     
     %%

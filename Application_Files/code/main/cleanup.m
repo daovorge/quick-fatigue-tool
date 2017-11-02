@@ -1,40 +1,17 @@
 function [] = cleanup(status)
 %CLEANUP    QFT function to clear variables.
-%   This function removes %APPDATA% and material data.
+%   This function removes %APPDATA% and prints errors to the log file.
 %   
 %   CLEANUP is used internally by Quick Fatigue Tool. The user
 %   is not required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 16-Oct-2017 09:28:25 GMT
+%   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
+%   Last modified 01-Nov-2017 14:46:47 GMT
     
     %%
     
 %% Remove material data
-setappdata(0, 'defaultAlgorithm', [])
-setappdata(0, 'defaultMSC', [])
-setappdata(0, 'fsc', [])
-setappdata(0, 'cael', [])
-setappdata(0, 'E', [])
-setappdata(0, 'uts', [])
-setappdata(0, 'poisson', [])
-setappdata(0, 's_values', [])
-setappdata(0, 'n_values', [])
-setappdata(0, 'r_values', [])
-setappdata(0, 'residualStress', [])
-setappdata(0, 'k', [])
-setappdata(0, 'ndEndurance', [])
-setappdata(0, 'b', [])
-setappdata(0, 'b2', [])
-setappdata(0, 'ucs', [])
-setappdata(0, 'Sf', [])
-setappdata(0, 'Ef', [])
-setappdata(0, 'c', [])
-setappdata(0, 'kp', [])
-setappdata(0, 'np', [])
-setappdata(0, 'twops', [])
-setappdata(0, 'TfPrime', [])
-setappdata(0, 'Tfs', [])
+flushMaterial()
 
 %% Close the status file
 fid_status = getappdata(0, 'fid_status');
@@ -78,13 +55,13 @@ if status == 1.0
     
     % Write file header
     try
-        fprintf(fid, 'Quick Fatigue Tool 6.11-05 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
+        fprintf(fid, 'Quick Fatigue Tool 6.11-06 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
     catch
-        fprintf(fid, 'Quick Fatigue Tool 6.11-05\r\n');
+        fprintf(fid, 'Quick Fatigue Tool 6.11-06\r\n');
     end
     fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
     fprintf(fid, 'Copyright Louis Vallance 2017\r\n');
-    fprintf(fid, 'Last modified 16-Oct-2017 09:28:25 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 01-Nov-2017 14:46:47 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');

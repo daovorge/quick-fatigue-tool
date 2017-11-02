@@ -1,5 +1,5 @@
 ==========================
-QUICK FATIGUE TOOL 6.11-05
+QUICK FATIGUE TOOL 6.11-06
 ==========================
 Copyright Louis Vallance 2017
 
@@ -303,5 +303,5 @@ Quick Fatigue Tool User Guide.
 %   M.Sc. Louis Vallance
 %   louisvallance@hotmail.co.uk
 %
-%   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 16-Oct-2017 09:28:25 GMT
+%   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
+%   Last modified 01-Nov-2017 14:46:47 GMT

@@ -12,7 +12,7 @@ classdef multiaxialPostProcess < handle
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.2 Multiaxial Gauge Fatigue
 %   
-%   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
 %   Last modified 16-Oct-2017 09:28:25 GMT
     
     %%
@@ -41,7 +41,7 @@ classdef multiaxialPostProcess < handle
             
             %% Header
             % Write file header
-            fprintf(fid, 'Quick Fatigue Tool 6.11-05 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
+            fprintf(fid, 'Quick Fatigue Tool 6.11-06 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
             fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
             fprintf(fid, 'Last modified 08-Feb-2017 12:23:04 GMT\r\n\r\n');
             

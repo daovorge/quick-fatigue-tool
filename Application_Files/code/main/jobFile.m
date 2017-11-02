@@ -5,8 +5,8 @@ classdef jobFile < handle
 %   JOBFILE is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 04-Oct-2017 18:09:00 GMT
+%   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
+%   Last modified 01-Nov-2017 14:46:47 GMT
     
     %%
     
@@ -238,16 +238,17 @@ classdef jobFile < handle
                 compositeCriteria = 0.0;
                 setappdata(0, 'compositeCriteria', compositeCriteria)
             elseif compositeCriteria > 0.0
+                useSN = 0.0;
                 setappdata(0, 'useSN', 0.0)
                 setappdata(0, 'dataCheck', 1.0)
                 
-                if algorithm == 0.0
-                    algorithm = 4.0;
-                    setappdata(0, 'algorithm', 7.0)
-                end
-                if msCorrection == 0.0
-                    msCorrection = 2.0;
-                    setappdata(0, 'msCorrection', 2.0)
+                msCorrection = 8.0;    setappdata(0, 'msCorrection', 8.0)
+                
+                % Determine the algorithm automatically
+                if isempty(dataset) == 0.0
+                    algorithm = 7.0;    setappdata(0, 'algorithm', 7.0)
+                else
+                    algorithm = 10.0;    setappdata(0, 'algorithm', 10.0)
                 end
             end
             

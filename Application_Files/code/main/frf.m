@@ -9,8 +9,8 @@ function [] = frf(algorithm, msCorrection, N, mainID, subID, use_sn)
 %   Reference section in Quick Fatigue Tool User Guide
 %      8.2 Fatigue Reserve Factor
 %   
-%   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 04-Apr-2017 13:26:59 GMT
+%   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
+%   Last modified 24-Oct-2017 13:58:55 GMT
     
     %%
     
@@ -137,6 +137,9 @@ for groups = 1:G
     % Get the current UTS
     uts = getappdata(0, 'uts');
     ucs = getappdata(0, 'ucs');
+    
+    % Get NdCompression flag
+    ndCompression = getappdata(0, 'ndCompression');
     
     % Get the residual stress for the group
     residual = getappdata(0, 'residualStress');
@@ -328,7 +331,14 @@ for groups = 1:G
                 %% GOODMAN
                 
                 % RADIAL FRF
-                if Smi == 0.0
+                if ((Smi + Sai) <= 0.0) && (ndCompression == 1.0)
+                    %{
+                        FRFR is maximum if the cycle is purely compressive
+                        and *NO COMPRESSION is specified in the material
+                    %}
+                    Ar = frfMaxValue;
+                    Br = 1.0;
+                elseif Smi == 0.0
                     % Special case where the mean stress is zero
                     if Sai == 0.0
                         Ar = frfMaxValue;
@@ -363,7 +373,14 @@ for groups = 1:G
                 frfR(totalCounter) = frfRi;
                 
                 % HORIZONTAL FRF
-                if (Sai == 0.0) && (Sai < So)
+                if ((Smi + Sai) <= 0.0) && (ndCompression == 1.0)
+                    %{
+                        FRFH is maximum if the cycle is purely compressive
+                        and *NO COMPRESSION is specified in the material
+                    %}
+                    Ah = frfMaxValue;
+                    Bh = 1.0;
+                elseif (Sai == 0.0) && (Sai < So)
                     %{
                         The mean stress is zero, but the cycle is not
                         touching the envelope. Bh is infinite, so take the
@@ -407,7 +424,14 @@ for groups = 1:G
                 frfH(totalCounter) = frfHi;
                 
                 % VERTICAL FRF
-                if abs(Smi) >= uts
+                if ((Smi + Sai) <= 0.0) && (ndCompression == 1.0)
+                    %{
+                        FRFV is maximum if the cycle is purely compressive
+                        and *NO COMPRESSION is specified in the material
+                    %}
+                    Av = frfMaxValue;
+                    Bv = 1.0;
+                elseif abs(Smi) >= uts
                     % FRFV is not defined at or above uts
                     Av = -1.0;
                     Bv = 1.0;
@@ -447,7 +471,14 @@ for groups = 1:G
                 Dpos = (Smi - buchPosMean)*(0.0 - buchPosAmp) - (Sai - buchPosAmp)*(0.0 - buchPosMean);
                 
                 % RADIAL FRF
-                if Smi < 0.0
+                if ((Smi + Sai) <= 0.0) && (ndCompression == 1.0)
+                    %{
+                        FRFR is maximum if the cycle is purely compressive
+                        and *NO COMPRESSION is specified in the material
+                    %}
+                    Ar = frfMaxValue;
+                    Br = 1.0;
+                elseif Smi < 0.0
                     % The cycle mean stress is negative
                     
                     if Dneg < 0.0
@@ -526,7 +557,14 @@ for groups = 1:G
                 frfR(totalCounter) = frfRi;
                 
                 % HORIZONTAL FRF
-                if Smi < 0.0
+                if ((Smi + Sai) <= 0.0) && (ndCompression == 1.0)
+                    %{
+                        FRFH is maximum if the cycle is purely compressive
+                        and *NO COMPRESSION is specified in the material
+                    %}
+                    Ah = frfMaxValue;
+                    Bh = 1.0;
+                elseif Smi < 0.0
                     %{
                         The cycle mean stress falls within the negative 
                         Buch envelope
@@ -608,7 +646,14 @@ for groups = 1:G
                 frfH(totalCounter) = frfHi;
                 
                 % VERTICAL FRF
-                if abs(Smi) >= proof
+                if ((Smi + Sai) <= 0.0) && (ndCompression == 1.0)
+                    %{
+                        FRFV is maximum if the cycle is purely compressive
+                        and *NO COMPRESSION is specified in the material
+                    %}
+                    Av = frfMaxValue;
+                    Bv = 1.0;
+                elseif abs(Smi) >= proof
                     % FRFV is not defined at or above proof
                     Av = -1.0;
                     Bv = 1.0;
@@ -669,7 +714,14 @@ for groups = 1:G
                 %% GERBER
                 
                 % RADIAL FRF
-                if Smi == 0.0
+                if ((Smi + Sai) <= 0.0) && (ndCompression == 1.0)
+                    %{
+                        FRFR is maximum if the cycle is purely compressive
+                        and *NO COMPRESSION is specified in the material
+                    %}
+                    Ar = frfMaxValue;
+                    Br = 1.0;
+                elseif Smi == 0.0
                     % Special case where the mean stress is zero
                     if Sai == 0.0
                         Ar = frfMaxValue;
@@ -707,7 +759,14 @@ for groups = 1:G
                 frfR(totalCounter) = frfRi;
                 
                 % HORIZONTAL FRF
-                if (Sai == 0.0) && (Sai < So)
+                if ((Smi + Sai) <= 0.0) && (ndCompression == 1.0)
+                    %{
+                        FRFH is maximum if the cycle is purely compressive
+                        and *NO COMPRESSION is specified in the material
+                    %}
+                    Ah = frfMaxValue;
+                    Bh = 1.0;
+                elseif (Sai == 0.0) && (Sai < So)
                     %{
                         The mean stress is zero, but the cycle is not
                         touching the envelope. Bh in infinite, so take the
@@ -751,7 +810,14 @@ for groups = 1:G
                 frfH(totalCounter) = frfHi;
                 
                 % VERTICAL FRF
-                if abs(Smi) >= uts
+                if ((Smi + Sai) <= 0.0) && (ndCompression == 1.0)
+                    %{
+                        FRFV is maximum if the cycle is purely compressive
+                        and *NO COMPRESSION is specified in the material
+                    %}
+                    Av = frfMaxValue;
+                    Bv = 1.0;
+                elseif abs(Smi) >= uts
                     % FRFV is not defined at or above uts
                     Av = -1.0;
                     Bv = 1.0;
@@ -777,6 +843,10 @@ for groups = 1:G
                 frfV(totalCounter) = frfVi;
             case -1.0
                 %% USER-DEFINED
+                
+                % Retain the non-normalized values
+                Smi_nn = Smi;
+                Sai_nn = Sai;
                 
                 %{
                     Normalize the cycle by the UTS/So or user-defined FRF
@@ -808,7 +878,14 @@ for groups = 1:G
                 So = frfData_a(frfData_m == 0.0);
                 
                 % RADIAL FRF
-                if Smi == 0.0
+                if ((Smi_nn + Sai_nn) <= 0.0) && (ndCompression == 1.0)
+                    %{
+                        FRFR is maximum if the cycle is purely compressive
+                        and *NO COMPRESSION is specified in the material
+                    %}
+                    Ar = frfMaxValue;
+                    Br = 1.0;
+                elseif Smi == 0.0
                     %{
                         Special case where the mean stress is zero. The
                         radial FRF is just the vertical FRF
@@ -927,7 +1004,14 @@ for groups = 1:G
                 end
                 
                 % HORIZONTAL FRF
-                if (Smi == 0.0) && (Sai < So)
+                if ((Smi_nn + Sai_nn) <= 0.0) && (ndCompression == 1.0)
+                    %{
+                        FRFH is maximum if the cycle is purely compressive
+                        and *NO COMPRESSION is specified in the material
+                    %}
+                    Ah = frfMaxValue;
+                    Bh = 1.0;
+                elseif (Smi == 0.0) && (Sai < So)
                     %{
                         The mean stress is zero, but the cycle is not
                         touching the envelope. Bh is zero, so take the max
@@ -1017,6 +1101,7 @@ for groups = 1:G
                 
                 % Horizontal FRF calculation
                 frfHi = Ah/Bh;
+                
                 if frfHi > frfMaxValue
                     frfHi = frfMaxValue;
                 elseif (frfHi < frfMinValue) && (frfHi ~= -1.0)
@@ -1026,7 +1111,14 @@ for groups = 1:G
                 frfH(totalCounter) = frfHi;
                 
                 % VERTICAL FRF
-                if (Smi < frfData_m(end)) || (Smi > frfData_m(1.0))
+                if ((Smi_nn + Sai_nn) <= 0.0) && (ndCompression == 1.0)
+                    %{
+                        FRFV is maximum if the cycle is purely compressive
+                        and *NO COMPRESSION is specified in the material
+                    %}
+                    Av = frfMaxValue;
+                    Bv = 1.0;
+                elseif (Smi < frfData_m(end)) || (Smi > frfData_m(1.0))
                     % FRFV is not defined outside the range of Sm
                     Av = -1.0;
                     Bv = 1.0;

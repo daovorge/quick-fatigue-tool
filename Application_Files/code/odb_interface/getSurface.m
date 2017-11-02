@@ -12,8 +12,8 @@ function [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(ma
 %   Reference section in Quick Fatigue Tool User Guide
 %      4.5.3 Custom analysis items
 %
-%   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 27-Sep-2017 16:13:56 GMT
+%   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
+%   Last modified 31-Oct-2017 09:12:00 GMT
 
 %%
 
@@ -32,12 +32,15 @@ if (strcmpi(items, 'surface') == 1.0) && (exist(surfaceFile, 'file') == 2.0) && 
     
     if error == 1.0
         setappdata(0, 'E033', 0.0)
-        messenger.writeMessage(286.0)
+        messenger.writeMessage(130.0)
+        items = 'surface';  setappdata(0, 'itemsFile', 'SURFACE')
+        setappdata(0, 'items', 'SURFACE')
     elseif error == 2.0
         messenger.writeMessage(287.0)
         items = 'surface';  setappdata(0, 'itemsFile', 'SURFACE')
     elseif error == 3.0
         items = 'all';  setappdata(0, 'items', 'all')
+        messenger.writeMessage(286.0)
     else
         setappdata(0, 'itemsFile', 'SURFACE')
         messenger.writeMessage(285.0)
@@ -186,16 +189,20 @@ elseif strcmpi(searchRegion, 'dataset') == 1.0
     L = length(uniqueMainID);
     
     % OLD AND SLOW METHOD
-    %     for i = 1:L
-    %         if i == L
-    %             fprintf(fid, '%.0f', uniqueMainID(i));
-    %         else
-    %             fprintf(fid, '%.0f, ', uniqueMainID(i));
-    %         end
-    %     end
+%     for i = 1:L
+%         if i == L
+%             fprintf(fid, '%.0f', uniqueMainID(i));
+%         else
+%             fprintf(fid, '%.0f, ', uniqueMainID(i));
+%         end
+%     end
     
-    fprintf(fid, '%.0f, ', uniqueMainID(1:L-1));
-    fprintf(fid, '%.0f', uniqueMainID(L));
+    if length(uniqueMainID) == 1.0
+        fprintf(fid, '%.0f', uniqueMainID);
+    else
+        fprintf(fid, '%.0f, ', uniqueMainID(1:L-1));
+        fprintf(fid, '%.0f', uniqueMainID(L));
+    end
     fclose(fid);
 end
 

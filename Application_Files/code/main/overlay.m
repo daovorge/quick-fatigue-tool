@@ -8,8 +8,8 @@ classdef overlay < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      4.8 Analysis continuation techniques
 %   
-%   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 29-Aug-2017 12:08:36 GMT
+%   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
+%   Last modified 30-Oct-2017 09:58:39 GMT
     
     %%
     
@@ -88,14 +88,21 @@ classdef overlay < handle
             end
             
             % Count the number of fields
-            if length(previousJobFieldNames) ~= 21.0
+            if algorithm == 8.0
+                numberOfFields = 15.0;
+                unitsPrevious = previousJobFieldNames(11.0);
+            else
+                numberOfFields = 21.0;
+                unitsPrevious = previousJobFieldNames(17.0);
+            end
+            
+            if length(previousJobFieldNames) ~= numberOfFields
                 setappdata(0, 'E145', 1.0)
                 error = 1.0;
                 return
             end
             
             % Switching from stres-based to strain-based is not permitted
-            unitsPrevious = previousJobFieldNames(17.0);
             if (ismember(unitsPrevious, 'WCM (Strain)') == 1.0) && (algorithm ~= 3.0)
                 error = 1.0;
                 setappdata(0, 'E147', 1.0)

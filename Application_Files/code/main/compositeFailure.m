@@ -6,8 +6,8 @@ function [] = compositeFailure(N, L)
 %   COMPOSITEFAILURE is used internally by Quick Fatigue Tool. The user is
 %   not required to run this file.
 %
-%   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 14-Oct-2017 18:15:15 GMT
+%   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
+%   Last modified 31-Oct-2017 16:10:34 GMT
     
     %%
 
@@ -157,6 +157,16 @@ for groups = 1:G
     S12_group = S12(startID:(startID + N) - 1.0, :);
     S13_group = S13(startID:(startID + N) - 1.0, :);
     S23_group = S23(startID:(startID + N) - 1.0, :);
+    
+    % Remove compressive stresses if ndCompression=1
+    if getappdata(0, 'ndCompression') == 1.0
+        S11_group(S11_group < 0.0) = 0.0;
+        S22_group(S22_group < 0.0) = 0.0;
+        S33_group(S33_group < 0.0) = 0.0;
+        S12_group(S12_group < 0.0) = 0.0;
+        S13_group(S13_group < 0.0) = 0.0;
+        S23_group(S23_group < 0.0) = 0.0;
+    end
     
     X = zeros(1.0, L);
     Y = zeros(1.0, L);

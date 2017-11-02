@@ -7,8 +7,8 @@ classdef keywords < handle
 %
 %   See also importMaterial, fetchMaterial, job.
 %   
-%   Quick Fatigue Tool 6.11-05 Copyright Louis Vallance 2017
-%   Last modified 03-Oct-2017 13:44:11 GMT
+%   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
+%   Last modified 19-Oct-2017 15:47:11 GMT
     
     %%
     
@@ -47,7 +47,7 @@ classdef keywords < handle
                 0.0, 1.0, 0.0, 0.0, 0.0, 'default.kt', 1.0, 0.0, 'B', 0.0, [],...
                 0.0, [], 'NORMAL', [], [], [], 'PART-1-1', [], [], 0.0, {'DEFAULT'}, 0.0,...
                 {}, 0.0, 'ELEMENT NODAL', [], 0.0, [], [], {}, {}, 'Job-1',...
-                'Template job file', [], '', [], [], [], {[], []}, [], 1.0, 0.0, 0.0};
+                'Template job file', [], '', [], [], [], {[], []}, [], 2.0, 0.0, 0.0};
         end
         
         %% INTERPRET CELL KEYWORD INPUT
