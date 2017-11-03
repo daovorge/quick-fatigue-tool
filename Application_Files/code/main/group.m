@@ -8,7 +8,7 @@ classdef group < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      4.6 Analysis groups
 %   
-%   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
 %   Last modified 11-Oct-2017 13:08:05 GMT
     
     %%

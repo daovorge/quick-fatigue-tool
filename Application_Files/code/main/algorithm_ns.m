@@ -13,7 +13,7 @@ classdef algorithm_ns < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.3 Normal Stress
 %   
-%   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
 %   Last modified 27-Sep-2017 13:32:23 GMT
     
     %%

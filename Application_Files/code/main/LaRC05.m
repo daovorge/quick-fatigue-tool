@@ -8,7 +8,7 @@ function [LARPFCRT, LARMFCRT, LARKFCRT, LARSFCRT, LARTFCRT] =...
 %   LARC05 is used internally by Quick Fatigue Tool. The user is
 %   not required to run this file.
 %
-%   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
 %   Last modified 14-Oct-2017 18:15:15 GMT
     
     %%

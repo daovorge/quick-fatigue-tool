@@ -5,7 +5,7 @@ classdef jobFile < handle
 %   JOBFILE is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
 %   Last modified 01-Nov-2017 14:46:47 GMT
     
     %%
@@ -246,7 +246,7 @@ classdef jobFile < handle
                 
                 % Determine the algorithm automatically
                 if isempty(dataset) == 0.0
-                    algorithm = 7.0;    setappdata(0, 'algorithm', 7.0)
+                    algorithm = 5.0;    setappdata(0, 'algorithm', 5.0)
                 else
                     algorithm = 10.0;    setappdata(0, 'algorithm', 10.0)
                 end

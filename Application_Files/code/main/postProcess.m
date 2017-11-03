@@ -10,7 +10,7 @@ classdef postProcess < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      10 Output
 %   
-%   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
 %   Last modified 16-Oct-2017 09:28:25 GMT
     
     %%
@@ -1989,11 +1989,11 @@ classdef postProcess < handle
             end
             
             if removeCarriageReturn == 1.0
-                fprintf('[POST] Starting Quick Fatigue Tool 6.11-06 ODB Interface');
-                fprintf(fid_status, '\n[POST] Starting Quick Fatigue Tool 6.11-06 ODB Interface');
+                fprintf('[POST] Starting Quick Fatigue Tool 6.11-07 ODB Interface');
+                fprintf(fid_status, '\n[POST] Starting Quick Fatigue Tool 6.11-07 ODB Interface');
             else
-                fprintf('[POST] Quick Fatigue Tool 6.11-06 ODB Interface');
-                fprintf(fid_status, '\n[POST] Quick Fatigue Tool 6.11-06 ODB Interface');
+                fprintf('[POST] Quick Fatigue Tool 6.11-07 ODB Interface');
+                fprintf(fid_status, '\n[POST] Quick Fatigue Tool 6.11-07 ODB Interface');
             end
             
             % Delete the upgrade log file
@@ -2009,7 +2009,7 @@ classdef postProcess < handle
             
             % Open the log file for writing
             fid_debug = fopen([sprintf('Project/output/%s/Data Files/', jobName), resultsDatabaseName, '.log'], 'w+');
-            fprintf(fid_debug, 'Quick Fatigue Tool 6.11-06 ODB Interface Log');
+            fprintf(fid_debug, 'Quick Fatigue Tool 6.11-07 ODB Interface Log');
             
             % Get the selected position
             userPosition = getappdata(0, 'odbResultPosition');
