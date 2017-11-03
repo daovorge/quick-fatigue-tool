@@ -11,7 +11,7 @@ classdef postProcess < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
-%   Last modified 16-Oct-2017 09:28:25 GMT
+%   Last modified 03-Nov-2017 10:41:32 GMT
     
     %%
     
@@ -56,6 +56,13 @@ classdef postProcess < handle
                     end
                 end
             end
+            
+            %{
+            	Remove near-zero values which can arise due to numerical
+                artifacting
+            %}
+            WCM(abs(WCM) < 1e-6) = 0.0;
+            
             setappdata(0, 'WCA', WCA)
             setappdata(0, 'WCM', WCM)
             
