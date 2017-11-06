@@ -11,7 +11,7 @@ classdef python < handle
 %      10.4 The ODB Interface
 %   
 %   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
-%   Last modified 10-Oct-2017 14:19:47 GMT
+%   Last modified 06-Nov-2017 18:43:35 GMT
     
     %%
     
@@ -915,12 +915,18 @@ classdef python < handle
                     % Get the associated energies as well
                     fieldDataFile_energy = importdata(energyFile, '\t');
                     energyMainIDs = fieldDataFile_energy.data(:, 2.0);
+                    energySubIDs = fieldDataFile_energy.data(:, 3.0);
                     totalStrainEnergy_i = fieldDataFile_energy.data(:, 4.0);
                     plasticStrainEnergy_i = fieldDataFile_energy.data(:, 5.0);
                     totalStrainEnergy = zeros(1.0, length(mainIDs));
                     plasticStrainEnergy = totalStrainEnergy;
                     
-                    commonIDs = ismember(mainIDs, energyMainIDs);
+                    
+                    allItems = [mainIDs, subIDs];
+                    energyMainIDs = [energyMainIDs, energySubIDs];
+                    commonIDs = ismember(allItems, energyMainIDs, 'rows');
+                    
+                    %commonIDs = ismember(mainIDs, energyMainIDs);
                     totalStrainEnergy(commonIDs) = totalStrainEnergy_i;
                     plasticStrainEnergy(commonIDs) = plasticStrainEnergy_i;
                     
