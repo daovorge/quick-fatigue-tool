@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
-%   Last modified 06-Nov-2017 09:54:05 GMT
+%   Last modified 06-Nov-2017 15:15:09 GMT
 
     %%
 
@@ -64,24 +64,26 @@ classdef messenger < handle
                     fprintf(fid, '\r\n***NOTE: THE DATA CHECK HAS BEEN COMPLETED (%fs)', getappdata(0, 'dataCheck_time'));
 
                     % Prompt user if they would like to view the message file
-                    if (ispc == 1.0) && (ismac == 0.0)
-                        answer = questdlg('Data check complete.', 'Quick Fatigue Tool', 'View messages', 'Open results folder', 'Close', 'View messages');
-                    elseif (ispc == 0.0) && (ismac == 1.0)
-                        answer = msgbox('Data check complete.', 'Quick Fatigue Tool');
-                    else
-                        answer = -1.0;
-                    end
-
-                    jobName = getappdata(0, 'jobName');
-                    dir = sprintf('Project\\output\\%s', jobName);
-                    if strcmpi(answer, 'View messages') == 1.0
-                        try
-                            system(sprintf('notepad %s &', [pwd, '\', dir, '\', jobName, '.msg']));
-                        catch
-                            errordlg('The message file could not be opened.', 'Quick Fatigue Tool')
+                    if getappdata(0, 'analysisDialogues') > 0.0
+                        if (ispc == 1.0) && (ismac == 0.0)
+                            answer = questdlg('Data check complete.', 'Quick Fatigue Tool', 'View messages', 'Open results folder', 'Close', 'View messages');
+                        elseif (ispc == 0.0) && (ismac == 1.0)
+                            answer = msgbox('Data check complete.', 'Quick Fatigue Tool');
+                        else
+                            answer = -1.0;
                         end
-                    elseif strcmpi(answer, 'Open results folder') == 1.0
-                        winopen(dir)
+                        
+                        jobName = getappdata(0, 'jobName');
+                        dir = sprintf('Project\\output\\%s', jobName);
+                        if strcmpi(answer, 'View messages') == 1.0
+                            try
+                                system(sprintf('notepad %s &', [pwd, '\', dir, '\', jobName, '.msg']));
+                            catch
+                                errordlg('The message file could not be opened.', 'Quick Fatigue Tool')
+                            end
+                        elseif strcmpi(answer, 'Open results folder') == 1.0
+                            winopen(dir)
+                        end
                     end
                 else
                     fprintf(fid, '\r\n***NOTE: THE ANALYSIS HAS BEEN COMPLETED');
@@ -2293,7 +2295,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2017\r\n');
-            fprintf(fid, 'Last modified 06-Nov-2017 09:54:05 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 06-Nov-2017 15:15:09 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
@@ -3438,13 +3440,15 @@ classdef messenger < handle
                 end
 
                 % Prompt user if they would like to view the analysis log
-                if (ispc == 1.0) && (ismac == 0.0)
-                    answer = questdlg('Analysis completed with warnings.', 'Quick Fatigue Tool', 'View log', 'Open results folder', 'Close', 'View log');
-                    delete(answer)
-                elseif (ispc == 0.0) && (ismac == 1.0)
-                    answer = msgbox('Analysis completed with warnings.', 'Quick Fatigue Tool');
-                else
-                    answer = -1.0;
+                if getappdata(0, 'analysisDialogues') > 0.0
+                    if (ispc == 1.0) && (ismac == 0.0)
+                        answer = questdlg('Analysis completed with warnings.', 'Quick Fatigue Tool', 'View log', 'Open results folder', 'Close', 'View log');
+                        delete(answer)
+                    elseif (ispc == 0.0) && (ismac == 1.0)
+                        answer = msgbox('Analysis completed with warnings.', 'Quick Fatigue Tool');
+                    else
+                        answer = -1.0;
+                    end
                 end
             else
                 if getappdata(0, 'echoMessagesToCWIN') == 1.0
@@ -3456,19 +3460,23 @@ classdef messenger < handle
                 end
 
                 % Prompt user if they would like to view the analysis log
-                if (ispc == 1.0) && (ismac == 0.0)
-                    answer = questdlg('Analysis completed without warnings.', 'Quick Fatigue Tool', 'View log', 'Open results folder', 'Close', 'View log');
-                elseif (ispc == 0.0) && (ismac == 1.0)
-                    answer = msgbox('Analysis completed without warnings.', 'Quick Fatigue Tool');
-                else
-                    answer = -1.0;
+                if getappdata(0, 'analysisDialogues') > 0.0
+                    if (ispc == 1.0) && (ismac == 0.0)
+                        answer = questdlg('Analysis completed without warnings.', 'Quick Fatigue Tool', 'View log', 'Open results folder', 'Close', 'View log');
+                    elseif (ispc == 0.0) && (ismac == 1.0)
+                        answer = msgbox('Analysis completed without warnings.', 'Quick Fatigue Tool');
+                    else
+                        answer = -1.0;
+                    end
                 end
             end
-
-            if strcmpi(answer, 'View log') == 1.0
-                winopen(logFile)
-            elseif strcmpi(answer, 'Open results folder') == 1.0
-                winopen(dir)
+            
+            if getappdata(0, 'analysisDialogues') > 0.0
+                if strcmpi(answer, 'View log') == 1.0
+                    winopen(logFile)
+                elseif strcmpi(answer, 'Open results folder') == 1.0
+                    winopen(dir)
+                end
             end
         end
     end

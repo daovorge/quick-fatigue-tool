@@ -6,7 +6,7 @@ function [] = cleanup(status)
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
-%   Last modified 06-Nov-2017 09:54:05 GMT
+%   Last modified 06-Nov-2017 15:15:09 GMT
     
     %%
     
@@ -61,7 +61,7 @@ if status == 1.0
     end
     fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
     fprintf(fid, 'Copyright Louis Vallance 2017\r\n');
-    fprintf(fid, 'Last modified 06-Nov-2017 09:54:05 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 06-Nov-2017 15:15:09 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');
@@ -1289,16 +1289,18 @@ if status == 1.0
     fclose(fid);
     
     % Prompt user if they would like to view the analysis log
-    if (ispc == 1.0) && (ismac == 0.0)
-        answer = questdlg('The analysis exited with an error - Please see the log file for more information.', 'Quick Fatigue Tool', 'View log', 'Close', 'View log');
-    elseif (ispc == 0.0) && (ismac == 1.0)
-        answer = errordlg('The analysis exited with an error - Please see the log file for more information.', 'Quick Fatigue Tool');
-    else
-        answer = -1.0;
-    end
-    
-    if strcmpi(answer, 'View log') == 1.0
-        winopen(errLogFile)
+    if getappdata(0, 'analysisDialogues') > 0.0
+        if (ispc == 1.0) && (ismac == 0.0)
+            answer = questdlg('The analysis exited with an error - Please see the log file for more information.', 'Quick Fatigue Tool', 'View log', 'Close', 'View log');
+        elseif (ispc == 0.0) && (ismac == 1.0)
+            answer = errordlg('The analysis exited with an error - Please see the log file for more information.', 'Quick Fatigue Tool');
+        else
+            answer = -1.0;
+        end
+        
+        if strcmpi(answer, 'View log') == 1.0
+            winopen(errLogFile)
+        end
     end
 end
 

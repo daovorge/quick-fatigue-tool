@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
-%   Last modified 01-Nov-2017 14:46:47 GMT
+%   Last modified 06-Nov-2017 15:15:09 GMT
     
     %%
     
@@ -4887,10 +4887,24 @@ classdef preProcess < handle
                 %}
                 cantRemovePreviousOutput = 0.0;
                 
-                response = questdlg(sprintf('An output directory already exists for job ''%s''.\nOK to overwrite?',...
-                    jobName), 'Quick Fatigue Tool', 'OK', 'Cancel', 'OK');
+                if getappdata(0, 'checkOverwrite') == 1.0
+                    if getappdata(0, 'analysisDialogues') > 0.0
+                        response = questdlg(sprintf('An output directory already exists for job ''%s''.\nOK to overwrite?',...
+                            jobName), 'Quick Fatigue Tool', 'OK', 'Cancel', 'OK');
+                        
+                        checkString = 'OK';
+                    else
+                        response = input(sprintf('\nAn output directory already exists for job ''%s''. OK to overwrite? [Y/N]: ', jobName), 's');
+                        
+                        checkString = 'Y';
+                    end
+                else
+                    response = 'OK';
+                    checkString = response;
+                end
                 
-                if strcmpi('OK', response)
+                
+                if strcmpi(checkString, response) == 1.0
                     try
                         rmdir(dir, 's');
                     catch unhandledException
@@ -5349,8 +5363,12 @@ classdef preProcess < handle
         function [error] = readEnvironment(jobName)
             error = 0.0;
             
+            if isempty(getappdata(0, 'analysisDialogues')) == 1.0
+                setappdata(0, 'analysisDialogues', 1.0)
+            end
+            
             % Read the global environment file
-            if exist('Application_Files/default/environment.m', 'file') == 0.0
+            if  exist('Application_Files/default/environment.m', 'file') == 0.0
                 % The global environment file does not exist. Warn the user
                 msg1 = sprintf('The environment file for the working directory was not found. The analysis may crash, or produce unexpected results.\n\n');
                 msg2 = sprintf('If the environment file exists elsewhere, move it to ''Application_Files/default'', then re-run the analysis.\n\n');
@@ -5379,7 +5397,8 @@ classdef preProcess < handle
                     
                     fprintf('ERROR: The analysis could not be started\n-> MException ID: %s\n', environmentFileException.identifier);
                     fprintf('-> Current path: %s\n', pwd);
-                    fprintf('-> The path should be the root QFT directory. Do not enter the PROJECT folder!\n');
+                    fprintf('-> 1) The path should be the root QFT directory. Do not enter the PROJECT folder!\n');
+                    fprintf('-> 2) Make sure that a valid environment.m file exists in APPLICATION_FILES\\DEFAULT!\n');
                     
                     return
                 end

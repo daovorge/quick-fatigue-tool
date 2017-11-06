@@ -26,7 +26,7 @@ function [] = job(varargin)
 %      1 Job file options
 %   
 %   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
-%   Last modified 19-Oct-2017 15:47:11 GMT
+%   Last modified 06-Nov-2017 15:15:09 GMT
     
     %%
     
@@ -73,6 +73,11 @@ end
 
 % The input file is the first argument
 inputFile = varargin{1.0};
+
+% Set default flag for analysis dialogues
+if isempty(getappdata(0, 'analysisDialogues')) == 1.0
+    setappdata(0, 'analysisDialogues', 1.0)
+end
 
 %% INITIALIZE BUFFERS
 [kwStr, kwStrSp, kwData] = keywords.initialize();
@@ -173,7 +178,22 @@ while feof(fid) == 0.0
                 the local database
             %}
             if exist(['Data/material/local/', materialName, '.mat'], 'file') == 2.0
-                response = questdlg(sprintf('The material ''%s'' already exists in the local database. Do you wish to overwrite the material?', materialName), 'Quick Fatigue Tool', 'Overwrite', 'Keep file', 'Abort', 'Overwrite');
+                
+                if getappdata(0, 'analysisDialogues') > 0.0
+                    response = questdlg(sprintf('The material ''%s'' already exists in the local database. Do you wish to overwrite the material?', materialName), 'Quick Fatigue Tool', 'Overwrite', 'Keep file', 'Abort', 'Overwrite');
+                else
+                    response = input(sprintf('The material ''%s'' already exists in the local database. Do you wish to overwrite the material? [<O>verwrite/<K>eep/<A>bort]: ', materialName), 's');
+                    
+                    if strcmpi(response, 'o') == 1.0
+                        response = 'Overwrite';
+                    elseif strcmpi(response, 'k') == 1.0
+                        response = 'Keep';
+                    elseif strcmpi(response, 'a') == 1.0
+                        response = 'Abort';
+                    else
+                        response = 'Abort';
+                    end
+                end
                 
                 if (strcmpi(response, 'Abort') == 1.0) || (isempty(response) == 1.0)
                     fprintf('[NOTICE] Input file processing was aborted by the user\n');
