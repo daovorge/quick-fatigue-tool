@@ -7,7 +7,7 @@ function [] = compositeFailure(N, L)
 %   not required to run this file.
 %
 %   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
-%   Last modified 31-Oct-2017 16:10:34 GMT
+%   Last modified 06-Nov-2017 09:54:05 GMT
     
     %%
 
@@ -329,6 +329,11 @@ end
 
 %% Remove INF values of K
 k(isinf(k)) = 0.0;
+
+%% Remove negative HSNMCCRT values
+if hashin == 1.0
+    HSNMCCRT(HSNMCCRT < 0.0) = 0.0;
+end
 
 %% Inform the user if composite has failed
 N_MSTRS = length(MSTRS(MSTRS >= 1.0));
