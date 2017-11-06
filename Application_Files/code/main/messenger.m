@@ -1200,7 +1200,10 @@ classdef messenger < handle
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The surface definition file ''%s'' is inconsistent with the dataset', returnType{i}], getappdata(0, 'hotspotFile'));
                         fprintf(fidType(i), ['-> The surface will be re-read from the output database', returnType{i}]);
                     case 131.0
-                        %_AVAILABLE_%
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: The keyword *NO COMPRESSION is specified for material %s (group %.0f), but its usage is not recommended here', returnType{i}], getappdata(0, 'message_groupMaterial'), getappdata(0, 'message_group'));
+                        fprintf(fidType(i), ['-> Composite analysis results for this analysis group may be inaccurate', returnType{i}]);
+                        
+                        setappdata(0, 'messageFileWarnings', 1.0)
                     case 132.0
                         if getappdata(0, 'suppress_ID132') == 0.0
                             fprintf(fidType(i), [returnType{i}, '***NOTE: Out-of-plane stresses (S33/S23/S13) were found during the composite failure/damage initiation calculation', returnType{i}]);
