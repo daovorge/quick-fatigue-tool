@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
-%   Last modified 15-Nov-2017 10:50:46 GMT
+%   Last modified 15-Nov-2017 14:28:58 GMT
 
     %%
 
@@ -2295,7 +2295,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2017\r\n');
-            fprintf(fid, 'Last modified 15-Nov-2017 10:50:46 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 15-Nov-2017 14:28:58 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
@@ -3177,7 +3177,9 @@ classdef messenger < handle
             end
 
             %% Write the critical plane summary (if applicable)
-            if (algorithm == 8.0) || (algorithm == 6.0) || (algorithm == 5.0) || (algorithm == 4.0)
+            proportionalItems = getappdata(0, 'proportionalItems');
+            
+            if ((algorithm == 8.0) || (algorithm == 6.0) || (algorithm == 5.0) || (algorithm == 4.0)) && (any(proportionalItems) == 0.0)
                 fprintf(fid, '\r\nCP SUMMARY AT WORST ITEM:\r\n=======\r\n');
 
                 fprintf(fid, '    CP Step Size: %.0f degrees\r\n', step);

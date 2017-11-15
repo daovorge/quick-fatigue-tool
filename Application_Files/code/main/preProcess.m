@@ -3866,8 +3866,6 @@ classdef preProcess < handle
             if any(proportionalItems) == 1.0
                 messenger.writeMessage(32.0)
             end
-            
-            setappdata(0, 'proportionalItems', proportionalItems)
         end
         
         %% Get the principal stress history for the loading

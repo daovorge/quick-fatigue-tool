@@ -14,7 +14,7 @@ classdef algorithm_sbbm < handle
 %      6.2 Stress-based Brown-Miller
 %   
 %   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
-%   Last modified 27-Sep-2017 13:32:23 GMT
+%   Last modified 15-Nov-2017 14:28:58 GMT
     
     %%
     
@@ -23,7 +23,7 @@ classdef algorithm_sbbm < handle
         function [nodalDamageParameter, nodalAmplitudes, nodalPairs,...
                 nodalPhiC, nodalThetaC, nodalDamage, maxPhiCurve] =...
                 main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, signalLength,...
-                step, planePrecision, nodalDamageParameter, nodalAmplitudes,...
+                step, proportional, planePrecision, nodalDamageParameter, nodalAmplitudes,...
                 nodalPairs, nodalPhiC, nodalThetaC, node, msCorrection,...
                 nodalDamage, gateTensors, tensorGate, signConvention,...
                 S1, S2, S3, maxPhiCurve, rainflowMode)
@@ -32,7 +32,7 @@ classdef algorithm_sbbm < handle
             [damageParameter, damageParamAll, phiC, thetaC, amplitudes,...
                 pairs, maxPhiCurve_i] =...
                 algorithm_sbbm.criticalPlaneAnalysis(Sxxi, Syyi, Szzi,...
-                Txyi, Tyzi, Txzi, signalLength, step, planePrecision,...
+                Txyi, Tyzi, Txzi, signalLength, step, proportional, planePrecision,...
                 gateTensors, tensorGate, signConvention,...
                 S1, S2, S3, rainflowMode);
             
@@ -67,7 +67,7 @@ classdef algorithm_sbbm < handle
         function [damageParameter, damageParamAll, phiC, thetaC,...
                 amplitudes, pairs, maxPhiCurve] =...
                 criticalPlaneAnalysis(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi,...
-                signalLength, step, precision, gateTensors, tensorGate,...
+                signalLength, step, proportional, precision, gateTensors, tensorGate,...
                 signConvention, S1, S2, S3, rainflowMode)
             
             % Create the stress tensor
@@ -83,12 +83,33 @@ classdef algorithm_sbbm < handle
             St(3.0, 2.0, :) = Tyzi;
             St(3.0, 3.0, :) = Szzi;
             
+            % Initialize critical plane stepping
+            if proportional == 1.0
+                stepTheta = 52.0;
+                stepPhi = 120.0;
+                precision = 1.0;
+                cpStartTheta = stepTheta;
+                cpEndTheta = stepTheta;
+                cpStartPhi = stepPhi;
+                cpEndPhi = stepPhi;
+                
+                index_theta = 1.0;
+            else
+                stepTheta = step;
+                stepPhi = step;
+                cpStartTheta = 0.0;
+                cpEndTheta = 180.0;
+                cpStartPhi = cpStartTheta;
+                cpEndPhi = cpEndTheta;
+                
+                index_theta = 0.0;
+            end
+            
             % Initialize matrices for normal and shear stress components on each plane
             f = zeros(precision, precision);
             
             % Indexes for sn and tn
             index_phi = 0.0;
-            index_theta = 0.0;
             
             % Store AMPLITUDES and PAIRS in a cell
             amplitudesBuffer = cell(precision, precision);
@@ -101,8 +122,8 @@ classdef algorithm_sbbm < handle
             S_prime = cell(1.0, signalLength);
             
             % Critical plane search
-            for theta = 0:step:180
-                for phi = 0:step:180
+            for theta = cpStartTheta:stepTheta:cpEndTheta
+                for phi = cpStartPhi:stepPhi:cpEndPhi
 
                     % Update the indexes
                     index_phi = index_phi + 1.0;
