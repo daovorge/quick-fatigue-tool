@@ -29,12 +29,16 @@ classdef algorithm_sbbm < handle
                 S1, S2, S3, maxPhiCurve, rainflowMode)
             
             % Perform the critical plane search
-            [damageParameter, damageParamAll, phiC, thetaC, amplitudes,...
-                pairs, maxPhiCurve_i] =...
-                algorithm_sbbm.criticalPlaneAnalysis(Sxxi, Syyi, Szzi,...
-                Txyi, Tyzi, Txzi, signalLength, step, proportional, planePrecision,...
-                gateTensors, tensorGate, signConvention,...
-                S1, S2, S3, rainflowMode);
+            if proportional == 1.0
+                [damageParameter, damageParamAll, amplitudes, pairs, phiC, thetaC, maxPhiCurve_i] = algorithm_sbbm.reducedAnalysis(Sxxi, Syyi, Txyi, S1, S2, S3, signConvention, signalLength, gateTensors, tensorGate);
+            else
+                [damageParameter, damageParamAll, phiC, thetaC, amplitudes,...
+                    pairs, maxPhiCurve_i] =...
+                    algorithm_sbbm.criticalPlaneAnalysis(Sxxi, Syyi, Szzi,...
+                    Txyi, Tyzi, Txzi, signalLength, step, planePrecision,...
+                    gateTensors, tensorGate, signConvention,...
+                    S1, S2, S3, rainflowMode);
+            end
             
             % Get current damage parameter
             nodalDamageParameter(node) = damageParameter;
@@ -67,7 +71,7 @@ classdef algorithm_sbbm < handle
         function [damageParameter, damageParamAll, phiC, thetaC,...
                 amplitudes, pairs, maxPhiCurve] =...
                 criticalPlaneAnalysis(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi,...
-                signalLength, step, proportional, precision, gateTensors, tensorGate,...
+                signalLength, step, precision, gateTensors, tensorGate,...
                 signConvention, S1, S2, S3, rainflowMode)
             
             % Create the stress tensor
@@ -83,33 +87,12 @@ classdef algorithm_sbbm < handle
             St(3.0, 2.0, :) = Tyzi;
             St(3.0, 3.0, :) = Szzi;
             
-            % Initialize critical plane stepping
-            if proportional == 1.0
-                stepTheta = 52.0;
-                stepPhi = 120.0;
-                precision = 1.0;
-                cpStartTheta = stepTheta;
-                cpEndTheta = stepTheta;
-                cpStartPhi = stepPhi;
-                cpEndPhi = stepPhi;
-                
-                index_theta = 1.0;
-            else
-                stepTheta = step;
-                stepPhi = step;
-                cpStartTheta = 0.0;
-                cpEndTheta = 180.0;
-                cpStartPhi = cpStartTheta;
-                cpEndPhi = cpEndTheta;
-                
-                index_theta = 0.0;
-            end
-            
             % Initialize matrices for normal and shear stress components on each plane
             f = zeros(precision, precision);
             
             % Indexes for sn and tn
             index_phi = 0.0;
+            index_theta = 0.0;
             
             % Store AMPLITUDES and PAIRS in a cell
             amplitudesBuffer = cell(precision, precision);
@@ -122,8 +105,8 @@ classdef algorithm_sbbm < handle
             S_prime = cell(1.0, signalLength);
             
             % Critical plane search
-            for theta = cpStartTheta:stepTheta:cpEndTheta
-                for phi = cpStartPhi:stepPhi:cpEndPhi
+            for theta = 0:step:180.0
+                for phi = 0:step:180.0
 
                     % Update the indexes
                     index_phi = index_phi + 1.0;
@@ -229,6 +212,44 @@ classdef algorithm_sbbm < handle
             % Record the damage parameter
             damageParamAll = amplitudes;
             damageParameter = max(damageParamAll);
+        end
+        
+        %% CYCLE COUNT IF NO CP
+        function [damageParameter, damageParamAll, amplitudes, pairs, phiC, thetaC, maxPhiCurve_i] = reducedAnalysis(Sxx, Syy, Txy, S1, S2, S3, signConvention, signalLength, gateTensors, tensorGate)
+            shear = applySignConvention(0.5.*(S1 - S3), signConvention, S1, S2, S3, Sxx, Syy, Txy);
+            damageParamAll = 0.5.*(S1 + S3) + shear;
+            
+            if signalLength < 3.0
+                % If the signal length is less than 3, there is no need to cycle count
+                amplitudes = 0.5*abs(max(damageParamAll) - min(damageParamAll));
+                pairs = [min(damageParamAll), max(damageParamAll)];
+            else
+                % Gate the tensors if applicable
+                if gateTensors > 0.0
+                    damageParamAll = analysis.gateTensors(damageParamAll, gateTensors, tensorGate);
+                end
+                
+                % Filter the damage parameter
+                damageParamAll = analysis.preFilter(damageParamAll, length(damageParamAll));
+                
+                % Rainflow cycle count the damage parameter
+                rfData = analysis.rainFlow(damageParamAll);
+                
+                % Get rainflow pairs from rfData
+                pairs = rfData(:, 1.0:2.0);
+                
+                % Get the amplitudes from the rainflow pairs
+                [amplitudes, ~] = analysis.getAmps(pairs);
+            end
+            
+            % Record the damage parameter
+            damageParamAll = amplitudes;
+            damageParameter = max(damageParamAll);
+            
+            % Provide dummy critical plane values
+            phiC = 0.0;
+            thetaC = 0.0;
+            maxPhiCurve_i = 0.0;
         end
         
         %% DAMAGE CALCULATION

@@ -79,7 +79,7 @@ CONV = [];
 LOAD_EQ = {1.0, 'Repeats'};
 
 % LOAD SCALE FACTORS
-SCALE = 0.8285;
+SCALE = 1.0;
 
 % LOAD OFFSET VALUES
 OFFSET = [];
