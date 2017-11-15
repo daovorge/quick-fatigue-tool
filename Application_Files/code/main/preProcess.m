@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
-%   Last modified 06-Nov-2017 15:15:09 GMT
+%   Last modified 15-Nov-2017 10:50:46 GMT
     
     %%
     
@@ -3823,15 +3823,7 @@ classdef preProcess < handle
         end
         
         %% Get load proportionality
-        function [step, planePrecision] = getLoadProportionality(Sxx, Syy, N, step, planePrecision, tolerance)
-            
-            % Get the principal stress history for the whole model
-            s1 = getappdata(0, 'S1');
-            s2 = getappdata(0, 'S2');
-            %s3 = getappdata(0, 'S3');
-            
-            % Flag to indicate load proportionality
-            proportional = 0.0;
+        function [proportionalItems] = getLoadProportionality(Sxx, Syy, Sxy, N, proportionalItems, tolerance)
             
             % Get the number of groups for the analysis
             G = getappdata(0, 'numberOfGroups');
@@ -3842,12 +3834,6 @@ classdef preProcess < handle
                 % Get the group ID buffer
                 groupIDBuffer = getappdata(0, 'groupIDBuffer');
             end
-            
-            %{
-                Calculate the shear stress from the principal stress for
-                the whole model
-            %}
-            s12 = 0.5.*abs(s1 - s2);
             
             %{
                 Set a counter which runs from 1 to the total number of
@@ -3864,46 +3850,24 @@ classdef preProcess < handle
                     groupIDs = linspace(1.0, N, N);
                 end
                 
-                for i = 1.0:N
-                    % Update the counter
-                    totalCounter = totalCounter + 1.0;
-                    
-                    % Get the group item
-                    groupItem = groupIDs(i);
-                    
-                    % Get the shear stress over the loading for the current item
-                    s12_i = s12(totalCounter, :);
-                    
-                    % Calculate the angle between the first and second principal stress
-                    theta = 2.0*(abs(0.5.*atand((2.0.*s12_i)./(Sxx(groupItem, :) - Syy(groupItem, :)))));
-                    
-                    % Remove NaN and zero values
-                    theta(isnan(theta)) = [];
-                    theta(theta == 0.0) = [];
-                    
-                    if isempty(theta) == 0.0
-                        theta_difference = max(theta) - min(theta);
-                        maxDifference = max(theta_difference);
-                        
-                        if maxDifference < tolerance
-                            if step(totalCounter) < 90.0
-                                step(totalCounter) = 90.0;
-                                planePrecision(totalCounter) = floor(180.0/step(totalCounter)) + 1.0;
-                                
-                                proportional = 1.0;
-                            end
-                        end
-                    end
-                end
+                % Update the counter
+                totalCounter = totalCounter + 1.0;
+                
+                % Calculate the angle between the first and second principal stress
+                theta = 0.5.*atand((2.0.*Sxy(groupIDs, :))./(Sxx(groupIDs, :) - Syy(groupIDs, :)));
+                
+                theta_difference = max(theta, [], 2.0) - min(theta, [], 2.0);
+                maxDifference = max(theta_difference, [], 2.0);
+                
+                proportionalItems(totalCounter:(totalCounter + N) - 1.0) = maxDifference < tolerance;
             end
-            
-            setappdata(0, 'stepSize', step)
-            setappdata(0, 'planePrecision', planePrecision)
             
             % If necessary, inform the user that load proportionality was detected
-            if proportional == 1.0
+            if any(proportionalItems) == 1.0
                 messenger.writeMessage(32.0)
             end
+            
+            setappdata(0, 'proportionalItems', proportionalItems)
         end
         
         %% Get the principal stress history for the loading
@@ -4092,15 +4056,8 @@ classdef preProcess < handle
                         stressInvParam = getappdata(0, 'VM');
                     end
                 case 2.0    % PRINCIPAL
-                    for i = 1:N
-                        for j = 1:L
-                            if S1(i, j) > abs(S3(i, j))
-                                stressInvParam(i, j) = S1(i, j);
-                            else
-                                stressInvParam(i, j) = S3(i, j);
-                            end
-                        end
-                    end
+                    stressInvParam(abs(S1) >= abs(S3)) = S1(abs(S1) >= abs(S3));
+                    stressInvParam(abs(S3) > abs(S1)) = S3(abs(S3) > abs(S1));
                 case 3.0    % HYDROSTATIC
                     stressInvParam = -(1.0/3.0).*(S1 + S2 + S3);
                 case 4.0    % TRESCA

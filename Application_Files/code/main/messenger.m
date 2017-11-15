@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
-%   Last modified 06-Nov-2017 18:43:35 GMT
+%   Last modified 15-Nov-2017 10:50:46 GMT
 
     %%
 
@@ -484,9 +484,9 @@ classdef messenger < handle
                         % Load proportionality
                         if (getappdata(0, 'algorithm') == 4.0 || getappdata(0, 'algorithm') == 5.0 || getappdata(0, 'algorithm') == 6.0 || getappdata(0, 'algorithm') == 8.0 || getappdata(0, 'algorithm') == 11.0)
                             fprintf(fidType(i), [returnType{i}, '***NOTE: In all or part of the model, the maximum deviation of the principal directions in the loading does not exceed the specified tolerance of %.3g degrees', returnType{i}], getappdata(0, 'proportionalityTolerance'));
-                            fprintf(fidType(i), ['-> The critical plane step size has been increased to 90 degrees for these analysis items', returnType{i}]);
-                            fprintf(fidType(i), ['-> The tolerance can be changed with the environment variable ''proportionalityTolerance''', returnType{i}]);
-                            fprintf(fidType(i), ['-> The load proportionality check can be disabled by setting the environment variable ''checkLoadProportionality'' to 0.0', returnType{i}]);
+                            fprintf(fidType(i), ['-> The loading is assumed to be proportional at these analysis items. Critical plane searching will be skipped', returnType{i}]);
+                            fprintf(fidType(i), ['-> The angle tolerance can be changed with the environment variable ''proportionalityTolerance''', returnType{i}]);
+                            fprintf(fidType(i), ['-> This check can be disabled by setting the environment variable ''checkLoadProportionality'' to 0.0', returnType{i}]);
 
                             setappdata(0, 'messageFileNotes', 1.0)
                         end
@@ -2295,7 +2295,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2017\r\n');
-            fprintf(fid, 'Last modified 06-Nov-2017 18:43:35 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 15-Nov-2017 10:50:46 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
@@ -3180,9 +3180,9 @@ classdef messenger < handle
             if (algorithm == 8.0) || (algorithm == 6.0) || (algorithm == 5.0) || (algorithm == 4.0)
                 fprintf(fid, '\r\nCP SUMMARY AT WORST ITEM:\r\n=======\r\n');
 
-                fprintf(fid, '    CP Step Size: %.0f degrees\r\n', step(worstAnalysisItem));
+                fprintf(fid, '    CP Step Size: %.0f degrees\r\n', step);
 
-                planesSearched = planePrecision(worstAnalysisItem)^2.0;
+                planesSearched = planePrecision^2.0;
                 fprintf(fid, '    %.0f planes searched\r\n', planesSearched);
                 fprintf(fid, '    Coordinates (degrees):\r\n    THETA = %.0f, PHI = %.0f\r\n',...
                     thetaOnCP, phiOnCP);

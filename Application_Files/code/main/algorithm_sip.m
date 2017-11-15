@@ -14,7 +14,7 @@ classdef algorithm_sip < handle
 %      6.5 Stress Invariant Parameter
 %   
 %   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
-%   Last modified 04-Oct-2017 18:09:00 GMT
+%   Last modified 15-Nov-2017 10:50:46 GMT
     
     %%
     
@@ -37,7 +37,7 @@ classdef algorithm_sip < handle
             % Remove NaN values from damage DAMAGEPARAMETER
             damageParameter(isnan(damageParameter)) = 0.0;
             
-            %% Rainflow count the von Mises stress
+            %% Rainflow count the damage parameter
             if signalLength < 3.0
                 % If the signal length is less than 3, there is no need to cycle count
                 cycles = 0.5*abs(max(damageParameter) - min(damageParameter));
@@ -48,10 +48,10 @@ classdef algorithm_sip < handle
                     damageParameter = analysis.gateTensors(damageParameter, gateTensors, tensorGate);
                 end
                 
-                % Filter the von Mises stress
+                % Filter the damage parameter
                 damageParameter = analysis.preFilter(damageParameter, length(damageParameter));
                 
-                % Rainflow cycle count the von Mises stresses
+                % Rainflow cycle count the damage parameter
                 rfData = analysis.rainFlow(damageParameter);
                 
                 % Get rainflow pairs from rfData
