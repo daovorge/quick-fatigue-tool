@@ -134,7 +134,7 @@ setappdata(0, 'thresholdScaleFactor', 0.8)
 
 % SEARCH PARAMETERS
 setappdata(0, 'stepSize', 10.0)
-setappdata(0, 'checkLoadProportionality', 0.0)
+setappdata(0, 'checkLoadProportionality', 1.0)
 setappdata(0, 'proportionalityTolerance', 1.0)
 
 % CP HISTORY SMOOTHING
