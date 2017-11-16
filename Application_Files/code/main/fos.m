@@ -10,7 +10,7 @@ function [] = fos(gateTensors, tensorGate, coldItems, algorithm, msCorrection, N
 %      8.3 Factor of Strength
 %   
 %   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
-%   Last modified 15-Nov-2017 10:50:46 GMT
+%   Last modified 16-Nov-2017 14:27:15 GMT
     
     %%
     
@@ -270,7 +270,7 @@ for groups = 1:G
                 case 6.0 % FINDLEY'S METHOD
                     k = getappdata(0, 'k');
                     [nodalDamageParameter, ~, ~, ~, ~, nodalDamage] = algorithm_findley.main(Sxxi, Syyi, Szzi,...
-                        Txyi, Tyzi, Txzi, L, step, planePrecision,...
+                        Txyi, Tyzi, Txzi, L, step, proportionalItems(totalCounter), planePrecision,...
                         nodalDamageParameter, nodalAmplitudes, nodalPairs, nodalPhiC,...
                         nodalThetaC, totalCounter, nodalDamage, msCorrection, gateTensors, tensorGate,...
                         signConvention, s1i, s2i, s3i, 1.0, k);

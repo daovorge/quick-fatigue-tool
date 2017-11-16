@@ -11,7 +11,7 @@ classdef postProcess < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
-%   Last modified 15-Nov-2017 10:50:46 GMT
+%   Last modified 16-Nov-2017 14:27:15 GMT
     
     %%
     
@@ -1382,6 +1382,9 @@ classdef postProcess < handle
             
             root = getappdata(0, 'outputDirectory');
             
+            % Get the worst analysis item
+            worstItem = getappdata(0, 'worstItem');
+            
             %{
                 LOAD HISTORIES -> Multiple values at worst item over all
                 signal increments
@@ -1492,40 +1495,44 @@ classdef postProcess < handle
                 ANGLE HISTORIES -> Multiple values at worst item over all
                 plane orientations
             %}
+            %%
+            proportionalItems = getappdata(0, 'proportionalItems');
             
-            if (algorithm < 7.0) && (algorithm ~= 10.0)
-                step = getappdata(0, 'stepSize');
-                planes = 0:step:180;
-                
-                ST = getappdata(0, 'shear_cp');
-                NT = getappdata(0, 'normal_cp');
-                
-                PT = getappdata(0, 'DPT');
-                DT = getappdata(0, 'DT');
-                LT = getappdata(0, 'LT');
-                
-                %% Open file for writing:
-                
-                if getappdata(0, 'file_H_OUTPUT_ANGLE') == 1.0
-                    dir = [root, 'Data Files/h-output-angle.dat'];
+            if proportionalItems(worstItem) == 0.0
+                if (algorithm < 7.0) && (algorithm ~= 10.0)
+                    step = getappdata(0, 'stepSize');
+                    planes = 0:step:180;
                     
-                    fid = fopen(dir, 'w+');
+                    ST = getappdata(0, 'shear_cp');
+                    NT = getappdata(0, 'normal_cp');
                     
-                    data = [planes; ST; NT; PT; DT; LT]';
+                    PT = getappdata(0, 'DPT');
+                    DT = getappdata(0, 'DT');
+                    LT = getappdata(0, 'LT');
                     
-                    fprintf(fid, 'ST, NT, DPP, DP, LP, WORST ITEM ANGLE HISTORIES (%.0f.%.0f)\r\n\r\n', worstMainID, worstSubID);
+                    %% Open file for writing:
                     
-                    fprintf(fid, 'PHI = %.0f degrees\r\n', getappdata(0, 'phiOnCP'));
-                    
-                    if getappdata(0, 'cpShearStress') == 1.0
-                        fprintf(fid, 'Plane orientation (THETA-degrees)\tMaximum shear stress (MPa)\tMaximum normal stress (MPa)\tDamage parameter (MPa)\tDamage\tLife (%s)\n', loadEqUnits);
-                    else
-                        fprintf(fid, 'Plane orientation (THETA-degrees)\tResultant shear stress (MPa)\tMaximum normal stress (MPa)\tDamage parameter (MPa)\tDamage\tLife (%s)\n', loadEqUnits);
+                    if getappdata(0, 'file_H_OUTPUT_ANGLE') == 1.0
+                        dir = [root, 'Data Files/h-output-angle.dat'];
+                        
+                        fid = fopen(dir, 'w+');
+                        
+                        data = [planes; ST; NT; PT; DT; LT]';
+                        
+                        fprintf(fid, 'ST, NT, DPP, DP, LP, WORST ITEM ANGLE HISTORIES (%.0f.%.0f)\r\n\r\n', worstMainID, worstSubID);
+                        
+                        fprintf(fid, 'PHI = %.0f degrees\r\n', getappdata(0, 'phiOnCP'));
+                        
+                        if getappdata(0, 'cpShearStress') == 1.0
+                            fprintf(fid, 'Plane orientation (THETA-degrees)\tMaximum shear stress (MPa)\tMaximum normal stress (MPa)\tDamage parameter (MPa)\tDamage\tLife (%s)\n', loadEqUnits);
+                        else
+                            fprintf(fid, 'Plane orientation (THETA-degrees)\tResultant shear stress (MPa)\tMaximum normal stress (MPa)\tDamage parameter (MPa)\tDamage\tLife (%s)\n', loadEqUnits);
+                        end
+                        
+                        fprintf(fid, sprintf('%%.0f\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\r\n', h, h, h, h, h), data');
+                        
+                        fclose(fid);
                     end
-                    
-                    fprintf(fid, sprintf('%%.0f\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\r\n', h, h, h, h, h), data');
-                    
-                    fclose(fid);
                 end
             end
             

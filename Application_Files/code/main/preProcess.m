@@ -4034,8 +4034,6 @@ classdef preProcess < handle
                 [N, L] = size(S1);
                 
                 stressInvParam = zeros(N, L);
-                
-                Ti = zeros(3.0, L);
             end
             
             switch stressInvParamType
@@ -4059,28 +4057,7 @@ classdef preProcess < handle
                 case 3.0    % HYDROSTATIC
                     stressInvParam = -(1.0/3.0).*(S1 + S2 + S3);
                 case 4.0    % TRESCA
-                    for i = 1:N
-                        %{
-                            Calculate the Tresca stress histories for the
-                            current item
-                        %}
-                        Ti(1.0, :) = (S1(i, :) - S2(i, :));
-                        Ti(2.0, :) = (S2(i, :) - S3(i, :));
-                        Ti(3.0, :) = (S1(i, :) - S3(i, :));
-                        
-                        %{
-                            For the current item, get the maximum (positive
-                            or negative) Tresca stress at each point in the
-                            load history
-                        %}
-                        for j = 1:L
-                            if abs(max(Ti(:, j))) > abs(min(Ti(:, j)))
-                                stressInvParam(i, j) = max(Ti(:, j));
-                            else
-                                stressInvParam(i, j) = min(Ti(:, j));
-                            end
-                        end
-                    end
+                    stressInvParam = 0.5*(S1 - S3);
                 otherwise   % VON MISES (DEFAULT)
                     stressInvParam = getappdata(0, 'VM');
             end

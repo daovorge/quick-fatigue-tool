@@ -14,7 +14,7 @@ classdef algorithm_sbbm < handle
 %      6.2 Stress-based Brown-Miller
 %   
 %   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
-%   Last modified 15-Nov-2017 14:28:58 GMT
+%   Last modified 16-Nov-2017 14:27:15 GMT
     
     %%
     
@@ -30,7 +30,7 @@ classdef algorithm_sbbm < handle
             
             % Perform the critical plane search
             if proportional == 1.0
-                [damageParameter, damageParamAll, amplitudes, pairs, phiC, thetaC, maxPhiCurve_i] = algorithm_sbbm.reducedAnalysis(Sxxi, Syyi, Txyi, S1, S2, S3, signConvention, signalLength, gateTensors, tensorGate);
+                [damageParameter, damageParamAll, amplitudes, pairs, phiC, thetaC, maxPhiCurve_i] = algorithm_sbbm.reducedAnalysis(S1, S3, signalLength, gateTensors, tensorGate);
             else
                 [damageParameter, damageParamAll, phiC, thetaC, amplitudes,...
                     pairs, maxPhiCurve_i] =...
@@ -105,8 +105,8 @@ classdef algorithm_sbbm < handle
             S_prime = cell(1.0, signalLength);
             
             % Critical plane search
-            for theta = 0:step:180.0
-                for phi = 0:step:180.0
+            for theta = 0:step:180
+                for phi = 0:step:180
 
                     % Update the indexes
                     index_phi = index_phi + 1.0;
@@ -215,9 +215,14 @@ classdef algorithm_sbbm < handle
         end
         
         %% CYCLE COUNT IF NO CP
-        function [damageParameter, damageParamAll, amplitudes, pairs, phiC, thetaC, maxPhiCurve_i] = reducedAnalysis(Sxx, Syy, Txy, S1, S2, S3, signConvention, signalLength, gateTensors, tensorGate)
-            shear = applySignConvention(0.5.*(S1 - S3), signConvention, S1, S2, S3, Sxx, Syy, Txy);
-            damageParamAll = 0.5.*(S1 + S3) + shear;
+        function [damageParameter, damageParamAll, amplitudes, pairs, phiC, thetaC, maxPhiCurve_i] = reducedAnalysis(S1, S3, signalLength, gateTensors, tensorGate)
+            %{
+                If the loading is proportional, the combination of  normal
+                and shear contributions can never exceed the maximum
+                principal stress
+            %}
+            damageParamAll(abs(S1) >= abs(S3)) = S1(abs(S1) >= abs(S3));
+            damageParamAll(abs(S3) > abs(S1)) = S3(abs(S3) > abs(S1));
             
             if signalLength < 3.0
                 % If the signal length is less than 3, there is no need to cycle count
@@ -316,7 +321,7 @@ classdef algorithm_sbbm < handle
                     ktn = ones(1.0, length(Nf));
                 end
                 
-                % Is SWT is being used, change b to 2b
+                % If SWT is being used, change b to 2b
                 if msCorrection == 5.0
                     b = 2.0*b;
                 end
