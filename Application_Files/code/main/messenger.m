@@ -352,6 +352,8 @@ classdef messenger < handle
                                 else
                                     fprintf(fidType(i), ['-> This value can be used as an argument for the ITEMS option in the job file', returnType{i}]);
                                 end
+							else
+								fprintf(fidType(i), ['-> Items numbers may be incorrect if surface detection was enabled', returnType{i}]);
                             end
                         end
                     case 19.0
