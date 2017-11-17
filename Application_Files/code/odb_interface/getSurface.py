@@ -37,8 +37,8 @@
 #   Reference sextion in Quick Fatigue Tool User Guide
 #      4.5.3 Custom analysis items
 #
-#   Quick Fatigue Tool 6.11-03 Copyright Louis Vallance 2017
-#   Last modified 17-Oct-2017 15:37:38 GMT
+#   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
+#   Last modified 17-Nov-2017 12:39:37 GMT
 
 import os
 from odbAccess import *
@@ -126,7 +126,7 @@ for instanceNumber in range(nInstances):
 			# Get element connectivity data:
 			conn = instance.getElementFromLabel(element.label).connectivity
 			
-		# 3D continuum hexahedron (brick) elements:
+		# ELTYPE 3D continuum hexahedron (brick) elements:
 		if ((element.type == 'C3D8') or (element.type == 'C3D8H') or (element.type == 'C3D8I') or (element.type == 'C3D8IH') or (element.type == 'C3D8R') or (element.type == 'C3D8RH') or (element.type == 'C3D8S') or (element.type == 'C3D8HS') or (element.type == 'C3D20') or (element.type == 'C3D20H') or (element.type == 'C3D20R') or (element.type == 'C3D20RH') or (element.type == 'C3D8T') or (element.type == 'C3D8HT') or (element.type == 'C3D8RT') or (element.type == 'C3D8RHT') or (element.type == 'C3D20T') or (element.type == 'C3D20HT') or (element.type == 'C3D20RT') or (element.type == 'C3D20RHT')):
 			
 			# Increment INDEX face node variable:
@@ -158,7 +158,7 @@ for instanceNumber in range(nInstances):
 			indexIncrement = 6
 			tetAndHex[1] = 1
 			
-		# 3D continuum tetrahedral elements:
+		# ELTYPE 3D continuum tetrahedral elements:
 		elif ((element.type == 'C3D4') or (element.type == 'C3D4H') or (element.type == 'C3D10') or (element.type == 'C3D10H') or (element.type == 'C3D10HS') or (element.type == 'C3D10M') or (element.type == 'C3D10MH') or (element.type == 'C3D4T') or (element.type == 'C3D10T') or (element.type == 'C3D10HT') or (element.type == 'C3D10MT') or (element.type == 'C3D10MHT')):
 			
 			# Increment INDEX face node variable:
@@ -186,7 +186,7 @@ for instanceNumber in range(nInstances):
 			indexIncrement = 4
 			tetAndHex[0] = 1
 			
-		# 3D continuum wedge (triangular prism) elements:
+		# ELTYPE 3D continuum wedge (triangular prism) elements:
 		elif ((element.type == 'C3D6') or (element.type == 'C3D6H') or (element.type == 'C3D15') or (element.type == 'C3D15H')):
 			
 			# Increment INDEX face node variable:
@@ -215,7 +215,7 @@ for instanceNumber in range(nInstances):
 			
 			indexIncrement = 5
 			
-		# 3D continuum pyramid elements:
+		# ELTYPE 3D continuum pyramid elements:
 		elif ((element.type == 'C3D5') or (element.type == 'C3D5H')):
 			
 			# Increment INDEX face node variable:
@@ -232,7 +232,7 @@ for instanceNumber in range(nInstances):
 			
 			indexIncrement = 5
 			
-		# 3D conventional triangular shell elements:
+		# ELTYPE 3D conventional triangular shell elements:
 		elif ((element.type == 'STRI3') or (element.type == 'S3') or (element.type == 'S3R') or (element.type == 'S3RS') or (element.type == 'STRI65') or (element.type == 'S3T') or (element.type == 'S3RT')):
 			
 			# Increment INDEX face node variable:
@@ -276,9 +276,9 @@ for instanceNumber in range(nInstances):
 					linearAndQuad[1] = 1
 				
 				indexIncrement = 1
-			
-		# 3D conventional quadrilateral shell elements:
-		elif ((element.type == 'S4') or (element.type == 'S4R') or (element.type == 'S4RS') or (element.type == 'S4RSW') or (element.type == 'S4R5') or (element.type == 'S8R') or (element.type == 'S8R5') or (element.type == 'S4T') or (element.type == 'S4RT') or (element.type == 'S8RT')):
+				
+		# ELTYPE 3D conventional quadrilateral shell elements:
+		elif ((element.type == 'S4') or (element.type == 'S4R') or (element.type == 'S4RS') or (element.type == 'S4RSW') or (element.type == 'S4R5') or (element.type == 'S8R') or (element.type == 'S8R5') or (element.type == 'S4T') or (element.type == 'S4RT') or (element.type == 'S8RT') or (element.type == 'S9R5')):
 			
 			# Increment INDEX face node variable:
 			if (i > 0):
@@ -324,7 +324,99 @@ for instanceNumber in range(nInstances):
 				
 				indexIncrement = 1
 				
-		# 3D continuum triangular shell elements:
+		# ELTYPE General triangular membrane elements:
+		elif ((element.type == 'M3D3') or (element.type == 'M3D6')):
+				
+			# Increment INDEX face node variable:
+			if (i > 0):
+				index = index + indexIncrement
+			
+			# Treat shell surface as shell faces:
+			if (SHELL_FACES.lower() == 'yes'):
+				
+				# Linear:
+				if (len(conn) == 3):
+					faces[index + 0][:] = itemgetter(*[0, 1])(conn)
+					faces[index + 1][:] = itemgetter(*[1, 2])(conn)
+					faces[index + 2][:] = itemgetter(*[2, 0])(conn)
+					
+					linearAndQuad[0] = 1
+					
+				# Quadratic:
+				else:
+					faces[index + 0][:] = itemgetter(*[0, 1, 3])(conn)
+					faces[index + 1][:] = itemgetter(*[1, 2, 4])(conn)
+					faces[index + 2][:] = itemgetter(*[2, 0, 5])(conn)
+					
+					linearAndQuad[1] = 1
+					
+				indexIncrement = 3
+				
+			# Treat shell surface as whole shell:
+			else:
+				
+				# Linear:
+				if (len(conn) == 3.0):
+					faces[index + 0][:] = itemgetter(*[0, 1, 2])(conn)
+					
+					linearAndQuad[0] = 1
+					
+				# Quadratic:
+				else:
+					faces[index + 0][:] = itemgetter(*[0, 1, 2, 3, 4, 5])(conn)
+					
+					linearAndQuad[1] = 1
+				
+				indexIncrement = 1
+				
+		# ELTYPE General quadrilateral membrane elements:
+		elif ((element.type == 'M3D4') or (element.type == 'M3D4R') or (element.type == 'M3D8') or (element.type == 'M3D8R') or (element.type == 'M3D9') or (element.type == 'M3D9R')):
+				
+			# Increment INDEX face node variable:
+			if (i > 0):
+				index = index + indexIncrement
+			
+			# Treat shell surface as shell faces:
+			if (SHELL_FACES.lower() == 'yes'):
+				
+				# Linear:
+				if (len(conn) == 4):
+					faces[index + 0][:] = itemgetter(*[0, 1])(conn)
+					faces[index + 1][:] = itemgetter(*[1, 2])(conn)
+					faces[index + 2][:] = itemgetter(*[2, 3])(conn)
+					faces[index + 3][:] = itemgetter(*[3, 0])(conn)
+					
+					linearAndQuad[0] = 1
+					
+				# Quadratic:
+				else:
+					faces[index + 0][:] = itemgetter(*[0, 1, 4])(conn)
+					faces[index + 1][:] = itemgetter(*[1, 2, 5])(conn)
+					faces[index + 2][:] = itemgetter(*[2, 3, 6])(conn)
+					faces[index + 3][:] = itemgetter(*[3, 0, 7])(conn)
+					
+					linearAndQuad[1] = 1
+					
+				indexIncrement = 4
+				
+			# Treat shell surface as whole shell:
+			else:
+				
+				# Linear:
+				if (len(conn) == 4.0):
+					faces[index + 0][:] = itemgetter(*[0, 1, 2, 3])(conn)
+					
+					linearAndQuad[0] = 1
+					
+				# Quadratic:
+				else:
+					faces[index + 0][:] = itemgetter(*[0, 1, 2, 3, 4, 5, 6, 7])(conn)
+					
+					linearAndQuad[1] = 1
+				
+				indexIncrement = 1
+				
+		# ELTYPE 3D continuum triangular shell elements:
 		elif ((element.type == 'SC6R') or (element.type == 'SC6RT')):
 			
 			# Increment INDEX face node variable:
@@ -341,7 +433,7 @@ for instanceNumber in range(nInstances):
 			
 			indexIncrement = 5
 			
-		# 3D continuum hexahedral shell elements:
+		# ELTYPE 3D continuum hexahedral shell elements:
 		elif ((element.type == 'SC8R') or (element.type == 'SC8RT')):
 			
 			# Increment INDEX face node variable:
@@ -359,7 +451,7 @@ for instanceNumber in range(nInstances):
 			
 			indexIncrement = 6
 			
-		# 3D continuum solid hexahedral shell elements
+		# ELTYPE 3D continuum solid hexahedral shell elements
 		elif (element.type == 'CSS8'):
 			
 			# Increment INDEX face node variable:
@@ -377,7 +469,7 @@ for instanceNumber in range(nInstances):
 			
 			indexIncrement = 6
 			
-		# 2D continuum triangular elements:
+		# ELTYPE 2D continuum triangular elements:
 		elif ((element.type == 'CPE3') or (element.type == 'CPE3H') or (element.type == 'CPE6') or (element.type == 'CPE6H') or (element.type == 'CPE6M') or (element.type == 'CPE6MH') or (element.type == 'CPS3') or (element.type == 'CPS6') or (element.type == 'CPS6M') or (element.type == 'CPEG3') or (element.type == 'CPEG3H') or (element.type == 'CPEG6') or (element.type == 'CPEG6H') or (element.type == 'CPEG6M') or (element.type == 'CPEG6MH')):
 			
 			# Increment INDEX face node variable:
@@ -421,8 +513,8 @@ for instanceNumber in range(nInstances):
 					linearAndQuad[1] = 1
 				
 				indexIncrement = 1
-			
-		# 2D Continuum quadrilateral elements:
+				
+		# ELTYPE 2D Continuum quadrilateral elements:
 		elif ((element.type == 'CPE4') or (element.type == 'CPE4H') or (element.type == 'CPE4I') or (element.type == 'CPE4IH') or (element.type == 'CPE4R') or (element.type == 'CPE4RH') or (element.type == 'CPE8') or (element.type == 'CPE8H') or (element.type == 'CPE8R') or (element.type == 'CPE8RH') or (element.type == 'CPS4') or (element.type == 'CPS4I') or (element.type == 'CPS4R') or (element.type == 'CPS8') or (element.type == 'CPS8R') or (element.type == 'CPEG4') or (element.type == 'CPEG4H') or (element.type == 'CPEG4I') or (element.type == 'CPEG4IH') or (element.type == 'CPEG4R') or (element.type == 'CPEG4RH') or (element.type == 'CPEG8') or (element.type == 'CPEG8H') or (element.type == 'CPEG8R') or (element.type == 'CPEG8RH')):
 			
 			# Increment INDEX face node variable:
