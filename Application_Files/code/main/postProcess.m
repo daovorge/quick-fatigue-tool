@@ -1078,7 +1078,7 @@ classdef postProcess < handle
                         plot(cumulativeDamage, '-', 'LineWidth', lineWidth, 'Color', midnightBlue)
                         
                         if crossing ~= -999.0
-                            l1 = line([crossing, crossing], [0.0, 1.0], 'lineWidth', lineWidth);
+                            l1 = line([crossing(1.0), crossing(1.0)], [0.0, 1.0], 'lineWidth', lineWidth);
                             legend(l1, 'Infinite Life Envelope')
                         end
 
