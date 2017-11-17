@@ -6,7 +6,7 @@ function [] = cleanup(status)
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
-%   Last modified 16-Nov-2017 14:27:15 GMT
+%   Last modified 17-Nov-2017 08:51:28 GMT
     
     %%
     
@@ -23,10 +23,13 @@ end
 %% Close any other open files
 fclose('all');
 
+%% Add output folder to current directory
+job = getappdata(0, 'jobName');
+addpath(genpath(sprintf('%s\\Project\\output\\%s', pwd, job)))
+
 %% If the analysis exited with errors, create error log
 if status == 1.0
     % Create an error log file
-    job = getappdata(0, 'jobName');
     dir = sprintf('Project/output/%s/', job);
     errLogFile = [dir, sprintf('%s.log', job)];
     
@@ -61,7 +64,7 @@ if status == 1.0
     end
     fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
     fprintf(fid, 'Copyright Louis Vallance 2017\r\n');
-    fprintf(fid, 'Last modified 16-Nov-2017 14:27:15 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 17-Nov-2017 08:51:28 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');
