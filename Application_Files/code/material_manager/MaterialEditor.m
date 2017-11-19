@@ -13,7 +13,7 @@ function varargout = MaterialEditor(varargin)%#ok<*DEFNU>
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
-%   Last modified 16-Oct-2017 09:28:25 GMT
+%   Last modified 19-Nov-2017 16:45:59 GMT
     
     %%
     
@@ -2759,7 +2759,7 @@ if get(handles.check_e, 'value') == 0.0
     set(handles.text_e_units, 'enable', 'off')
 end
 if get(handles.check_poisson, 'value') == 0.0
-    set(handles.edit_poisson, 'enable', 'off')
+    set(handles.edit_poisson, 'enable', 'inactive')
 end
 if get(handles.check_uts, 'value') == 0.0
     set(handles.edit_uts, 'enable', 'off')
