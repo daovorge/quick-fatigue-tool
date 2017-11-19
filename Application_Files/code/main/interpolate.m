@@ -11,8 +11,8 @@ function [cumulativeDamage] = interpolate(cumulativeDamage, pairs, msCorrection,
 %   Reference section in Quick Fatigue Tool User Guide
 %      5.4 Using custom stress-life data
 %   
-%   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
-%   Last modified 08-Jun-2017 10:05:25 GMT
+%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
+%   Last modified 06-Nov-2017 18:43:35 GMT
     
     %%
     
@@ -160,7 +160,11 @@ elseif msCorrection == 7.0
         Ri = Ri*scaleFactors(index);
         
         % If there is an exact S-N curve for Ri, just use this curve
-        rExact = find(rValues == Ri);
+        %rExact = find(rValues == Ri);
+        ratios = (1.0 - rValues/Ri);
+        ratios(isinf(ratios)) = 1.0;
+        ratios(isnan(ratios)) = 0.0;
+        rExact = find(ratios < 1e-6);
         
         if isempty(rExact) == 0.0
             % The S-N data is defined explicitly for the Ri load ratio

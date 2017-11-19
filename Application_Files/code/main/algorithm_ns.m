@@ -13,8 +13,8 @@ classdef algorithm_ns < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.3 Normal Stress
 %   
-%   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
-%   Last modified 27-Sep-2017 13:32:23 GMT
+%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
+%   Last modified 16-Nov-2017 14:27:15 GMT
     
     %%
         
@@ -22,17 +22,22 @@ classdef algorithm_ns < handle
         %% ENTRY FUNCTION
         function [nodalDamageParameter, nodalAmplitudes, nodalPairs,...
                 nodalPhiC, nodalThetaC, nodalDamage, maxPhiCurve] =...
-                main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, signalLength,...
-                step, precision, nodalDamageParameter, nodalAmplitudes,...
+                main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi,...
+                S1, S3, signalLength,...
+                step, proportional, precision, nodalDamageParameter, nodalAmplitudes,...
                 nodalPairs, nodalPhiC, nodalThetaC, node, msCorrection,...
                 nodalDamage, gateTensors, tensorGate, maxPhiCurve)
             
             % Perform the critical plane search
-            [damageParameter, damageParamAll, phiC, thetaC, amplitudes,...
-                pairs, maxPhiCurve_i] =...
-                algorithm_ns.criticalPlaneAnalysis(Sxxi, Syyi, Szzi, Txyi,...
-                Tyzi, Txzi, signalLength, step, gateTensors, tensorGate,...
-                precision);
+            if proportional == 1.0
+                [damageParameter, damageParamAll, amplitudes, pairs, phiC, thetaC, maxPhiCurve_i] = algorithm_ns.reducedAnalysis(S1, S3, signalLength, gateTensors, tensorGate);
+            else
+                [damageParameter, damageParamAll, phiC, thetaC, amplitudes,...
+                    pairs, maxPhiCurve_i] =...
+                    algorithm_ns.criticalPlaneAnalysis(Sxxi, Syyi, Szzi, Txyi,...
+                    Tyzi, Txzi, signalLength, step, gateTensors, tensorGate,...
+                    precision);
+            end
             
             % Get current Damage parameter
             nodalDamageParameter(node) = damageParameter;
@@ -196,6 +201,44 @@ classdef algorithm_ns < handle
             % Record the damage parameter
             damageParamAll = amplitudes;
             damageParameter = max(damageParamAll);
+        end
+        
+        %% CYCLE COUNT IF NO CP
+        function [damageParameter, damageParamAll, amplitudes, pairs, phiC, thetaC, maxPhiCurve_i] = reducedAnalysis(S1, S3, signalLength, gateTensors, tensorGate)
+            damageParamAll(abs(S1) >= abs(S3)) = S1(abs(S1) >= abs(S3));
+            damageParamAll(abs(S3) > abs(S1)) = S3(abs(S3) > abs(S1));
+            
+            if signalLength < 3.0
+                % If the signal length is less than 3, there is no need to cycle count
+                amplitudes = 0.5*abs(max(damageParamAll) - min(damageParamAll));
+                pairs = [min(damageParamAll), max(damageParamAll)];
+            else
+                % Gate the tensors if applicable
+                if gateTensors > 0.0
+                    damageParamAll = analysis.gateTensors(damageParamAll, gateTensors, tensorGate);
+                end
+                
+                % Filter the damage parameter
+                damageParamAll = analysis.preFilter(damageParamAll, length(damageParamAll));
+                
+                % Rainflow cycle count the damage parameter
+                rfData = analysis.rainFlow(damageParamAll);
+                
+                % Get rainflow pairs from rfData
+                pairs = rfData(:, 1.0:2.0);
+                
+                % Get the amplitudes from the rainflow pairs
+                [amplitudes, ~] = analysis.getAmps(pairs);
+            end
+            
+            % Record the damage parameter
+            damageParamAll = amplitudes;
+            damageParameter = max(damageParamAll);
+            
+            % Provide dummy critical plane values
+            phiC = 0.0;
+            thetaC = 0.0;
+            maxPhiCurve_i = 0.0;
         end
         
         %% DAMAGE CALCULATION

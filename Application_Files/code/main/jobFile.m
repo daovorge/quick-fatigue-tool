@@ -5,8 +5,8 @@ classdef jobFile < handle
 %   JOBFILE is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
-%   Last modified 01-Nov-2017 14:46:47 GMT
+%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
+%   Last modified 06-Nov-2017 15:15:09 GMT
     
     %%
     
@@ -246,7 +246,7 @@ classdef jobFile < handle
                 
                 % Determine the algorithm automatically
                 if isempty(dataset) == 0.0
-                    algorithm = 7.0;    setappdata(0, 'algorithm', 7.0)
+                    algorithm = 5.0;    setappdata(0, 'algorithm', 5.0)
                 else
                     algorithm = 10.0;    setappdata(0, 'algorithm', 10.0)
                 end
@@ -1808,6 +1808,10 @@ classdef jobFile < handle
             
             error = 0.0;
             
+            if getappdata(0, 'analysisDialogues') == 0.0
+                return
+            end
+            
             outputDatabase = getappdata(0, 'outputDatabase');
             partInstance = getappdata(0, 'partInstance');
             autoExportODB = getappdata(0, 'autoExport_ODB');
@@ -2024,6 +2028,10 @@ classdef jobFile < handle
         %% IF THE FOS IS REQUESTED, CHECK THAT FIELD OUTPUT IS ALSO REQUESTED
         function [outputField, error] = checkFOS(outputField)
             error = 0.0;
+            
+            if getappdata(0, 'analysisDialogues') == 0.0
+                return
+            end
             
             if (getappdata(0, 'enableFOS') == 1.0) && (outputField == 0.0)
                 msg = sprintf('The Factor of Strength algorithm is enabled, but field output was not requested in the job file.');

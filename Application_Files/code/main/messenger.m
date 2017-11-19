@@ -6,8 +6,8 @@ classdef messenger < handle
 %   MESSENGER is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %
-%   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
-%   Last modified 01-Nov-2017 14:46:47 GMT
+%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
+%   Last modified 19-Nov-2017 16:45:59 GMT
 
     %%
 
@@ -64,24 +64,26 @@ classdef messenger < handle
                     fprintf(fid, '\r\n***NOTE: THE DATA CHECK HAS BEEN COMPLETED (%fs)', getappdata(0, 'dataCheck_time'));
 
                     % Prompt user if they would like to view the message file
-                    if (ispc == 1.0) && (ismac == 0.0)
-                        answer = questdlg('Data check complete.', 'Quick Fatigue Tool', 'View messages', 'Open results folder', 'Close', 'View messages');
-                    elseif (ispc == 0.0) && (ismac == 1.0)
-                        answer = msgbox('Data check complete.', 'Quick Fatigue Tool');
-                    else
-                        answer = -1.0;
-                    end
-
-                    jobName = getappdata(0, 'jobName');
-                    dir = sprintf('Project\\output\\%s', jobName);
-                    if strcmpi(answer, 'View messages') == 1.0
-                        try
-                            system(sprintf('notepad %s &', [pwd, '\', dir, '\', jobName, '.msg']));
-                        catch
-                            errordlg('The message file could not be opened.', 'Quick Fatigue Tool')
+                    if getappdata(0, 'analysisDialogues') > 0.0
+                        if (ispc == 1.0) && (ismac == 0.0)
+                            answer = questdlg('Data check complete.', 'Quick Fatigue Tool', 'View messages', 'Open results folder', 'Close', 'View messages');
+                        elseif (ispc == 0.0) && (ismac == 1.0)
+                            answer = msgbox('Data check complete.', 'Quick Fatigue Tool');
+                        else
+                            answer = -1.0;
                         end
-                    elseif strcmpi(answer, 'Open results folder') == 1.0
-                        winopen(dir)
+                        
+                        jobName = getappdata(0, 'jobName');
+                        dir = sprintf('Project\\output\\%s', jobName);
+                        if strcmpi(answer, 'View messages') == 1.0
+                            try
+                                system(sprintf('notepad %s &', [pwd, '\', dir, '\', jobName, '.msg']));
+                            catch
+                                errordlg('The message file could not be opened.', 'Quick Fatigue Tool')
+                            end
+                        elseif strcmpi(answer, 'Open results folder') == 1.0
+                            winopen(dir)
+                        end
                     end
                 else
                     fprintf(fid, '\r\n***NOTE: THE ANALYSIS HAS BEEN COMPLETED');
@@ -350,6 +352,8 @@ classdef messenger < handle
                                 else
                                     fprintf(fidType(i), ['-> This value can be used as an argument for the ITEMS option in the job file', returnType{i}]);
                                 end
+							else
+								fprintf(fidType(i), ['-> Items numbers may be incorrect if surface detection was enabled', returnType{i}]);
                             end
                         end
                     case 19.0
@@ -482,9 +486,9 @@ classdef messenger < handle
                         % Load proportionality
                         if (getappdata(0, 'algorithm') == 4.0 || getappdata(0, 'algorithm') == 5.0 || getappdata(0, 'algorithm') == 6.0 || getappdata(0, 'algorithm') == 8.0 || getappdata(0, 'algorithm') == 11.0)
                             fprintf(fidType(i), [returnType{i}, '***NOTE: In all or part of the model, the maximum deviation of the principal directions in the loading does not exceed the specified tolerance of %.3g degrees', returnType{i}], getappdata(0, 'proportionalityTolerance'));
-                            fprintf(fidType(i), ['-> The critical plane step size has been increased to 90 degrees for these analysis items', returnType{i}]);
-                            fprintf(fidType(i), ['-> The tolerance can be changed with the environment variable ''proportionalityTolerance''', returnType{i}]);
-                            fprintf(fidType(i), ['-> The load proportionality check can be disabled by setting the environment variable ''checkLoadProportionality'' to 0.0', returnType{i}]);
+                            fprintf(fidType(i), ['-> The loading is assumed to be proportional at these analysis items. Critical plane searching will be skipped', returnType{i}]);
+                            fprintf(fidType(i), ['-> The angle tolerance can be changed with the environment variable ''proportionalityTolerance''', returnType{i}]);
+                            fprintf(fidType(i), ['-> This check can be disabled by setting the environment variable ''checkLoadProportionality'' to 0.0', returnType{i}]);
 
                             setappdata(0, 'messageFileNotes', 1.0)
                         end
@@ -1200,7 +1204,10 @@ classdef messenger < handle
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The surface definition file ''%s'' is inconsistent with the dataset', returnType{i}], getappdata(0, 'hotspotFile'));
                         fprintf(fidType(i), ['-> The surface will be re-read from the output database', returnType{i}]);
                     case 131.0
-                        %_AVAILABLE_%
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: The keyword *NO COMPRESSION is specified for material %s (group %.0f), but its usage is not recommended here', returnType{i}], getappdata(0, 'message_groupMaterial'), getappdata(0, 'message_group'));
+                        fprintf(fidType(i), ['-> Composite analysis results for this analysis group may be inaccurate', returnType{i}]);
+                        
+                        setappdata(0, 'messageFileWarnings', 1.0)
                     case 132.0
                         if getappdata(0, 'suppress_ID132') == 0.0
                             fprintf(fidType(i), [returnType{i}, '***NOTE: Out-of-plane stresses (S33/S23/S13) were found during the composite failure/damage initiation calculation', returnType{i}]);
@@ -2284,13 +2291,13 @@ classdef messenger < handle
 
             % Write file header
             try
-                fprintf(fid, 'Quick Fatigue Tool 6.11-06 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
+                fprintf(fid, 'Quick Fatigue Tool 6.11-07 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
             catch
-                fprintf(fid, 'Quick Fatigue Tool 6.11-06\r\n');
+                fprintf(fid, 'Quick Fatigue Tool 6.11-07\r\n');
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2017\r\n');
-            fprintf(fid, 'Last modified 01-Nov-2017 14:46:47 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 19-Nov-2017 16:45:59 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
@@ -3172,12 +3179,14 @@ classdef messenger < handle
             end
 
             %% Write the critical plane summary (if applicable)
-            if (algorithm == 8.0) || (algorithm == 6.0) || (algorithm == 5.0) || (algorithm == 4.0)
+            proportionalItems = getappdata(0, 'proportionalItems');
+            
+            if ((algorithm == 8.0) || (algorithm == 6.0) || (algorithm == 5.0) || (algorithm == 4.0)) && (any(proportionalItems) == 0.0)
                 fprintf(fid, '\r\nCP SUMMARY AT WORST ITEM:\r\n=======\r\n');
 
-                fprintf(fid, '    CP Step Size: %.0f degrees\r\n', step(worstAnalysisItem));
+                fprintf(fid, '    CP Step Size: %.0f degrees\r\n', step);
 
-                planesSearched = planePrecision(worstAnalysisItem)^2.0;
+                planesSearched = planePrecision^2.0;
                 fprintf(fid, '    %.0f planes searched\r\n', planesSearched);
                 fprintf(fid, '    Coordinates (degrees):\r\n    THETA = %.0f, PHI = %.0f\r\n',...
                     thetaOnCP, phiOnCP);
@@ -3435,13 +3444,15 @@ classdef messenger < handle
                 end
 
                 % Prompt user if they would like to view the analysis log
-                if (ispc == 1.0) && (ismac == 0.0)
-                    answer = questdlg('Analysis completed with warnings.', 'Quick Fatigue Tool', 'View log', 'Open results folder', 'Close', 'View log');
-                    delete(answer)
-                elseif (ispc == 0.0) && (ismac == 1.0)
-                    answer = msgbox('Analysis completed with warnings.', 'Quick Fatigue Tool');
-                else
-                    answer = -1.0;
+                if getappdata(0, 'analysisDialogues') > 0.0
+                    if (ispc == 1.0) && (ismac == 0.0)
+                        answer = questdlg('Analysis completed with warnings.', 'Quick Fatigue Tool', 'View log', 'Open results folder', 'Close', 'View log');
+                        delete(answer)
+                    elseif (ispc == 0.0) && (ismac == 1.0)
+                        answer = msgbox('Analysis completed with warnings.', 'Quick Fatigue Tool');
+                    else
+                        answer = -1.0;
+                    end
                 end
             else
                 if getappdata(0, 'echoMessagesToCWIN') == 1.0
@@ -3453,19 +3464,23 @@ classdef messenger < handle
                 end
 
                 % Prompt user if they would like to view the analysis log
-                if (ispc == 1.0) && (ismac == 0.0)
-                    answer = questdlg('Analysis completed without warnings.', 'Quick Fatigue Tool', 'View log', 'Open results folder', 'Close', 'View log');
-                elseif (ispc == 0.0) && (ismac == 1.0)
-                    answer = msgbox('Analysis completed without warnings.', 'Quick Fatigue Tool');
-                else
-                    answer = -1.0;
+                if getappdata(0, 'analysisDialogues') > 0.0
+                    if (ispc == 1.0) && (ismac == 0.0)
+                        answer = questdlg('Analysis completed without warnings.', 'Quick Fatigue Tool', 'View log', 'Open results folder', 'Close', 'View log');
+                    elseif (ispc == 0.0) && (ismac == 1.0)
+                        answer = msgbox('Analysis completed without warnings.', 'Quick Fatigue Tool');
+                    else
+                        answer = -1.0;
+                    end
                 end
             end
-
-            if strcmpi(answer, 'View log') == 1.0
-                winopen(logFile)
-            elseif strcmpi(answer, 'Open results folder') == 1.0
-                winopen(dir)
+            
+            if getappdata(0, 'analysisDialogues') > 0.0
+                if strcmpi(answer, 'View log') == 1.0
+                    winopen(logFile)
+                elseif strcmpi(answer, 'Open results folder') == 1.0
+                    winopen(dir)
+                end
             end
         end
     end

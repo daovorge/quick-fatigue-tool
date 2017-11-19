@@ -5,8 +5,8 @@ function [] = cleanup(status)
 %   CLEANUP is used internally by Quick Fatigue Tool. The user
 %   is not required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
-%   Last modified 01-Nov-2017 14:46:47 GMT
+%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
+%   Last modified 19-Nov-2017 16:45:59 GMT
     
     %%
     
@@ -23,10 +23,13 @@ end
 %% Close any other open files
 fclose('all');
 
+%% Add output folder to current directory
+job = getappdata(0, 'jobName');
+addpath(genpath(sprintf('%s\\Project\\output\\%s', pwd, job)))
+
 %% If the analysis exited with errors, create error log
 if status == 1.0
     % Create an error log file
-    job = getappdata(0, 'jobName');
     dir = sprintf('Project/output/%s/', job);
     errLogFile = [dir, sprintf('%s.log', job)];
     
@@ -55,13 +58,13 @@ if status == 1.0
     
     % Write file header
     try
-        fprintf(fid, 'Quick Fatigue Tool 6.11-06 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
+        fprintf(fid, 'Quick Fatigue Tool 6.11-07 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
     catch
-        fprintf(fid, 'Quick Fatigue Tool 6.11-06\r\n');
+        fprintf(fid, 'Quick Fatigue Tool 6.11-07\r\n');
     end
     fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
     fprintf(fid, 'Copyright Louis Vallance 2017\r\n');
-    fprintf(fid, 'Last modified 01-Nov-2017 14:46:47 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 19-Nov-2017 16:45:59 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');
@@ -464,7 +467,7 @@ if status == 1.0
     end
     if getappdata(0, 'E023') == 1.0
         fprintf(fid, '\r\n\r\n***ERROR: No stress datasets were specified');
-        fprintf(fid, '\r\n-> At least one stress dataset is required for analysis');
+        fprintf(fid, '\r\n-> At least one stress dataset is required for multiaxial analysis');
         fprintf(fid, '\r\n\r\nError code: E023');
         rmappdata(0, 'E023')
     end
@@ -1289,16 +1292,18 @@ if status == 1.0
     fclose(fid);
     
     % Prompt user if they would like to view the analysis log
-    if (ispc == 1.0) && (ismac == 0.0)
-        answer = questdlg('The analysis exited with an error - Please see the log file for more information.', 'Quick Fatigue Tool', 'View log', 'Close', 'View log');
-    elseif (ispc == 0.0) && (ismac == 1.0)
-        answer = errordlg('The analysis exited with an error - Please see the log file for more information.', 'Quick Fatigue Tool');
-    else
-        answer = -1.0;
-    end
-    
-    if strcmpi(answer, 'View log') == 1.0
-        winopen(errLogFile)
+    if getappdata(0, 'analysisDialogues') > 0.0
+        if (ispc == 1.0) && (ismac == 0.0)
+            answer = questdlg('The analysis exited with an error - Please see the log file for more information.', 'Quick Fatigue Tool', 'View log', 'Close', 'View log');
+        elseif (ispc == 0.0) && (ismac == 1.0)
+            answer = errordlg('The analysis exited with an error - Please see the log file for more information.', 'Quick Fatigue Tool');
+        else
+            answer = -1.0;
+        end
+        
+        if strcmpi(answer, 'View log') == 1.0
+            winopen(errLogFile)
+        end
     end
 end
 

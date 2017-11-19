@@ -9,8 +9,8 @@ function [] = fos(gateTensors, tensorGate, coldItems, algorithm, msCorrection, N
 %   Reference section in Quick Fatigue Tool User Guide
 %      8.3 Factor of Strength
 %   
-%   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
-%   Last modified 16-Aug-2017 09:58:29 GMT
+%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
+%   Last modified 16-Nov-2017 14:27:15 GMT
     
     %%
     
@@ -26,6 +26,9 @@ Txz = getappdata(0, 'Txz');
 s1 = getappdata(0, 'S1');
 s2 = getappdata(0, 'S2');
 s3 = getappdata(0, 'S3');
+
+% Get proportionaly items
+proportionalItems = getappdata(0, 'proportionalItems');
 
 % Get the damage at each item
 nodalDamage = getappdata(0, 'D');
@@ -241,7 +244,7 @@ for groups = 1:G
             setappdata(0, 'Txzi_FOS', Txzi)
             
             % If necessray, re-calculate the principal stress history
-            if (algorithm == 4.0) || (algorithm == 6.0) || (algorithm == 7.0) || (algorithm == 3.0)
+            if (algorithm == 4.0) || (algorithm == 5.0) || (algorithm == 6.0) || (algorithm == 7.0) || (algorithm == 3.0)
                 preProcess.getPrincipalStress(1.0, Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, algorithm, 1.0)
                 
                 s1i = getappdata(0, 'S1_FOS');
@@ -255,19 +258,19 @@ for groups = 1:G
                         totalCounter, nodalDamage, msCorrection, nodalDamageParameter, gateTensors, tensorGate, s1i, s2i, s3i);
                 case 4.0 % STRESS-BASED BROWN-MILLER
                     [nodalDamageParameter, ~, ~, ~, ~, nodalDamage] = algorithm_sbbm.main(Sxxi, Syyi, Szzi,...
-                        Txyi, Tyzi, Txzi, L, step(totalCounter), planePrecision(totalCounter),...
+                        Txyi, Tyzi, Txzi, L, step, proportionalItems(totalCounter), planePrecision,...
                         nodalDamageParameter, nodalAmplitudes, nodalPairs, nodalPhiC,...
                         nodalThetaC, totalCounter, msCorrection, nodalDamage, gateTensors, tensorGate,...
                         signConvention, s1i, s2i, s3i, 1.0, rainflowMode);
                 case 5.0 % NORMAL STRESS
                     [nodalDamageParameter, ~, ~, ~, ~, nodalDamage] = algorithm_ns.main(Sxxi, Syyi, Szzi,...
-                        Txyi, Tyzi, Txzi, L, step(totalCounter), planePrecision(totalCounter),...
+                        Txyi, Tyzi, Txzi, s1i, s3i, L, step, proportionalItems(totalCounter), planePrecision,...
                         nodalDamageParameter, nodalAmplitudes, nodalPairs, nodalPhiC,...
                         nodalThetaC, totalCounter, msCorrection, nodalDamage, gateTensors, tensorGate, 1.0);
                 case 6.0 % FINDLEY'S METHOD
                     k = getappdata(0, 'k');
                     [nodalDamageParameter, ~, ~, ~, ~, nodalDamage] = algorithm_findley.main(Sxxi, Syyi, Szzi,...
-                        Txyi, Tyzi, Txzi, L, step(totalCounter), planePrecision(totalCounter),...
+                        Txyi, Tyzi, Txzi, L, step, proportionalItems(totalCounter), planePrecision,...
                         nodalDamageParameter, nodalAmplitudes, nodalPairs, nodalPhiC,...
                         nodalThetaC, totalCounter, nodalDamage, msCorrection, gateTensors, tensorGate,...
                         signConvention, s1i, s2i, s3i, 1.0, k);

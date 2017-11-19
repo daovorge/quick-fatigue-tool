@@ -11,7 +11,7 @@ function varargout = LocalMaterialDatabase(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials
 %   
-%   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
 %   Last modified 16-Oct-2017 09:28:25 GMT
     
     %%

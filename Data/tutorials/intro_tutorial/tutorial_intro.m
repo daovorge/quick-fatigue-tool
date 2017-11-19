@@ -17,8 +17,8 @@ function [] = tutorial_intro()
 %   Reference section in Quick Fatigue Tool User Settings Reference Guide
 %      1 Job file options
 %   
-%   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
-%   Last modified 03-Oct-2017 13:44:11 GMT
+%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
+%   Last modified 17-Nov-2017 08:51:28 GMT
 
 %% JOB
 
@@ -79,7 +79,7 @@ CONV = [];
 LOAD_EQ = {1.0, 'Repeats'};
 
 % LOAD SCALE FACTORS
-SCALE = 0.8285;
+SCALE = 1.0;
 
 % LOAD OFFSET VALUES
 OFFSET = [];

@@ -12,8 +12,8 @@
 %   Reference section in Quick Fatigue Tool User Settings Reference Guide
 %      2 Environment variables
 %   
-%   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
-%   Last modified 08-Oct-2017 12:50:10 GMT
+%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
+%   Last modified 06-Nov-2017 15:15:09 GMT
 
 %% GATE TENSORS
 %{
@@ -134,7 +134,7 @@ setappdata(0, 'thresholdScaleFactor', 0.8)
 
 % SEARCH PARAMETERS
 setappdata(0, 'stepSize', 10.0)
-setappdata(0, 'checkLoadProportionality', 0.0)
+setappdata(0, 'checkLoadProportionality', 1.0)
 setappdata(0, 'proportionalityTolerance', 1.0)
 
 % CP HISTORY SMOOTHING
@@ -388,6 +388,10 @@ setappdata(0, 'historyFormatString', 'f')
 
 % COMMAND WINDOW OUTPUT
 setappdata(0, 'echoMessagesToCWIN', 0.0)
+
+% ANALYSIS DIALOGUES
+setappdata(0, 'analysisDialogues', 1.0)
+setappdata(0, 'checkOverwrite', 1.0)
 
 %% APPLICATION DATA
 
