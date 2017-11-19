@@ -10,7 +10,7 @@ classdef virtualGaugeUtils < handle
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.4 Virtual Strain Gauge
 %   
-%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
 %   Last modified 14-Oct-2017 18:15:15 GMT
     
     %%
