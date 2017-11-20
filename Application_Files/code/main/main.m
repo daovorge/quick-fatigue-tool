@@ -299,7 +299,7 @@ end
 nodalElimination = getappdata(0, 'nodalElimination');
 
 % Only if Uniaxial Stress-Life or BS 7608 are not being used for analysis
-if (algorithm ~= 10.0) && (algorithm ~= 8.0) && (algorithm ~= 3.0)
+if (algorithm ~= 10.0) && (algorithm ~= 8.0) && (algorithm ~= 3.0) && (getappdata(0, 'compositeCriteria') == 0.0)
     if (nodalElimination > 0.0) && (N > 1.0)
         fprintf('\n[PRE] Optimizing datasets')
         fprintf(fid_status, '\n[PRE] Optimizing datasets');

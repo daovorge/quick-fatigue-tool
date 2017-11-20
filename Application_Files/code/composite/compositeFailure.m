@@ -447,18 +447,17 @@ if (failStressGeneral ~= -1.0) || (tsaiWuTT ~= -1.0) || (failStrain ~= -1.0) || 
     fclose(fid);
     
     messenger.writeMessage(129.0)
+    
+    %% Write results to ODB if applicable
+    if getappdata(0, 'autoExport_ODB') == 1.0
+        if getappdata(0, 'autoExport_uniaxial') == 1.0
+            messenger.writeMessage(203.0)
+        else
+            composite.exportODB(fid_status, mainID)
+        end
+    end
 else
     messenger.writeMessage(300.0)
-end
-
-%% Write results to ODB if applicable
-emptyFields = all(data(:, 3:end) == -1.0);
-if (getappdata(0, 'autoExport_ODB') == 1.0) && (all(emptyFields == -1.0) == 0.0)
-    if getappdata(0, 'autoExport_uniaxial') == 1.0
-        messenger.writeMessage(203.0)
-    else
-        composite.exportODB(fid_status, mainID)
-    end
 end
 
 %% Cleanup
