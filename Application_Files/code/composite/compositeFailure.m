@@ -1,4 +1,4 @@
-function [] = compositeFailure(N, L)
+function [] = compositeFailure(N, L, mainID, fid_status)
 %COMPOSITEFAILURE    QFT function to calculate composite failure criteria.
 %   This function calculates composite failure criteria according to the
 %   maximum stress, Tsai-Hill, Tsai-Wu, Azzi-Tsai-Hill and Hashin criteria.
@@ -7,7 +7,7 @@ function [] = compositeFailure(N, L)
 %   not required to run this file.
 %
 %   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 06-Nov-2017 09:54:05 GMT
+%   Last modified 20-Nov-2017 15:52:10 GMT
     
     %%
 
@@ -451,5 +451,15 @@ else
     messenger.writeMessage(300.0)
 end
 
-% Cleanup
+%% Write results to ODB if applicable
+emptyFields = all(data(:, 3:end) == -1.0);
+if (getappdata(0, 'autoExport_ODB') == 1.0) && (all(emptyFields == -1.0) == 0.0)
+    if getappdata(0, 'autoExport_uniaxial') == 1.0
+        messenger.writeMessage(203.0)
+    else
+        composite.exportODB(fid_status, mainID)
+    end
+end
+
+%% Cleanup
 messenger.writeMessage(127.0)

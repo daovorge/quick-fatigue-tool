@@ -9,7 +9,7 @@ function [LARPFCRT, LARMFCRT, LARKFCRT, LARSFCRT, LARTFCRT] =...
 %   not required to run this file.
 %
 %   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 14-Oct-2017 18:15:15 GMT
+%   Last modified 20-Nov-2017 15:52:10 GMT
     
     %%
 
