@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 21-Nov-2017 15:34:28 GMT
+%   Last modified 21-Nov-2017 17:50:16 GMT
 
     %%
 
@@ -2247,9 +2247,8 @@ classdef messenger < handle
                     case 306.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The LaRC05 damage initiation (fibre tensile) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'LARTFCRT'));
                     case 307.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: One or more regions in the model are in a state of pure triaxial tension/compression', returnType{i}]);
-                        fprintf(fidType(i), ['-> These regions have zero effective ductility, and could fail due to sudden brittle fracture', returnType{i}]);
-                        fprintf(fidType(i), ['-> Check the field data for infinite values of the variable TRF', returnType{i}]);
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: One or more regions in the model are in a highly triaxial state of stress (TRF > 2)', returnType{i}]);
+                        fprintf(fidType(i), ['-> The effective ductility at these regions is diminished and there is a higher likelihood of brittle fracture', returnType{i}]);
                         
                         setappdata(0, 'messageFileWarnings', 1.0)
                 end
@@ -2308,7 +2307,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2017\r\n');
-            fprintf(fid, 'Last modified 21-Nov-2017 15:34:28 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 21-Nov-2017 17:50:16 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

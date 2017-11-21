@@ -11,7 +11,7 @@ classdef postProcess < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 21-Nov-2017 15:34:28 GMT
+%   Last modified 21-Nov-2017 17:50:16 GMT
     
     %%
     
@@ -253,7 +253,7 @@ classdef postProcess < handle
             setappdata(0, 'TRF', triaxialityFactor)
             
             % Warn the user if any parts of the model are in a state of pure triaxial tension/compression
-            if any(isinf(triaxialityFactor)) == 1.0
+            if any(triaxialityFactor > 2.0) == 1.0
                 messenger.writeMessage(307.0)
             end
         end
@@ -1996,18 +1996,27 @@ classdef postProcess < handle
                 if status == 1.0
                     % There is no Abaqus executable on the host machine
                     fprintf('[POST] ODB Error: %s', result);
+                    fprintf(fid_status, '[POST] ODB Error: %s', result);
                     fprintf('\n[ERROR] ODB Interface exited with errors');
                     fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors');
                     return
                 end
             end
             
-            % If the ODB is already up-to-date, simply copy the file
-            % instead
+            % If the ODB is already up-to-date, try to copy the file instead
             removeCarriageReturn = 0.0;
             if exist([resultsDatabasePath, '/', resultsDatabaseName, '.odb'], 'file') == 0.0
-                copyfile(modelDatabasePath, [resultsDatabasePath, '/', resultsDatabaseName, '.odb'])
-                removeCarriageReturn = 1.0;
+                try
+                    copyfile(modelDatabasePath, [resultsDatabasePath, '/', resultsDatabaseName, '.odb'])
+                    removeCarriageReturn = 1.0;
+                catch exception
+                    % The file could not be copied
+                    fprintf('[POST] ODB Error: %s', exception.message);
+                    fprintf(fid_status, '[POST] ODB Error: %s', exception.message);
+                    fprintf('\n[ERROR] ODB Interface exited with errors');
+                    fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors');
+                    return
+                end
             end
             
             if removeCarriageReturn == 1.0

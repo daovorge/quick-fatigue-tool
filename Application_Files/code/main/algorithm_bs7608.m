@@ -1044,7 +1044,7 @@ classdef algorithm_bs7608 < handle
             setappdata(0, 'TRF', triaxialityFactor)
             
             % Warn the user if any parts of the model are in a state of pure triaxial tension/compression
-            if any(isinf(triaxialityFactor)) == 1.0
+            if any(triaxialityFactor > 2.0) == 1.0
                 messenger.writeMessage(307.0)
             end
         end
