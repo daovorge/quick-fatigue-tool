@@ -7,7 +7,7 @@ function [] = compositeFailure(N, L, mainID, fid_status)
 %   not required to run this file.
 %
 %   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 20-Nov-2017 15:52:10 GMT
+%   Last modified 21-Nov-2017 11:22:26 GMT
     
     %%
 
@@ -45,6 +45,9 @@ S33 = getappdata(0, 'Szz');
 S12 = getappdata(0, 'Txy');
 S13 = getappdata(0, 'Txz');
 S23 = getappdata(0, 'Tyz');
+
+% Constant for quadratic formula
+C = linspace(-1.0, -1.0, L);
 
 % Check if the symbolic math toolbox is available
 symsAvailable = checkToolbox('Symbolic Math Toolbox');
@@ -222,7 +225,7 @@ for groups = 1:G
         S12i = S12_group(i, :);
         S13i = S13_group(i, :);
         S23i = S23_group(i, :);
-        
+
         %% Check for out-of-plane stress components
         if any(S33i) == 1.0 || any(S13i) == 1.0 || any(S23i) == 1.0
             messenger.writeMessage(132.0)
@@ -237,21 +240,31 @@ for groups = 1:G
             Y(S22i >= 0.0) = Yt;
             Y(S22i < 0.0) = Yc;
             
-            % Failure calculation
+            % Failure calculation (MSTRS)
             MS11 = S11i./X;
             MS22 = S22i./Y;
-            MS12 = abs(S12./S);
+            MS12 = abs(S12i./S);
             MSTRS(totalCounter) = max(max([MS11; MS22; MS12]));
             
-            TSAIH(totalCounter) = max((S11i.^2.0./X.^2.0) - ((S11i.*S22i)./X.^2.0) + (S22i.^2.0./Y.^2.0) + (S12i.^2.0./S.^2.0));
-            TSAIW(totalCounter) = max((F1.*S11i) + (F2.*S22i) + (F11.*S11i.^2.0) + (F22.*S22i.^2.0) + (F66.*S12i.^2.0) + (2.0.*F12.*S11i.*S22i));
-            AZZIT(totalCounter) = max((S11i.^2.0./X.^2.0) - (abs((S11i.*S22i))/X.^2.0) + (S22i.^2.0./Y.^2.0) + (S12i.^2.0./S.^2.0));
+            % Failure calculation (TSAIH)
+            TSAIH(totalCounter) = sqrt((max((S11i.^2.0./X.^2.0) - ((S11i.*S22i)./X.^2.0) + (S22i.^2.0./Y.^2.0) + (S12i.^2.0./S.^2.0))));
+            
+            % Failure calculation (TSAIW)
+            A = (F11.*S11i.*S11i) + (F22.*S22i.*S22i) + (F66.*S12i.*S12i) + (2.0.*F12.*S11i.*S22i);
+            B = (F1.*S11i) + (F2.*S22i);
+            TSAIW(totalCounter) = 1.0./min([(-B + sqrt(B.^2.0 - (4.0.*A.*C)))./(2.0.*A), (-B - sqrt(B.^2.0 - (4.0.*A.*C)))./(2.0.*A)]);
+            
+            % Failure calculation (AZZIT)
+            AZZIT(totalCounter) = sqrt(max((S11i.^2.0./X.^2.0) - (abs((S11i.*S22i))/X.^2.0) + (S22i.^2.0./Y.^2.0) + (S12i.^2.0./S.^2.0)));
         end
         
         if tsaiWuTT == 1.0
             k(totalCounter) = max(S12i./S23i);
             
-            TSAIWTT(totalCounter) = max((F2.*S22i) + (F3.*S33i) + (F22.*S22i.^2.0) + (F33*S33i.^2.0) + (2.0.*F23.*S22i.*S33i));
+            A = (F22.*S22i.^2.0) + (F33*S33i.^2.0) + (2.0.*F23.*S22i.*S33i);
+            B = (F2.*S22i) + (F3.*S33i);
+            C2 = (S12i./S23i).^2 - 1.0;
+            TSAIWTT(totalCounter) = 1.0./min([(-B + sqrt(B.^2.0 - (4.0.*A.*C2)))./(2.0.*A), (-B - sqrt(B.^2.0 - (4.0.*A.*C2)))./(2.0.*A)]);
         end
         
         %% FAIL STRAIN CALCULATION
@@ -334,6 +347,23 @@ k(isinf(k)) = 0.0;
 if hashin == 1.0
     HSNMCCRT(HSNMCCRT < 0.0) = 0.0;
 end
+
+%% Round failure measures to 1 if within tolerance
+MSTRS(abs(MSTRS - 1.0) < 1e-6) = 1.0;
+MSTRN(abs(MSTRN - 1.0) < 1e-6) = 1.0;
+TSAIH(abs(TSAIH - 1.0) < 1e-6) = 1.0;
+TSAIW(abs(TSAIW - 1.0) < 1e-6) = 1.0;
+TSAIWTT(abs(TSAIWTT - 1.0) < 1e-6) = 1.0;
+AZZIT(abs(AZZIT - 1.0) < 1e-6) = 1.0;
+HSNFTCRT(abs(HSNFTCRT - 1.0) < 1e-6) = 1.0;
+HSNFCCRT(abs(HSNFCCRT - 1.0) < 1e-6) = 1.0;
+HSNMTCRT(abs(HSNMTCRT - 1.0) < 1e-6) = 1.0;
+HSNMCCRT(abs(HSNMCCRT - 1.0) < 1e-6) = 1.0;
+LARPFCRT(abs(LARPFCRT - 1.0) < 1e-6) = 1.0;
+LARMFCRT(abs(LARMFCRT - 1.0) < 1e-6) = 1.0;
+LARKFCRT(abs(LARKFCRT - 1.0) < 1e-6) = 1.0;
+LARSFCRT(abs(LARSFCRT - 1.0) < 1e-6) = 1.0;
+LARTFCRT(abs(LARTFCRT - 1.0) < 1e-6) = 1.0;
 
 %% Inform the user if composite has failed
 N_MSTRS = length(MSTRS(MSTRS >= 1.0));
