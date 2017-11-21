@@ -94,6 +94,15 @@ if isappdata(0, 'failStress_limit23') == 1.0
     set(handles.edit_limit23, 'string', getappdata(0, 'failStress_limit23'))
 end
 
+% Load icon
+[a,~]=imread('icoR_delete.jpg');
+[r,c,~]=size(a); 
+x=ceil(r/35); 
+y=ceil(c/35); 
+g=a(1:x:end,1:y:end,:);
+g(g==255)=5.5*255;
+set(handles.pButton_reset, 'CData', g);
+
 
 % --- Outputs from this function are returned to the command line.
 function varargout = failStress_OutputFcn(~, ~, handles) 
@@ -514,3 +523,18 @@ function edit_cross12_CreateFcn(hObject, ~, ~)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in pButton_reset.
+function pButton_reset_Callback(~, ~, handles)
+set(handles.edit_tsfd, 'string', [])
+set(handles.edit_csfd, 'string', [])
+set(handles.edit_tstd, 'string', [])
+set(handles.edit_cstd, 'string', [])
+set(handles.edit_tsttd, 'string', [])
+set(handles.edit_csttd, 'string', [])
+set(handles.edit_shear, 'string', [])
+set(handles.edit_cross12, 'string', 0)
+set(handles.edit_cross23, 'string', 0)
+set(handles.edit_limit12, 'string', [])
+set(handles.edit_limit23, 'string', [])

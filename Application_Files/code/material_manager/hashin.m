@@ -78,6 +78,15 @@ if isappdata(0, 'hashin_tss') == 1.0
     set(handles.edit_tss, 'string', getappdata(0, 'hashin_tss'))
 end
 
+% Load icon
+[a,~]=imread('icoR_delete.jpg');
+[r,c,~]=size(a); 
+x=ceil(r/35); 
+y=ceil(c/35); 
+g=a(1:x:end,1:y:end,:);
+g(g==255)=5.5*255;
+set(handles.pButton_reset, 'CData', g);
+
 
 % --- Outputs from this function are returned to the command line.
 function varargout = hashin_OutputFcn(~, ~, handles) 
@@ -372,3 +381,14 @@ function enable(handles)
 set(findall(handles.hashinDamage, '-property', 'Enable'), 'Enable', 'on')
 set(handles.edit_alpha, 'backgroundColor', 'white')
 set(handles.edit_alpha, 'backgroundColor', [177/255, 206/255, 237/255])
+
+
+% --- Executes on button press in pButton_reset.
+function pButton_reset_Callback(~, ~, handles)
+set(handles.edit_alpha, 'string', 0)
+set(handles.edit_lts, 'string', [])
+set(handles.edit_lcs, 'string', [])
+set(handles.edit_tts, 'string', [])
+set(handles.edit_tcs, 'string', [])
+set(handles.edit_lss, 'string', [])
+set(handles.edit_tss, 'string', [])
