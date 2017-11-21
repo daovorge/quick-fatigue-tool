@@ -11,7 +11,7 @@ function [] = main(flags)
 %   Author contact: louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 21-Nov-2017 11:22:26 GMT
+%   Last modified 21-Nov-2017 15:34:28 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');    tic_pre = tic;
@@ -43,7 +43,7 @@ setappdata(0, 'messageFileWarnings', 0.0)
 %% PRINT COMMAND WINDOW HEADER
 fprintf('[NOTICE] Quick Fatigue Tool 6.11-08')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2017)')
-fprintf('\n[NOTICE] Last modified 21-Nov-2017 11:22:26 GMT')
+fprintf('\n[NOTICE] Last modified 21-Nov-2017 15:34:28 GMT')
 
 cleanExit = 0.0;
 
@@ -328,7 +328,7 @@ else
         messenger.writeMessage(20.0)
     end
 
-    if nodalElimination > 0.0 && (algorithm == 10.0 || algorithm == 3.0)
+    if (nodalElimination > 0.0) && (algorithm == 10.0 || algorithm == 3.0) && (getappdata(0, 'compositeCriteria') == 0.0)
         messenger.writeMessage(21.0)
     end
 

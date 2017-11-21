@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 21-Nov-2017 11:22:26 GMT
+%   Last modified 21-Nov-2017 15:34:28 GMT
 
     %%
 
@@ -2199,13 +2199,18 @@ classdef messenger < handle
                     case 286.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The surface definition file ''%s'' is invalid', returnType{i}], getappdata(0, 'hotspotFile'));
                         fprintf(fidType(i), ['-> The whole model will be analysed', returnType{i}]);
+                        
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 287.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: Some items in the surface definition file could not be located in the stress dataset', returnType{i}]);
                         fprintf(fidType(i), ['-> Verify that the results position in the surface definition is consistent with the model definition in the job file', returnType{i}]);
+                        
+                        setappdata(0, 'messageFileWarnings', 1.0)
                     case 289.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The following elements are not supported by the surface detection algorithm: %s', returnType{i}], getappdata(0, 'message_289_unsupportedElements'));
                         fprintf(fidType(i), ['-> These elements have been skipped', returnType{i}]);
+                        
+                        setappdata(0, 'messageFileWarnings', 1.0)
                     case 290.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The maximum stress failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'MSTRS'));
                     case 291.0
@@ -2225,7 +2230,7 @@ classdef messenger < handle
                     case 298.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin damage initiation (matrix tensile) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNMTCRT'));
                     case 299.0
-                        
+                        %_AVAILABLE_%
                     case 300.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The COMPOSITE_CRITERIA job file option was specified, but composite criteria were not evaluated', returnType{i}]);
                         fprintf(fidType(i), ['-> The specified composite properies are insufficient', returnType{i}]);
@@ -2241,6 +2246,12 @@ classdef messenger < handle
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The LaRC05 damage initiation (fibre split) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'LARSFCRT'));
                     case 306.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The LaRC05 damage initiation (fibre tensile) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'LARTFCRT'));
+                    case 307.0
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: One or more regions in the model are in a state of pure triaxial tension/compression', returnType{i}]);
+                        fprintf(fidType(i), ['-> These regions have zero effective ductility, and could fail due to sudden brittle fracture', returnType{i}]);
+                        fprintf(fidType(i), ['-> Check the field data for infinite values of the variable TRF', returnType{i}]);
+                        
+                        setappdata(0, 'messageFileWarnings', 1.0)
                 end
             end
         end
@@ -2297,7 +2308,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2017\r\n');
-            fprintf(fid, 'Last modified 21-Nov-2017 11:22:26 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 21-Nov-2017 15:34:28 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

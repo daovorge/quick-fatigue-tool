@@ -14,7 +14,7 @@ classdef algorithm_bs7608 < handle
 %      6.6 BS 7608 Fatigue of Welded Steel Joints
 %   
 %   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 16-Nov-2017 14:27:15 GMT
+%   Last modified 21-Nov-2017 15:34:28 GMT
     
     %%
     
@@ -1042,6 +1042,11 @@ classdef algorithm_bs7608 < handle
             end
             
             setappdata(0, 'TRF', triaxialityFactor)
+            
+            % Warn the user if any parts of the model are in a state of pure triaxial tension/compression
+            if any(isinf(triaxialityFactor)) == 1.0
+                messenger.writeMessage(307.0)
+            end
         end
         
         %% BS 7608 WRITE FIELD OUTPUT
