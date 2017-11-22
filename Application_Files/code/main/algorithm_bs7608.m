@@ -14,7 +14,7 @@ classdef algorithm_bs7608 < handle
 %      6.6 BS 7608 Fatigue of Welded Steel Joints
 %   
 %   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 21-Nov-2017 15:34:28 GMT
+%   Last modified 22-Nov-2017 09:33:19 GMT
     
     %%
     
@@ -1554,8 +1554,10 @@ classdef algorithm_bs7608 < handle
                 if numberOfCycles > 1.0
                     cumulativeDamage = cumsum(damagePerCycle);
                     
-                    % If the maximum damage is zero, skip this variable
-                    if max(cumulativeDamage) ~= 0.0
+                    % If the maximum damage is zero or INF, skip this variable
+                    if (max(cumulativeDamage) == 0.0) || (max(cumulativeDamage) == inf)
+                        messenger.writeMessage(299.0)
+                    else
                         % Check whether damage crosses the infinite life envelope
                         crossing = -999.0;
                         cael = 0.5*getappdata(0, 'cael');
