@@ -7,7 +7,7 @@ function [] = compositeFailure(N, L, mainID, fid_status)
 %   not required to run this file.
 %
 %   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 21-Nov-2017 11:22:26 GMT
+%   Last modified 23-Nov-2017 09:28:06 GMT
     
     %%
 
@@ -241,8 +241,8 @@ for groups = 1:G
             Y(S22i < 0.0) = Yc;
             
             % Failure calculation (MSTRS)
-            MS11 = S11i./X;
-            MS22 = S22i./Y;
+            MS11 = abs(S11i./X);
+            MS22 = abs(S22i./Y);
             MS12 = abs(S12i./S);
             MSTRS(totalCounter) = max(max([MS11; MS22; MS12]));
             
@@ -252,7 +252,7 @@ for groups = 1:G
             % Failure calculation (TSAIW)
             A = (F11.*S11i.*S11i) + (F22.*S22i.*S22i) + (F66.*S12i.*S12i) + (2.0.*F12.*S11i.*S22i);
             B = (F1.*S11i) + (F2.*S22i);
-            TSAIW(totalCounter) = 1.0./min([(-B + sqrt(B.^2.0 - (4.0.*A.*C)))./(2.0.*A), (-B - sqrt(B.^2.0 - (4.0.*A.*C)))./(2.0.*A)]);
+            TSAIW(totalCounter) = abs(1.0./min([(-B + sqrt(B.^2.0 - (4.0.*A.*C)))./(2.0.*A), (-B - sqrt(B.^2.0 - (4.0.*A.*C)))./(2.0.*A)]));
             
             % Failure calculation (AZZIT)
             AZZIT(totalCounter) = sqrt(max((S11i.^2.0./X.^2.0) - (abs((S11i.*S22i))/X.^2.0) + (S22i.^2.0./Y.^2.0) + (S12i.^2.0./S.^2.0)));
@@ -264,7 +264,7 @@ for groups = 1:G
             A = (F22.*S22i.^2.0) + (F33*S33i.^2.0) + (2.0.*F23.*S22i.*S33i);
             B = (F2.*S22i) + (F3.*S33i);
             C2 = (S12i./S23i).^2 - 1.0;
-            TSAIWTT(totalCounter) = 1.0./min([(-B + sqrt(B.^2.0 - (4.0.*A.*C2)))./(2.0.*A), (-B - sqrt(B.^2.0 - (4.0.*A.*C2)))./(2.0.*A)]);
+            TSAIWTT(totalCounter) = abs(1.0./min([(-B + sqrt(B.^2.0 - (4.0.*A.*C2)))./(2.0.*A), (-B - sqrt(B.^2.0 - (4.0.*A.*C2)))./(2.0.*A)]));
         end
         
         %% FAIL STRAIN CALCULATION
