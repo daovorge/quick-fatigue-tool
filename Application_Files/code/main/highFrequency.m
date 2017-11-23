@@ -7,7 +7,7 @@ classdef highFrequency < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 04-Oct-2017 18:09:00 GMT
+%   Last modified 23-Nov-2017 09:28:06 GMT
     
     %%
     
@@ -138,11 +138,20 @@ classdef highFrequency < handle
             
             % Check the length of the history data
             if length(scale) < 2.0
-                error = true;
-                setappdata(0, 'E017', 1.0)
-
-                Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
-                return
+                if getappdata(0, 'compositeCriteria') == 1.0
+                    %{
+                    	For composite failure criteria analysis, a load
+                        history 1 point is permitted. Prepend a zero to the
+                        load history
+                    %}
+                    scale = [0.0, scale];
+                else
+                    error = true;
+                    setappdata(0, 'E017', 1.0)
+                    
+                    Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
+                    return
+                end
             end
             
             % Check the dimensionality of the history data
@@ -392,11 +401,20 @@ classdef highFrequency < handle
                     
                     % Check the length of the history data
                     if length(scale) < 2.0
-                        error = true;
-                        setappdata(0, 'E017', 1.0)
-                        
-                        Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
-                        return
+                        if getappdata(0, 'compositeCriteria') == 1.0
+                            %{
+                                For composite failure criteria analysis, a
+                                load history 1 point is permitted. Prepend
+                                a zero to the load history
+                            %}
+                            scale = [0.0, scale]; %#ok<AGROW>
+                        else
+                            error = true;
+                            setappdata(0, 'E017', 1.0)
+                            
+                            Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
+                            return
+                        end
                     end
                     
                     % Check the dimensionality of the history data
@@ -557,24 +575,34 @@ classdef highFrequency < handle
             L = length(channels);
             first_time = 1.0;
             
+            % Get the composite criteria flag
+            compositeCriteria = getappdata(0, 'compositeCriteria');
+            
             % Begin reading datasets
-            if ischar(channels) == 1.0
-                % Only one dataset is defined in a sequence
-                if isempty(channels) == 1.0
-                    setappdata(0, 'E023', 1.0)
-                else
-                    setappdata(0, 'E024', 1.0)
+            if compositeCriteria == 1.0
+                if ischar(channels) == 1.0
+                    channels = {channels, channels};
+                elseif length(channels) == 1.0
+                    channels = [channels(1.0), channels(1.0)];
                 end
-                
-                error = true;
-                Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
-                return
-            elseif length(channels) == 1.0
-                setappdata(0, 'E024', 1.0)
-                
-                error = true;
-                Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
-                return
+            else
+                if ischar(channels) == 1.0
+                    if isempty(channels) == 1.0
+                        setappdata(0, 'E023', 1.0)
+                    else
+                        setappdata(0, 'E024', 1.0)
+                    end
+                    
+                    error = true;
+                    Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
+                    return
+                elseif length(channels) == 1.0
+                    setappdata(0, 'E024', 1.0)
+                    
+                    error = true;
+                    Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
+                    return
+                end
             end
             
             % Verify the loading scale factors
