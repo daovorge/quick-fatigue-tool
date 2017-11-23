@@ -6,7 +6,7 @@ function [] = cleanup(status)
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 23-Nov-2017 09:28:06 GMT
+%   Last modified 23-Nov-2017 14:46:40 GMT
     
     %%
     
@@ -64,7 +64,7 @@ if status == 1.0
     end
     fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
     fprintf(fid, 'Copyright Louis Vallance 2017\r\n');
-    fprintf(fid, 'Last modified 23-Nov-2017 09:28:06 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 23-Nov-2017 14:46:40 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');
@@ -414,20 +414,24 @@ if status == 1.0
         fprintf(fid, '\r\n\r\n***ERROR: An unhandled exception was encountered while combining the loading data');
         
         % Print the error stack
-        fprintf(fid, '\r\n-> MException ID: %s', exception.identifier);
-        fprintf(fid, '\r\n-> MException Message: %s', exception.message);
-        if isempty(exception.cause) == 0.0
-            fprintf(fid, '\r\n-> MException cause: %s', exception.cause);
+        try
+            fprintf(fid, '\r\n-> MException ID: %s', exception.identifier);
+            fprintf(fid, '\r\n-> MException Message: %s', exception.message);
+            if isempty(exception.cause) == 0.0
+                fprintf(fid, '\r\n-> MException cause: %s', exception.cause);
+            end
+            fprintf(fid, '\r\n');
+            stack = exception.stack;
+            for i = 1:length(stack)
+                fprintf(fid, '\r\n<Level %.0f>\r\n', i);
+                fprintf(fid, 'File: ''%s''\r\n', stack(i).file);
+                fprintf(fid, 'Name: %s\r\n', stack(i).name);
+                fprintf(fid, 'Line: %.0f\r\n', stack(i).line);
+            end
+            fprintf(fid, '\r\nPLEASE SAVE THIS FILE AND CONTACT THE DEVELOPER FOR FURTHER ASSISTANCE: LOUISVALLANCE@HOTMAIL.CO.UK');
+        catch
+            fprintf(fid, '\r\n\r\nPLEASE SAVE THIS FILE AND CONTACT THE DEVELOPER FOR FURTHER ASSISTANCE: LOUISVALLANCE@HOTMAIL.CO.UK');
         end
-        fprintf(fid, '\r\n');
-        stack = exception.stack;
-        for i = 1:length(stack)
-            fprintf(fid, '\r\n<Level %.0f>\r\n', i);
-            fprintf(fid, 'File: ''%s''\r\n', stack(i).file);
-            fprintf(fid, 'Name: %s\r\n', stack(i).name);
-            fprintf(fid, 'Line: %.0f\r\n', stack(i).line);
-        end
-        fprintf(fid, '\r\nPLEASE SAVE THIS FILE AND CONTACT THE DEVELOPER FOR FURTHER ASSISTANCE: LOUISVALLANCE@HOTMAIL.CO.UK');
         
         fprintf(fid, '\r\n\r\nError code: E022');
         rmappdata(0, 'E022')

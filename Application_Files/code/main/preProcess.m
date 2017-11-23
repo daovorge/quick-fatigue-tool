@@ -3226,7 +3226,9 @@ classdef preProcess < handle
             if L == nScaleFactors
                 % Dataset/history pairs equal to number of loading scale factors
             elseif L > nScaleFactors
-                messenger.writeMessage(281.0)
+                if ((compositeCriteria == 1.0) && (ischar(channels) == 1.0) && (L > 2.0)) || ((compositeCriteria == 0.0) && (L > nScaleFactors))
+                    messenger.writeMessage(281.0)
+                end
                 
                 % Dataset/history pairs greater than number of loading scale factors
                 extraScaleFactors = linspace(loadingScale(end), loadingScale(end), (L - nScaleFactors));

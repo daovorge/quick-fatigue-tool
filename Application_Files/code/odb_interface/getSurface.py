@@ -38,7 +38,7 @@
 #      4.5.3 Custom analysis items
 #
 #   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
-#   Last modified 17-Nov-2017 12:39:37 GMT
+#   Last modified 23-Nov-2017 14:46:40 GMT
 
 import os
 from odbAccess import *
@@ -127,7 +127,7 @@ for instanceNumber in range(nInstances):
 			conn = instance.getElementFromLabel(element.label).connectivity
 			
 		# ELTYPE 3D continuum hexahedron (brick) elements:
-		if ((element.type == 'C3D8') or (element.type == 'C3D8H') or (element.type == 'C3D8I') or (element.type == 'C3D8IH') or (element.type == 'C3D8R') or (element.type == 'C3D8RH') or (element.type == 'C3D8S') or (element.type == 'C3D8HS') or (element.type == 'C3D20') or (element.type == 'C3D20H') or (element.type == 'C3D20R') or (element.type == 'C3D20RH') or (element.type == 'C3D8T') or (element.type == 'C3D8HT') or (element.type == 'C3D8RT') or (element.type == 'C3D8RHT') or (element.type == 'C3D20T') or (element.type == 'C3D20HT') or (element.type == 'C3D20RT') or (element.type == 'C3D20RHT')):
+		if ((element.type == 'C3D8') or (element.type == 'C3D8H') or (element.type == 'C3D8I') or (element.type == 'C3D8IH') or (element.type == 'C3D8R') or (element.type == 'C3D8RH') or (element.type == 'C3D8S') or (element.type == 'C3D8HS') or (element.type == 'C3D20') or (element.type == 'C3D20H') or (element.type == 'C3D20R') or (element.type == 'C3D20RH') or (element.type == 'C3D8T') or (element.type == 'C3D8HT') or (element.type == 'C3D8RT') or (element.type == 'C3D8RHT') or (element.type == 'C3D20T') or (element.type == 'C3D20HT') or (element.type == 'C3D20RT') or (element.type == 'C3D20RHT') or (element.type == 'C3D8C3') or (element.type == 'C3D8IC3') or (element.type == 'C3D8RC3') or (element.type == 'C3D8HC3') or (element.type == 'C3D8RHC3') or (element.type == 'C3D8IHC3') or (element.type == 'C3D20C3') or (element.type == 'C3D20HC3') or (element.type == 'C3D20RC3') or (element.type == 'C3D20RHC3')):
 			
 			# Increment INDEX face node variable:
 			if (i > 0):

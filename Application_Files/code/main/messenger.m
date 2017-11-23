@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 23-Nov-2017 09:28:06 GMT
+%   Last modified 23-Nov-2017 14:46:40 GMT
 
     %%
 
@@ -1211,7 +1211,8 @@ classdef messenger < handle
                     case 132.0
                         if getappdata(0, 'suppress_ID132') == 0.0
                             fprintf(fidType(i), [returnType{i}, '***NOTE: Out-of-plane stresses (S33/S23/S13) were found during the composite failure/damage initiation calculation', returnType{i}]);
-                            fprintf(fidType(i), ['-> For composite materials, plane stress conditions are assumed', returnType{i}]);
+                            fprintf(fidType(i), ['-> For composite materials, plane stress conditions (S11/S22/S12) are assumed', returnType{i}]);
+                            fprintf(fidType(i), ['-> If the composite is made from continuum solid elements, this message can be disregarded', returnType{i}]);
                             
                             if i == X
                                 setappdata(0, 'suppress_ID132', 1.0)
@@ -2207,7 +2208,7 @@ classdef messenger < handle
                         
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 289.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: The following elements are not supported by the surface detection algorithm: %s', returnType{i}], getappdata(0, 'message_289_unsupportedElements'));
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: The following elements are not supported by the surface detection algorithm: %s'], getappdata(0, 'message_289_unsupportedElements'));
                         fprintf(fidType(i), ['-> These elements have been skipped', returnType{i}]);
                         
                         setappdata(0, 'messageFileWarnings', 1.0)
@@ -2307,7 +2308,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2017\r\n');
-            fprintf(fid, 'Last modified 23-Nov-2017 09:28:06 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 23-Nov-2017 14:46:40 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
