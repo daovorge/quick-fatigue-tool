@@ -81,7 +81,7 @@ classdef algorithm_user_example < handle
 %      6.9 User-defined
 %   
 %   Quick Fatigue Tool 6.10-09 Copyright Louis Vallance 2017
-%   Last modified 19-May-2017 16:27:36 GMT
+%   Last modified 24-Nov-2017 09:30:36 GMT
     
     %%
         
@@ -117,8 +117,8 @@ classdef algorithm_user_example < handle
             Sf = getappdata(0, 'Sf');   % Fatigue strength coefficient
             b = getappdata(0, 'b');   % Fatigue strength exponent
             
-            % STEP 2: Define an effective stress history from the stress
-            % components
+            % STEP 2a: Define an effective stress history from the first
+            % principal stress
             %{
                 Use the stress components to calculate the maximum damage
                 parameter, DPARAMI, for the current analysis item.
@@ -126,6 +126,16 @@ classdef algorithm_user_example < handle
             % e.g. Principal stress
             history = getappdata(0, 'S1');
             damageParameter = max(history);
+            
+            % STEP 2b: Define a uniaxial stress history from the stress
+            % components
+            %{
+                Use the stress components to calculate the maximum damage
+                parameter, DPARAMI, for the current analysis item.
+            %}
+            % e.g. S11
+            %history = varargin{1.0};
+            %damageParameter = max(history);
             
             % STEP 3: Rainflow cycle count the stress history
             if length(history) > 2.0
