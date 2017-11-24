@@ -7,7 +7,7 @@ classdef highFrequency < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 23-Nov-2017 09:28:06 GMT
+%   Last modified 24-Nov-2017 12:40:07 GMT
     
     %%
     
@@ -791,7 +791,7 @@ classdef highFrequency < handle
                 region = 1.0;
             end
             
-            %% Remove unused columns if required:
+            %% Remove unused columns if necessary:
             
             % Initialize the dataset buffers
             fieldDataBuffer = cell(1.0, region);
@@ -869,6 +869,33 @@ classdef highFrequency < handle
                     remove = 6.0;
                 end
                 
+                % 1D stress, two position label columns
+                if length(cellData_region_i{4.0}) ~= length(cellData_region_i{1.0})
+                    cellData_region_i{4.0} = zeros(length(cellData_region_i{1.0}), 1.0, 'double');
+                    remove = 7.0;
+                elseif isnan(cellData_region_i{4.0}) == 1.0
+                    cellData_region_i{4.0} = zeros(length(cellData_region_i{1.0}), 1.0, 'double');
+                    remove = 7.0;
+                end
+                
+                % 1D stress, one position label column
+                if length(cellData_region_i{3.0}) ~= length(cellData_region_i{1.0})
+                    cellData_region_i{3.0} = zeros(length(cellData_region_i{1.0}), 1.0, 'double');
+                    remove = 8.0;
+                elseif isnan(cellData_region_i{3.0}) == 1.0
+                    cellData_region_i{3.0} = zeros(length(cellData_region_i{1.0}), 1.0, 'double');
+                    remove = 8.0;
+                end
+                
+                % 1D stress, no position label columns
+                if length(cellData_region_i{2.0}) ~= length(cellData_region_i{1.0})
+                    cellData_region_i{2.0} = zeros(length(cellData_region_i{1.0}), 1.0, 'double');
+                    remove = 9.0;
+                elseif isnan(cellData_region_i{2.0}) == 1.0
+                    cellData_region_i{2.0} = zeros(length(cellData_region_i{1.0}), 1.0, 'double');
+                    remove = 9.0;
+                end
+                
                 %% Check for concatenation errors:
                 
                 try
@@ -892,7 +919,13 @@ classdef highFrequency < handle
                     return
                 end
                 
-                if remove == 6.0
+                if remove == 9.0
+                    fieldData_i(:, 2:10) = [];
+                elseif remove == 8.0
+                    fieldData_i(:, 3:10) = [];
+                elseif remove == 7.0
+                    fieldData_i(:, 4:10) = [];
+                elseif remove == 6.0
                     fieldData_i(:, 5:10) = [];
                 elseif remove == 5.0
                     fieldData_i(:, 6:10) = [];
@@ -982,6 +1015,18 @@ classdef highFrequency < handle
                         X = 1.0;
                         
                         fieldData_i(:, 5:6) = 0.0;
+                    case 3.0
+                        mainIDs_i = fieldData_i(:, 1.0);
+                        
+                        fieldData_i(:, 4:8) = 0.0;
+                    case 2.0
+                        mainIDs_i = fieldData_i(:, 1.0);
+                        
+                        fieldData_i(:, 3:7) = 0.0;
+                    case 1.0
+                        mainIDs_i = linspace(1.0, 1.0, Ri)';
+                        
+                        fieldData_i(:, 2:6) = 0.0;
                     otherwise
                         error = 1.0;
                         setappdata(0, 'E031', 1.0)
