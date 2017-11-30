@@ -13,7 +13,7 @@ function [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(ma
 %      4.5.3 Custom analysis items
 %
 %   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 31-Oct-2017 09:12:00 GMT
+%   Last modified 30-Nov-2017 09:29:21 GMT
 
 %%
 
@@ -182,6 +182,9 @@ end
 if (strcmpi(searchRegion, 'dataset') == 1.0) && (strcmpi(odbResultPosition, 'nodal') == 1.0)
     searchRegion = 'INSTANCE';
     messenger.writeMessage(276.0)
+elseif (strcmpi(searchRegion, 'dataset')) && (numberOfInstances > 1.0)
+    searchRegion = 'INSTANCE';
+    messenger.writeMessage(308.0)
 elseif strcmpi(searchRegion, 'dataset') == 1.0
     fileName = [pwd, '/Application_Files/code/odb_interface/element_ids.dat'];
     fid = fopen(fileName, 'w+');

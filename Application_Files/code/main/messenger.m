@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 24-Nov-2017 12:40:07 GMT
+%   Last modified 30-Nov-2017 09:29:21 GMT
 
     %%
 
@@ -2147,12 +2147,20 @@ classdef messenger < handle
                     case 273.0
                         message = getappdata(0, 'message_273');
                         
+                        partInstance = getappdata(0, 'partInstance');
+                        
                         fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: Surface detection failed on ''%s'' with the following error:', returnType{i}], getappdata(0, 'outputDatabase'));
                         fprintf(fidType(i), '%s', message);
                         
                         if isempty(strfind(message, 'The database is from a previous release of Abaqus.')) == 0.0
                             fprintf(fidType(i), ['-> The installed Abaqus API is from a more recent version of Abaqus than that which was used to generate the model ODB file', returnType{i}]);
                             fprintf(fidType(i), ['-> Set the environment variables ''autoExport_upgradeODB=1.0'' and ''autoExport_abqCmd=<abaqus-version>'', where <abaqus-version> is the identifier of the Abaqus version to which the ODB file is upgraded', returnType{i}]);
+                        elseif iscell(partInstance) == 1.0
+                            for j = 1:length(partInstance)
+                                if isempty(strfind(message, partInstance{j})) == 0.0
+                                    fprintf(fidType(i), ['-> The part instance name ''%s'' is either spelled incorrectly or it does not exist in the model', returnType{i}], partInstance{j});
+                                end
+                            end
                         elseif isempty(strfind(message, getappdata(0, 'partInstance'))) == 0.0
                             fprintf(fidType(i), ['-> The part instance name is either spelled incorrectly or it does not exist in the model', returnType{i}]);
                         end
@@ -2164,7 +2172,7 @@ classdef messenger < handle
                     case 275.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Detected %.0f elements on the model surface', returnType{i}], getappdata(0, 'message_275'));
                     case 276.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: Surface detection cannot be limited to dataset elements for unique nodal stress data', returnType{i}], getappdata(0, 'message_275'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Surface detection cannot be limited to dataset elements if the unique nodal element position is specified with the RESULT_POSITION option', returnType{i}], getappdata(0, 'message_275'));
                         fprintf(fidType(i), ['-> The whole part instance will be searched', returnType{i}]);
                     case 277.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The stress dataset(s) contain no items on the element surface', returnType{i}], getappdata(0, 'message_275'));
@@ -2252,6 +2260,9 @@ classdef messenger < handle
                         fprintf(fidType(i), ['-> The effective ductility at these regions is diminished and there is a higher likelihood of brittle fracture', returnType{i}]);
                         
                         setappdata(0, 'messageFileWarnings', 1.0)
+                    case 308.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Surface detection cannot be limited to dataset elements if more than one part instance is specified with the PART_INSTANCE option', returnType{i}], getappdata(0, 'message_275'));
+                        fprintf(fidType(i), ['-> The whole part instance will be searched', returnType{i}]);
                 end
             end
         end
@@ -2308,7 +2319,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2017\r\n');
-            fprintf(fid, 'Last modified 24-Nov-2017 12:40:07 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 30-Nov-2017 09:29:21 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
