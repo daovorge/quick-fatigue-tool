@@ -328,7 +328,7 @@ classdef jobFile < handle
                         algorithmN = [0.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0];
                         matchingAlg = find(strncmpi({algorithm}, algorithms, length(algorithm)) == 1.0);
                         
-                        if isempty(matchingAlg) == 1.0
+                        if (isempty(matchingAlg) == 1.0) || (length(matchingAlg) ~= 1.0)
                             % The algorithm could not be found in the library
                             error = 1.0;
                             fprintf('ERROR: The value of ALGORITHM (''%s'') could not be recognized\n', algorithm)
@@ -382,7 +382,7 @@ classdef jobFile < handle
                             mscs = {'default', 'morrow', 'goodman', 'soderberg', 'walker', 'swt', 'gerber', 'ratio', 'none'};
                             matchingMsc = find(strncmpi({msCorrection}, mscs, length(msCorrection)) == 1.0);
                             
-                            if isempty(matchingMsc) == 1.0
+                            if (isempty(matchingAlg) == 1.0) || (length(matchingAlg) ~= 1.0)
                                 % The mean stress correction could not be found in the library
                                 error = 1.0;
                                 fprintf('ERROR: The value of MS_CORRECTION (''%s'') could not be recognized\n', msCorrection)

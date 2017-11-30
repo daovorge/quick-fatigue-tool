@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 30-Nov-2017 15:19:11 GMT
+%   Last modified 30-Nov-2017 20:36:28 GMT
 
     %%
 
@@ -2319,7 +2319,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2017\r\n');
-            fprintf(fid, 'Last modified 30-Nov-2017 15:19:11 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 30-Nov-2017 20:36:28 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
