@@ -26,7 +26,7 @@ function [] = job(varargin)
 %      1 Job file options
 %   
 %   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 01-Dec-2017 10:09:17 GMT
+%   Last modified 01-Dec-2017 13:15:24 GMT
     
     %%
     
@@ -221,7 +221,7 @@ while feof(fid) == 0.0
             end
             
             % Advance the file by nTLINE to get past the material definition
-            for i = 1:nTLINE_material - 1.0
+            for i = 1:nTLINE_material
                 TLINE = fgetl(fid);
             end
             TOKEN = strtok(TLINE, '=');

@@ -7,7 +7,7 @@ function [] = compositeFailure(N, L, mainID, fid_status)
 %   not required to run this file.
 %
 %   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 23-Nov-2017 09:28:06 GMT
+%   Last modified 01-Dec-2017 13:15:24 GMT
     
     %%
 
@@ -185,7 +185,7 @@ for groups = 1:G
         F22 = -(1.0/(Yt*Yc));
         F66 = 1.0/S^2.0;
         
-        if isempty(B12) == 0.0
+        if (isempty(B12) == 0.0) && (B12 ~= 0.0)
             F12 = (1.0/(2.0*B12^2.0)) * (1.0 - ((1.0/Xt) + (1.0/Xc) + (1.0/Yt) + (1.0/Yc))*(B12) + ((1.0/(Xt*Xc)) + (1.0/(Yt*Yc)))*(B12^2.0));
         else
             F12 = Fc12*sqrt(F11*F22);
@@ -199,7 +199,7 @@ for groups = 1:G
         F22 = -(1.0/(Yt*Yc));
         F33 = 1.0/(Zt*Zc);
         
-        if isempty(B23) == 0.0
+        if (isempty(B12) == 0.0) && (B12 ~= 0.0)
             F23 = (1.0/(2.0*B23^2.0)) * (1.0 - ((1.0/Yt) + (1.0/Yc) + (1.0/Zt) + (1.0/Zc))*(B23) + ((1.0/(Yt*Yc)) + (1.0/(Zt*Zc)))*(B23^2.0));
         else
             F23 = Fc23*sqrt(F22*F33);

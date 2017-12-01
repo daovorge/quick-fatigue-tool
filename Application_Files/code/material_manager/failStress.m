@@ -10,7 +10,7 @@ function varargout = failStress(varargin)%#ok<*DEFNU>
 %      5 Materials
 %   
 %   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 09-Oct-2017 11:03:00 GMT
+%   Last modified 01-Dec-2017 13:15:24 GMT
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -354,12 +354,22 @@ if isempty(get(handles.edit_limit12, 'string')) == 0.0
         error = 1.0;
     end
 end
+if failStress_limit12 == 0.0
+    errordlg('The stress limit (12) must be non-zero.', 'Quick Fatigue Tool')
+    uiwait; enable(handles)
+    return
+end
 
 failStress_limit23 = str2double(get(handles.edit_limit23, 'string'));
 if isempty(get(handles.edit_limit23, 'string')) == 0.0
     if isnan(failStress_limit23) == 1.0 || isinf(failStress_limit23) == 1.0 || isreal(failStress_limit23) == 0.0
         error = 1.0;
     end
+end
+if failStress_limit23 == 0.0
+    errordlg('The stress limit (23) must be non-zero.', 'Quick Fatigue Tool')
+    uiwait; enable(handles)
+    return
 end
 
 if error == 1.0
