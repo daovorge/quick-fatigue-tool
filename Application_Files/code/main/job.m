@@ -26,7 +26,7 @@ function [] = job(varargin)
 %      1 Job file options
 %   
 %   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 06-Nov-2017 15:15:09 GMT
+%   Last modified 01-Dec-2017 10:09:17 GMT
     
     %%
     
@@ -90,7 +90,7 @@ end
 setappdata(0, 'jobFromTextFile', 1.0)
 
 % Check the file extension
-[~, ~, EXT] = fileparts(inputFile);
+[~, NAME, EXT] = fileparts(inputFile);
 if isempty(EXT) == 1.0
     inputFile = [inputFile, '.inp'];
 elseif strcmp(EXT, '.') == 1.0
@@ -368,6 +368,15 @@ setappdata(0, 'kw_processed', processedKeywords)
 setappdata(0, 'kw_undefined', undefinedKw)
 setappdata(0, 'kw_bad', badKw)
 setappdata(0, 'kw_ambiguous', ambiguousKw)
+
+%% CHECK THE JOB NAME
+if any(ismember(processedKeywords, 'JOB NAME')) == 0.0
+    %{
+        The job name was not defined in the input file, so use the file
+        name instead
+    %}
+    kwData{42.0} = NAME;
+end
 
 %% CLOSE THE FILE AND SUBMIT THE JOB
 % Close the input file
