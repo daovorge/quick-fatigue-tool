@@ -6,7 +6,7 @@ classdef jobFile < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 01-Dec-2017 09:10:46 GMT
+%   Last modified 01-Dec-2017 21:13:54 GMT
     
     %%
     
@@ -1802,18 +1802,31 @@ classdef jobFile < handle
                 return
             end
             
-            % If high frequency data is provided, superimpose it onto the low frequency
-            % block
+            % If high frequency data is provided, superimpose it onto the low frequency block
             if (isempty(hfDataset) == 0.0) || ((algorithm == 10.0 || algorithm == 3.0) && isempty(hfHistory) == 0.0)
-                [Sxx, Syy, Szz, Txy, Tyz, Txz, error] = highFrequency.main(Sxx, Syy, Szz, Txy, Tyz, Txz, hfDataset, hfHistory, hfTime, algorithm, items, hfScales);
-                
                 %{
-                    If high frequency datasets were used with the Uniaxial
-                    Stress-Life algorithm, update the OLDSIGNAL variable to
-                    reflect the newly superinposed data
+                    This functionality requires the Signal Processing
+                    Toolbox. If the toolbox is not available, abort the
+                    analysis
                 %}
-                if algorithm == 10.0 || algorithm == 3.0
-                    oldSignal = Sxx;
+                sptAvailable = checkToolbox('Signal Processing Toolbox');
+                
+                if sptAvailable ~= 1.0
+                    error = 1.0;
+                    setappdata(0, 'E009', 1.0)
+                    return
+                else
+                    [Sxx, Syy, Szz, Txy, Tyz, Txz, error] = highFrequency.main(Sxx, Syy, Szz, Txy, Tyz, Txz, hfDataset, hfHistory, hfTime, algorithm, items, hfScales);
+                    
+                    %{
+                        If high frequency datasets were used with the
+                        Uniaxial Stress-Life algorithm, update the
+                        OLDSIGNAL variable to reflect the newly
+                        superinposed data
+                    %}
+                    if algorithm == 10.0 || algorithm == 3.0
+                        oldSignal = Sxx;
+                    end
                 end
             end
             

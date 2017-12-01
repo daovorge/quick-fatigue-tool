@@ -6,7 +6,7 @@ function [] = cleanup(status)
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 01-Dec-2017 13:15:24 GMT
+%   Last modified 01-Dec-2017 21:13:54 GMT
     
     %%
     
@@ -31,7 +31,7 @@ if status == 1.0
     errLogFile = [dir, sprintf('%s.log', job)];
     
     %{
-    	Available error codes: E009, E010, E011, E083, E084, E085, E086,
+    	Available error codes: E010, E011, E083, E084, E085, E086,
     	E087, E088, E089, E090, E091, E092, E093, E094, E095
     %}
     
@@ -61,7 +61,7 @@ if status == 1.0
     end
     fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
     fprintf(fid, 'Copyright Louis Vallance 2017\r\n');
-    fprintf(fid, 'Last modified 01-Dec-2017 13:15:24 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 01-Dec-2017 21:13:54 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');
@@ -1278,6 +1278,14 @@ if status == 1.0
         
         fprintf(fid, '\r\n\r\nError code: E150');
         rmappdata(0, 'E150')
+    end
+    if getappdata(0, 'E009') == 1.0
+        fprintf(fid, '\r\n\r\n***ERROR: The Signal Processing Toolbox is required to use the options HF_DATASET/HF_FREQUENCY');
+        fprintf(fid, '\r\n-> The workaround is to define the high frequency loading manually with the options DATASET/HISTORY');
+        fprintf(fid, '\r\n-> The analysis has been aborted');
+        
+        fprintf(fid, '\r\n\r\nError code: E009');
+        rmappdata(0, 'E009')
     end
     
     % Write file footer
