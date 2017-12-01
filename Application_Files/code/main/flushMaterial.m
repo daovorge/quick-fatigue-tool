@@ -6,11 +6,13 @@ function [] = flushMaterial()
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 25-Oct-2017 14:18:04 GMT
+%   Last modified 01-Dec-2017 12:42:06 GMT
     
     %%
     
 %% Remove material data
+
+% Fatigue
 if isappdata(0, 'defaultAlgorithm') == 1.0
     rmappdata(0, 'defaultAlgorithm')
 end
@@ -92,6 +94,8 @@ end
 if isappdata(0, 'k') == 1.0
     rmappdata(0, 'k')
 end
+
+% Composote: Fail stress
 if isappdata(0, 'failStress_tsfd') == 1.0
     rmappdata(0, 'failStress_tsfd')
 end
@@ -125,6 +129,8 @@ end
 if isappdata(0, 'failStress_limit23') == 1.0
     rmappdata(0, 'failStress_limit23')
 end
+
+% Composote: Fail strain
 if isappdata(0, 'failStrain_tsfd') == 1.0
     rmappdata(0, 'failStrain_tsfd')
 end
@@ -149,8 +155,13 @@ end
 if isappdata(0, 'failStrain_g12') == 1.0
     rmappdata(0, 'failStrain_g12')
 end
+
+% Composote: Hashin
 if isappdata(0, 'hashin_alpha') == 1.0
     rmappdata(0, 'hashin_alpha')
+end
+if isappdata(0, 'hashin_lts') == 1.0
+    rmappdata(0, 'hashin_lts')
 end
 if isappdata(0, 'hashin_lcs') == 1.0
     rmappdata(0, 'hashin_lcs')
@@ -167,6 +178,8 @@ end
 if isappdata(0, 'hashin_tss') == 1.0
     rmappdata(0, 'hashin_tss')
 end
+
+% Composote: LaRC05
 if isappdata(0, 'larc05_lts') == 1.0
     rmappdata(0, 'larc05_lts')
 end

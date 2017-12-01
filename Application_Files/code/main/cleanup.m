@@ -6,7 +6,7 @@ function [] = cleanup(status)
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 01-Dec-2017 10:09:17 GMT
+%   Last modified 01-Dec-2017 12:42:06 GMT
     
     %%
     
@@ -19,9 +19,6 @@ try %#ok<TRYNC>
     fprintf(fid_status, '\r\n\r\nTHE ANALYSIS HAS NOT BEEN COMPLETED');
     fclose(fid_status);
 end
-
-%% Close any other open files
-fclose('all');
 
 %% Add output folder to current directory
 job = getappdata(0, 'jobName');
@@ -64,7 +61,7 @@ if status == 1.0
     end
     fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
     fprintf(fid, 'Copyright Louis Vallance 2017\r\n');
-    fprintf(fid, 'Last modified 01-Dec-2017 10:09:17 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 01-Dec-2017 12:42:06 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');
@@ -1321,6 +1318,7 @@ if (getappdata(0, 'cleanAppData') == 2.0) || (getappdata(0, 'cleanAppData') == 3
     end
 end
 
+%% Close any other open files
 fclose('all');
 
 %% Re-enable warnings

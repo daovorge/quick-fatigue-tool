@@ -490,5 +490,5 @@ else
     messenger.writeMessage(300.0)
 end
 
-%% Cleanup
+%% Update .msg file
 messenger.writeMessage(127.0)
