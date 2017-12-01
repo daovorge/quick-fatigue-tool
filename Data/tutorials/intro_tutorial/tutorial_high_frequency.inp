@@ -1,0 +1,52 @@
+**TUTORIAL_HIGH_FREQUENCY    Demonstration of high frequency loading.
+**   This function contains a list of job file options to configure a
+**   user-defined fatigue analysis using the text file processor.
+**
+**   The fatigue loading represents one full revolution of the component.
+**
+**   Execute the command
+**   >> job tutorial_high_frequency
+**   to start the fatigue analysis.
+**   
+**   Please refer to the Quick Fatigue Tool User Guide for detailed
+**   instructions on creating an analysis job.
+**
+**   Reference section in Quick Fatigue Tool User Guide
+**      2.4 Configuring and running an analysis
+**      3.5 High frequency datasets
+**   
+**   Reference section in Quick Fatigue Tool User Settings Reference Guide
+**      1 Job file options
+**   
+**   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
+**   Last modified 01-Dec-2017 13:15:24 GMT
+**
+**Job definition
+*JOB NAME = tutorial_high_frequency
+*JOB DESCRIPTION = Demonstration of high frequency loading capability
+**
+**Material definition
+*MATERIAL = sae-950c
+*USE SN = 1
+**
+** Loading definition (general)
+*UNITS = MPa
+*LOAD EQ = {1, Revolutions}
+**
+** Loading definition (low frequency)
+*HISTORY = [150, -150, 100, 0, 200]
+*SCALE = 0.6
+**
+** Loading definition (high frequency)
+*HF HISTORY = [0, 40, -20, 30, 0]
+*HF TIME = {100, 1}
+*HF SCALE = 1
+**
+**Analysis definition
+*ALGORITHM = uniaxial stress
+*MS CORRECTION = walker
+**
+**Output requests
+*OUTPUT FIELD = 1
+*OUTPUT HISTORY = 1
+*OUTPUT FIGURE = 1
