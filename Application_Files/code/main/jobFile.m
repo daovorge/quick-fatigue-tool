@@ -6,7 +6,7 @@ classdef jobFile < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 03-Dec-2017 14:15:55 GMT
+%   Last modified 04-Dec-2017 13:11:42 GMT
     
     %%
     
@@ -420,7 +420,7 @@ classdef jobFile < handle
                             mscs = {'default', 'morrow', 'goodman', 'soderberg', 'walker', 'swt', 'gerber', 'ratio', 'none'};
                             matchingMsc = find(strncmpi({msCorrection}, mscs, length(msCorrection)) == 1.0);
                             
-                            if (isempty(matchingAlg) == 1.0) || (length(matchingAlg) ~= 1.0)
+                            if (isempty(matchingMsc) == 1.0) || (length(matchingMsc) ~= 1.0)
                                 % The mean stress correction could not be found in the library
                                 error = 1.0;
                                 fprintf('ERROR: The value of MS_CORRECTION (''%s'') is not recognized\n', msCorrection)
