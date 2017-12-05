@@ -11,7 +11,7 @@ classdef virtualGaugeUtils < handle
 %      A3.4 Virtual Strain Gauge
 %   
 %   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 14-Oct-2017 18:15:15 GMT
+%   Last modified 05-Dec-2017 14:21:12 GMT
     
     %%
     
@@ -265,17 +265,17 @@ classdef virtualGaugeUtils < handle
             
             % Create the text file for Gauge A
             fidA = fopen([outputLocation, '\Gauge A.txt'], 'w+');
-            fprintf(fidA, '%f ', gaugeA);
+            fprintf(fidA, '%f\n', gaugeA);
             fclose(fidA);
             
             % Create the text file for Gauge B
             fidB = fopen([outputLocation, '\Gauge B.txt'], 'w+');
-            fprintf(fidB, '%f ', gaugeB);
+            fprintf(fidB, '%f\n', gaugeB);
             fclose(fidB);
             
             % Create the text file for Gauge C
             fidC = fopen([outputLocation, '\Gauge C.txt'], 'w+');
-            fprintf(fidC, '%f ', gaugeC);
+            fprintf(fidC, '%f\n', gaugeC);
             fclose(fidC);
         end
     end
