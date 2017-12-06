@@ -23,7 +23,6 @@ group_materialProps = getappdata(0, 'group_materialProps');
 for groups = 1:G
     % Get the material properties for the current group
     
-    
     if (useSN == 1.0) && (nSets > 1.0)
         preProcess.snInterpolate(msCorrection)
     end
