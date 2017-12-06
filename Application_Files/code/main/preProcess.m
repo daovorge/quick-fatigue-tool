@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 24-Nov-2017 12:40:07 GMT
+%   Last modified 06-Dec-2017 11:51:06 GMT
     
     %%
     
@@ -1906,7 +1906,7 @@ classdef preProcess < handle
                 larc05_iterate = 0.0;
                 setappdata(0, 'larc05_iterate', larc05_iterate)
             end
-            if isnan(larc05_iterate) == 1.0
+            if (isempty(larc05_iterate) == 1.0) || (isnan(larc05_iterate) == 1.0)
                 larc05_iterate = 0.0;
             elseif (larc05_iterate ~= 0.0) && (larc05_iterate ~= 1.0)
                 larc05_iterate = 0.0;
