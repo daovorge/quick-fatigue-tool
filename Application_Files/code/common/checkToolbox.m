@@ -21,6 +21,8 @@ function [isAvailable] = checkToolbox(toolboxName)
             tag = 'noSMT';
         case 'Statistics Toolbox'
             tag = 'noSMLT';
+        case 'Signal Processing Toolbox'
+            tag = 'noSPT';
         otherwise
             isAvailable = -1.0;
             return

@@ -9,8 +9,8 @@ function varargout = failStress(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials
 %   
-%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
-%   Last modified 09-Oct-2017 11:03:00 GMT
+%   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
+%   Last modified 01-Dec-2017 13:15:24 GMT
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -93,6 +93,15 @@ end
 if isappdata(0, 'failStress_limit23') == 1.0
     set(handles.edit_limit23, 'string', getappdata(0, 'failStress_limit23'))
 end
+
+% Load icon
+[a,~]=imread('icoR_delete.jpg');
+[r,c,~]=size(a); 
+x=ceil(r/35); 
+y=ceil(c/35); 
+g=a(1:x:end,1:y:end,:);
+g(g==255)=5.5*255;
+set(handles.pButton_reset, 'CData', g);
 
 
 % --- Outputs from this function are returned to the command line.
@@ -345,12 +354,22 @@ if isempty(get(handles.edit_limit12, 'string')) == 0.0
         error = 1.0;
     end
 end
+if failStress_limit12 == 0.0
+    errordlg('The stress limit (12) must be non-zero.', 'Quick Fatigue Tool')
+    uiwait; enable(handles)
+    return
+end
 
 failStress_limit23 = str2double(get(handles.edit_limit23, 'string'));
 if isempty(get(handles.edit_limit23, 'string')) == 0.0
     if isnan(failStress_limit23) == 1.0 || isinf(failStress_limit23) == 1.0 || isreal(failStress_limit23) == 0.0
         error = 1.0;
     end
+end
+if failStress_limit23 == 0.0
+    errordlg('The stress limit (23) must be non-zero.', 'Quick Fatigue Tool')
+    uiwait; enable(handles)
+    return
 end
 
 if error == 1.0
@@ -514,3 +533,18 @@ function edit_cross12_CreateFcn(hObject, ~, ~)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in pButton_reset.
+function pButton_reset_Callback(~, ~, handles)
+set(handles.edit_tsfd, 'string', [])
+set(handles.edit_csfd, 'string', [])
+set(handles.edit_tstd, 'string', [])
+set(handles.edit_cstd, 'string', [])
+set(handles.edit_tsttd, 'string', [])
+set(handles.edit_csttd, 'string', [])
+set(handles.edit_shear, 'string', [])
+set(handles.edit_cross12, 'string', 0)
+set(handles.edit_cross23, 'string', 0)
+set(handles.edit_limit12, 'string', [])
+set(handles.edit_limit23, 'string', [])

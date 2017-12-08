@@ -10,8 +10,8 @@ classdef postProcess < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      10 Output
 %   
-%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
-%   Last modified 16-Nov-2017 14:27:15 GMT
+%   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
+%   Last modified 22-Nov-2017 09:33:19 GMT
     
     %%
     
@@ -251,6 +251,11 @@ classdef postProcess < handle
             end
             
             setappdata(0, 'TRF', triaxialityFactor)
+            
+            % Warn the user if any parts of the model are in a state of pure triaxial tension/compression
+            if any(triaxialityFactor > 2.0) == 1.0
+                messenger.writeMessage(307.0)
+            end
         end
         
         %% Write field output to file:
@@ -1058,8 +1063,10 @@ classdef postProcess < handle
                 if numberOfCycles > 1.0
                     cumulativeDamage = cumsum(damagePerCycle);
                     
-                    % If the maximum damage is zero, skip this variable
-                    if max(cumulativeDamage) ~= 0.0
+                    % If the maximum damage is zero or INF, skip this variable
+                    if (max(cumulativeDamage) == 0.0) || (max(cumulativeDamage) == inf)
+                        messenger.writeMessage(299.0)
+                    else
                         % Check whether damage crosses the infinite life envelope
                         crossing = -999.0;
                         cael = 0.5*getappdata(0, 'cael');
@@ -1991,26 +1998,35 @@ classdef postProcess < handle
                 if status == 1.0
                     % There is no Abaqus executable on the host machine
                     fprintf('[POST] ODB Error: %s', result);
+                    fprintf(fid_status, '[POST] ODB Error: %s', result);
                     fprintf('\n[ERROR] ODB Interface exited with errors');
                     fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors');
                     return
                 end
             end
             
-            % If the ODB is already up-to-date, simply copy the file
-            % instead
+            % If the ODB is already up-to-date, try to copy the file instead
             removeCarriageReturn = 0.0;
             if exist([resultsDatabasePath, '/', resultsDatabaseName, '.odb'], 'file') == 0.0
-                copyfile(modelDatabasePath, [resultsDatabasePath, '/', resultsDatabaseName, '.odb'])
-                removeCarriageReturn = 1.0;
+                try
+                    copyfile(modelDatabasePath, [resultsDatabasePath, '/', resultsDatabaseName, '.odb'])
+                    removeCarriageReturn = 1.0;
+                catch exception
+                    % The file could not be copied
+                    fprintf('[POST] ODB Error: %s', exception.message);
+                    fprintf(fid_status, '[POST] ODB Error: %s', exception.message);
+                    fprintf('\n[ERROR] ODB Interface exited with errors');
+                    fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors');
+                    return
+                end
             end
             
             if removeCarriageReturn == 1.0
-                fprintf('[POST] Starting Quick Fatigue Tool 6.11-07 ODB Interface');
-                fprintf(fid_status, '\n[POST] Starting Quick Fatigue Tool 6.11-07 ODB Interface');
+                fprintf('[POST] Starting Quick Fatigue Tool 6.11-08 ODB Interface');
+                fprintf(fid_status, '\n[POST] Starting Quick Fatigue Tool 6.11-08 ODB Interface');
             else
-                fprintf('[POST] Quick Fatigue Tool 6.11-07 ODB Interface');
-                fprintf(fid_status, '\n[POST] Quick Fatigue Tool 6.11-07 ODB Interface');
+                fprintf('[POST] Quick Fatigue Tool 6.11-08 ODB Interface');
+                fprintf(fid_status, '\n[POST] Quick Fatigue Tool 6.11-08 ODB Interface');
             end
             
             % Delete the upgrade log file
@@ -2026,7 +2042,7 @@ classdef postProcess < handle
             
             % Open the log file for writing
             fid_debug = fopen([sprintf('Project/output/%s/Data Files/', jobName), resultsDatabaseName, '.log'], 'w+');
-            fprintf(fid_debug, 'Quick Fatigue Tool 6.11-07 ODB Interface Log');
+            fprintf(fid_debug, 'Quick Fatigue Tool 6.11-08 ODB Interface Log');
             
             % Get the selected position
             userPosition = getappdata(0, 'odbResultPosition');

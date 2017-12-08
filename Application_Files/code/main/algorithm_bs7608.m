@@ -13,8 +13,8 @@ classdef algorithm_bs7608 < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.6 BS 7608 Fatigue of Welded Steel Joints
 %   
-%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
-%   Last modified 16-Nov-2017 14:27:15 GMT
+%   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
+%   Last modified 22-Nov-2017 09:33:19 GMT
     
     %%
     
@@ -1042,6 +1042,11 @@ classdef algorithm_bs7608 < handle
             end
             
             setappdata(0, 'TRF', triaxialityFactor)
+            
+            % Warn the user if any parts of the model are in a state of pure triaxial tension/compression
+            if any(triaxialityFactor > 2.0) == 1.0
+                messenger.writeMessage(307.0)
+            end
         end
         
         %% BS 7608 WRITE FIELD OUTPUT
@@ -1549,8 +1554,10 @@ classdef algorithm_bs7608 < handle
                 if numberOfCycles > 1.0
                     cumulativeDamage = cumsum(damagePerCycle);
                     
-                    % If the maximum damage is zero, skip this variable
-                    if max(cumulativeDamage) ~= 0.0
+                    % If the maximum damage is zero or INF, skip this variable
+                    if (max(cumulativeDamage) == 0.0) || (max(cumulativeDamage) == inf)
+                        messenger.writeMessage(299.0)
+                    else
                         % Check whether damage crosses the infinite life envelope
                         crossing = -999.0;
                         cael = 0.5*getappdata(0, 'cael');

@@ -7,8 +7,8 @@ classdef preProcess < handle
 %
 %   See also postProcess.
 %
-%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
-%   Last modified 15-Nov-2017 10:50:46 GMT
+%   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
+%   Last modified 06-Dec-2017 11:51:06 GMT
     
     %%
     
@@ -1906,7 +1906,7 @@ classdef preProcess < handle
                 larc05_iterate = 0.0;
                 setappdata(0, 'larc05_iterate', larc05_iterate)
             end
-            if isnan(larc05_iterate) == 1.0
+            if (isempty(larc05_iterate) == 1.0) || (isnan(larc05_iterate) == 1.0)
                 larc05_iterate = 0.0;
             elseif (larc05_iterate ~= 0.0) && (larc05_iterate ~= 1.0)
                 larc05_iterate = 0.0;
@@ -2475,13 +2475,22 @@ classdef preProcess < handle
                     
                     % Check the length of the history data
                     if length(scale) < 2.0
-                        error = true;
-                        setappdata(0, 'E017', 1.0)
-                        
-                        mainID = -999.0;
-                        subID = -999.0;
-                        Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
-                        return
+                        if getappdata(0, 'compositeCriteria') == 1.0
+                            %{
+                                For composite failure criteria analysis, a
+                                load history 1 point is permitted. Prepend
+                                a zero to the load history
+                            %}
+                            scale = [0.0, scale]; %#ok<AGROW>
+                        else
+                            error = true;
+                            setappdata(0, 'E017', 1.0)
+                            
+                            mainID = -999.0;
+                            subID = -999.0;
+                            Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
+                            return
+                        end
                     end
                     
                     % Check the dimensionality of the history data
@@ -2880,7 +2889,7 @@ classdef preProcess < handle
                 region = 1.0;
             end
             
-            %% Remove unused columns if required:
+            %% Remove unused columns if necessary:
             
             % Initialize the dataset buffers
             fieldDataBuffer = cell(1.0, region);
@@ -2911,7 +2920,7 @@ classdef preProcess < handle
                 if length(cellData_region_i{10.0}) ~= length(cellData_region_i{1.0})
                     cellData_region_i{10.0} = zeros(length(cellData_region_i{1.0}), 1.0, 'double');
                     remove = 1.0;
-                elseif isnan(cellData_region_i{10.0})
+                elseif isnan(cellData_region_i{10.0}) == 1.0
                     cellData_region_i{10.0} = zeros(length(cellData_region_i{1.0}), 1.0, 'double');
                     remove = 1.0;
                 end
@@ -2920,7 +2929,7 @@ classdef preProcess < handle
                 if length(cellData_region_i{9.0}) ~= length(cellData_region_i{1.0})
                     cellData_region_i{9.0} = zeros(length(cellData_region_i{1.0}), 1.0, 'double');
                     remove = 2.0;
-                elseif isnan(cellData_region_i{9.0})
+                elseif isnan(cellData_region_i{9.0}) == 1.0
                     cellData_region_i{9.0} = zeros(length(cellData_region_i{1.0}), 1.0, 'double');
                     remove = 2.0;
                 end
@@ -2929,7 +2938,7 @@ classdef preProcess < handle
                 if length(cellData_region_i{8.0}) ~= length(cellData_region_i{1.0})
                     cellData_region_i{8.0} = zeros(length(cellData_region_i{1.0}), 1.0, 'double');
                     remove = 3.0;
-                elseif isnan(cellData_region_i{8.0})
+                elseif isnan(cellData_region_i{8.0}) == 1.0
                     cellData_region_i{8.0} = zeros(length(cellData_region_i{1.0}), 1.0, 'double');
                     remove = 3.0;
                 end
@@ -2940,7 +2949,7 @@ classdef preProcess < handle
                 if length(cellData_region_i{7.0}) ~= length(cellData_region_i{1.0})
                     cellData_region_i{7.0} = zeros(length(cellData_region_i{1.0}), 1.0, 'double');
                     remove = 4.0;
-                elseif isnan(cellData_region_i{7.0})
+                elseif isnan(cellData_region_i{7.0}) == 1.0
                     cellData_region_i{7.0} = zeros(length(cellData_region_i{1.0}), 1.0, 'double');
                     remove = 4.0;
                 end
@@ -2949,7 +2958,7 @@ classdef preProcess < handle
                 if length(cellData_region_i{6.0}) ~= length(cellData_region_i{1.0})
                     cellData_region_i{6.0} = zeros(length(cellData_region_i{1.0}), 1.0, 'double');
                     remove = 5.0;
-                elseif isnan(cellData_region_i{6.0})
+                elseif isnan(cellData_region_i{6.0}) == 1.0
                     cellData_region_i{6.0} = zeros(length(cellData_region_i{1.0}), 1.0, 'double');
                     remove = 5.0;
                 end
@@ -2958,9 +2967,36 @@ classdef preProcess < handle
                 if length(cellData_region_i{5.0}) ~= length(cellData_region_i{1.0})
                     cellData_region_i{5.0} = zeros(length(cellData_region_i{1.0}), 1.0, 'double');
                     remove = 6.0;
-                elseif isnan(cellData_region_i{5.0})
+                elseif isnan(cellData_region_i{5.0}) == 1.0
                     cellData_region_i{5.0} = zeros(length(cellData_region_i{1.0}), 1.0, 'double');
                     remove = 6.0;
+                end
+                
+                % 1D stress, two position label columns
+                if length(cellData_region_i{4.0}) ~= length(cellData_region_i{1.0})
+                    cellData_region_i{4.0} = zeros(length(cellData_region_i{1.0}), 1.0, 'double');
+                    remove = 7.0;
+                elseif isnan(cellData_region_i{4.0}) == 1.0
+                    cellData_region_i{4.0} = zeros(length(cellData_region_i{1.0}), 1.0, 'double');
+                    remove = 7.0;
+                end
+                
+                % 1D stress, one position label column
+                if length(cellData_region_i{3.0}) ~= length(cellData_region_i{1.0})
+                    cellData_region_i{3.0} = zeros(length(cellData_region_i{1.0}), 1.0, 'double');
+                    remove = 8.0;
+                elseif isnan(cellData_region_i{3.0}) == 1.0
+                    cellData_region_i{3.0} = zeros(length(cellData_region_i{1.0}), 1.0, 'double');
+                    remove = 8.0;
+                end
+                
+                % 1D stress, no position label columns
+                if length(cellData_region_i{2.0}) ~= length(cellData_region_i{1.0})
+                    cellData_region_i{2.0} = zeros(length(cellData_region_i{1.0}), 1.0, 'double');
+                    remove = 9.0;
+                elseif isnan(cellData_region_i{2.0}) == 1.0
+                    cellData_region_i{2.0} = zeros(length(cellData_region_i{1.0}), 1.0, 'double');
+                    remove = 9.0;
                 end
                 
                 %% Check for concatenation errors:
@@ -2977,14 +3013,14 @@ classdef preProcess < handle
                     return
                 end
                 
-                if isempty(fieldData_i)
+                if isempty(fieldData_i) == 1.0
                     subIDs = -999.0;
                     mainIDs = -999.0;
                     error = 1.0;
                     setappdata(0, 'E029', 1.0)
                     
                     return
-                elseif any(any(isnan(fieldData_i))) || any(any(isinf(fieldData_i)))
+                elseif (any(any(isnan(fieldData_i))) == 1.0) || (any(any(isinf(fieldData_i))) == 1.0)
                     subIDs = -999.0;
                     mainIDs = -999.0;
                     error = 1.0;
@@ -2993,7 +3029,13 @@ classdef preProcess < handle
                     return
                 end
                 
-                if remove == 6.0
+                if remove == 9.0
+                    fieldData_i(:, 2:10) = [];
+                elseif remove == 8.0
+                    fieldData_i(:, 3:10) = [];
+                elseif remove == 7.0
+                    fieldData_i(:, 4:10) = [];
+                elseif remove == 6.0
                     fieldData_i(:, 5:10) = [];
                 elseif remove == 5.0
                     fieldData_i(:, 6:10) = [];
@@ -3019,12 +3061,12 @@ classdef preProcess < handle
                 
                 % Get the element type
                 elementType = getappdata(0, 'elementType');
-                if isempty(elementType)
+                if isempty(elementType) == 1.0
                     elementType = 0.0;
                 elseif isnumeric(elementType) == 0.0
                     elementType = 0.0;
-                elseif isnan(elementType) || ~isreal(elementType) || ...
-                        isinf(elementType) || ~isreal(elementType)
+                elseif (isnan(elementType) == 1.0) || (isreal(elementType) == 0.0) || ...
+                        (isinf(elementType) == 1.0) || (isreal(elementType) == 0.0)
                     elementType = 0.0;
                 end
                 
@@ -3089,6 +3131,24 @@ classdef preProcess < handle
                         mainIDs_i = linspace(1.0, Ri, Ri)';
                         
                         fieldData_i(:, 5:6) = 0.0;
+                    case 3.0
+                        nodeType = 2.0;
+                        mainIDs_i = fieldData_i(:, 1.0);
+                        subIDs_i = fieldData_i(:, 2.0);
+                        
+                        fieldData_i(:, 4:8) = 0.0;
+                    case 2.0
+                        nodeType = 1.0;
+                        mainIDs_i = fieldData_i(:, 1.0);
+                        subIDs_i = linspace(1.0, 1.0, Ri)';
+                        
+                        fieldData_i(:, 3:7) = 0.0;
+                    case 1.0
+                        nodeType = 0.0;
+                        mainIDs_i = linspace(1.0, 1.0, Ri)';
+                        subIDs_i = linspace(1.0, 1.0, Ri)';
+                        
+                        fieldData_i(:, 2:6) = 0.0;
                     otherwise
                         subIDs = -999.0;
                         mainIDs = -999.0;
@@ -3198,7 +3258,17 @@ classdef preProcess < handle
         function [error, mainID, subID, Sxx, Syy, Szz, Txy, Tyz, Txz] = datasetSequence(channels, items, elementType, loadingScale, loadingOffset)
             %% Assume that a dataset sequence has been defined
             error = 0.0;
-            L = length(channels);
+            
+            % Get the composite criteria flag
+            compositeCriteria = getappdata(0, 'compositeCriteria');
+            
+            % Get the sequence length
+            if (ischar(channels) == 1.0) && (compositeCriteria == 1.0)
+                L = 2.0;
+            else
+                L = length(channels);
+            end
+            
             first_time = 1.0;
             
             % Verify the loading scale factors
@@ -3207,7 +3277,9 @@ classdef preProcess < handle
             if L == nScaleFactors
                 % Dataset/history pairs equal to number of loading scale factors
             elseif L > nScaleFactors
-                messenger.writeMessage(281.0)
+                if ((compositeCriteria == 1.0) && (ischar(channels) == 1.0) && (L > 2.0)) || ((compositeCriteria == 0.0) && (L > nScaleFactors))
+                    messenger.writeMessage(281.0)
+                end
                 
                 % Dataset/history pairs greater than number of loading scale factors
                 extraScaleFactors = linspace(loadingScale(end), loadingScale(end), (L - nScaleFactors));
@@ -3229,26 +3301,34 @@ classdef preProcess < handle
             end
             
             % Begin reading datasets
-            if ischar(channels)
-                if isempty(channels)
-                    setappdata(0, 'E023', 1.0)
-                else
-                    setappdata(0, 'E024', 1.0)
+            if compositeCriteria == 1.0
+                if ischar(channels) == 1.0
+                    channels = {channels, channels};
+                elseif length(channels) == 1.0
+                    channels = [channels(1.0), channels(1.0)];
                 end
-                
-                error = true;
-                mainID = -999;
-                subID = -999;
-                Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
-                return
-            elseif length(channels) == 1.0
-                setappdata(0, 'E024', 1.0)
-                
-                error = true;
-                mainID = -999.0;
-                subID = -999.0;
-                Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
-                return
+            else
+                if ischar(channels) == 1.0
+                    if isempty(channels) == 1.0
+                        setappdata(0, 'E023', 1.0)
+                    else
+                        setappdata(0, 'E024', 1.0)
+                    end
+                    
+                    error = true;
+                    mainID = -999;
+                    subID = -999;
+                    Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
+                    return
+                elseif length(channels) == 1.0
+                    setappdata(0, 'E024', 1.0)
+                    
+                    error = true;
+                    mainID = -999.0;
+                    subID = -999.0;
+                    Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
+                    return
+                end
             end
             
             try
@@ -5020,13 +5100,22 @@ classdef preProcess < handle
             
             % Check the length of the history data
             if length(scale) < 2.0
-                error = true;
-                setappdata(0, 'E017', 1.0)
-                
-                mainID = -999;
-                subID = -999;
-                oldSignal = -999;
-                return
+                if getappdata(0, 'compositeCriteria') == 1.0
+                    %{
+                    	For composite failure criteria analysis, a load
+                        history 1 point is permitted. Prepend a zero to the
+                        load history
+                    %}
+                    scale = [0.0, scale];
+                else
+                    error = true;
+                    setappdata(0, 'E017', 1.0)
+                    
+                    mainID = -999.0;
+                    subID = -999.0;
+                    Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
+                    return
+                end
             end
             
             % Check the dimensionality of the history data

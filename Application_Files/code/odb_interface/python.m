@@ -10,7 +10,7 @@ classdef python < handle
 %   Reference section in Quick Fatigue Tool Appendices
 %      10.4 The ODB Interface
 %   
-%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
 %   Last modified 06-Nov-2017 18:43:35 GMT
     
     %%
@@ -103,8 +103,8 @@ classdef python < handle
         end
         
         %% Verify the inputs for automatic export
-        function [error] = verifyAuto(requestedFields,...
-                fieldDataPath, fieldDataName, resultsDatabasePath, partInstanceName)
+        function [error] = verifyAuto(requestedFields, fieldDataPath,...
+                fieldDataName, resultsDatabasePath, partInstanceName)
 
             error = 0.0;
             
@@ -150,9 +150,8 @@ classdef python < handle
         function [positionLabels, position, positionLabelData,...
                 positionID, connectivity, mainIDs, subIDs, stepDescription,...
                 fieldData, fieldNames, connectedElements, error] = getFieldData(fieldDataPath,...
-                requestedFields, userPosition,...
-                partInstanceName, autoPosition, fid_debug,...
-                resultsDatabasePath, resultsDatabaseName)
+                requestedFields, userPosition, partInstanceName,...
+                autoPosition, fid_debug, resultsDatabasePath, resultsDatabaseName)
             
             error = 0.0;
             connectedElements = [];
@@ -434,7 +433,7 @@ classdef python < handle
                 return
             end
             loadingUnits = char(c{3});
-            stepDescription = ['version 6.11-07; ', job, ', ', loading];
+            stepDescription = ['version 6.11-08; ', job, ', ', loading];
             
             %% Get the requested field data
             fprintf(fid_debug, ' %.0f fields requested', length(requestedFields(requestedFields == true)));
@@ -1063,7 +1062,7 @@ classdef python < handle
             fprintf(fid, '\r\n#   M.Sc. Louis Vallance, AMIMechE');
             fprintf(fid, '\r\n#   louisvallance@hotmail.co.uk');
             fprintf(fid, '\r\n#');
-            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017');
+            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017');
             fprintf(fid, '\r\n#   Last modified 10-Oct-2017 14:19:47 GMT');
             
             % Write Abaqus import header
@@ -1452,7 +1451,7 @@ classdef python < handle
             fprintf(fid, '\r\n#   M.Sc. Louis Vallance');
             fprintf(fid, '\r\n#   louisvallance@hotmail.co.uk');
             fprintf(fid, '\r\n#');
-            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017');
+            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017');
             fprintf(fid, '\r\n#   Last modified 10-Oct-2017 14:19:47 GMT');
             
             % Write Abaqus import header
@@ -1681,7 +1680,7 @@ classdef python < handle
             fprintf(fid, '\r\n#   Technical Specialist SIMULIA');
             fprintf(fid, '\r\n#   louisvallance@hotmail.co.uk');
             fprintf(fid, '\r\n#');
-            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017');
+            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017');
             fprintf(fid, '\r\n#   Last modified 10-Oct-2017 14:19:47 GMT');
             
             % Write Abaqus import header

@@ -9,7 +9,7 @@ function varargout = failStrain(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials
 %   
-%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
 %   Last modified 09-Oct-2017 11:03:00 GMT
 
 % Begin initialization code - DO NOT EDIT
@@ -76,6 +76,15 @@ end
 if isappdata(0, 'failStrain_g12') == 1.0
     set(handles.edit_g12, 'string', getappdata(0, 'failStrain_g12'))
 end
+
+% Load icon
+[a,~]=imread('icoR_delete.jpg');
+[r,c,~]=size(a); 
+x=ceil(r/35); 
+y=ceil(c/35); 
+g=a(1:x:end,1:y:end,:);
+g(g==255)=5.5*255;
+set(handles.pButton_reset, 'CData', g);
 
 
 % --- Outputs from this function are returned to the command line.
@@ -425,3 +434,15 @@ function edit_g12_CreateFcn(hObject, ~, ~)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in pButton_reset.
+function pButton_reset_Callback(~, ~, handles)
+set(handles.edit_tsfd, 'string', [])
+set(handles.edit_csfd, 'string', [])
+set(handles.edit_tstd, 'string', [])
+set(handles.edit_cstd, 'string', [])
+set(handles.edit_shear, 'string', [])
+set(handles.edit_e11, 'string', [])
+set(handles.edit_e22, 'string', [])
+set(handles.edit_g12, 'string', [])

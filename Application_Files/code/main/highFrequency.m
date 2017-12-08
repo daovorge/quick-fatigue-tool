@@ -6,8 +6,8 @@ classdef highFrequency < handle
 %   HIGHFREQUENCY is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
-%   Last modified 04-Oct-2017 18:09:00 GMT
+%   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
+%   Last modified 24-Nov-2017 12:40:07 GMT
     
     %%
     
@@ -138,11 +138,20 @@ classdef highFrequency < handle
             
             % Check the length of the history data
             if length(scale) < 2.0
-                error = true;
-                setappdata(0, 'E017', 1.0)
-
-                Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
-                return
+                if getappdata(0, 'compositeCriteria') == 1.0
+                    %{
+                    	For composite failure criteria analysis, a load
+                        history 1 point is permitted. Prepend a zero to the
+                        load history
+                    %}
+                    scale = [0.0, scale];
+                else
+                    error = true;
+                    setappdata(0, 'E017', 1.0)
+                    
+                    Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
+                    return
+                end
             end
             
             % Check the dimensionality of the history data
@@ -392,11 +401,20 @@ classdef highFrequency < handle
                     
                     % Check the length of the history data
                     if length(scale) < 2.0
-                        error = true;
-                        setappdata(0, 'E017', 1.0)
-                        
-                        Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
-                        return
+                        if getappdata(0, 'compositeCriteria') == 1.0
+                            %{
+                                For composite failure criteria analysis, a
+                                load history 1 point is permitted. Prepend
+                                a zero to the load history
+                            %}
+                            scale = [0.0, scale]; %#ok<AGROW>
+                        else
+                            error = true;
+                            setappdata(0, 'E017', 1.0)
+                            
+                            Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
+                            return
+                        end
                     end
                     
                     % Check the dimensionality of the history data
@@ -557,24 +575,34 @@ classdef highFrequency < handle
             L = length(channels);
             first_time = 1.0;
             
+            % Get the composite criteria flag
+            compositeCriteria = getappdata(0, 'compositeCriteria');
+            
             % Begin reading datasets
-            if ischar(channels) == 1.0
-                % Only one dataset is defined in a sequence
-                if isempty(channels) == 1.0
-                    setappdata(0, 'E023', 1.0)
-                else
-                    setappdata(0, 'E024', 1.0)
+            if compositeCriteria == 1.0
+                if ischar(channels) == 1.0
+                    channels = {channels, channels};
+                elseif length(channels) == 1.0
+                    channels = [channels(1.0), channels(1.0)];
                 end
-                
-                error = true;
-                Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
-                return
-            elseif length(channels) == 1.0
-                setappdata(0, 'E024', 1.0)
-                
-                error = true;
-                Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
-                return
+            else
+                if ischar(channels) == 1.0
+                    if isempty(channels) == 1.0
+                        setappdata(0, 'E023', 1.0)
+                    else
+                        setappdata(0, 'E024', 1.0)
+                    end
+                    
+                    error = true;
+                    Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
+                    return
+                elseif length(channels) == 1.0
+                    setappdata(0, 'E024', 1.0)
+                    
+                    error = true;
+                    Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
+                    return
+                end
             end
             
             % Verify the loading scale factors
@@ -763,7 +791,7 @@ classdef highFrequency < handle
                 region = 1.0;
             end
             
-            %% Remove unused columns if required:
+            %% Remove unused columns if necessary:
             
             % Initialize the dataset buffers
             fieldDataBuffer = cell(1.0, region);
@@ -841,6 +869,33 @@ classdef highFrequency < handle
                     remove = 6.0;
                 end
                 
+                % 1D stress, two position label columns
+                if length(cellData_region_i{4.0}) ~= length(cellData_region_i{1.0})
+                    cellData_region_i{4.0} = zeros(length(cellData_region_i{1.0}), 1.0, 'double');
+                    remove = 7.0;
+                elseif isnan(cellData_region_i{4.0}) == 1.0
+                    cellData_region_i{4.0} = zeros(length(cellData_region_i{1.0}), 1.0, 'double');
+                    remove = 7.0;
+                end
+                
+                % 1D stress, one position label column
+                if length(cellData_region_i{3.0}) ~= length(cellData_region_i{1.0})
+                    cellData_region_i{3.0} = zeros(length(cellData_region_i{1.0}), 1.0, 'double');
+                    remove = 8.0;
+                elseif isnan(cellData_region_i{3.0}) == 1.0
+                    cellData_region_i{3.0} = zeros(length(cellData_region_i{1.0}), 1.0, 'double');
+                    remove = 8.0;
+                end
+                
+                % 1D stress, no position label columns
+                if length(cellData_region_i{2.0}) ~= length(cellData_region_i{1.0})
+                    cellData_region_i{2.0} = zeros(length(cellData_region_i{1.0}), 1.0, 'double');
+                    remove = 9.0;
+                elseif isnan(cellData_region_i{2.0}) == 1.0
+                    cellData_region_i{2.0} = zeros(length(cellData_region_i{1.0}), 1.0, 'double');
+                    remove = 9.0;
+                end
+                
                 %% Check for concatenation errors:
                 
                 try
@@ -864,7 +919,13 @@ classdef highFrequency < handle
                     return
                 end
                 
-                if remove == 6.0
+                if remove == 9.0
+                    fieldData_i(:, 2:10) = [];
+                elseif remove == 8.0
+                    fieldData_i(:, 3:10) = [];
+                elseif remove == 7.0
+                    fieldData_i(:, 4:10) = [];
+                elseif remove == 6.0
                     fieldData_i(:, 5:10) = [];
                 elseif remove == 5.0
                     fieldData_i(:, 6:10) = [];
@@ -954,6 +1015,18 @@ classdef highFrequency < handle
                         X = 1.0;
                         
                         fieldData_i(:, 5:6) = 0.0;
+                    case 3.0
+                        mainIDs_i = fieldData_i(:, 1.0);
+                        
+                        fieldData_i(:, 4:8) = 0.0;
+                    case 2.0
+                        mainIDs_i = fieldData_i(:, 1.0);
+                        
+                        fieldData_i(:, 3:7) = 0.0;
+                    case 1.0
+                        mainIDs_i = linspace(1.0, 1.0, Ri)';
+                        
+                        fieldData_i(:, 2:6) = 0.0;
                     otherwise
                         error = 1.0;
                         setappdata(0, 'E031', 1.0)

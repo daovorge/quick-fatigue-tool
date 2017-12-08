@@ -9,8 +9,8 @@ classdef postProcess_e < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      10 Output
 %   
-%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
-%   Last modified 16-Oct-2017 09:28:25 GMT
+%   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
+%   Last modified 22-Nov-2017 09:33:19 GMT
     
     %%
     
@@ -280,6 +280,11 @@ classdef postProcess_e < handle
             end
             
             setappdata(0, 'TRF', triaxialityFactor)
+            
+            % Warn the user if any parts of the model are in a state of pure triaxial tension/compression
+            if any(triaxialityFactor > 2.0) == 1.0
+                messenger.writeMessage(307.0)
+            end
         end
         
         %% Write field output to file:
@@ -1102,8 +1107,10 @@ classdef postProcess_e < handle
                 if numberOfCycles > 1.0
                     cumulativeDamage = cumsum(damagePerCycle);
                     
-                    % If the maximum damage is zero, skip this variable
-                    if max(cumulativeDamage) ~= 0.0
+                    % If the maximum damage is zero or INF, skip this variable
+                    if (max(cumulativeDamage) == 0.0) || (max(cumulativeDamage) == inf)
+                        messenger.writeMessage(299.0)
+                    else
                         % Check whether damage crosses the infinite life envelope
                         crossing = -999.0;
                         cael = 0.5*getappdata(0, 'cael');

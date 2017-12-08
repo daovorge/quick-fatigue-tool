@@ -84,8 +84,8 @@ classdef algorithm_user < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.10 User-defined algorithms
 %   
-%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
-%   Last modified 19-May-2017 16:27:36 GMT
+%   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
+%   Last modified 24-Nov-2017 09:30:36 GMT
     
     %%
         
@@ -114,11 +114,25 @@ classdef algorithm_user < handle
                 8: MSC
             %}
             
+            % Get stress tensor components
+            S11 = varargin{1.0};
+            
             % DEFINE OUTPUT (DUMMY VALUES)
+            N = varargin{7.0};
             DPARAMI = 400.0;
-            AMPI = {200.0};
-            PAIRI = {[400.0, -400.0]};
-            DAMI = 1e-6;
+            AMPI{N} = 200.0;
+            PAIRI{N} = [400.0, -400.0];
+            DAMI(N) = 1e-6;
+            
+            %{
+                Additional APPDATA variables for history output. It is not
+                compulsory to define these variables, but they will be
+                required if the user specifies field or history output.
+            %}
+            setappdata(0, 'CS', zeros(1.0, length(S11)))
+            setappdata(0, 'CN', zeros(1.0, length(S11)))
+            setappdata(0, 'cyclesOnCP', PAIRI{N})
+            setappdata(0, 'amplitudesOnCP', AMPI{N})
         end
     end
 end

@@ -9,7 +9,7 @@ function varargout = larc05(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials
 %   
-%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
 %   Last modified 11-Oct-2017 13:08:05 GMT
 
 % Begin initialization code - DO NOT EDIT
@@ -98,6 +98,15 @@ isAvailable = checkToolbox('Symbolic Math Toolbox');
 if isAvailable == 0.0
     set(handles.check_iterate, 'enable', 'off')
 end
+
+% Load icon
+[a,~]=imread('icoR_delete.jpg');
+[r,c,~]=size(a); 
+x=ceil(r/35); 
+y=ceil(c/35); 
+g=a(1:x:end,1:y:end,:);
+g(g==255)=5.5*255;
+set(handles.pButton_reset, 'CData', g);
 
 
 % --- Outputs from this function are returned to the command line.
@@ -523,3 +532,19 @@ rmappdata(0, 'noSMT')
 
 % Hint: delete(hObject) closes the figure
 delete(hObject);
+
+
+% --- Executes on button press in pButton_reset.
+function pButton_reset_Callback(~, ~, handles)
+set(handles.edit_lts, 'string', [])
+set(handles.edit_lcs, 'string', [])
+set(handles.edit_tts, 'string', [])
+set(handles.edit_tcs, 'string', [])
+set(handles.edit_lss, 'string', [])
+set(handles.edit_tss, 'string', [])
+set(handles.edit_shear, 'string', [])
+set(handles.edit_nl, 'string', [])
+set(handles.edit_nt, 'string', [])
+set(handles.edit_alpha0, 'string', 53)
+set(handles.edit_phi0, 'string', [])
+set(handles.check_iterate, 'value', 0.0)

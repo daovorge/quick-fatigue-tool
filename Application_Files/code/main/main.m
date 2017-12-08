@@ -10,8 +10,8 @@ function [] = main(flags)
 %
 %   Author contact: louisvallance@hotmail.co.uk
 %
-%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
-%   Last modified 19-Nov-2017 16:45:59 GMT
+%   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
+%   Last modified 06-Dec-2017 13:46:50 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');    tic_pre = tic;
@@ -41,9 +41,9 @@ setappdata(0, 'messageFileNotes', 0.0)
 setappdata(0, 'messageFileWarnings', 0.0)
 
 %% PRINT COMMAND WINDOW HEADER
-fprintf('[NOTICE] Quick Fatigue Tool 6.11-07')
+fprintf('[NOTICE] Quick Fatigue Tool 6.11-08')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2017)')
-fprintf('\n[NOTICE] Last modified 19-Nov-2017 16:45:59 GMT')
+fprintf('\n[NOTICE] Last modified 06-Dec-2017 13:46:50 GMT')
 
 cleanExit = 0.0;
 
@@ -73,7 +73,7 @@ fileName = sprintf('Project/output/%s/%s.sta', jobName, jobName);
 fid_status = fopen(fileName, 'w+');
 setappdata(0, 'fid_status', fid_status)
 c = clock;
-fprintf(fid_status, '[NOTICE] Quick Fatigue Tool 6.11-07\t%s', datestr(datenum(c(1.0), c(2.0), c(3.0), c(4.0), c(5.0), c(6.0))));
+fprintf(fid_status, '[NOTICE] Quick Fatigue Tool 6.11-08\t%s', datestr(datenum(c(1.0), c(2.0), c(3.0), c(4.0), c(5.0), c(6.0))));
 
 fprintf('\n[NOTICE] The job ''%s'' has been submitted for analysis', jobName)
 fprintf(fid_status, '\n[NOTICE] The job file "%s.m" has been submitted for analysis', jobName);
@@ -299,7 +299,7 @@ end
 nodalElimination = getappdata(0, 'nodalElimination');
 
 % Only if Uniaxial Stress-Life or BS 7608 are not being used for analysis
-if (algorithm ~= 10.0) && (algorithm ~= 8.0) && (algorithm ~= 3.0)
+if (algorithm ~= 10.0) && (algorithm ~= 8.0) && (algorithm ~= 3.0) && (getappdata(0, 'compositeCriteria') == 0.0)
     if (nodalElimination > 0.0) && (N > 1.0)
         fprintf('\n[PRE] Optimizing datasets')
         fprintf(fid_status, '\n[PRE] Optimizing datasets');
@@ -328,7 +328,7 @@ else
         messenger.writeMessage(20.0)
     end
 
-    if nodalElimination > 0.0 && (algorithm == 10.0 || algorithm == 3.0)
+    if (nodalElimination > 0.0) && (algorithm == 10.0 || algorithm == 3.0) && (getappdata(0, 'compositeCriteria') == 0.0)
         messenger.writeMessage(21.0)
     end
 
@@ -360,7 +360,7 @@ if getappdata(0, 'compositeCriteria') == 1.0
     fprintf('\n[NOTICE] Begin composite failure assessment')
     fprintf(fid_status, '\n[NOTICE] Begin composite failure assessment');
     
-    compositeFailure(N, signalLength)
+    compositeFailure(N, signalLength, mainID, fid_status)
     
     fprintf('\n[NOTICE] End composite failure assessment')
     fprintf(fid_status, '\n[NOTICE] End composite failure assessment');

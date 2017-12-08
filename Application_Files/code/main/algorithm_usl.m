@@ -13,7 +13,7 @@ classdef algorithm_usl < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.8 Uniaxial Stress-Life
 %   
-%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
 %   Last modified 21-Sep-2017 12:46:54 GMT
     
     %%

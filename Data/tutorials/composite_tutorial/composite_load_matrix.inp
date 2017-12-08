@@ -3,6 +3,5 @@
 **composite laminate loaded across the fibre (transverse)
 *MATERIAL = IM7 (8551-7)
 *DATASET = composite-dataset-transverse.dat
-*HISTORY = [1, -1]
 *PLANE STRESS = 1
 *COMPOSITE CRITERIA = 1

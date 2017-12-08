@@ -12,14 +12,27 @@ function [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(ma
 %   Reference section in Quick Fatigue Tool User Guide
 %      4.5.3 Custom analysis items
 %
-%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
-%   Last modified 31-Oct-2017 09:12:00 GMT
+%   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
+%   Last modified 30-Nov-2017 15:19:11 GMT
 
 %%
+
+%% Create string from part instances
+partInstance = getappdata(0, 'partInstance');
+instanceStrings = [];
+
+if iscell(partInstance) == 1.0
+    for i = 1:length(partInstance)
+        instanceStrings = [instanceStrings, partInstance{i}]; %#ok<AGROW>
+    end
+else
+    instanceStrings = partInstance;
+end
 
 %% Check if a surface definition already exists
 outputDatabase = getappdata(0, 'outputDatabase');
 [~, name, ~] = fileparts(outputDatabase);
+name = ['[M]', name, '[I]', instanceStrings];
 root = [pwd, '\Data\surfaces'];
 surfaceFile = [root, '\', name, '_surface.dat'];
 
@@ -59,7 +72,6 @@ if (strcmpi(items, 'surface') == 1.0) && (exist(surfaceFile, 'file') == 2.0) && 
 end
 
 %% Check if surface detection can be used
-partInstance = getappdata(0, 'partInstance');
 odbResultPosition = getappdata(0, 'odbResultPosition');
 
 % Check intpus
@@ -182,6 +194,9 @@ end
 if (strcmpi(searchRegion, 'dataset') == 1.0) && (strcmpi(odbResultPosition, 'nodal') == 1.0)
     searchRegion = 'INSTANCE';
     messenger.writeMessage(276.0)
+elseif (strcmpi(searchRegion, 'dataset')) && (numberOfInstances > 1.0)
+    searchRegion = 'INSTANCE';
+    messenger.writeMessage(308.0)
 elseif strcmpi(searchRegion, 'dataset') == 1.0
     fileName = [pwd, '/Application_Files/code/odb_interface/element_ids.dat'];
     fid = fopen(fileName, 'w+');
@@ -530,8 +545,11 @@ if exist(root, 'dir') == 0.0
     mkdir(root)
 end
 
-% Create the file
+% Create the file name
 [~, name, ~] = fileparts(outputDatabase);
+name = ['[M]', name, '[I]', instanceStrings];
+
+% Create the file
 dir = [root, sprintf('\\%s_surface.dat', name)];
 fid = fopen(dir, 'w+');
 

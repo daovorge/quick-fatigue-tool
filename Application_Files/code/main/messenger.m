@@ -6,8 +6,8 @@ classdef messenger < handle
 %   MESSENGER is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %
-%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
-%   Last modified 19-Nov-2017 16:45:59 GMT
+%   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
+%   Last modified 06-Dec-2017 13:46:50 GMT
 
     %%
 
@@ -1195,7 +1195,10 @@ classdef messenger < handle
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 127.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Composite materials may not be used for fatigue analysis. The analysis will not continue beyond this point', returnType{i}]);
-                        rmappdata(0, 'noSMT')
+                        
+                        if i == 1.0
+                            rmappdata(0, 'noSMT')
+                        end
                     case 128.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The output variables RHIST and RC require the Statistics and Machine Learning Toolbox.', returnType{i}]);
                     case 129.0
@@ -1211,7 +1214,8 @@ classdef messenger < handle
                     case 132.0
                         if getappdata(0, 'suppress_ID132') == 0.0
                             fprintf(fidType(i), [returnType{i}, '***NOTE: Out-of-plane stresses (S33/S23/S13) were found during the composite failure/damage initiation calculation', returnType{i}]);
-                            fprintf(fidType(i), ['-> For composite materials, plane stress conditions are assumed', returnType{i}]);
+                            fprintf(fidType(i), ['-> For composite materials, plane stress conditions (S11/S22/S12) are assumed', returnType{i}]);
+                            fprintf(fidType(i), ['-> If the composite is made from continuum solid elements, this message can be disregarded', returnType{i}]);
                             
                             if i == X
                                 setappdata(0, 'suppress_ID132', 1.0)
@@ -2146,12 +2150,20 @@ classdef messenger < handle
                     case 273.0
                         message = getappdata(0, 'message_273');
                         
+                        partInstance = getappdata(0, 'partInstance');
+                        
                         fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: Surface detection failed on ''%s'' with the following error:', returnType{i}], getappdata(0, 'outputDatabase'));
                         fprintf(fidType(i), '%s', message);
                         
                         if isempty(strfind(message, 'The database is from a previous release of Abaqus.')) == 0.0
                             fprintf(fidType(i), ['-> The installed Abaqus API is from a more recent version of Abaqus than that which was used to generate the model ODB file', returnType{i}]);
                             fprintf(fidType(i), ['-> Set the environment variables ''autoExport_upgradeODB=1.0'' and ''autoExport_abqCmd=<abaqus-version>'', where <abaqus-version> is the identifier of the Abaqus version to which the ODB file is upgraded', returnType{i}]);
+                        elseif iscell(partInstance) == 1.0
+                            for j = 1:length(partInstance)
+                                if isempty(strfind(message, partInstance{j})) == 0.0
+                                    fprintf(fidType(i), ['-> The part instance name ''%s'' is either spelled incorrectly or it does not exist in the model', returnType{i}], partInstance{j});
+                                end
+                            end
                         elseif isempty(strfind(message, getappdata(0, 'partInstance'))) == 0.0
                             fprintf(fidType(i), ['-> The part instance name is either spelled incorrectly or it does not exist in the model', returnType{i}]);
                         end
@@ -2163,7 +2175,7 @@ classdef messenger < handle
                     case 275.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Detected %.0f elements on the model surface', returnType{i}], getappdata(0, 'message_275'));
                     case 276.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: Surface detection cannot be limited to dataset elements for unique nodal stress data', returnType{i}], getappdata(0, 'message_275'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Surface detection cannot be limited to dataset elements if the unique nodal element position is specified with the RESULT_POSITION option', returnType{i}], getappdata(0, 'message_275'));
                         fprintf(fidType(i), ['-> The whole part instance will be searched', returnType{i}]);
                     case 277.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The stress dataset(s) contain no items on the element surface', returnType{i}], getappdata(0, 'message_275'));
@@ -2199,13 +2211,18 @@ classdef messenger < handle
                     case 286.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The surface definition file ''%s'' is invalid', returnType{i}], getappdata(0, 'hotspotFile'));
                         fprintf(fidType(i), ['-> The whole model will be analysed', returnType{i}]);
+                        
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 287.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: Some items in the surface definition file could not be located in the stress dataset', returnType{i}]);
                         fprintf(fidType(i), ['-> Verify that the results position in the surface definition is consistent with the model definition in the job file', returnType{i}]);
+                        
+                        setappdata(0, 'messageFileWarnings', 1.0)
                     case 289.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: The following elements are not supported by the surface detection algorithm: %s', returnType{i}], getappdata(0, 'message_289_unsupportedElements'));
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: The following elements are not supported by the surface detection algorithm: %s'], getappdata(0, 'message_289_unsupportedElements'));
                         fprintf(fidType(i), ['-> These elements have been skipped', returnType{i}]);
+                        
+                        setappdata(0, 'messageFileWarnings', 1.0)
                     case 290.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The maximum stress failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'MSTRS'));
                     case 291.0
@@ -2225,7 +2242,7 @@ classdef messenger < handle
                     case 298.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin damage initiation (matrix tensile) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNMTCRT'));
                     case 299.0
-                        
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The DAC MATLAB figure was not generated because the maximum cumulative damage is either zero or infinite', returnType{i}]);
                     case 300.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The COMPOSITE_CRITERIA job file option was specified, but composite criteria were not evaluated', returnType{i}]);
                         fprintf(fidType(i), ['-> The specified composite properies are insufficient', returnType{i}]);
@@ -2241,6 +2258,14 @@ classdef messenger < handle
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The LaRC05 damage initiation (fibre split) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'LARSFCRT'));
                     case 306.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The LaRC05 damage initiation (fibre tensile) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'LARTFCRT'));
+                    case 307.0
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: One or more regions in the model are in a highly triaxial state of stress (TRF > 2)', returnType{i}]);
+                        fprintf(fidType(i), ['-> The effective ductility at these regions is diminished and there is a higher likelihood of brittle fracture', returnType{i}]);
+                        
+                        setappdata(0, 'messageFileWarnings', 1.0)
+                    case 308.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Surface detection cannot be limited to dataset elements if more than one part instance is specified with the PART_INSTANCE option', returnType{i}], getappdata(0, 'message_275'));
+                        fprintf(fidType(i), ['-> The whole part instance will be searched', returnType{i}]);
                 end
             end
         end
@@ -2291,13 +2316,13 @@ classdef messenger < handle
 
             % Write file header
             try
-                fprintf(fid, 'Quick Fatigue Tool 6.11-07 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
+                fprintf(fid, 'Quick Fatigue Tool 6.11-08 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
             catch
-                fprintf(fid, 'Quick Fatigue Tool 6.11-07\r\n');
+                fprintf(fid, 'Quick Fatigue Tool 6.11-08\r\n');
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2017\r\n');
-            fprintf(fid, 'Last modified 19-Nov-2017 16:45:59 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 06-Dec-2017 13:46:50 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

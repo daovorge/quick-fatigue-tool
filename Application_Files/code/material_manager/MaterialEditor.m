@@ -12,8 +12,8 @@ function varargout = MaterialEditor(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials
 %   
-%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
-%   Last modified 19-Nov-2017 16:45:59 GMT
+%   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
+%   Last modified 06-Dec-2017 08:59:42 GMT
     
     %%
     
@@ -1300,6 +1300,23 @@ else
     end
     if isappdata(0, 'larc05_iterate') == 1.0
         rmappdata(0, 'larc05_iterate')
+    end
+    
+    % k-value calculation
+    if isappdata(0, 'k_solution_model') == 1.0
+        rmappdata(0, 'k_solution_model')
+    end
+    if isappdata(0, 'k_solution_r') == 1.0
+        rmappdata(0, 'k_solution_r')
+    end
+    if isappdata(0, 'k_solution_fi') == 1.0
+        rmappdata(0, 'k_solution_fi')
+    end
+    if isappdata(0, 'k_solution_t') == 1.0
+        rmappdata(0, 'k_solution_t')
+    end
+    if isappdata(0, 'k_solution_uts') == 1.0
+        rmappdata(0, 'k_solution_uts')
     end
 end
 

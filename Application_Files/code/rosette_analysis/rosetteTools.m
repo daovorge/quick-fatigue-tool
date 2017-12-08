@@ -10,7 +10,7 @@ classdef rosetteTools < handle
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.3 Rosette Analysis
 %   
-%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
 %   Last modified 14-Oct-2017 18:15:15 GMT
     
     %%

@@ -6,7 +6,7 @@ function [] = getRMinus1Curve(useSN, msCorrection, nSets, G)
 %   GETRMINUS1CURVE is used internally by Quick Fatigue Tool. The user is
 %   not required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
 %   Last modified 08-Jun-2017 09:59:37 GMT
     
     %%
@@ -22,7 +22,6 @@ group_materialProps = getappdata(0, 'group_materialProps');
 
 for groups = 1:G
     % Get the material properties for the current group
-    
     
     if (useSN == 1.0) && (nSets > 1.0)
         preProcess.snInterpolate(msCorrection)

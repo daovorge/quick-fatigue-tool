@@ -5,8 +5,8 @@ classdef jobFile < handle
 %   JOBFILE is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
-%   Last modified 06-Nov-2017 15:15:09 GMT
+%   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
+%   Last modified 04-Dec-2017 13:11:42 GMT
     
     %%
     
@@ -114,13 +114,6 @@ classdef jobFile < handle
             if isempty(items) == 1.0
                 items = 'ALL';
                 setappdata(0, 'items', 'ALL')
-            elseif ischar(items) == 1.0
-                [~, ~, ext] = fileparts(items);
-                
-                if (isempty(ext) == 1.0) && (strcmpi(items, 'ALL') == 0.0 && strcmpi(items, 'MAXPS') == 0.0 && strcmpi(items, 'SURFACE') == 0.0)
-                    items = 'ALL';
-                    setappdata(0, 'items', 'ALL')
-                end
             end
             
             if isempty(scale) == 1.0
@@ -258,6 +251,38 @@ classdef jobFile < handle
             end
             
             %% CHECK CERTAIN FLAGS FOR STRING INPUT
+            if ischar(items) == 1.0
+                items = lower(items);
+                switch items
+                    case 'all'
+                        setappdata(0, 'items', 'ALL')
+                    case 'surface'
+                        setappdata(0, 'items', 'SURFACE')
+                    case 'maxps'
+                        setappdata(0, 'items', 'MAXPS')
+                    otherwise
+                        if exist(items, 'file') == 2.0
+                            setappdata(0, 'items', items)
+                        else
+                            % No exact string match
+                            itemsWords = {'all', 'surface', 'maxps'};
+                            matchingItems = find(strncmpi({items}, itemsWords, length(items)) == 1.0);
+                            
+                            if (isempty(matchingItems) == 1.0) || (length(matchingItems) ~= 1.0)
+                                % The items could not be found in the library
+                                error = 1.0;
+                                fprintf('ERROR: The value of ITEMS (''%s'') is not recognized\n', items)
+                                fprintf('-> A list of available inputs can be found in Section 1.2.6 of the Quick Fatigue Tool User Settings Reference Guide\n');
+                                return
+                            elseif length(itemsWords{matchingItems}) ~= length(items)
+                                % The items is a partial match
+                                items = itemsWords{matchingItems};
+                                setappdata(0, 'items', items)
+                            end
+                        end
+                end
+            end
+            
             if ischar(units) == 1.0
                 units = lower(units);
                 switch units
@@ -283,9 +308,22 @@ classdef jobFile < handle
                         units = 6.0;
                         setappdata(0, 'units', 6.0)
                     otherwise
-                        units = 10.0;
-                        setappdata(0, 'units', 10.0)
+                        % No exact string match
+                        unitWords = {'user', 'pa', 'kpa', 'mpa', 'psi', 'ksi', 'msi'};
+                        unitN = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0];
+                        matchingUnits = find(strncmpi({units}, unitWords, length(units)) == 1.0);
                         
+                        if (isempty(matchingUnits) == 1.0) || (length(matchingUnits) ~= 1.0)
+                            % The units could not be found in the library
+                            error = 1.0;
+                            fprintf('ERROR: The value of UNITS (''%s'') is not recognized\n', units)
+                            fprintf('-> A list of available units can be found in Section 1.2.3 of the Quick Fatigue Tool User Settings Reference Guide\n');
+                            return
+                        elseif length(unitWords{matchingUnits}) ~= length(units)
+                            % The unit is a partial match
+                            units = unitN(matchingUnits);
+                            setappdata(0, 'algorithm', units)
+                        end
                 end
             end
             
@@ -328,11 +366,11 @@ classdef jobFile < handle
                         algorithmN = [0.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0];
                         matchingAlg = find(strncmpi({algorithm}, algorithms, length(algorithm)) == 1.0);
                         
-                        if isempty(matchingAlg) == 1.0
+                        if (isempty(matchingAlg) == 1.0) || (length(matchingAlg) ~= 1.0)
                             % The algorithm could not be found in the library
                             error = 1.0;
-                            fprintf('ERROR: The value of ALGORITHM (''%s'') could not be recognized\n', algorithm)
-                            fprintf('-> A list of available analysis algorithms can be found in Section 6 of the Quick Fatigue Tool User Guide\n');
+                            fprintf('ERROR: The value of ALGORITHM (''%s'') is not recognized\n', algorithm)
+                            fprintf('-> A list of available analysis algorithms can be found in Section 1.2.6 of the Quick Fatigue Tool User Settings Reference Guide\n');
                             return
                         elseif length(algorithms{matchingAlg}) ~= length(algorithm)
                             % The algorithm is a partial match
@@ -382,10 +420,10 @@ classdef jobFile < handle
                             mscs = {'default', 'morrow', 'goodman', 'soderberg', 'walker', 'swt', 'gerber', 'ratio', 'none'};
                             matchingMsc = find(strncmpi({msCorrection}, mscs, length(msCorrection)) == 1.0);
                             
-                            if isempty(matchingMsc) == 1.0
+                            if (isempty(matchingMsc) == 1.0) || (length(matchingMsc) ~= 1.0)
                                 % The mean stress correction could not be found in the library
                                 error = 1.0;
-                                fprintf('ERROR: The value of MS_CORRECTION (''%s'') could not be recognized\n', msCorrection)
+                                fprintf('ERROR: The value of MS_CORRECTION (''%s'') is not recognized\n', msCorrection)
                                 fprintf('-> A list of available mean stress corrections can be found in Section 7 of the Quick Fatigue Tool User Guide\n');
                                 return
                             elseif length(mscs{matchingMsc}) ~= length(msCorrection)
@@ -408,6 +446,64 @@ classdef jobFile < handle
                         setappdata(0, 'isExplicit', 1.0)
                     otherwise
                         setappdata(0, 'isExplicit', 0.0)
+                end
+            end
+            
+            if ischar(odbResultPosition) == 1.0
+                odbResultPosition = lower(odbResultPosition);
+                switch odbResultPosition
+                    case 'element nodal'
+                        setappdata(0, 'odbResultPosition', 'ELEMENT NODAL')
+                    case 'unique nodal'
+                        setappdata(0, 'odbResultPosition', 'UNIQUE NODAL')
+                    case 'integration point'
+                        setappdata(0, 'odbResultPosition', 'INTEGRATION POINT')
+                    case 'centroid'
+                        setappdata(0, 'odbResultPosition', 'CENTROID')
+                    otherwise
+                        % No exact string match
+                        resultWords = {'element nodal', 'unique nodal', 'integration point', 'centroid'};
+                        matchingResults = find(strncmpi({odbResultPosition}, resultWords, length(odbResultPosition)) == 1.0);
+                        
+                        if (isempty(matchingResults) == 1.0) || (length(matchingResults) ~= 1.0)
+                            % The result position could not be found in the library
+                            error = 1.0;
+                            fprintf('ERROR: The value of RESULT_POSITION (''%s'') is not recognized\n', odbResultPosition)
+                            fprintf('-> A list of available result positions can be found in Section 1.2.10 of the Quick Fatigue Tool User Settings Reference Guide\n');
+                            return
+                        elseif length(resultWords{matchingResults}) ~= length(odbResultPosition)
+                            % The result position is a partial match
+                            odbResultPosition = resultWords{matchingResults};
+                            setappdata(0, 'odbResultPosition', odbResultPosition)
+                        end
+                end
+            end
+            
+            if ischar(failureMode) == 1.0
+                failureMode = lower(failureMode);
+                switch failureMode
+                    case 'normal'
+                        setappdata(0, 'failureMode', 'NORMAL')
+                    case 'shear'
+                        setappdata(0, 'failureMode', 'SHEAR')
+                    case 'combined'
+                        setappdata(0, 'failureMode', 'COMBINED')
+                    otherwise
+                        % No exact string match
+                        failureWords = {'normal', 'shear', 'combined'};
+                        matchingMode = find(strncmpi({failureMode}, failureWords, length(failureMode)) == 1.0);
+                        
+                        if (isempty(matchingMode) == 1.0) || (length(matchingMode) ~= 1.0)
+                            % The result position could not be found in the library
+                            error = 1.0;
+                            fprintf('ERROR: The value of FAILURE_MODE (''%s'') is not recognized\n', failureMode)
+                            fprintf('-> A list of available weld failure modes can be found in Section 1.2.12 of the Quick Fatigue Tool User Settings Reference Guide\n');
+                            return
+                        elseif length(failureWords{matchingMode}) ~= length(failureMode)
+                            % The result position is a partial match
+                            failureMode = failureWords{matchingMode};
+                            setappdata(0, 'failureMode', failureMode)
+                        end
                 end
             end
         end
@@ -1706,18 +1802,31 @@ classdef jobFile < handle
                 return
             end
             
-            % If high frequency data is provided, superimpose it onto the low frequency
-            % block
+            % If high frequency data is provided, superimpose it onto the low frequency block
             if (isempty(hfDataset) == 0.0) || ((algorithm == 10.0 || algorithm == 3.0) && isempty(hfHistory) == 0.0)
-                [Sxx, Syy, Szz, Txy, Tyz, Txz, error] = highFrequency.main(Sxx, Syy, Szz, Txy, Tyz, Txz, hfDataset, hfHistory, hfTime, algorithm, items, hfScales);
-                
                 %{
-                    If high frequency datasets were used with the Uniaxial
-                    Stress-Life algorithm, update the OLDSIGNAL variable to
-                    reflect the newly superinposed data
+                    This functionality requires the Signal Processing
+                    Toolbox. If the toolbox is not available, abort the
+                    analysis
                 %}
-                if algorithm == 10.0 || algorithm == 3.0
-                    oldSignal = Sxx;
+                sptAvailable = checkToolbox('Signal Processing Toolbox');
+                
+                if sptAvailable ~= 1.0
+                    error = 1.0;
+                    setappdata(0, 'E009', 1.0)
+                    return
+                else
+                    [Sxx, Syy, Szz, Txy, Tyz, Txz, error] = highFrequency.main(Sxx, Syy, Szz, Txy, Tyz, Txz, hfDataset, hfHistory, hfTime, algorithm, items, hfScales);
+                    
+                    %{
+                        If high frequency datasets were used with the
+                        Uniaxial Stress-Life algorithm, update the
+                        OLDSIGNAL variable to reflect the newly
+                        superinposed data
+                    %}
+                    if algorithm == 10.0 || algorithm == 3.0
+                        oldSignal = Sxx;
+                    end
                 end
             end
             
