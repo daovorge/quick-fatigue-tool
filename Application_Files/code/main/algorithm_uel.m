@@ -13,7 +13,7 @@ classdef algorithm_uel < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.9 Uniaxial Strain-Life
 %   
-%   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
 %   Last modified 30-Aug-2017 15:40:20 GMT
     
     %%

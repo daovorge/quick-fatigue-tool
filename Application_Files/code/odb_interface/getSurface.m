@@ -12,7 +12,7 @@ function [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(ma
 %   Reference section in Quick Fatigue Tool User Guide
 %      4.5.3 Custom analysis items
 %
-%   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
 %   Last modified 30-Nov-2017 15:19:11 GMT
 
 %%

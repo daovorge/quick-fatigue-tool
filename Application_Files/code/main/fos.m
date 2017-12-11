@@ -9,7 +9,7 @@ function [] = fos(gateTensors, tensorGate, coldItems, algorithm, msCorrection, N
 %   Reference section in Quick Fatigue Tool User Guide
 %      8.3 Factor of Strength
 %   
-%   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
 %   Last modified 16-Nov-2017 14:27:15 GMT
     
     %%
