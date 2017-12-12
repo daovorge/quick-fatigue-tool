@@ -13,7 +13,7 @@ function [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(ma
 %      4.5.3 Custom analysis items
 %
 %   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
-%   Last modified 30-Nov-2017 15:19:11 GMT
+%   Last modified 12-Dec-2017 11:04:33 GMT
 
 %%
 
@@ -29,10 +29,30 @@ else
     instanceStrings = partInstance;
 end
 
+%% Get the result position
+odbResultPosition = getappdata(0, 'odbResultPosition');
+
+if strcmpi(odbResultPosition, 'element nodal') == 1.0
+    odbResultPosition = 'ELEMENTAL';
+elseif strcmpi(odbResultPosition, 'unique nodal') == 1.0
+    odbResultPosition = 'NODAL';
+elseif strcmpi(odbResultPosition, 'centroid') == 1.0
+    odbResultPosition = 'CENTROIDAL';
+else
+    % Integration point is not currently supported
+    messenger.writeMessage(270.0)
+    if strcmpi(items, 'surface') == 1.0
+        items = 'ALL';
+        setappdata(0, 'items', 'ALL')
+    end
+    return
+end
+
 %% Check if a surface definition already exists
 outputDatabase = getappdata(0, 'outputDatabase');
+
 [~, name, ~] = fileparts(outputDatabase);
-name = ['[M]', name, '[I]', instanceStrings];
+name = ['[M]', name, '[I]', instanceStrings, '[P]', odbResultPosition];
 root = [pwd, '\Data\surfaces'];
 surfaceFile = [root, '\', name, '_surface.dat'];
 
@@ -72,8 +92,6 @@ if (strcmpi(items, 'surface') == 1.0) && (exist(surfaceFile, 'file') == 2.0) && 
 end
 
 %% Check if surface detection can be used
-odbResultPosition = getappdata(0, 'odbResultPosition');
-
 % Check intpus
 if isempty(outputDatabase) == 1.0
     if strcmpi(items, 'surface') == 1.0
@@ -114,23 +132,6 @@ if ischar(partInstance) == 1.0
     numberOfInstances = 1.0;
 else
     numberOfInstances = length(partInstance);
-end
-
-% Get results position
-if strcmpi(odbResultPosition, 'element nodal') == 1.0
-    odbResultPosition = 'ELEMENTAL';
-elseif strcmpi(odbResultPosition, 'unique nodal') == 1.0
-    odbResultPosition = 'NODAL';
-elseif strcmpi(odbResultPosition, 'centroid') == 1.0
-    odbResultPosition = 'CENTROIDAL';
-else
-    % Integration point is not currently supported
-    messenger.writeMessage(270.0)
-    if strcmpi(items, 'surface') == 1.0
-        items = 'ALL';
-        setappdata(0, 'items', 'ALL')
-    end
-    return
 end
 
 %% Get the Abaqus command
@@ -547,7 +548,7 @@ end
 
 % Create the file name
 [~, name, ~] = fileparts(outputDatabase);
-name = ['[M]', name, '[I]', instanceStrings];
+name = ['[M]', name, '[I]', instanceStrings, '[P]', odbResultPosition];
 
 % Create the file
 dir = [root, sprintf('\\%s_surface.dat', name)];
