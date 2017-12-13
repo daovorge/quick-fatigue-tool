@@ -9,7 +9,7 @@ classdef importMaterial < handle
 %   LocalMaterialDatabase, material, MaterialEditor, MaterialManager.
 %   
 %   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
-%   Last modified 11-Oct-2017 13:08:05 GMT
+%   Last modified 13-Dec-2017 08:13:25 GMT
     
     %%
     
@@ -235,6 +235,20 @@ classdef importMaterial < handle
             % Check if the *USER MATERIAL keyword contains the NAME parameter
             [~, TOKEN] = strtok(TLINE, ',');
             TOKEN = lower(TOKEN);
+            
+            if isempty(TOKEN) == 1.0
+                %{
+                    A material definition keyword could not be found in the
+                    file. RETURN and warn the user
+                %}
+                error = 2.0;
+                if isappdata(0, 'materialManagerImport') == 1.0
+                    importMaterial.printSummary(keywordWarnings, materialName, materialFile, kwStrSp, error)
+                    rmappdata(0, 'materialManagerImport')
+                end
+                return
+            end
+            
             TOKEN(1.0) = [];
             materialName = strtrim(TOKEN);
             
@@ -615,7 +629,7 @@ classdef importMaterial < handle
                                     material_properties.poisson_active = 1.0;
                                 end
                                 
-                                if isempty(material_properties.uts) == 0.0
+                                if isempty(material_properties.uts) == 0.0 || isempty(material_properties.ucs) == 0.0
                                     material_properties.uts_active = 1.0;
                                 end
                                 
