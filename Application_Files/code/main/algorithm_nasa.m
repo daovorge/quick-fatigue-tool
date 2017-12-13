@@ -14,7 +14,7 @@ classdef algorithm_nasa < handle
 %      6.7 NASALIFE
 %   
 %   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
-%   Last modified 21-Sep-2017 12:46:54 GMT
+%   Last modified 13-Dec-2017 13:38:50 GMT
     
     %%
     
@@ -834,12 +834,10 @@ classdef algorithm_nasa < handle
             end
             
             % Get the octahedral shear stress tensor history for the loading
-            octahedralShearStress = zeros(1, signalLength);
-            for i = 1:signalLength
-                octahedralShearStress(i) = (1.0/3.0)*sqrt((octahedralTensor(1.0, 1.0, i) - octahedralTensor(2.0, 2.0, i))^2.0 +...
-                    (octahedralTensor(2.0, 2.0, i) - octahedralTensor(3.0, 3.0, i))^2.0 +...
-                    (octahedralTensor(1.0, 1.0, i) - octahedralTensor(3.0, 3.0, i))^2.0);
-            end
+            octahedralShearStress0 = (1.0/3.0).*sqrt((octahedralTensor(1.0, 1.0, :) - octahedralTensor(2.0, 2.0, :)).^2.0 +...
+                    (octahedralTensor(2.0, 2.0, :) - octahedralTensor(3.0, 3.0, :)).^2.0 +...
+                    (octahedralTensor(1.0, 1.0, :) - octahedralTensor(3.0, 3.0, :)).^2.0);
+            octahedralShearStress(1:signalLength) = octahedralShearStress0(1.0, 1.0, :);
             
             %% Rainflow count the octahedral shear stress
             if signalLength < 3.0
@@ -999,16 +997,13 @@ classdef algorithm_nasa < handle
             end
             
             % Save data for history output
-            CS = zeros(1.0, signalLength);
-            CN = CS;
-            
-            for i = 1:signalLength
-                CS(i) = 0.5*(octahedralTensor(1.0, 1.0, i) - octahedralTensor(3.0, 3.0, i));
-                CN(i) = 0.5*(octahedralTensor(1.0, 1.0, i) + octahedralTensor(3.0, 3.0, i));
-            end
+            CS0 = 0.5*(octahedralTensor(1.0, 1.0, :) - octahedralTensor(3.0, 3.0, :));
+            CS(1:signalLength) = CS0(1.0, 1.0, :);
             
             setappdata(0, 'CS', CS)
-            setappdata(0, 'CN', CN)
+            normalStress(abs(s1i) >= abs(s3i)) = s1i(abs(s1i) >= abs(s3i));
+            normalStress(abs(s3i) > abs(s1i)) = s3i(abs(s3i) > abs(s1i));
+            setappdata(0, 'CN', normalStress)
             setappdata(0, 'cyclesOnCP', pairs)
             setappdata(0, 'amplitudesOnCP', Sa)
             

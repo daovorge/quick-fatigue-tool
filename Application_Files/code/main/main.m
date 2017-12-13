@@ -11,7 +11,7 @@ function [] = main(flags)
 %   Author contact: louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
-%   Last modified 13-Dec-2017 08:13:25 GMT
+%   Last modified 13-Dec-2017 13:38:50 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');    tic_pre = tic;
@@ -43,7 +43,7 @@ setappdata(0, 'messageFileWarnings', 0.0)
 %% PRINT COMMAND WINDOW HEADER
 fprintf('[NOTICE] Quick Fatigue Tool 6.11-09')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2017)')
-fprintf('\n[NOTICE] Last modified 13-Dec-2017 08:13:25 GMT')
+fprintf('\n[NOTICE] Last modified 13-Dec-2017 13:38:50 GMT')
 
 cleanExit = 0.0;
 
@@ -859,6 +859,21 @@ s2i = s2(x3, :);
 s3i = s3(x3, :);
 
 %{
+    If the loading of the worst analysis item is proportional then skip the
+    worst item analysis
+%}
+if proportionalItems(worstAnalysisItem) == 1.0
+    normalStress(abs(s1i) >= abs(s3i)) = s1i(abs(s1i) >= abs(s3i));
+    normalStress(abs(s3i) > abs(s1i)) = s3i(abs(s3i) > abs(s1i));
+    
+    setappdata(0, 'CS', 0.5.*(s1i - s3i))
+    setappdata(0, 'CN', normalStress)
+    setappdata(0, 'cyclesOnCP', nodalPairs{worstAnalysisItem})
+    setappdata(0, 'amplitudesOnCP', nodalAmplitudes{worstAnalysisItem})
+    setappdata(0, 'worstNodeCumulativeDamage', getappdata(0, 'cumulativeDamage'))
+end
+
+%{
     Get the material properties for the group containing the worst analysis
     item
 %}
@@ -869,8 +884,8 @@ if length(worstGroup) ~= 1.0
 end
 [~, ~] = group.switchProperties(worstGroup, groupIDBuffer);
 
-% Additional analysis for history output
-if (outputHistory == 1.0) || (outputField == 1.0) || (outputFigure == 1.0)
+% Additional analysis for critical plane history output
+if ((outputHistory == 1.0) || (outputField == 1.0) || (outputFigure == 1.0)) && (proportionalItems(worstAnalysisItem) == 0.0)
     fprintf('\n[POST] Calculating worst item output')
     fprintf(fid_status, '\n[POST] Calculating worst item output');
 
@@ -897,8 +912,7 @@ if (outputHistory == 1.0) || (outputField == 1.0) || (outputFigure == 1.0)
             % NORMAL STRESS
             algorithm_ns.worstItemAnalysis(worstNodeTensor, phiOnCP, thetaOnCP,...
                 signalLength, msCorrection, planePrecision,...
-                gateTensors, tensorGate, step, signConvention,...
-                s1i, s2i, s3i)
+                gateTensors, tensorGate, step, signConvention, s1i, s2i, s3i)
         case 8.0
             % BS 7608
             algorithm_bs7608.worstItemAnalysis(worstNodeTensor, phiOnCP,...
