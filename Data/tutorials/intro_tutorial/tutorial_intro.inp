@@ -40,7 +40,7 @@
 **Loading definition
 *DATASET = stress_uni.dat
 *HISTORY = [1, -1]
-*SCALE = 0.8285
+*SCALE = 1.0
 *UNITS = MPa
 **
 **Analysis definition
