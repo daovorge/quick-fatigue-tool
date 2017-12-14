@@ -9,13 +9,13 @@ classdef importMaterial < handle
 %   LocalMaterialDatabase, material, MaterialEditor, MaterialManager.
 %   
 %   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
-%   Last modified 13-Dec-2017 08:13:25 GMT
+%   Last modified 14-Dec-2017 10:22:23 GMT
     
     %%
     
     methods(Static = true)
         %% INITIALIZE DEFAULT KEYWORDS
-        function [material_properties, kwStr, kwStrSp, algStr, mscStr, regStr, fatStr, nssStr, classStr, compositeStr] = initialize()
+        function [material_properties, kwStr, kwStrSp, algStr, mscStr, behStr, regStr, fatStr, nssStr, classStr, compositeStr] = initialize()
             % DEFAULT MATERIAL STRUCTURE
             material_properties = struct(...
                 'default_algorithm', 6.0,...
@@ -96,12 +96,12 @@ classdef importMaterial < handle
             
             % KEYWORD STRINGS
             kwStr = {'USERMATERIAL', 'DESCRIPTION', 'DEFAULTALGORITHM',...
-                'DEFAULTMSC', 'CAEL', 'REGRESSION', 'MECHANICAL',...
+                'DEFAULTMSC', 'CAEL', 'BEHAVIOR', 'REGRESSION', 'MECHANICAL',...
                 'FATIGUE', 'CYCLIC', 'NORMALSTRESSSENSITIVITY', 'CLASS',...
                 'COMPOSITE', 'KNEE', 'NOCOMPRESSION', 'ENDMATERIAL'};
             
             kwStrSp = {'USER MATERIAL', 'DESCRIPTION', 'DEFAULT ALGORITHM',...
-                'DEFAULT MSC', 'CAEL', 'REGRESSION', 'MECHANICAL',...
+                'DEFAULT MSC', 'CAEL', 'BEHAVIOR', 'REGRESSION', 'MECHANICAL',...
                 'FATIGUE', 'CYCLIC', 'NORMAL STRESS SENSITIVITY', 'CLASS',...
                 'COMPOSITE', 'KNEE', 'NO COMPRESSION', 'END MATERIAL'};
             
@@ -110,6 +110,9 @@ classdef importMaterial < handle
             
             % MSC STRINGS
             mscStr = {'MORROW', 'GOODMAN', 'SODERBERG', 'WALKER', 'SWT', 'GERBER', 'RATIO', 'NONE'};
+            
+            % BEHAVIOR STRINGS
+            behStr = {'STEEL', 'ALUMINIUM', 'OTHER'};
             
             % REGRESSION STRINGS
             regStr = {'UNIFORM', 'UNIVERSAL', 'MODIFIED', '9050', 'NONE'};
@@ -137,7 +140,7 @@ classdef importMaterial < handle
             error = 0.0;
             
             % Initialize the material properties
-            [material_properties, kwStr, kwStrSp, algStr, mscStr, regStr, fatStr, nssStr, classStr, compositeStr] = importMaterial.initialize();
+            [material_properties, kwStr, kwStrSp, algStr, mscStr, behStr, regStr, fatStr, nssStr, classStr, compositeStr] = importMaterial.initialize();
             
             % Initialize the material name
             materialName = 'Material-1 (empty)';
@@ -460,7 +463,40 @@ classdef importMaterial < handle
                             
                             % Get the next line
                             TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
-                        case 6.0 % *REGRESSION
+                        case 6.0 % *BEHAVIOR
+                            %{
+                                The material behavior is defined by a
+                                single parameter after the keyword
+                                declaration
+                            %}
+                            % Get the parameter after the keyword
+                            parameter = lower(parameter);
+                            parameter(ismember(parameter,' ,')) = [];
+                            
+                            % Check if the parameter matches the library
+                            matchingParameter = find(strncmpi({parameter}, behStr, length(parameter)) == 1.0);
+                            
+                            %{
+                                If there is not matching parameter, use the
+                                default value
+                            %}
+                            if (isempty(matchingParameter) == 1.0) || (length(matchingParameter) ~= 1.0)
+                                material_properties.behavior = 1.0;
+                                keywordWarnings(6.0) = 1.0;
+                            else
+                                switch matchingParameter
+                                    case 1.0 % Steel
+                                        material_properties.behavior = 1.0;
+                                    case 2.0 % Aluminium
+                                        material_properties.behavior = 2.0;
+                                    case 3.0 % Other
+                                        material_properties.behavior = 3.0;
+                                end
+                            end
+                            
+                            % Get the next line in the file
+                            TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
+                        case 7.0 % *REGRESSION
                             %{
                                 The regression method is defined by a
                                 single parameter after the keyword
@@ -497,7 +533,7 @@ classdef importMaterial < handle
                             
                             % Get the next line in the file
                             TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
-                        case 7.0 % *MECHANICAL
+                        case 8.0 % *MECHANICAL
                             %{
                                 Mechanical properties are defined by up to
                                 four numeric values per data line, and up
@@ -637,7 +673,7 @@ classdef importMaterial < handle
                                     material_properties.proof_active = 1.0;
                                 end
                             end
-                        case 8.0 % *FATIGUE
+                        case 9.0 % *FATIGUE
                             %{
                                 Fatigue constants are defined by up to
                                 four numeric values per data line, and up
@@ -937,7 +973,7 @@ classdef importMaterial < handle
                                         end
                                 end
                             end
-                        case 9.0 % *CYCLIC
+                        case 10.0 % *CYCLIC
                             for dataLine = 1:2
                                 % Get the data line
                                 TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
@@ -1039,7 +1075,7 @@ classdef importMaterial < handle
                                     material_properties.np_active = 1.0;
                                 end
                             end
-                        case 10.0 % *NORMAL STRESS SENSITIVITY
+                        case 11.0 % *NORMAL STRESS SENSITIVITY
                             %{
                                 The normal stress sensitivity is defined by
                                 a single parameter after the keyword
@@ -1233,7 +1269,7 @@ classdef importMaterial < handle
                             
                             % Get the next line in the file
                             TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
-                        case 11.0 % *CLASS
+                        case 12.0 % *CLASS
                             %{
                                 The material class is defined by a single
                                 parameter after the keyword declaration
@@ -1273,7 +1309,7 @@ classdef importMaterial < handle
                             
                             % Get the next line in the file
                             TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
-                        case 12.0 % *COMPOSITE
+                        case 13.0 % *COMPOSITE
                             %{
                                 The composite properties are defined by a
                                 single parameter after the keyword
@@ -1617,7 +1653,7 @@ classdef importMaterial < handle
                             
                             % Get the next line in the file
                             TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
-                        case 13.0 % *KNEE
+                        case 14.0 % *KNEE
                             %{
                                 The S-N knee is defined as up to two
                                 numeric values directly below the keyword
@@ -1659,7 +1695,7 @@ classdef importMaterial < handle
                             
                             % Get the next line
                             TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
-                        case 14.0 % *NO COMPRESSION
+                        case 15.0 % *NO COMPRESSION
                             %{
                                 This keyword is declared without a
                                 parameter or datalines
@@ -1668,7 +1704,7 @@ classdef importMaterial < handle
                             
                             % Get the next line
                             TLINE = fgetl(fid); nTLINE_material = nTLINE_material + 1.0; nTLINE_total = nTLINE_total + 1.0;
-                        case 15.0 % *END MATERIAL
+                        case 16.0 % *END MATERIAL
                             %{
                                 The user has manually declared the end of
                                 the material definition. Stop processing
