@@ -468,11 +468,13 @@ classdef preProcess < handle
                This parameter only needs to be set once. The definition
                applies to all groups
             %}
+            behavior = material_properties.behavior;
+            
             if groups == 1.0
                 if isempty(getappdata(0, 'ndEndurance')) == 0.0
                     switch getappdata(0, 'ndEndurance');
                         case 0.0
-                            if class == 6.0
+                            if behavior == 2.0
                                 setappdata(0, 'ndEndurance', 0.0)
                             else
                                 setappdata(0, 'ndEndurance', 1.0)
@@ -490,7 +492,6 @@ classdef preProcess < handle
             end
             
             %% Fatigue strength exponent
-            behavior = material_properties.behavior;
             setappdata(0, 'materialBehavior', behavior);
             reg_model = material_properties.reg_model;
             setappdata(0, 'regressionModel', reg_model);

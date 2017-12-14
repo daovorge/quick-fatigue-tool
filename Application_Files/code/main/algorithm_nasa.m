@@ -14,7 +14,7 @@ classdef algorithm_nasa < handle
 %      6.7 NASALIFE
 %   
 %   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
-%   Last modified 13-Dec-2017 13:38:50 GMT
+%   Last modified 14-Dec-2017 08:08:52 GMT
     
     %%
     
@@ -1020,7 +1020,7 @@ classdef algorithm_nasa < handle
             % Get the gamma parameter
             gamma = getappdata(0, 'walkerGamma');
             
-            if gamma == -9999.9
+            if gamma == -9999.0
                 % Calculate gamma based on load ratio
                 if R < 0.0
                     gamma = 1.0;
