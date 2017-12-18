@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
-%   Last modified 14-Dec-2017 10:22:23 GMT
+%   Last modified 18-Dec-2017 09:21:04 GMT
     
     %%
     
@@ -4976,7 +4976,7 @@ classdef preProcess < handle
         %% Read a stress history for Uniaxial Stress-Life
         function [Sxx, Syy, Szz, Txy, Tyz, Txz, mainID, subID, error, oldSignal] = uniaxialRead(scales, gateHistories, historyGate, loadingScale, loadingOffset)
             error = 0.0;
-            setappdata(0, 'dataLabel', -999)
+            setappdata(0, 'dataLabel', -999.0)
             Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
             
             % Check that the stress history is defined
@@ -5004,9 +5004,9 @@ classdef preProcess < handle
             end
             
             if error == 1.0
-                mainID = -999;
-                subID = -999;
-                oldSignal = -999;
+                mainID = -999.0;
+                subID = -999.0;
+                oldSignal = -999.0;
                 
                 return
             end
@@ -5084,9 +5084,9 @@ classdef preProcess < handle
                         setappdata(0, 'scaleNotFound', 1.0)
                     end
                     
-                    mainID = -999;
-                    subID = -999;
-                    oldSignal = -999;
+                    mainID = -999.0;
+                    subID = -999.0;
+                    oldSignal = -999.0;
                     return
                 end
             else
@@ -5114,7 +5114,7 @@ classdef preProcess < handle
                     
                     mainID = -999.0;
                     subID = -999.0;
-                    Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
+                    oldSignal = -999.0;
                     return
                 end
             end
@@ -5127,9 +5127,9 @@ classdef preProcess < handle
                 
                 error = true;
                 
-                mainID = -999;
-                subID = -999;
-                oldSignal = -999;
+                mainID = -999.0;
+                subID = -999.0;
+                oldSignal = -999.0;
                 return
             elseif c == 1.0
                 scale = scale';
@@ -5175,8 +5175,9 @@ classdef preProcess < handle
                             setappdata(0, 'pvDetectionFailFile', scale)
                         end
                         
-                        mainID = -999;
-                        subID = -999;
+                        mainID = -999.0;
+                        subID = -999.0;
+                        oldSignal = -999.0;
                         return
                     end
                     
