@@ -6,7 +6,7 @@ classdef jobFile < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
-%   Last modified 04-Dec-2017 13:11:42 GMT
+%   Last modified 18-Dec-2017 07:36:05 GMT
     
     %%
     
@@ -238,7 +238,14 @@ classdef jobFile < handle
                 msCorrection = 8.0;    setappdata(0, 'msCorrection', 8.0)
                 
                 % Determine the algorithm automatically
-                if isempty(dataset) == 0.0
+                if isempty(dataset) == 1.0 && isempty(history) == 1.0
+                    fprintf('[ERROR] No loadings are defined for composite criteria analysis\n')
+                    fprintf('-> Loadings are defined using the DATASET and HISTORY job file options\n');
+                    fprintf('-> Loading methods are described in Section 3 of the Quick Fatigue Tool User Guide\n');
+                    
+                    error = 1.0;
+                    return
+                elseif isempty(dataset) == 0.0
                     algorithm = 5.0;    setappdata(0, 'algorithm', 5.0)
                 else
                     algorithm = 10.0;    setappdata(0, 'algorithm', 10.0)
@@ -271,7 +278,7 @@ classdef jobFile < handle
                             if (isempty(matchingItems) == 1.0) || (length(matchingItems) ~= 1.0)
                                 % The items could not be found in the library
                                 error = 1.0;
-                                fprintf('ERROR: The value of ITEMS (''%s'') is not recognized\n', items)
+                                fprintf('[ERROR] The value of ITEMS (''%s'') is not recognized\n', items)
                                 fprintf('-> A list of available inputs can be found in Section 1.2.6 of the Quick Fatigue Tool User Settings Reference Guide\n');
                                 return
                             elseif length(itemsWords{matchingItems}) ~= length(items)
@@ -316,7 +323,7 @@ classdef jobFile < handle
                         if (isempty(matchingUnits) == 1.0) || (length(matchingUnits) ~= 1.0)
                             % The units could not be found in the library
                             error = 1.0;
-                            fprintf('ERROR: The value of UNITS (''%s'') is not recognized\n', units)
+                            fprintf('[ERROR] The value of UNITS (''%s'') is not recognized\n', units)
                             fprintf('-> A list of available units can be found in Section 1.2.3 of the Quick Fatigue Tool User Settings Reference Guide\n');
                             return
                         elseif length(unitWords{matchingUnits}) ~= length(units)
@@ -369,7 +376,7 @@ classdef jobFile < handle
                         if (isempty(matchingAlg) == 1.0) || (length(matchingAlg) ~= 1.0)
                             % The algorithm could not be found in the library
                             error = 1.0;
-                            fprintf('ERROR: The value of ALGORITHM (''%s'') is not recognized\n', algorithm)
+                            fprintf('[ERROR] The value of ALGORITHM (''%s'') is not recognized\n', algorithm)
                             fprintf('-> A list of available analysis algorithms can be found in Section 1.2.6 of the Quick Fatigue Tool User Settings Reference Guide\n');
                             return
                         elseif length(algorithms{matchingAlg}) ~= length(algorithm)
@@ -423,7 +430,7 @@ classdef jobFile < handle
                             if (isempty(matchingMsc) == 1.0) || (length(matchingMsc) ~= 1.0)
                                 % The mean stress correction could not be found in the library
                                 error = 1.0;
-                                fprintf('ERROR: The value of MS_CORRECTION (''%s'') is not recognized\n', msCorrection)
+                                fprintf('[ERROR] The value of MS_CORRECTION (''%s'') is not recognized\n', msCorrection)
                                 fprintf('-> A list of available mean stress corrections can be found in Section 7 of the Quick Fatigue Tool User Guide\n');
                                 return
                             elseif length(mscs{matchingMsc}) ~= length(msCorrection)
@@ -468,7 +475,7 @@ classdef jobFile < handle
                         if (isempty(matchingResults) == 1.0) || (length(matchingResults) ~= 1.0)
                             % The result position could not be found in the library
                             error = 1.0;
-                            fprintf('ERROR: The value of RESULT_POSITION (''%s'') is not recognized\n', odbResultPosition)
+                            fprintf('[ERROR] The value of RESULT_POSITION (''%s'') is not recognized\n', odbResultPosition)
                             fprintf('-> A list of available result positions can be found in Section 1.2.10 of the Quick Fatigue Tool User Settings Reference Guide\n');
                             return
                         elseif length(resultWords{matchingResults}) ~= length(odbResultPosition)
@@ -496,7 +503,7 @@ classdef jobFile < handle
                         if (isempty(matchingMode) == 1.0) || (length(matchingMode) ~= 1.0)
                             % The result position could not be found in the library
                             error = 1.0;
-                            fprintf('ERROR: The value of FAILURE_MODE (''%s'') is not recognized\n', failureMode)
+                            fprintf('[ERROR] The value of FAILURE_MODE (''%s'') is not recognized\n', failureMode)
                             fprintf('-> A list of available weld failure modes can be found in Section 1.2.12 of the Quick Fatigue Tool User Settings Reference Guide\n');
                             return
                         elseif length(failureWords{matchingMode}) ~= length(failureMode)
