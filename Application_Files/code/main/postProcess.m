@@ -11,7 +11,7 @@ classdef postProcess < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
-%   Last modified 22-Nov-2017 09:33:19 GMT
+%   Last modified 18-Dec-2017 12:38:48 GMT
     
     %%
     
@@ -1374,7 +1374,11 @@ classdef postProcess < handle
                     grid on
                 end
                 
-                dir = [root, 'MATLAB Figures/LH, Load history'];
+                if getappdata(0, 'gateHistories') == 1.0
+                    dir = [root, 'MATLAB Figures/LH, Load histories (after pre-gating) at worst item'];
+                else
+                    dir = [root, 'MATLAB Figures/LH, Load histories at worst item'];
+                end
                 saveas(f12, dir, figureFormat)
                 if strcmpi(figureFormat, 'fig') == true
                     postProcess.makeVisible([dir, '.fig'])
