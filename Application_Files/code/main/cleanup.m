@@ -6,7 +6,7 @@ function [] = cleanup(status)
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
-%   Last modified 18-Dec-2017 12:38:48 GMT
+%   Last modified 18-Dec-2017 13:56:33 GMT
     
     %%
     
@@ -31,7 +31,7 @@ if status == 1.0
     errLogFile = [dir, sprintf('%s.log', job)];
     
     %{
-    	Available error codes: E010, E011, E083, E084, E085, E086,
+    	Available error codes: E011, E083, E084, E085, E086,
     	E087, E088, E089, E090, E091, E092, E093, E094, E095
     %}
     
@@ -61,7 +61,7 @@ if status == 1.0
     end
     fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
     fprintf(fid, 'Copyright Louis Vallance 2017\r\n');
-    fprintf(fid, 'Last modified 18-Dec-2017 12:38:48 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 18-Dec-2017 13:56:33 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');
@@ -1286,6 +1286,12 @@ if status == 1.0
         
         fprintf(fid, '\r\n\r\nError code: E009');
         rmappdata(0, 'E009')
+    end
+    if getappdata(0, 'E010') == 1.0
+        fprintf(fid, '\r\n\r\n***ERROR: COMPOSITE_CRITERA cannot be used with CONTINUE_FROM');
+        
+        fprintf(fid, '\r\n\r\nError code: E010');
+        rmappdata(0, 'E010')
     end
     
     % Write file footer
