@@ -10,7 +10,7 @@ function [] = frf(algorithm, msCorrection, N, mainID, subID, use_sn)
 %      8.2 Fatigue Reserve Factor
 %   
 %   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
-%   Last modified 24-Oct-2017 13:58:55 GMT
+%   Last modified 18-Dec-2017 10:16:35 GMT
     
     %%
     
@@ -19,6 +19,9 @@ function [] = frf(algorithm, msCorrection, N, mainID, subID, use_sn)
 % User FRF diagnostics
 frfDiagnostics = getappdata(0, 'frfDiagnostics');
 outputFigure = getappdata(0, 'outputFigure');
+if N == 1.0
+    frfDiagnostics = 1.0;
+end
 
 % Initialize the FRF variables
 frfR = linspace(-1.0, -1.0, N);
@@ -998,11 +1001,6 @@ for groups = 1:G
                 
                 frfR(totalCounter) = frfRi;
                 
-                % DEBUG: Plot the current cycle on a Haigh diagram
-                if (any(totalCounter == frfDiagnostics) == 1.0) && (outputFigure == 1.0)
-                    mscFileUtils.plotUserFRFCycle(Smi, Sai, frfData_m, frfData_a, totalCounter)
-                end
-                
                 % HORIZONTAL FRF
                 if ((Smi_nn + Sai_nn) <= 0.0) && (ndCompression == 1.0)
                     %{
@@ -1159,6 +1157,11 @@ for groups = 1:G
                 end
                 
                 frfV(totalCounter) = frfVi;
+                
+                % DEBUG: Plot the current cycle on a Haigh diagram
+                if (any(totalCounter == frfDiagnostics) == 1.0) && (outputFigure == 1.0)
+                    mscFileUtils.plotUserFRFCycle(Smi, Sai, frfData_m, frfData_a, totalCounter, frfRi, frfHi, frfVi)
+                end
         end
         
         % Worst FRF calculation

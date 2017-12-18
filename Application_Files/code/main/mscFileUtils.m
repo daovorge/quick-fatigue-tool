@@ -7,7 +7,7 @@ classdef mscFileUtils < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
-%   Last modified 30-Jun-2017 12:48:35 GMT
+%   Last modified 18-Dec-2017 10:16:35 GMT
     
     %%
     
@@ -342,7 +342,7 @@ classdef mscFileUtils < handle
         end
         
         %% PLOT THE CURRENT CYCLE ON THE USER FRF ENVELOPE
-        function plotUserFRFCycle(Smi, Sai, frfData_m, frfData_a, item)
+        function plotUserFRFCycle(Smi, Sai, frfData_m, frfData_a, item, frfRi, frfHi, frfVi)
             % Get the current figure handle
             f1 = figure('visible', 'off');
             
@@ -431,7 +431,7 @@ classdef mscFileUtils < handle
                 % Don't tighten the axis
             end
             
-            legend([p1, p2, p3, p4, p5], 'FRF Envelope', 'Cycle', 'Radial', 'Horizontal', 'Vertical')
+            legend([p1, p2, p3, p4, p5], 'FRF Envelope', 'Cycle', sprintf('Radial (%.4f)', frfRi), sprintf('Horizontal (%.4f)', frfHi), sprintf('Vertical (%.4f)', frfVi))
             
             dir = [getappdata(0, 'outputDirectory'), sprintf('MATLAB Figures/UFRF, User FRF diagnostics at data set location %.0f', item)];
             figureFormat = getappdata(0, 'figureFormat');
