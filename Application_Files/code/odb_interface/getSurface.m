@@ -13,7 +13,7 @@ function [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(ma
 %      4.5.3 Custom analysis items
 %
 %   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
-%   Last modified 12-Dec-2017 11:04:33 GMT
+%   Last modified 20-Dec-2017 11:27:45 GMT
 
 %%
 
@@ -50,6 +50,7 @@ end
 
 %% Check if a surface definition already exists
 outputDatabase = getappdata(0, 'outputDatabase');
+setappdata(0, 'surfaceFromFile', 0.0)
 
 [~, name, ~] = fileparts(outputDatabase);
 name = ['[M]', name, '[I]', instanceStrings, '[P]', odbResultPosition];
@@ -76,6 +77,7 @@ if (strcmpi(items, 'surface') == 1.0) && (exist(surfaceFile, 'file') == 2.0) && 
         messenger.writeMessage(286.0)
     else
         setappdata(0, 'itemsFile', 'SURFACE')
+        setappdata(0, 'surfaceFromFile', 1.0)
         messenger.writeMessage(285.0)
         
         Sxx = Sxx(items, :);

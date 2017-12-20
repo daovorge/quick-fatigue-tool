@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
-%   Last modified 18-Dec-2017 13:56:33 GMT
+%   Last modified 20-Dec-2017 11:27:45 GMT
 
     %%
 
@@ -345,7 +345,7 @@ classdef messenger < handle
                                 setappdata(0, 'messageFileNotes', 1.0)
                             end
                             
-                            if strcmpi(getappdata(0, 'items'), 'surface') == 0.0
+                            if (strcmpi(getappdata(0, 'items'), 'surface') == 0.0) && (getappdata(0, 'surfaceFromFile') == 0.0)
                                 if length(worstItem) > 1.0
                                     fprintf(fidType(i), ['-> These values can be used in conjunction with the ITEMS option in the job', returnType{i}]);
                                     fprintf(fidType(i), ['   file to re-run the analysis at these locations only', returnType{i}]);
@@ -353,7 +353,7 @@ classdef messenger < handle
                                     fprintf(fidType(i), ['-> This value can be used as an argument for the ITEMS option in the job file', returnType{i}]);
                                 end
 							else
-								fprintf(fidType(i), ['-> Items numbers may be incorrect if surface detection was enabled', returnType{i}]);
+								fprintf(fidType(i), ['-> Item numbers may be incorrect if surface detection was enabled', returnType{i}]);
                             end
                         end
                     case 19.0
@@ -2322,7 +2322,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2017\r\n');
-            fprintf(fid, 'Last modified 18-Dec-2017 13:56:33 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 20-Dec-2017 11:27:45 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
