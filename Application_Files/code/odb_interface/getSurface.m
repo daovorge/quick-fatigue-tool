@@ -13,9 +13,12 @@ function [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(ma
 %      4.5.3 Custom analysis items
 %
 %   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
-%   Last modified 20-Dec-2017 11:27:45 GMT
+%   Last modified 20-Dec-2017 14:51:09 GMT
 
 %%
+
+%% Indicate if surface is read from file
+setappdata(0, 'surfaceFromFile', 0.0)
 
 %% Create string from part instances
 partInstance = getappdata(0, 'partInstance');
@@ -50,7 +53,6 @@ end
 
 %% Check if a surface definition already exists
 outputDatabase = getappdata(0, 'outputDatabase');
-setappdata(0, 'surfaceFromFile', 0.0)
 
 [~, name, ~] = fileparts(outputDatabase);
 name = ['[M]', name, '[I]', instanceStrings, '[P]', odbResultPosition];
@@ -326,6 +328,7 @@ if strcmpi(odbResultPosition, 'nodal') == 1.0
     % Check if there are any surface elements/nodes
     if isempty(surfaceNodes) == 1.0
         messenger.writeMessage(269.0)
+        setappdata(0, 'surfaceFromFile', 0.0)
         if strcmpi(items, 'surface') == 1.0
             items = 'ALL';
             setappdata(0, 'items', 'ALL')
@@ -396,6 +399,7 @@ elseif strcmpi(odbResultPosition, 'elemental') == 1.0
     % Check if there are any surface elements/nodes
     if (isempty(surfaceElements) == 1.0) || (isempty(connectedSurfaceNodes) == 1.0)
         messenger.writeMessage(269.0)
+        setappdata(0, 'surfaceFromFile', 0.0)
         if strcmpi(items, 'surface') == 1.0
             items = 'ALL';
             setappdata(0, 'items', 'ALL')
@@ -487,6 +491,7 @@ else
     % Check if there are any surface elements/nodes
     if isempty(surfaceElements) == 1.0
         messenger.writeMessage(269.0)
+        setappdata(0, 'surfaceFromFile', 0.0)
         if strcmpi(items, 'surface') == 1.0
             items = 'ALL';
             setappdata(0, 'items', 'ALL')
