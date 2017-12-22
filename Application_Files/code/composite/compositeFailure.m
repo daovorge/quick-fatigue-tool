@@ -6,6 +6,11 @@ function [] = compositeFailure(N, L, mainID, fid_status)
 %   COMPOSITEFAILURE is used internally by Quick Fatigue Tool. The user is
 %   not required to run this file.
 %
+%   See also composite, LaRC05.
+%
+%   Reference section in Quick Fatigue Tool User Guide
+%      12.3 Composite failure criteria
+%
 %   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
 %   Last modified 01-Dec-2017 13:15:24 GMT
     

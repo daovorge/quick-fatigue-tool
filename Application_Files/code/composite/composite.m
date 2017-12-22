@@ -4,7 +4,7 @@ classdef composite < handle
 %   COMPOSITE is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %
-%   See also postProcess.
+%   See also compositeFailure, LaRC05.
 %
 %   Reference section in Quick Fatigue Tool User Guide
 %      12.3 Composite failure criteria
