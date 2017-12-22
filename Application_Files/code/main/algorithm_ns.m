@@ -13,7 +13,7 @@ classdef algorithm_ns < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.3 Normal Stress
 %   
-%   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
 %   Last modified 16-Nov-2017 14:27:15 GMT
     
     %%
@@ -148,7 +148,7 @@ classdef algorithm_ns < handle
                             fT = analysis.preFilter(normalStress, signalLength);
                         end
                         
-                        % Now rainflow the shear stresses
+                        % Now rainflow the normal stresses
                         rfData = analysis.rainFlow(fT);
                         
                         % Get rainflow pairs from rfData
@@ -410,6 +410,7 @@ classdef algorithm_ns < handle
             
             % Critical plane search
             for theta = 0:step:180
+                
                 thetaIndex = thetaIndex + 1.0;
                 
                 % Calculate the current Q matrix

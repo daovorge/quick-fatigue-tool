@@ -8,8 +8,8 @@ classdef overlay < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      4.8 Analysis continuation techniques
 %   
-%   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 30-Oct-2017 09:58:39 GMT
+%   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
+%   Last modified 18-Dec-2017 13:56:33 GMT
     
     %%
     
@@ -44,6 +44,13 @@ classdef overlay < handle
             % The current job name must be different from the previous job
             if strcmp(continueFrom, getappdata(0, 'jobName')) == 1.0
                 setappdata(0, 'E119', 1.0)
+                error = 1.0;
+                return
+            end
+            
+            % Composite criteria analysis is not supported by analysis continuation
+            if getappdata(0, 'compositeCriteria') == 1.0
+                setappdata(0, 'E010', 1.0)
                 error = 1.0;
                 return
             end

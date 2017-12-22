@@ -6,8 +6,8 @@ classdef messenger < handle
 %   MESSENGER is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %
-%   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 06-Dec-2017 13:46:50 GMT
+%   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
+%   Last modified 21-Dec-2017 09:04:56 GMT
 
     %%
 
@@ -315,7 +315,7 @@ classdef messenger < handle
 
                         algorithm = getappdata(0, 'algorithm');
                         
-                        if (algorithm ~= 10.0) && (algorithm ~= 3.0)
+                        if ((algorithm ~= 10.0) && (algorithm ~= 3.0)) && ((strcmpi(getappdata(0, 'items'), 'surface') == 0.0) && (getappdata(0, 'surfaceFromFile') == 0.0))
                             if length(worstItem) > 1.0
                                 if length(worstItem) > 10.0
                                     fprintf(fidType(i), [returnType{i}, '***NOTE: The worst analysis item IDs are:', returnType{i}]);
@@ -345,16 +345,14 @@ classdef messenger < handle
                                 setappdata(0, 'messageFileNotes', 1.0)
                             end
                             
-                            if strcmpi(getappdata(0, 'items'), 'surface') == 0.0
-                                if length(worstItem) > 1.0
-                                    fprintf(fidType(i), ['-> These values can be used in conjunction with the ITEMS option in the job', returnType{i}]);
-                                    fprintf(fidType(i), ['   file to re-run the analysis at these locations only', returnType{i}]);
-                                else
-                                    fprintf(fidType(i), ['-> This value can be used as an argument for the ITEMS option in the job file', returnType{i}]);
-                                end
-							else
-								fprintf(fidType(i), ['-> Items numbers may be incorrect if surface detection was enabled', returnType{i}]);
+                            if length(worstItem) > 1.0
+                                fprintf(fidType(i), ['-> These values can be used in conjunction with the ITEMS option in the job', returnType{i}]);
+                                fprintf(fidType(i), ['   file to re-run the analysis at these locations only', returnType{i}]);
+                            else
+                                fprintf(fidType(i), ['-> This value can be used as an argument for the ITEMS option in the job file', returnType{i}]);
                             end
+                        elseif ((strcmpi(getappdata(0, 'items'), 'surface') == 1.0) || (getappdata(0, 'surfaceFromFile') == 1.0))
+                            fprintf(fidType(i), [returnType{i}, '***NOTE: Worst analysis item output is not possible when surface detection is used', returnType{i}]);
                         end
                     case 19.0
                         % Nodal elimination
@@ -2316,13 +2314,13 @@ classdef messenger < handle
 
             % Write file header
             try
-                fprintf(fid, 'Quick Fatigue Tool 6.11-08 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
+                fprintf(fid, 'Quick Fatigue Tool 6.11-09 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
             catch
-                fprintf(fid, 'Quick Fatigue Tool 6.11-08\r\n');
+                fprintf(fid, 'Quick Fatigue Tool 6.11-09\r\n');
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2017\r\n');
-            fprintf(fid, 'Last modified 06-Dec-2017 13:46:50 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 21-Dec-2017 09:04:56 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

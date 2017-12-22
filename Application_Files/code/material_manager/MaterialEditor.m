@@ -12,8 +12,8 @@ function varargout = MaterialEditor(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials
 %   
-%   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 06-Dec-2017 08:59:42 GMT
+%   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
+%   Last modified 14-Dec-2017 11:52:41 GMT
     
     %%
     
@@ -1118,6 +1118,7 @@ else
     set(handles.check_uts, 'value', 0.0)
     set(handles.edit_uts, 'string', '', 'enable', 'inactive', 'backgroundColor', [241/255, 241/255, 241/255])
     set(handles.edit_ucs, 'string', '', 'enable', 'inactive', 'backgroundColor', [241/255, 241/255, 241/255])
+    set(handles.edit_proof, 'string', '', 'enable', 'inactive', 'backgroundColor', 'white')
     set(handles.edit_proof, 'string', '', 'enable', 'inactive', 'backgroundColor', simulia_blue)
     set(handles.check_proof, 'value', 0.0)
     set(handles.edit_poisson, 'string', '0.33', 'enable', 'inactive', 'backgroundColor', [241/255, 241/255, 241/255])
@@ -1129,17 +1130,22 @@ else
     set(handles.pButton_viewRValues, 'enable', 'off')
     set(handles.pButton_rmRValues, 'enable', 'off')
     setappdata(0, 'panel_userMaterial_snData', [pwd, '/Data/material/sn_data'])
+    set(handles.edit_sf, 'string', '', 'enable', 'inactive', 'backgroundColor', 'white')
     set(handles.edit_sf, 'string', '', 'enable', 'inactive', 'backgroundColor', simulia_blue)
     set(handles.check_sf, 'value', 0.0)
     set(handles.edit_b, 'string', '', 'enable', 'inactive', 'backgroundColor', simulia_blue)
     set(handles.pButton_knee, 'enable', 'off')
     set(handles.check_b, 'value', 0.0)
+    set(handles.edit_ef, 'string', '', 'enable', 'inactive', 'backgroundColor', 'white')
     set(handles.edit_ef, 'string', '', 'enable', 'inactive', 'backgroundColor', simulia_blue)
     set(handles.check_ef, 'value', 0.0)
+    set(handles.edit_c, 'string', '', 'enable', 'inactive', 'backgroundColor', 'white')
     set(handles.edit_c, 'string', '', 'enable', 'inactive', 'backgroundColor', simulia_blue)
     set(handles.check_c, 'value', 0.0)
+    set(handles.edit_kp, 'string', '', 'enable', 'inactive', 'backgroundColor', 'white')
     set(handles.edit_kp, 'string', '', 'enable', 'inactive', 'backgroundColor', simulia_blue)
     set(handles.check_kp, 'value', 0.0)
+    set(handles.edit_np, 'string', '', 'enable', 'inactive', 'backgroundColor', 'white')
     set(handles.edit_np, 'string', '', 'enable', 'inactive', 'backgroundColor', simulia_blue)
     set(handles.check_np, 'value', 0.0)
     set(handles.edit_nssc, 'string', '', 'enable', 'inactive', 'backgroundColor', simulia_blue)

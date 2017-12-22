@@ -6,7 +6,12 @@ function [] = compositeFailure(N, L, mainID, fid_status)
 %   COMPOSITEFAILURE is used internally by Quick Fatigue Tool. The user is
 %   not required to run this file.
 %
-%   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
+%   See also composite, LaRC05.
+%
+%   Reference section in Quick Fatigue Tool User Guide
+%      12.3 Composite failure criteria
+%
+%   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
 %   Last modified 01-Dec-2017 13:15:24 GMT
     
     %%
@@ -483,7 +488,7 @@ if (failStressGeneral ~= -1.0) || (tsaiWuTT ~= -1.0) || (failStrain ~= -1.0) || 
         if getappdata(0, 'autoExport_uniaxial') == 1.0
             messenger.writeMessage(203.0)
         else
-            composite.exportODB(fid_status, mainID)
+            compositeOutput.exportODB(fid_status, mainID)
         end
     end
 else

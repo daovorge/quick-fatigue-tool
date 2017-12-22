@@ -16,10 +16,10 @@ function [] = template_job()
 %   Reference section in Quick Fatigue Tool User Settings Reference Guide
 %      1 Job file options
 %   
-%   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 03-Oct-2017 13:44:11 GMT
+%   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
+%   Last modified 18-Dec-2017 12:38:48 GMT
 
-%% JOB
+%% 1: JOB
 
 JOB_NAME = 'template_job';
 
@@ -29,7 +29,7 @@ CONTINUE_FROM = '';
 
 DATA_CHECK = 0.0;
 
-%% MATERIAL
+%% 2: MATERIAL
 
 MATERIAL = '';
 
@@ -46,7 +46,7 @@ SN_SCALE = [];
 % S-N KNOCK-DOWN FACTORS
 SN_KNOCK_DOWN = {};
 
-%% LOADING
+%% 3: LOADING
 
 % STRESS DATASETS
 DATASET = '';
@@ -86,7 +86,7 @@ OFFSET = [];
 % LOAD REPEATS
 REPEATS = 1.0;
 
-%% HIGH FREQUENCY LOADINGS
+%% 4: HIGH FREQUENCY LOADINGS
 
 HF_DATASET = '';
 
@@ -100,7 +100,7 @@ HF_TIME = {[], []};
 % SCALE FACTORS FOR HIGH FREQUENCY DATASETS
 HF_SCALE = [];
 
-%% ABAQUS RPT / DATASET FILE
+%% 5: ABAQUS RPT / DATASET FILE
 
 %{
     0: Allow dataset files with 3D stress elements only
@@ -108,7 +108,7 @@ HF_SCALE = [];
 %}
 PLANE_STRESS = 0.0;
 
-%% ANALYSIS
+%% 6: ANALYSIS
 
 % ANALYSIS GROUPS
 GROUP = {'DEFAULT'};
@@ -174,7 +174,7 @@ FATIGUE_RESERVE_FACTOR = 2.0;
 % SAVE ITEMS BELOW DESIGN LIFE
 HOTSPOT = 0.0;
 
-%% SURFACE FINISH / NOTCH EFFECTS
+%% 7: SURFACE FINISH / NOTCH EFFECTS
 %{
     k: Define Kt as a value
     'file-name.kt': Select surface finish from list (DATA/KT/*.kt)
@@ -199,21 +199,21 @@ NOTCH_RADIUS = [];
 % IN-PLANE RESIDUAL STRESS
 RESIDUAL = 0.0;
 
-%% VIRTUAL STRAIN GAUGES
+%% 8: VIRTUAL STRAIN GAUGES
 
 GAUGE_LOCATION = {};
 
 GAUGE_ORIENTATION = {};
 
-%% OUTPUT REQUESTS
+%% 9: OUTPUT REQUESTS
 
 OUTPUT_FIELD = 1.0;
 
 OUTPUT_HISTORY = 1.0;
 
-OUTPUT_FIGURE = 1.0;
+OUTPUT_FIGURE = 0.0;
 
-%% ABAQUS ODB INTERFACE
+%% 10: ABAQUS ODB INTERFACE
 
 % ASSOCIATE THE JOB WITH AN ABAQUS OUTPUT DATABASE (.ODB) FILE
 OUTPUT_DATABASE = '';
@@ -226,7 +226,7 @@ STEP_NAME = '';
 
 RESULT_POSITION = 'ELEMENT NODAL';
 
-%% BS 7608 WELD DEFINITION
+%% 11: BS 7608 WELD DEFINITION
 
 % WELD CLASSIFICATION
 WELD_CLASS = 'B';
@@ -247,7 +247,7 @@ CHARACTERISTIC_LENGTH = [];
 
 SEA_WATER = 0.0;
 
-%% SUPPLEMENTARY ANALYSIS OPTIONS
+%% 12: SUPPLEMENTARY ANALYSIS OPTIONS
 
 % YIELD CRITERIA
 %{

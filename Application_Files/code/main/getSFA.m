@@ -5,7 +5,7 @@ function SFA = getSFA(WCA, WCDP, N)
 %   GETSFA is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
 %   Last modified 12-Oct-2017 11:51:09 GMT
     
     %%

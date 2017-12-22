@@ -12,10 +12,13 @@ function [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(ma
 %   Reference section in Quick Fatigue Tool User Guide
 %      4.5.3 Custom analysis items
 %
-%   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 30-Nov-2017 15:19:11 GMT
+%   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
+%   Last modified 21-Dec-2017 09:04:56 GMT
 
 %%
+
+%% Indicate if surface is read from file
+setappdata(0, 'surfaceFromFile', 0.0)
 
 %% Create string from part instances
 partInstance = getappdata(0, 'partInstance');
@@ -29,10 +32,21 @@ else
     instanceStrings = partInstance;
 end
 
+%% Get the result position
+odbResultPosition = getappdata(0, 'odbResultPosition');
+if strcmpi(odbResultPosition, 'element nodal') == 1.0
+    odbResultPosition = 'ELEMENTAL';
+elseif strcmpi(odbResultPosition, 'unique nodal') == 1.0
+    odbResultPosition = 'NODAL';
+elseif strcmpi(odbResultPosition, 'centroid') == 1.0
+    odbResultPosition = 'CENTROIDAL';
+end
+
 %% Check if a surface definition already exists
 outputDatabase = getappdata(0, 'outputDatabase');
+
 [~, name, ~] = fileparts(outputDatabase);
-name = ['[M]', name, '[I]', instanceStrings];
+name = ['[M]', name, '[I]', instanceStrings, '[P]', odbResultPosition];
 root = [pwd, '\Data\surfaces'];
 surfaceFile = [root, '\', name, '_surface.dat'];
 
@@ -56,6 +70,7 @@ if (strcmpi(items, 'surface') == 1.0) && (exist(surfaceFile, 'file') == 2.0) && 
         messenger.writeMessage(286.0)
     else
         setappdata(0, 'itemsFile', 'SURFACE')
+        setappdata(0, 'surfaceFromFile', 1.0)
         messenger.writeMessage(285.0)
         
         Sxx = Sxx(items, :);
@@ -72,8 +87,6 @@ if (strcmpi(items, 'surface') == 1.0) && (exist(surfaceFile, 'file') == 2.0) && 
 end
 
 %% Check if surface detection can be used
-odbResultPosition = getappdata(0, 'odbResultPosition');
-
 % Check intpus
 if isempty(outputDatabase) == 1.0
     if strcmpi(items, 'surface') == 1.0
@@ -104,6 +117,17 @@ if (algorithm == 3.0) || (algorithm == 1.0)
     return
 end
 
+%% Integration point data is not supported
+if strcmpi(odbResultPosition, 'integration point') == 1.0
+    % Integration point is not currently supported
+    messenger.writeMessage(270.0)
+    if strcmpi(items, 'surface') == 1.0
+        items = 'ALL';
+        setappdata(0, 'items', 'ALL')
+    end
+    return
+end
+
 %% Collect additional information
 
 % Get the number of items before surface detection
@@ -114,23 +138,6 @@ if ischar(partInstance) == 1.0
     numberOfInstances = 1.0;
 else
     numberOfInstances = length(partInstance);
-end
-
-% Get results position
-if strcmpi(odbResultPosition, 'element nodal') == 1.0
-    odbResultPosition = 'ELEMENTAL';
-elseif strcmpi(odbResultPosition, 'unique nodal') == 1.0
-    odbResultPosition = 'NODAL';
-elseif strcmpi(odbResultPosition, 'centroid') == 1.0
-    odbResultPosition = 'CENTROIDAL';
-else
-    % Integration point is not currently supported
-    messenger.writeMessage(270.0)
-    if strcmpi(items, 'surface') == 1.0
-        items = 'ALL';
-        setappdata(0, 'items', 'ALL')
-    end
-    return
 end
 
 %% Get the Abaqus command
@@ -323,6 +330,7 @@ if strcmpi(odbResultPosition, 'nodal') == 1.0
     % Check if there are any surface elements/nodes
     if isempty(surfaceNodes) == 1.0
         messenger.writeMessage(269.0)
+        setappdata(0, 'surfaceFromFile', 0.0)
         if strcmpi(items, 'surface') == 1.0
             items = 'ALL';
             setappdata(0, 'items', 'ALL')
@@ -393,6 +401,7 @@ elseif strcmpi(odbResultPosition, 'elemental') == 1.0
     % Check if there are any surface elements/nodes
     if (isempty(surfaceElements) == 1.0) || (isempty(connectedSurfaceNodes) == 1.0)
         messenger.writeMessage(269.0)
+        setappdata(0, 'surfaceFromFile', 0.0)
         if strcmpi(items, 'surface') == 1.0
             items = 'ALL';
             setappdata(0, 'items', 'ALL')
@@ -484,6 +493,7 @@ else
     % Check if there are any surface elements/nodes
     if isempty(surfaceElements) == 1.0
         messenger.writeMessage(269.0)
+        setappdata(0, 'surfaceFromFile', 0.0)
         if strcmpi(items, 'surface') == 1.0
             items = 'ALL';
             setappdata(0, 'items', 'ALL')
@@ -547,7 +557,7 @@ end
 
 % Create the file name
 [~, name, ~] = fileparts(outputDatabase);
-name = ['[M]', name, '[I]', instanceStrings];
+name = ['[M]', name, '[I]', instanceStrings, '[P]', odbResultPosition];
 
 % Create the file
 dir = [root, sprintf('\\%s_surface.dat', name)];

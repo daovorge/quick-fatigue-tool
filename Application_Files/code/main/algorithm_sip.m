@@ -13,8 +13,8 @@ classdef algorithm_sip < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.5 Stress Invariant Parameter
 %   
-%   Quick Fatigue Tool 6.11-08 Copyright Louis Vallance 2017
-%   Last modified 15-Nov-2017 10:50:46 GMT
+%   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
+%   Last modified 13-Dec-2017 13:38:50 GMT
     
     %%
     
@@ -243,7 +243,10 @@ classdef algorithm_sip < handle
             
             % Save data for history output
             setappdata(0, 'CS', 0.5*(ps1 - ps3))
-            setappdata(0, 'CN', 0.5*(ps1 + ps3))
+            normalStress(abs(ps1) >= abs(ps3)) = ps1(abs(ps1) >= abs(ps3));
+            normalStress(abs(ps3) > abs(ps1)) = ps3(abs(ps3) > abs(ps1));
+            setappdata(0, 'CN', normalStress)
+            
             setappdata(0, 'cyclesOnCP', pairs)
             setappdata(0, 'amplitudesOnCP', cycles)
             
