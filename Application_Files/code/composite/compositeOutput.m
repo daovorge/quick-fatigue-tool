@@ -1,8 +1,8 @@
-classdef composite < handle
-%COMPOSITE    QFT class to export composite analysis results to an ODB file.
+classdef compositeOutput < handle
+%COMPOSITEOUTPUT    QFT class to export composite analysis results to an ODB file.
 %   
-%   COMPOSITE is used internally by Quick Fatigue Tool. The user is not
-%   required to run this file.
+%   COMPOSITEOUTPUT is used internally by Quick Fatigue Tool. The user is
+%   not required to run this file.
 %
 %   See also compositeFailure, LaRC05.
 %
@@ -193,7 +193,7 @@ classdef composite < handle
                 
                 [positionLabels, position, positionLabelData, positionID, connectivity,...
                     mainIDs, subIDs, stepDescription, fieldData, fieldNames,...
-                    connectedElements, error] = composite.getFieldData(fieldDataPath,...
+                    connectedElements, error] = compositeOutput.getFieldData(fieldDataPath,...
                     userPosition, partInstanceName, autoPosition,...
                     fid_debug, resultsDatabasePath, resultsDatabaseName);
                 

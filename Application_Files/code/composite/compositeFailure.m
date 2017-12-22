@@ -488,7 +488,7 @@ if (failStressGeneral ~= -1.0) || (tsaiWuTT ~= -1.0) || (failStrain ~= -1.0) || 
         if getappdata(0, 'autoExport_uniaxial') == 1.0
             messenger.writeMessage(203.0)
         else
-            composite.exportODB(fid_status, mainID)
+            compositeOutput.exportODB(fid_status, mainID)
         end
     end
 else

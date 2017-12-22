@@ -32,9 +32,18 @@ else
     instanceStrings = partInstance;
 end
 
+%% Get the result position
+odbResultPosition = getappdata(0, 'odbResultPosition');
+if strcmpi(odbResultPosition, 'element nodal') == 1.0
+    odbResultPosition = 'ELEMENTAL';
+elseif strcmpi(odbResultPosition, 'unique nodal') == 1.0
+    odbResultPosition = 'NODAL';
+elseif strcmpi(odbResultPosition, 'centroid') == 1.0
+    odbResultPosition = 'CENTROIDAL';
+end
+
 %% Check if a surface definition already exists
 outputDatabase = getappdata(0, 'outputDatabase');
-odbResultPosition = getappdata(0, 'odbResultPosition');
 
 [~, name, ~] = fileparts(outputDatabase);
 name = ['[M]', name, '[I]', instanceStrings, '[P]', odbResultPosition];
@@ -108,14 +117,8 @@ if (algorithm == 3.0) || (algorithm == 1.0)
     return
 end
 
-%% Get the result position
-if strcmpi(odbResultPosition, 'element nodal') == 1.0
-    odbResultPosition = 'ELEMENTAL';
-elseif strcmpi(odbResultPosition, 'unique nodal') == 1.0
-    odbResultPosition = 'NODAL';
-elseif strcmpi(odbResultPosition, 'centroid') == 1.0
-    odbResultPosition = 'CENTROIDAL';
-else
+%% Integration point data is not supported
+if strcmpi(odbResultPosition, 'integration point') == 1.0
     % Integration point is not currently supported
     messenger.writeMessage(270.0)
     if strcmpi(items, 'surface') == 1.0
