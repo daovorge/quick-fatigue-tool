@@ -14,7 +14,7 @@ classdef algorithm_findley < handle
 %      6.4 Findley's Method
 %   
 %   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
-%   Last modified 16-Nov-2017 14:27:15 GMT
+%   Last modified 05-Jan-2018 09:35:40 GMT
     
     %%
     
@@ -267,7 +267,10 @@ classdef algorithm_findley < handle
         %% CYCLE COUNT IF NO CP
         function [damageParameter, damageParamAll, amplitudes, pairs, phiC, thetaC, maxPhiCurve_i] = reducedAnalysis(Sxx, Syy, Txy, S1, S2, S3, signConvention, signalLength, gateTensors, tensorGate, k)
             shear = applySignConvention(0.5.*(S1 - S3), signConvention, S1, S2, S3, Sxx, Syy, Txy);
-            normal = k.*0.5.*(S1 + S3);
+            normal(abs(S1) >= abs(S3)) = S1(abs(S1) >= abs(S3));
+            normal(abs(S3) > abs(S1)) = S3(abs(S3) > abs(S1));
+            normal = k.*normal;
+            
             damageParamAll = normal + shear;
             
             if signalLength < 3.0
