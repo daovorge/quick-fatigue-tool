@@ -14,7 +14,7 @@ classdef algorithm_sbbm < handle
 %      6.2 Stress-based Brown-Miller
 %   
 %   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
-%   Last modified 16-Nov-2017 14:27:15 GMT
+%   Last modified 08-Jan-2018 08:53:45 GMT
     
     %%
     
@@ -217,10 +217,15 @@ classdef algorithm_sbbm < handle
         %% CYCLE COUNT IF NO CP
         function [damageParameter, damageParamAll, amplitudes, pairs, phiC, thetaC, maxPhiCurve_i] = reducedAnalysis(S1, S3, signalLength, gateTensors, tensorGate)
             %{
-                If the loading is proportional, the combination of  normal
-                and shear contributions can never exceed the maximum
-                principal stress
+                If the loading is proportional, there is no need to perform
+                a critical plane search. In these cases, the damage
+                parameter is found from Mohr's Circle of stress.
+                
+                The SBBM parameter is the maximum normal stress (the
+                combination of  normal and shear contributions can never
+                exceed the maximum principal stress)
             %}
+            
             damageParamAll(abs(S1) >= abs(S3)) = S1(abs(S1) >= abs(S3));
             damageParamAll(abs(S3) > abs(S1)) = S3(abs(S3) > abs(S1));
             
