@@ -10,7 +10,7 @@ classdef python < handle
 %   Reference section in Quick Fatigue Tool Appendices
 %      10.4 The ODB Interface
 %   
-%   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
 %   Last modified 06-Nov-2017 18:43:35 GMT
     
     %%
@@ -433,7 +433,7 @@ classdef python < handle
                 return
             end
             loadingUnits = char(c{3});
-            stepDescription = ['version 6.11-09; ', job, ', ', loading];
+            stepDescription = ['version 6.11-10; ', job, ', ', loading];
             
             %% Get the requested field data
             fprintf(fid_debug, ' %.0f fields requested', length(requestedFields(requestedFields == true)));
@@ -1062,7 +1062,7 @@ classdef python < handle
             fprintf(fid, '\r\n#   M.Sc. Louis Vallance, AMIMechE');
             fprintf(fid, '\r\n#   louisvallance@hotmail.co.uk');
             fprintf(fid, '\r\n#');
-            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017');
+            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017');
             fprintf(fid, '\r\n#   Last modified 10-Oct-2017 14:19:47 GMT');
             
             % Write Abaqus import header
@@ -1451,7 +1451,7 @@ classdef python < handle
             fprintf(fid, '\r\n#   M.Sc. Louis Vallance');
             fprintf(fid, '\r\n#   louisvallance@hotmail.co.uk');
             fprintf(fid, '\r\n#');
-            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017');
+            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017');
             fprintf(fid, '\r\n#   Last modified 10-Oct-2017 14:19:47 GMT');
             
             % Write Abaqus import header
@@ -1680,7 +1680,7 @@ classdef python < handle
             fprintf(fid, '\r\n#   Technical Specialist SIMULIA');
             fprintf(fid, '\r\n#   louisvallance@hotmail.co.uk');
             fprintf(fid, '\r\n#');
-            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017');
+            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017');
             fprintf(fid, '\r\n#   Last modified 10-Oct-2017 14:19:47 GMT');
             
             % Write Abaqus import header

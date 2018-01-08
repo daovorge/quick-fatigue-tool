@@ -9,7 +9,7 @@ function [epsilon, sigma, error, warning] = css2e(sigma_e, E, kp, np)
 %	CSS2E is a variation of CSS2. This version omits rainflow cycle
 %	counting.
 %   
-%   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
 %   Last modified 30-Aug-2017 15:40:20 GMT
     
     %%

@@ -13,7 +13,7 @@ classdef algorithm_findley < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.4 Findley's Method
 %   
-%   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
 %   Last modified 05-Jan-2018 09:35:40 GMT
     
     %%
