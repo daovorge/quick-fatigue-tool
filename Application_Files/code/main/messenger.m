@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
-%   Last modified 09-Jan-2017 13:40:51 GMT
+%   Last modified 10-Jan-2017 09:33:05 GMT
 
     %%
 
@@ -1461,7 +1461,7 @@ classdef messenger < handle
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 164.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: Load proportionality checking is not available for Findley''s method. The user-defined step size of %.0f will be used for the whole model', returnType{i}], getappdata(0, 'stepSize'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Load proportionality checking is not available for Findley''s method. The user-defined step size of %.0f degrees will be used for the whole model', returnType{i}], getappdata(0, 'stepSize'));
                     case 165.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The Goodman limit stress (PROOF) could not be set for group %.0f because the proof stress is undefined for that group', returnType{i}], getappdata(0, 'message_165_group'));
                         fprintf(fidType(i), ['-> The UTS will be used instead', returnType{i}]);

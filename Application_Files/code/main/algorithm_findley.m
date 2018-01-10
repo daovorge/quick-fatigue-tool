@@ -14,7 +14,7 @@ classdef algorithm_findley < handle
 %      6.4 Findley's Method
 %   
 %   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
-%   Last modified 08-Jan-2018 08:53:45 GMT
+%   Last modified 10-Jan-2017 09:33:05 GMT
     
     %%
     
@@ -23,21 +23,16 @@ classdef algorithm_findley < handle
         function [nodalDamageParameter, nodalAmplitudes,...
                 nodalPairs, nodalPhiC, nodalThetaC, nodalDamage,...
                 maxPhiCurve] = main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi,...
-                signalLength, step, proportional, planePrecision, nodalDamageParameter,...
+                signalLength, step, planePrecision, nodalDamageParameter,...
                 nodalAmplitudes, nodalPairs, nodalPhiC, nodalThetaC, node,...
                 nodalDamage, msCorrection, gateTensors, tensorGate, signConvention,...
                 S1, S2, S3, maxPhiCurve, k)
             
-            % Perform the new critical plane search
-            if proportional == 1.0
-                [damageParameter, damageParamAll, amplitudes, pairs, phiC, thetaC, maxPhiCurve_i] = algorithm_findley.reducedAnalysis(Sxxi, Syyi, Txyi, S1, S2, S3, signConvention, signalLength, gateTensors, tensorGate, k);
-            else
-                [damageParameter, damageParamAll, phiC, thetaC, amplitudes,...
-                    pairs, maxPhiCurve_i] =...
-                    algorithm_findley.criticalPlaneAnalysis(Sxxi, Syyi,...
-                    Szzi, Txyi, Tyzi, Txzi, signalLength, step, gateTensors,...
-                    tensorGate, planePrecision, signConvention, S1, S2, S3, k);
-            end
+            [damageParameter, damageParamAll, phiC, thetaC, amplitudes,...
+                pairs, maxPhiCurve_i] =...
+                algorithm_findley.criticalPlaneAnalysis(Sxxi, Syyi,...
+                Szzi, Txyi, Tyzi, Txzi, signalLength, step, gateTensors,...
+                tensorGate, planePrecision, signConvention, S1, S2, S3, k);
             
             % Get current Findley parameter
             nodalDamageParameter(node) = damageParameter;
@@ -262,63 +257,6 @@ classdef algorithm_findley < handle
                 %% Calculate the Findley parameter on this plane
                 [damageParameter, damageParamAll] = analysis.getFindleyParameter(amplitudes, times, normalStressK, numberOfAmps);
             end
-        end
-        
-        %% CYCLE COUNT IF NO CP
-        function [damageParameter, damageParamAll, amplitudes, pairs, phiC, thetaC, maxPhiCurve_i] = reducedAnalysis(Sxx, Syy, Txy, S1, S2, S3, signConvention, signalLength, gateTensors, tensorGate, k)
-            %{
-                If the loading is proportional, there is no need to perform
-                a critical plane search. In these cases, the damage
-                parameter is found from Mohr's Circle of stress.
-                
-                The Findley damage parameter is the sum of the maximum
-                shear stress amplitude and the normal stress
-            %}
-            
-            % Shear stress
-            shear = applySignConvention(0.5.*(S1 - S3), signConvention, S1, S2, S3, Sxx, Syy, Txy);
-            
-            % Normal stress * k
-            normal(abs(S1) >= abs(S3)) = S1(abs(S1) >= abs(S3));
-            normal(abs(S3) > abs(S1)) = S3(abs(S3) > abs(S1));
-            normal = k.*normal;
-            
-            if signalLength < 3.0
-                % If the signal length is less than 3, there is no need to cycle count
-                amplitudes = 0.5*abs(max(shear) - min(shear));
-                pairs = [min(shear), max(shear)];
-                
-                damageParamAll = amplitudes + max(normal);
-                damageParameter = damageParamAll;
-            else
-                % Gate the tensors if applicable
-                if gateTensors > 0.0
-                    shear = analysis.gateTensors(shear, gateTensors, tensorGate);
-                end
-                
-                % Filter the damage parameter
-                shear = analysis.preFilter(shear, signalLength);
-                
-                % Rainflow cycle count the damage parameter
-                rfData = analysis.rainFlow(shear);
-                
-                % Get rainflow pairs from rfData
-                pairs = rfData(:, 1.0:2.0);
-                
-                % Get timestamps from rainflow pairs
-                times = rfData(:, 3:4);
-                
-                % Get the amplitudes from the rainflow pairs
-                [amplitudes, numberOfAmps] = analysis.getAmps(pairs);
-                
-                % Calculate the Findley parameter on this plane
-                [damageParameter, damageParamAll] = analysis.getFindleyParameter(amplitudes, times, normal, numberOfAmps);
-            end
-            
-            % Provide dummy critical plane values
-            phiC = 0.0;
-            thetaC = 0.0;
-            maxPhiCurve_i = 0.0;
         end
         
         %% DAMAGE CALCULATION

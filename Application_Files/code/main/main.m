@@ -11,7 +11,7 @@ function [] = main(flags)
 %   Author contact: louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
-%   Last modified 09-Jan-2017 13:40:51 GMT
+%   Last modified 10-Jan-2017 09:33:05 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');    tic_pre = tic;
@@ -43,7 +43,7 @@ setappdata(0, 'messageFileWarnings', 0.0)
 %% PRINT COMMAND WINDOW HEADER
 fprintf('[NOTICE] Quick Fatigue Tool 6.11-10')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2017)')
-fprintf('\n[NOTICE] Last modified 09-Jan-2017 13:40:51 GMT')
+fprintf('\n[NOTICE] Last modified 10-Jan-2017 09:33:05 GMT')
 
 cleanExit = 0.0;
 
@@ -391,7 +391,7 @@ setappdata(0, 'planePrecision', planePrecision)
 
 %% CHECK THE LOAD PROPORTIONALITY
 proportionalItems = zeros(1.0, N);
-if getappdata(0, 'checkLoadProportionality') == 1.0 && (algorithm ~= 10.0 && algorithm ~= 3.0 && algorithm ~= 7.0 && algorithm ~= 9.0)
+if getappdata(0, 'checkLoadProportionality') == 1.0 && (algorithm ~= 10.0 && algorithm ~= 3.0 && algorithm ~= 7.0 && algorithm ~= 9.0 && algorithm ~= 6.0)
     proportionalItems = preProcess.getLoadProportionality(Sxx, Syy, Txy, N, proportionalItems, getappdata(0, 'proportionalityTolerance'));
 end
 setappdata(0, 'proportionalItems', proportionalItems)
@@ -656,7 +656,7 @@ for groups = 1:G
                 [nodalDamageParameter, nodalAmplitudes, nodalPairs,...
                     nodalPhiC, nodalThetaC, nodalDamage, maxPhiCurve] =...
                     algorithm_findley.main(Sxxi, Syyi, Szzi, Txyi, Tyzi,...
-                    Txzi, signalLength, step, proportionalItems(totalCounter), planePrecision,...
+                    Txzi, signalLength, step, planePrecision,...
                     nodalDamageParameter, nodalAmplitudes, nodalPairs, nodalPhiC,...
                     nodalThetaC, totalCounter, nodalDamage, msCorrection,...
                     gateTensors, tensorGate, signConvention, s1i, s2i,...
