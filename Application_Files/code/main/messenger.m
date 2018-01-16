@@ -6,8 +6,8 @@ classdef messenger < handle
 %   MESSENGER is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %
-%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
-%   Last modified 10-Jan-2017 09:33:05 GMT
+%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2018
+%   Last modified 16-Jan-2018 14:46:08 GMT
 
     %%
 
@@ -2319,8 +2319,8 @@ classdef messenger < handle
                 fprintf(fid, 'Quick Fatigue Tool 6.11-10\r\n');
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
-            fprintf(fid, 'Copyright Louis Vallance 2017\r\n');
-            fprintf(fid, 'Last modified 09-Jan-2017 13:40:51 GMT\r\n\r\n');
+            fprintf(fid, 'Copyright Louis Vallance 2018\r\n');
+            fprintf(fid, 'Last modified 16-Jan-2018 14:46:08 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
