@@ -5,7 +5,7 @@ function [Sxx, Syy, Szz, Txy, Txz, Tyz] = constantAmplitude(Sxx, Syy, Szz, Txy, 
 %   CONSTANTAMPLITUDE is used internally by Quick Fatigue Tool. The user
 %   is not required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2017
 %   Last modified 04-Apr-2017 13:26:59 GMT
     
     %%

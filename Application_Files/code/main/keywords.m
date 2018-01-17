@@ -7,7 +7,7 @@ classdef keywords < handle
 %
 %   See also importMaterial, fetchMaterial, job.
 %   
-%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2017
 %   Last modified 18-Dec-2017 07:36:05 GMT
     
     %%
