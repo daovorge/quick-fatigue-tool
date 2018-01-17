@@ -5,8 +5,8 @@ classdef jobFile < handle
 %   JOBFILE is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
-%   Last modified 18-Dec-2017 07:36:05 GMT
+%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
+%   Last modified 09-Jan-2017 13:40:51 GMT
     
     %%
     
@@ -1710,7 +1710,7 @@ classdef jobFile < handle
                         conversionFactor = 1.0;
                         units = 'MPa';
                     else
-                        conversionFactor = 1E6/userUnits;
+                        conversionFactor = userUnits/1E6;
                         units = 'User-defined';
                     end
                 case 1.0

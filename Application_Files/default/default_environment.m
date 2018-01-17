@@ -12,8 +12,8 @@
 %   Reference section in Quick Fatigue Tool User Settings Reference Guide
 %      2 Environment variables
 %   
-%   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
-%   Last modified 06-Nov-2017 15:15:09 GMT
+%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2018
+%   Last modified 17-Jan-2018 08:19:00 GMT
 
 %% GATE TENSORS
 %{
@@ -172,6 +172,13 @@ setappdata(0, 'importMaterialState', 1.0)
     1: Include the effect of fatigue ductility (if applicable)
 %}
 setappdata(0, 'plasticSN', 0.0)
+
+% DAMAGE PARAMETER FOR PROPORTIONAL LOADS
+%{
+    1: Maximum normal stress
+    2: Maximum combined (shear + direct) stress
+%}
+setappdata(0, 'sbbmParameter', 2.0)
 
 %% ALGORITHM SETTINGS FOR FINDLEY'S METHOD
 

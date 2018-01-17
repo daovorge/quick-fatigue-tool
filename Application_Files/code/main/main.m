@@ -10,8 +10,8 @@ function [] = main(flags)
 %
 %   Author contact: louisvallance@hotmail.co.uk
 %
-%   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
-%   Last modified 21-Dec-2017 09:04:56 GMT
+%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2018
+%   Last modified 17-Jan-2018 08:19:00 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');    tic_pre = tic;
@@ -41,9 +41,9 @@ setappdata(0, 'messageFileNotes', 0.0)
 setappdata(0, 'messageFileWarnings', 0.0)
 
 %% PRINT COMMAND WINDOW HEADER
-fprintf('[NOTICE] Quick Fatigue Tool 6.11-09')
-fprintf('\n[NOTICE] (Copyright Louis Vallance 2017)')
-fprintf('\n[NOTICE] Last modified 21-Dec-2017 09:04:56 GMT')
+fprintf('[NOTICE] Quick Fatigue Tool 6.11-10')
+fprintf('\n[NOTICE] (Copyright Louis Vallance 2018)')
+fprintf('\n[NOTICE] Last modified 17-Jan-2018 08:19:00 GMT')
 
 cleanExit = 0.0;
 
@@ -73,7 +73,7 @@ fileName = sprintf('Project/output/%s/%s.sta', jobName, jobName);
 fid_status = fopen(fileName, 'w+');
 setappdata(0, 'fid_status', fid_status)
 c = clock;
-fprintf(fid_status, '[NOTICE] Quick Fatigue Tool 6.11-09\t%s', datestr(datenum(c(1.0), c(2.0), c(3.0), c(4.0), c(5.0), c(6.0))));
+fprintf(fid_status, '[NOTICE] Quick Fatigue Tool 6.11-10\t%s', datestr(datenum(c(1.0), c(2.0), c(3.0), c(4.0), c(5.0), c(6.0))));
 
 fprintf('\n[NOTICE] The job ''%s'' has been submitted for analysis', jobName)
 fprintf(fid_status, '\n[NOTICE] The job file "%s.m" has been submitted for analysis', jobName);
@@ -391,7 +391,7 @@ setappdata(0, 'planePrecision', planePrecision)
 
 %% CHECK THE LOAD PROPORTIONALITY
 proportionalItems = zeros(1.0, N);
-if getappdata(0, 'checkLoadProportionality') == 1.0 && (algorithm ~= 10.0 && algorithm ~= 3.0 && algorithm ~= 7.0 && algorithm ~= 9.0)
+if getappdata(0, 'checkLoadProportionality') == 1.0 && (algorithm ~= 10.0 && algorithm ~= 3.0 && algorithm ~= 7.0 && algorithm ~= 9.0 && algorithm ~= 6.0)
     proportionalItems = preProcess.getLoadProportionality(Sxx, Syy, Txy, N, proportionalItems, getappdata(0, 'proportionalityTolerance'));
 end
 setappdata(0, 'proportionalItems', proportionalItems)
@@ -656,7 +656,7 @@ for groups = 1:G
                 [nodalDamageParameter, nodalAmplitudes, nodalPairs,...
                     nodalPhiC, nodalThetaC, nodalDamage, maxPhiCurve] =...
                     algorithm_findley.main(Sxxi, Syyi, Szzi, Txyi, Tyzi,...
-                    Txzi, signalLength, step, proportionalItems(totalCounter), planePrecision,...
+                    Txzi, signalLength, step, planePrecision,...
                     nodalDamageParameter, nodalAmplitudes, nodalPairs, nodalPhiC,...
                     nodalThetaC, totalCounter, nodalDamage, msCorrection,...
                     gateTensors, tensorGate, signConvention, s1i, s2i,...

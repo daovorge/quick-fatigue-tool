@@ -13,8 +13,8 @@ classdef algorithm_sbbm < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.2 Stress-based Brown-Miller
 %   
-%   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
-%   Last modified 16-Nov-2017 14:27:15 GMT
+%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2018
+%   Last modified 16-Jan-2018 14:46:08 GMT
     
     %%
     
@@ -30,7 +30,7 @@ classdef algorithm_sbbm < handle
             
             % Perform the critical plane search
             if proportional == 1.0
-                [damageParameter, damageParamAll, amplitudes, pairs, phiC, thetaC, maxPhiCurve_i] = algorithm_sbbm.reducedAnalysis(S1, S3, signalLength, gateTensors, tensorGate);
+                [damageParameter, damageParamAll, amplitudes, pairs, phiC, thetaC, maxPhiCurve_i] = algorithm_sbbm.reducedAnalysis(S1, S2, S3, signalLength, gateTensors, tensorGate);
             else
                 [damageParameter, damageParamAll, phiC, thetaC, amplitudes,...
                     pairs, maxPhiCurve_i] =...
@@ -215,14 +215,44 @@ classdef algorithm_sbbm < handle
         end
         
         %% CYCLE COUNT IF NO CP
-        function [damageParameter, damageParamAll, amplitudes, pairs, phiC, thetaC, maxPhiCurve_i] = reducedAnalysis(S1, S3, signalLength, gateTensors, tensorGate)
+        function [damageParameter, damageParamAll, amplitudes, pairs, phiC, thetaC, maxPhiCurve_i] = reducedAnalysis(S1, S2, S3, signalLength, gateTensors, tensorGate)
             %{
-                If the loading is proportional, the combination of  normal
-                and shear contributions can never exceed the maximum
-                principal stress
+                If the loading is proportional, there is no need to perform
+                a critical plane search. In these cases, the damage
+                parameter is found from Mohr's Circle of stress.
+                
+                The SBBM parameter is either the maximum normal stress or
+				the maximum combination of normal and shear stress.
             %}
-            damageParamAll(abs(S1) >= abs(S3)) = S1(abs(S1) >= abs(S3));
-            damageParamAll(abs(S3) > abs(S1)) = S3(abs(S3) > abs(S1));
+            
+            %%
+            if getappdata(0, 'sbbmParameter') == 1.0
+                damageParamAll(abs(S1) >= abs(S3)) = S1(abs(S1) >= abs(S3));
+                damageParamAll(abs(S3) > abs(S1)) = S3(abs(S3) > abs(S1));
+            else
+                theta = linspace(0.0, 180.0, 181.0);
+                normalStress = zeros(signalLength, 181.0);
+                shearStress = zeros(signalLength, 181.0);
+                damageParamAll = zeros(1.0, signalLength);
+                combinedStress = zeros(signalLength, 181.0);
+                %criticalPlane = zeros(1.0, signalLength);
+                
+                for i = 1:signalLength
+                    normalStress(i, :) = 0.5.*(S1(i) + S3(i)) + 0.5.*(S1(i) - S3(i)).*cosd(2.0.*theta);
+                    shearStress(i, :) = (-0.5.*(S1(i) - S3(i)).*sind(2.0.*theta)) * sign((1.0/3.0)*(S1(i) + S2(i) + S3(i)));
+                    
+                    combinedStress(i, :) = normalStress(i, :) + shearStress(i, :);
+                    
+                    if abs(min(combinedStress(i, :))) > abs(max(combinedStress(i, :)))
+                        damageParamAll(i) = min(combinedStress(i, :));
+                    else
+                        damageParamAll(i) = max(combinedStress(i, :));
+                    end
+                    
+                    %criticalPlane(i) = theta(find(combinedStress(i, :) == damageParameter(i), 1.0));
+                end
+            end
+            %%
             
             if signalLength < 3.0
                 % If the signal length is less than 3, there is no need to cycle count

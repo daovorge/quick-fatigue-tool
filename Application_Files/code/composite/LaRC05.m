@@ -13,7 +13,7 @@ function [LARPFCRT, LARMFCRT, LARKFCRT, LARSFCRT, LARTFCRT] =...
 %   Reference section in Quick Fatigue Tool User Guide
 %      12.3 Composite failure criteria
 %
-%   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
 %   Last modified 20-Nov-2017 15:52:10 GMT
     
     %%

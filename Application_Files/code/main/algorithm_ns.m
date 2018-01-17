@@ -13,8 +13,8 @@ classdef algorithm_ns < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.3 Normal Stress
 %   
-%   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
-%   Last modified 16-Nov-2017 14:27:15 GMT
+%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
+%   Last modified 08-Jan-2018 08:53:45 GMT
     
     %%
         
@@ -205,6 +205,15 @@ classdef algorithm_ns < handle
         
         %% CYCLE COUNT IF NO CP
         function [damageParameter, damageParamAll, amplitudes, pairs, phiC, thetaC, maxPhiCurve_i] = reducedAnalysis(S1, S3, signalLength, gateTensors, tensorGate)
+            %{
+                If the loading is proportional, there is no need to perform
+                a critical plane search. In these cases, the damage
+                parameter is found from Mohr's Circle of stress.
+                
+                The Normal Stress damage parameter is the maximum normal
+                stress
+            %}
+            
             damageParamAll(abs(S1) >= abs(S3)) = S1(abs(S1) >= abs(S3));
             damageParamAll(abs(S3) > abs(S1)) = S3(abs(S3) > abs(S1));
             

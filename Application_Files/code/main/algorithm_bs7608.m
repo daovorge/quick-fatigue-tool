@@ -13,8 +13,8 @@ classdef algorithm_bs7608 < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.6 BS 7608 Fatigue of Welded Steel Joints
 %   
-%   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
-%   Last modified 18-Dec-2017 12:38:48 GMT
+%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
+%   Last modified 08-Jan-2018 08:53:45 GMT
     
     %%
     
@@ -507,6 +507,12 @@ classdef algorithm_bs7608 < handle
         
         %% CYCLE COUNT IF NO CP
         function [damageParameter, damageParamAll, amplitudes, pairs, phiC, thetaC, maxPhiCurve_i] = reducedAnalysis(Sxx, Syy, Txy, S1, S2, S3, signConvention, signalLength, gateTensors, tensorGate, failureMode)
+            %{
+                If the loading is proportional, there is no need to perform
+                a critical plane search. In these cases, the damage
+                parameter is found from Mohr's Circle of stress.
+            %}
+            
             switch failureMode
                 case 1.0 % NORMAL
                     damageParamAll(abs(S1) >= abs(S3)) = S1(abs(S1) >= abs(S3));

@@ -1,7 +1,7 @@
 ==========================
-QUICK FATIGUE TOOL 6.11-09
+QUICK FATIGUE TOOL 6.11-10
 ==========================
-Copyright Louis Vallance 2017
+Copyright Louis Vallance 2018
 
 This document provides a quick guide for getting started with Quick Fatigue Tool.
 For a complete description of the code and its features, please consult the
@@ -303,5 +303,5 @@ Quick Fatigue Tool User Guide.
 %   M.Sc. Louis Vallance
 %   louisvallance@hotmail.co.uk
 %
-%   Quick Fatigue Tool 6.11-09 Copyright Louis Vallance 2017
-%   Last modified 21-Dec-2017 09:04:56 GMT
+%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2018
+%   Last modified 17-Jan-2018 08:19:00 GMT
