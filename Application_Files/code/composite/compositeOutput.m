@@ -9,8 +9,8 @@ classdef compositeOutput < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      12.3 Composite failure criteria
 %   
-%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
-%   Last modified 20-Nov-2017 15:52:10 GMT
+%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2018
+%   Last modified 17-Jan-2018 11:19:25 GMT
     
     %%
     
@@ -192,7 +192,7 @@ classdef compositeOutput < handle
                 fprintf(fid_status, '\n[POST] Collecting composite field data');
                 
                 [positionLabels, position, positionLabelData, positionID, connectivity,...
-                    mainIDs, subIDs, stepDescription, fieldData, fieldNames,...
+                    mainIDs, subIDs, stepDescription, fieldData, fieldNames, fieldDescriptions,...
                     connectedElements, error] = compositeOutput.getFieldData(fieldDataPath,...
                     userPosition, partInstanceName, autoPosition,...
                     fid_debug, resultsDatabasePath, resultsDatabaseName);
@@ -234,7 +234,7 @@ classdef compositeOutput < handle
                 [scriptFile, newLocation, stepName, error] = python.writePythonScript(resultsDatabaseName,...
                     resultsDatabasePath, partInstanceName, positionLabels,...
                     position, positionLabelData, positionID, connectivity, mainIDs,...
-                    subIDs, stepDescription, fieldData, fieldNames, fid_debug,...
+                    subIDs, stepDescription, fieldData, fieldNames, fieldDescriptions, fid_debug,...
                     stepName, isExplicit, connectedElements, createODBSet,...
                     ODBSetName, stepType);
                 
@@ -349,7 +349,7 @@ classdef compositeOutput < handle
         %% Obtain field data from analysis results
         function [positionLabels, position, positionLabelData,...
                 positionID, connectivity, mainIDs, subIDs, stepDescription,...
-                fieldData, fieldNames, connectedElements, error] = getFieldData(fieldDataPath,...
+                fieldData, fieldNames, fieldDescriptions, connectedElements, error] = getFieldData(fieldDataPath,...
                 userPosition, partInstanceName, autoPosition, fid_debug,...
                 resultsDatabasePath, resultsDatabaseName)
             
@@ -377,6 +377,7 @@ classdef compositeOutput < handle
                 stepDescription = 0.0;
                 fieldData = 0.0;
                 fieldNames = 0.0;
+                fieldDescriptions = 0.0;
                 return
             end
             
@@ -447,6 +448,7 @@ classdef compositeOutput < handle
                             stepDescription = 0.0;
                             fieldData = 0.0;
                             fieldNames = 0.0;
+                            fieldDescriptions = 0.0;
                             return
                         end
                         
@@ -471,6 +473,7 @@ classdef compositeOutput < handle
                             stepDescription = 0.0;
                             fieldData = 0.0;
                             fieldNames = 0.0;
+                            fieldDescriptions = 0.0;
                             return
                         end
                         
@@ -495,6 +498,7 @@ classdef compositeOutput < handle
                             stepDescription = 0.0;
                             fieldData = 0.0;
                             fieldNames = 0.0;
+                            fieldDescriptions = 0.0;
                             return
                         end
                         
@@ -523,6 +527,7 @@ classdef compositeOutput < handle
                             stepDescription = 0.0;
                             fieldData = 0.0;
                             fieldNames = 0.0;
+                            fieldDescriptions = 0.0;
                             return
                         end
                         
@@ -555,6 +560,7 @@ classdef compositeOutput < handle
                             stepDescription = 0.0;
                             fieldData = 0.0;
                             fieldNames = 0.0;
+                            fieldDescriptions = 0.0;
                             return
                         end
                         
@@ -586,6 +592,7 @@ classdef compositeOutput < handle
                 stepDescription = 0.0;
                 fieldData = 0.0;
                 fieldNames = 0.0;
+                fieldDescriptions = 0.0;
                 return
             end
             
@@ -618,15 +625,23 @@ classdef compositeOutput < handle
             %% Get the composite field data
             fieldNamesFile = fieldDataFile.colheaders(3.0:end);
             allFieldData = fieldDataFile.data(:, 3.0:end);
+            fieldDescriptionsData = {'Maximum stress theory failure measure', 'Maximum strain theory failure measure', 'Tsai-Hill theory failure measure',...
+                'Tsai-Wu theory failure measure', 'Tsai-Wu theory failue measure for closed cell OVC foam', 'Azzi-Tsai-Hill theory failure measure',...
+                'Hashin''s fibre tensile damage initiation criterion', 'Hashin''s fibre compression damage initiation criterion',...
+                'Hashin''s matrix tensile damage initiation criterion', 'Hashin''s matrix compression damage initiation criterion',...
+                'LaRC05 polymer failure measure', 'LaRC05 matrix failure measure', 'LaRC05 fibre kink failure measure', 'LaRC05 fibre split failure measure',...
+                'LaRC05 fibre tensile failure measure'};
             [R, ~] = size(allFieldData);
             
             fieldData = zeros(R, 0.0);
             fieldNames = cell(1.0, 0.0);
+            fieldDescriptions = fieldNames;
             index = 1.0;
             for i = 1:15.0
                 if all(allFieldData(:, i) == -1.0) == 0.0
                     fieldData(:, index) = allFieldData(:, i);
                     fieldNames(index) = fieldNamesFile(i);
+                    fieldDescriptions(index) = fieldDescriptionsData(i);
                     
                     index = index + 1.0;
                 end

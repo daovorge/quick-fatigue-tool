@@ -10,8 +10,8 @@ classdef python < handle
 %   Reference section in Quick Fatigue Tool Appendices
 %      10.4 The ODB Interface
 %   
-%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
-%   Last modified 06-Nov-2017 18:43:35 GMT
+%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2018
+%   Last modified 17-Jan-2018 11:19:25 GMT
     
     %%
     
@@ -149,7 +149,7 @@ classdef python < handle
         %% Obtain field data from analysis results
         function [positionLabels, position, positionLabelData,...
                 positionID, connectivity, mainIDs, subIDs, stepDescription,...
-                fieldData, fieldNames, connectedElements, error] = getFieldData(fieldDataPath,...
+                fieldData, fieldNames, fieldDescriptions, connectedElements, error] = getFieldData(fieldDataPath,...
                 requestedFields, userPosition, partInstanceName,...
                 autoPosition, fid_debug, resultsDatabasePath, resultsDatabaseName)
             
@@ -177,6 +177,7 @@ classdef python < handle
                 stepDescription = 0.0;
                 fieldData = 0.0;
                 fieldNames = 0.0;
+                fieldDescriptions = 0.0;
                 return
             end
             
@@ -247,6 +248,7 @@ classdef python < handle
                             stepDescription = 0.0;
                             fieldData = 0.0;
                             fieldNames = 0.0;
+                            fieldDescriptions = 0.0;
                             return
                         end
                         
@@ -271,6 +273,7 @@ classdef python < handle
                             stepDescription = 0.0;
                             fieldData = 0.0;
                             fieldNames = 0.0;
+                            fieldDescriptions = 0.0;
                             return
                         end
                         
@@ -295,6 +298,7 @@ classdef python < handle
                             stepDescription = 0.0;
                             fieldData = 0.0;
                             fieldNames = 0.0;
+                            fieldDescriptions = 0.0;
                             return
                         end
                         
@@ -323,6 +327,7 @@ classdef python < handle
                             stepDescription = 0.0;
                             fieldData = 0.0;
                             fieldNames = 0.0;
+                            fieldDescriptions = 0.0;
                             return
                         end
                         
@@ -355,6 +360,7 @@ classdef python < handle
                             stepDescription = 0.0;
                             fieldData = 0.0;
                             fieldNames = 0.0;
+                            fieldDescriptions = 0.0;
                             return
                         end
                         
@@ -386,6 +392,7 @@ classdef python < handle
                 stepDescription = 0.0;
                 fieldData = 0.0;
                 fieldNames = 0.0;
+                fieldDescriptions = 0.0;
                 return
             end
             
@@ -430,6 +437,7 @@ classdef python < handle
                 stepDescription = 0.0;
                 fieldData = 0.0;
                 fieldNames = 0.0;
+                fieldDescriptions = 0.0;
                 return
             end
             loadingUnits = char(c{3});
@@ -443,12 +451,14 @@ classdef python < handle
             
             fieldData = zeros(length(mainIDs), length(requestedFields(requestedFields == true)));
             fieldNames = cell(1.0, length(requestedFields(requestedFields == true)));
+            fieldDescriptions = fieldNames;
             
             % Check if the plastic strain energy was calculated
             energyFile = sprintf('Project/output/%s/Data Files/warn_yielding_items.dat', getappdata(0, 'jobName'));
             if (requestedFields(19.0) == true) && exist(energyFile, 'file') == 2.0
                 fieldData = zeros(length(mainIDs), 2.0 + length(requestedFields(requestedFields == true)));
                 fieldNames = cell(1.0, 2.0 + length(requestedFields(requestedFields == true)));
+                fieldDescriptions = fieldNames;
             else
                 YIELD = getappdata(0, 'YIELD');
 
@@ -471,6 +481,7 @@ classdef python < handle
             if (requestedFields(5.0) == true) && exist(fosAccuracyFile, 'file') == 2.0
                 fieldData = zeros(length(mainIDs), 1.0 + length(requestedFields(requestedFields == true)));
                 fieldNames = cell(1.0, 1.0 + length(requestedFields(requestedFields == true)));
+                fieldDescriptions = fieldNames;
             else
             end
             
@@ -485,7 +496,8 @@ classdef python < handle
                 if strcmp(fieldName(1:4), 'LL (') == true
                     % The field exists
                     fieldData(:, index) = fieldDataFile.data(:, 4.0);
-                    fieldNames{index} = sprintf('LL, LOG10(Life) [%s]', loadingUnits);
+                    fieldNames{index} = sprintf('LL-%s', loadingUnits);
+                    fieldDescriptions{index} = sprintf('Fatigue life (logarithmic)');
                     
                     index = index + 1.0;
                 else
@@ -530,7 +542,8 @@ classdef python < handle
                         fieldData(:, index) = tempField;
                     end
                     
-                    fieldNames{index} = sprintf('L, Life [%s]', loadingUnits);
+                    fieldNames{index} = sprintf('L-%s', loadingUnits);
+                    fieldDescriptions{index} = sprintf('Fatigue life (linear)');
                     
                     index = index + 1.0;
                 else
@@ -557,7 +570,8 @@ classdef python < handle
                     fieldData(:, index) = tempField;
                     
                     % The field exists
-                    fieldNames{index} = sprintf('D, Damage [1/%s]', loadingUnits);
+                    fieldNames{index} = sprintf('D-1/%s', loadingUnits);
+                    fieldDescriptions{index} = sprintf('Fatigue damage (1/L)');
                     
                     index = index + 1.0;
                  else
@@ -584,7 +598,8 @@ classdef python < handle
                     fieldData(:, index) = tempField;
                     
                     % The field exists
-                    fieldNames{index} = sprintf('DDL, Damage at Design Life [1/%s]', loadingUnits);
+                    fieldNames{index} = sprintf('DDL-1/%s', loadingUnits);
+                    fieldDescriptions{index} = sprintf('Fatigue damage at design life');
                     
                     index = index + 1.0;
                 else
@@ -614,13 +629,15 @@ classdef python < handle
                         fprintf(fid_debug, '\r\n\tWarning: Requested field FOS is not available. The field will not be written to the output database.');
                     else
                         fieldData(:, index) = fos;
-                        fieldNames{index} = sprintf('FOS, Factor of Strength');
+                        fieldNames{index} = sprintf('FOS');
+                        fieldDescriptions{index} = sprintf('Factor of strength');
                         
                         if exist(fosAccuracyFile, 'file') == 2.0
                             % Get the FOS accuracy as well
                             fieldDataFile_fosAccuracy = importdata(fosAccuracyFile, '\t');
                             fieldData(:, index + 1.0) = fieldDataFile_fosAccuracy.data(:, 3.0);
-                            fieldNames{index + 1.0} = sprintf('FACC, FOS accuracy [%%]');
+                            fieldNames{index + 1.0} = sprintf('FACC, %%');
+                            fieldDescriptions{index + 1.0} = sprintf('Factor of strength accuracy');
                             
                             index = index + 2.0;
                         else
@@ -649,7 +666,8 @@ classdef python < handle
                     tempField(tempField == inf) = 10.0;
                     
                     fieldData(:, index) = tempField;
-                    fieldNames{index} = sprintf('SFA, Endurance Safety Factor');
+                    fieldNames{index} = sprintf('SFA');
+                    fieldDescriptions{index} = sprintf('Fatigue endurance safety factor');
                     
                     index = index + 1.0;
                 else
@@ -669,7 +687,8 @@ classdef python < handle
                 if any(strcmp(fieldNamesFile, 'FRFR')) == true
                     % The field exists
                     fieldData(:, index) = fieldDataFile.data(:, find(strcmp(fieldNamesFile, 'FRFR') == true));
-                    fieldNames{index} = sprintf('FRFR, Fatigue Reserve Factor - Radial');
+                    fieldNames{index} = sprintf('FRFR');
+                    fieldDescriptions{index} = sprintf('Fatigue Reserve Factor - Radial');
                     
                     index = index + 1.0;
                 else
@@ -689,7 +708,8 @@ classdef python < handle
                 if any(strcmp(fieldNamesFile, 'FRFH')) == true
                     % The field exists
                     fieldData(:, index) = fieldDataFile.data(:, find(strcmp(fieldNamesFile, 'FRFH') == true));
-                    fieldNames{index} = sprintf('FRFH, Fatigue Reserve Factor - Horizontal');
+                    fieldNames{index} = sprintf('FRFH');
+                    fieldDescriptions{index} = sprintf('Fatigue Reserve Factor - Horizontal');
                     
                     index = index + 1.0;
                 else
@@ -709,7 +729,8 @@ classdef python < handle
                 if any(strcmp(fieldNamesFile, 'FRFV')) == true
                     % The field exists
                     fieldData(:, index) = fieldDataFile.data(:, find(strcmp(fieldNamesFile, 'FRFV') == true));
-                    fieldNames{index} = sprintf('FRFV, Fatigue Reserve Factor - Vertical');
+                    fieldNames{index} = sprintf('FRFV');
+                    fieldDescriptions{index} = sprintf('Fatigue Reserve Factor - Vertical');
                     
                     index = index + 1.0;
                 else
@@ -729,7 +750,8 @@ classdef python < handle
                 if any(strcmp(fieldNamesFile, 'FRFW')) == true
                     % The field exists
                     fieldData(:, index) = fieldDataFile.data(:, find(strcmp(fieldNamesFile, 'FRFW') == true));
-                    fieldNames{index} = sprintf('FRFW, Fatigue Reserve Factor - Worst');
+                    fieldNames{index} = sprintf('FRFW');
+                    fieldDescriptions{index} = sprintf('Fatigue Reserve Factor - Worst');
                     
                     index = index + 1.0;
                 else
@@ -749,7 +771,8 @@ classdef python < handle
                 if any(strcmp(fieldNamesFile, 'SMAX (MPa)')) == true
                     % The field exists
                     fieldData(:, index) = fieldDataFile.data(:, find(strcmp(fieldNamesFile, 'SMAX (MPa)') == true));
-                    fieldNames{index} = sprintf('SMAX, Maximum Stress in Loading [MPa]');
+                    fieldNames{index} = sprintf('SMAX-MPa');
+                    fieldDescriptions{index} = sprintf('Maximum stress in loading');
                     
                     index = index + 1.0;
                 else
@@ -769,7 +792,8 @@ classdef python < handle
                 if any(strcmp(fieldNamesFile, 'SMXP')) == true
                     % The field exists
                     fieldData(:, index) = fieldDataFile.data(:, find(strcmp(fieldNamesFile, 'SMXP') == true));
-                    fieldNames{index} = sprintf('SMXP, Maximum Stress in Loading/0.2%% Proof Stress');
+                    fieldNames{index} = sprintf('SMXP');
+                    fieldDescriptions{index} = sprintf('Maximum Stress in Loading/0.2%% Proof Stress');
                     
                     index = index + 1.0;
                 else
@@ -789,7 +813,8 @@ classdef python < handle
                 if any(strcmp(fieldNamesFile, 'SMXU')) == true
                     % The field exists
                     fieldData(:, index) = fieldDataFile.data(:, find(strcmp(fieldNamesFile, 'SMXU') == true));
-                    fieldNames{index} = sprintf('SMXU, Maximum Stress in Loading/UTS');
+                    fieldNames{index} = sprintf('SMXU');
+                    fieldDescriptions{index} = sprintf('Maximum Stress in Loading/UTS');
                     
                     index = index + 1.0;
                 else
@@ -809,7 +834,8 @@ classdef python < handle
                 if any(strcmp(fieldNamesFile, 'TRF')) == true
                     % The field exists
                     fieldData(:, index) = fieldDataFile.data(:, find(strcmp(fieldNamesFile, 'TRF') == true));
-                    fieldNames{index} = sprintf('TRF, Triaxiality Factor');
+                    fieldNames{index} = sprintf('TRF');
+                    fieldDescriptions{index} = sprintf('Triaxiality factor');
                     
                     index = index + 1.0;
                 else
@@ -829,7 +855,8 @@ classdef python < handle
                 if any(strcmp(fieldNamesFile, 'WCM (MPa)')) == true
                     % The field exists
                     fieldData(:, index) = fieldDataFile.data(:, find(strcmp(fieldNamesFile, 'WCM (MPa)') == true));
-                    fieldNames{index} = sprintf('WCM, Worst Cycle Mean Stress [MPa]');
+                    fieldNames{index} = sprintf('WCM-MPa');
+                    fieldDescriptions{index} = sprintf('Worst cycle mean stress');
                     
                     index = index + 1.0;
                 else
@@ -849,7 +876,8 @@ classdef python < handle
                 if any(strcmp(fieldNamesFile, 'WCA (MPa)')) == true
                     % The field exists
                     fieldData(:, index) = fieldDataFile.data(:, find(strcmp(fieldNamesFile, 'WCA (MPa)') == true));
-                    fieldNames{index} = sprintf('WCA, Worst Cycle Stress Amplitude [MPa]');
+                    fieldNames{index} = sprintf('WCA-MPa');
+                    fieldDescriptions{index} = sprintf('Worst cycle stress amplitude');
                     
                     index = index + 1.0;
                 else
@@ -869,7 +897,8 @@ classdef python < handle
                 if any(strcmp(fieldNamesFile, 'WCDP (MPa)')) == true
                     % The field exists
                     fieldData(:, index) = fieldDataFile.data(:, find(strcmp(fieldNamesFile, 'WCDP (MPa)') == true));
-                    fieldNames{index} = sprintf('WCDP, Worst Cycle Damage Parameter [MPa]');
+                    fieldNames{index} = sprintf('WCDP-MPa');
+                    fieldDescriptions{index} = sprintf('Worst cycle damage parameter');
                     
                     index = index + 1.0;
                 else
@@ -889,7 +918,8 @@ classdef python < handle
                 if any(strcmp(fieldNamesFile, 'WCATAN (Deg)')) == true
                     % The field exists
                     fieldData(:, index) = fieldDataFile.data(:, find(strcmp(fieldNamesFile, 'WCATAN (Deg)') == true));
-                    fieldNames{index} = sprintf('WCATAN, Worst Cycle Arctangent');
+                    fieldNames{index} = sprintf('WCATAN');
+                    fieldDescriptions{index} = sprintf('Worst cycle arctangent');
                     
                     index = index + 1.0;
                 else
@@ -909,7 +939,8 @@ classdef python < handle
                 if any(strcmp(fieldNamesFile, 'YIELD')) == true
                     % The field exists
                     fieldData(:, index) = fieldDataFile.data(:, find(strcmp(fieldNamesFile, 'YIELD') == true));
-                    fieldNames{index} = sprintf('YIELD, Items with plastic strain energy');
+                    fieldNames{index} = sprintf('YIELD');
+                    fieldDescriptions{index} = sprintf('Items with plastic strain energy');
                     
                     % Get the associated energies as well
                     fieldDataFile_energy = importdata(energyFile, '\t');
@@ -932,8 +963,10 @@ classdef python < handle
                     fieldData(:, index + 1.0) = totalStrainEnergy';
                     fieldData(:, index + 2.0) = plasticStrainEnergy';
                     
-                    fieldNames{index + 1.0} = sprintf('TSE, Total strain energy [mJ]');
-                    fieldNames{index + 2.0} = sprintf('PSE, Plastic strain energy [mJ]');
+                    fieldNames{index + 1.0} = sprintf('TSE-mJ');
+                    fieldNames{index + 2.0} = sprintf('PSE-mJ');
+                    fieldDescriptions{index + 1.0} = sprintf('Total strain energy');
+                    fieldDescriptions{index + 2.0} = sprintf('Plastic strain energy');
                 else
                     columnsToDelete = columnsToDelete + 1.0;
                     fprintf(fid_debug, '\r\n\tWarning: Requested field YIELD is not available. The field will not be written to the output database');
@@ -948,6 +981,7 @@ classdef python < handle
             if columnsToDelete > 0.0
                 fieldData(:, (end - (columnsToDelete - 1.0)):end) = [];
                 fieldNames(:, (end - (columnsToDelete - 1.0)):end) = [];
+                fieldDescriptions(:, (end - (columnsToDelete - 1.0)):end) = [];
             end
             
             %% Re-order position labels
@@ -1040,7 +1074,7 @@ classdef python < handle
         function [scriptFile, newLocation, stepName, error] = writePythonScript(resultsFileName,...
                 resultsDatabasePath, partInstance, positionLabels,...
                 position, positionLabelData, positionID, connectivity,...
-                mainIDs, subIDs, stepDescription, fieldData, fieldNames, fid_debug,...
+                mainIDs, subIDs, stepDescription, fieldData, fieldNames, fieldDescriptions, fid_debug,...
                 stepName, isExplicit, connectedElements, createODBSet,...
                 ODBSetName, stepType)
             % Initialize error flag
@@ -1062,8 +1096,8 @@ classdef python < handle
             fprintf(fid, '\r\n#   M.Sc. Louis Vallance, AMIMechE');
             fprintf(fid, '\r\n#   louisvallance@hotmail.co.uk');
             fprintf(fid, '\r\n#');
-            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017');
-            fprintf(fid, '\r\n#   Last modified 10-Oct-2017 14:19:47 GMT');
+            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2018');
+            fprintf(fid, '\r\n#   Last modified 17-Jan-2018 11:19:25 GMT');
             
             % Write Abaqus import header
             fprintf(fid, '\r\n\r\nfrom odbAccess import *');
@@ -1293,7 +1327,7 @@ classdef python < handle
                 
                 if stepType == 1.0
                     fprintf(fid, '\r\n\r\n# Create the next field:');
-                    fprintf(fid, '\r\nnewField = newFrame.FieldOutput(name="%s", description="%s", type=SCALAR)', fieldNames{f}, fieldNames{f});
+                    fprintf(fid, '\r\nnewField = newFrame.FieldOutput(name="%s", description="%s", type=SCALAR)', fieldNames{f}, fieldDescriptions{f});
                 end
                 
                 % Format the field data
@@ -1451,8 +1485,8 @@ classdef python < handle
             fprintf(fid, '\r\n#   M.Sc. Louis Vallance');
             fprintf(fid, '\r\n#   louisvallance@hotmail.co.uk');
             fprintf(fid, '\r\n#');
-            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017');
-            fprintf(fid, '\r\n#   Last modified 10-Oct-2017 14:19:47 GMT');
+            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2018');
+            fprintf(fid, '\r\n#   Last modified 17-Jan-2018 11:19:25 GMT');
             
             % Write Abaqus import header
             fprintf(fid, '\r\n\r\nfrom odbAccess import *');
@@ -1680,8 +1714,8 @@ classdef python < handle
             fprintf(fid, '\r\n#   Technical Specialist SIMULIA');
             fprintf(fid, '\r\n#   louisvallance@hotmail.co.uk');
             fprintf(fid, '\r\n#');
-            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017');
-            fprintf(fid, '\r\n#   Last modified 10-Oct-2017 14:19:47 GMT');
+            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2018');
+            fprintf(fid, '\r\n#   Last modified 17-Jan-2018 11:19:25 GMT');
             
             % Write Abaqus import header
             fprintf(fid, '\r\n\r\nfrom odbAccess import *');

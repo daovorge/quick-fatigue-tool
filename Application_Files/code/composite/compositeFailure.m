@@ -11,8 +11,8 @@ function [] = compositeFailure(N, L, mainID, fid_status)
 %   Reference section in Quick Fatigue Tool User Guide
 %      12.3 Composite failure criteria
 %
-%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
-%   Last modified 01-Dec-2017 13:15:24 GMT
+%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2018
+%   Last modified 17-Jan-2018 11:19:25 GMT
     
     %%
 

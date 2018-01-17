@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="2021885741" file="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox\Export Tool.prj" location="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox" name="Export Tool" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="1222945449" file="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox\Export Tool.prj" location="E:\Projects\Quick_Fatigue_Tool\git\quick-fatigue-tool\Application_Files\toolbox" name="Export Tool" target="target.mlapps" target-name="Package App">
     <param.appname>Export Tool</param.appname>
     <param.authnamewatermark>Louis Vallance</param.authnamewatermark>
     <param.email>louisvallance@hotmail.co.uk</param.email>
@@ -13,7 +13,7 @@
     <param.summary>Abaqus ODB interface application for Quick Fatigue Tool</param.summary>
     <param.description>Export Tool allows the user to export field data from a completed fatigue analysis to an Abaqus Output Database (ODB) file which can be displayed in SIMULIA Abaqus/Viewer. For guidance on using Export Tool, please refer to Section 10.4 of the Quick Fatigue Tool User Guide.</param.description>
     <param.screenshot />
-    <param.version>6.11.07</param.version>
+    <param.version>6.11.11</param.version>
     <param.products.name>
       <item>MATLAB</item>
     </param.products.name>
