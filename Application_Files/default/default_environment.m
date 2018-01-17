@@ -13,7 +13,7 @@
 %      2 Environment variables
 %   
 %   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2018
-%   Last modified 16-Jan-2018 14:46:08 GMT
+%   Last modified 17-Jan-2018 08:19:00 GMT
 
 %% GATE TENSORS
 %{
@@ -176,9 +176,9 @@ setappdata(0, 'plasticSN', 0.0)
 % DAMAGE PARAMETER FOR PROPORTIONAL LOADS
 %{
     1: Maximum normal stress
-    2: Combined (shear + direct) stress
+    2: Maximum combined (shear + direct) stress
 %}
-setappdata(0, 'sbbmParameter', 1.0)
+setappdata(0, 'sbbmParameter', 2.0)
 
 %% ALGORITHM SETTINGS FOR FINDLEY'S METHOD
 
