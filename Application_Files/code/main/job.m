@@ -25,8 +25,8 @@ function [] = job(varargin)
 %   Reference section in Quick Fatigue Tool User Settings Reference Guide
 %      1 Job file options
 %   
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2017
-%   Last modified 01-Dec-2017 13:15:24 GMT
+%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
+%   Last modified 18-Jan-2018 12:34:59 GMT
     
     %%
     
@@ -221,7 +221,7 @@ while feof(fid) == 0.0
             end
             
             % Advance the file by nTLINE to get past the material definition
-            for i = 1:nTLINE_material
+            for i = 1:nTLINE_material - 1.0
                 TLINE = fgetl(fid);
             end
             TOKEN = strtok(TLINE, '=');
@@ -251,7 +251,7 @@ while feof(fid) == 0.0
             %}
             if tokenLength == 1.0
                 emptyKeywords = emptyKeywords + 1.0;
-            else
+            elseif strcmpi(TOKEN, 'endmaterial') == 0.0
                 partialKw{index_pkw} = TOKEN;
                 
                 index_pkw = index_pkw + 1.0;
