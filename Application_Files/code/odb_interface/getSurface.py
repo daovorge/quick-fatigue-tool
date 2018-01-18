@@ -37,8 +37,8 @@
 #   Reference sextion in Quick Fatigue Tool User Guide
 #      4.5.3 Custom analysis items
 #
-#   Quick Fatigue Tool 6.11-07 Copyright Louis Vallance 2017
-#   Last modified 23-Nov-2017 14:46:40 GMT
+#   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
+#   Last modified 18-Jan-2018 09:09:39 GMT
 
 import os
 from odbAccess import *
@@ -187,7 +187,7 @@ for instanceNumber in range(nInstances):
 			tetAndHex[0] = 1
 			
 		# ELTYPE 3D continuum wedge (triangular prism) elements:
-		elif ((element.type == 'C3D6') or (element.type == 'C3D6H') or (element.type == 'C3D15') or (element.type == 'C3D15H')):
+		elif ((element.type == 'C3D6') or (element.type == 'C3D6T') or (element.type == 'C3D6H') or (element.type == 'C3D15') or (element.type == 'C3D15H')):
 			
 			# Increment INDEX face node variable:
 			if (i > 0):
