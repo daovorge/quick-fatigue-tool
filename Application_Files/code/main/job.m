@@ -26,7 +26,7 @@ function [] = job(varargin)
 %      1 Job file options
 %   
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 18-Jan-2018 12:34:59 GMT
+%   Last modified 18-Jan-2018 12:58:04 GMT
     
     %%
     
@@ -77,6 +77,11 @@ inputFile = varargin{1.0};
 % Set default flag for analysis dialogues
 if isempty(getappdata(0, 'analysisDialogues')) == 1.0
     setappdata(0, 'analysisDialogues', 1.0)
+end
+
+% Set default flag for overwrite dialogues
+if isempty(getappdata(0, 'checkOverwrite')) == 1.0
+    setappdata(0, 'checkOverwrite', 1.0)
 end
 
 %% INITIALIZE BUFFERS
@@ -179,9 +184,9 @@ while feof(fid) == 0.0
             %}
             if exist(['Data/material/local/', materialName, '.mat'], 'file') == 2.0
                 
-                if getappdata(0, 'analysisDialogues') > 0.0
+                if (getappdata(0, 'analysisDialogues') > 0.0) && (getappdata(0, 'checkOverwrite') > 0.0)
                     response = questdlg(sprintf('The material ''%s'' already exists in the local database. Do you wish to overwrite the material?', materialName), 'Quick Fatigue Tool', 'Overwrite', 'Keep file', 'Abort', 'Overwrite');
-                else
+                elseif getappdata(0, 'checkOverwrite') > 0.0
                     response = input(sprintf('The material ''%s'' already exists in the local database. Do you wish to overwrite the material? [<O>verwrite/<K>eep/<A>bort]: ', materialName), 's');
                     
                     if strcmpi(response, 'o') == 1.0
@@ -193,6 +198,8 @@ while feof(fid) == 0.0
                     else
                         response = 'Abort';
                     end
+                else
+                    response = 'Overwrite';
                 end
                 
                 if (strcmpi(response, 'Abort') == 1.0) || (isempty(response) == 1.0)
