@@ -368,7 +368,11 @@ try
         return
     end
 catch
-    message = sprintf('An error occurred while opening the field data file.');
+    if isempty(get(handles.edit_fieldData, 'string')) == 1.0
+        message = sprintf('Field data must be specified.');
+    else
+        message = sprintf('An error occurred while opening the field data file.');
+    end
     errordlg(message, 'Quick Fatigue Tool')
     uiwait
     
