@@ -11,7 +11,7 @@ classdef python < handle
 %      10.4 The ODB Interface
 %   
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 17-Jan-2018 11:19:25 GMT
+%   Last modified 22-Jan-2018 13:37:40 GMT
     
     %%
     
@@ -156,6 +156,19 @@ classdef python < handle
             error = 0.0;
             connectedElements = [];
             
+            %% Initialize output
+            positionLabels = 0.0;
+            position = 0.0;
+            positionLabelData = 0.0;
+            positionID = 0.0;
+            connectivity = 0.0;
+            mainIDs = 0.0;
+            subIDs = 0.0;
+            stepDescription = 0.0;
+            fieldData = 0.0;
+            fieldNames = 0.0;
+            fieldDescriptions = 0.0;
+            
             %% Collect field data columns in cells
             fieldDataFile = importdata(fieldDataPath, '\t');
             
@@ -167,17 +180,6 @@ classdef python < handle
                 fprintf(fid_debug, '\r\n\t\tError: %s', unhandledException.message);
                 
                 error = 4.0;
-                positionLabels = 0.0;
-                position = 0.0;
-                positionLabelData = 0.0;
-                positionID = 0.0;
-                connectivity = 0.0;
-                mainIDs = 0.0;
-                subIDs = 0.0;
-                stepDescription = 0.0;
-                fieldData = 0.0;
-                fieldNames = 0.0;
-                fieldDescriptions = 0.0;
                 return
             end
             
@@ -238,17 +240,6 @@ classdef python < handle
                         [connectivityData, connectedElements, error] = python.getNodalConnectivity(partInstanceName, mainIDs, subIDs, fid_debug, resultsDatabasePath, resultsDatabaseName);
                         
                         if error > 0.0
-                            positionLabels = 0.0;
-                            position = 0.0;
-                            positionLabelData = 0.0;
-                            positionID = 0.0;
-                            connectivity = 0.0;
-                            mainIDs = 0.0;
-                            subIDs = 0.0;
-                            stepDescription = 0.0;
-                            fieldData = 0.0;
-                            fieldNames = 0.0;
-                            fieldDescriptions = 0.0;
                             return
                         end
                         
@@ -263,17 +254,6 @@ classdef python < handle
                         [connectivityData, connectedElements, error] = python.getIntegrationPointConnectivity(partInstanceName, mainIDs, fid_debug, resultsDatabasePath, resultsDatabaseName);
                         
                         if error > 0.0
-                            positionLabels = 0.0;
-                            position = 0.0;
-                            positionLabelData = 0.0;
-                            positionID = 0.0;
-                            connectivity = 0.0;
-                            mainIDs = 0.0;
-                            subIDs = 0.0;
-                            stepDescription = 0.0;
-                            fieldData = 0.0;
-                            fieldNames = 0.0;
-                            fieldDescriptions = 0.0;
                             return
                         end
                         
@@ -288,17 +268,6 @@ classdef python < handle
                         [connectivityData, connectedElements, error] = python.getNodalConnectivity(partInstanceName, mainIDs, subIDs, fid_debug, resultsDatabasePath, resultsDatabaseName);
                         
                         if error > 0.0
-                            positionLabels = 0.0;
-                            position = 0.0;
-                            positionLabelData = 0.0;
-                            positionID = 0.0;
-                            connectivity = 0.0;
-                            mainIDs = 0.0;
-                            subIDs = 0.0;
-                            stepDescription = 0.0;
-                            fieldData = 0.0;
-                            fieldNames = 0.0;
-                            fieldDescriptions = 0.0;
                             return
                         end
                         
@@ -317,17 +286,6 @@ classdef python < handle
                         [connectivityData, connectedElements, error] = python.getNodalConnectivity(partInstanceName, mainIDs, subIDs, fid_debug, resultsDatabasePath, resultsDatabaseName);
                         
                         if error > 0.0
-                            positionLabels = 0.0;
-                            position = 0.0;
-                            positionLabelData = 0.0;
-                            positionID = 0.0;
-                            connectivity = 0.0;
-                            mainIDs = 0.0;
-                            subIDs = 0.0;
-                            stepDescription = 0.0;
-                            fieldData = 0.0;
-                            fieldNames = 0.0;
-                            fieldDescriptions = 0.0;
                             return
                         end
                         
@@ -350,17 +308,6 @@ classdef python < handle
                         [connectivityData, connectedElements, error] = python.getIntegrationPointConnectivity(partInstanceName, mainIDs, fid_debug, resultsDatabasePath, resultsDatabaseName);
                         
                         if error > 0.0
-                            positionLabels = 0.0;
-                            position = 0.0;
-                            positionLabelData = 0.0;
-                            positionID = 0.0;
-                            connectivity = 0.0;
-                            mainIDs = 0.0;
-                            subIDs = 0.0;
-                            stepDescription = 0.0;
-                            fieldData = 0.0;
-                            fieldNames = 0.0;
-                            fieldDescriptions = 0.0;
                             return
                         end
                         
@@ -382,17 +329,6 @@ classdef python < handle
             if isempty(positionLabels) == 1.0
                 fprintf(fid_debug, '\r\n\tError: No matching position labels were found from the model output database');
                 error = 1.0;
-                positionLabels = 0.0;
-                position = 0.0;
-                positionLabelData = 0.0;
-                positionID = 0.0;
-                connectivity = 0.0;
-                mainIDs = 0.0;
-                subIDs = 0.0;
-                stepDescription = 0.0;
-                fieldData = 0.0;
-                fieldNames = 0.0;
-                fieldDescriptions = 0.0;
                 return
             end
             
@@ -427,17 +363,6 @@ classdef python < handle
                 fprintf(fid_debug, '\r\n\tError: %s', unhandledException.message);
                 
                 error = 1.0;
-                positionLabels = 0.0;
-                position = 0.0;
-                positionLabelData = 0.0;
-                positionID = 0.0;
-                connectivity = 0.0;
-                mainIDs = 0.0;
-                subIDs = 0.0;
-                stepDescription = 0.0;
-                fieldData = 0.0;
-                fieldNames = 0.0;
-                fieldDescriptions = 0.0;
                 return
             end
             loadingUnits = char(c{3});
@@ -446,7 +371,17 @@ classdef python < handle
             %% Get the requested field data
             fprintf(fid_debug, ' %.0f fields requested', length(requestedFields(requestedFields == true)));
             
-            fieldNamesFile = fieldDataFile.colheaders;
+            % Try to extract the column headers
+            try
+                fieldNamesFile = fieldDataFile.colheaders;
+            catch unhandledException
+                fprintf(fid_debug, '\r\n\t\tError: Field data file is formatted incorrectly. Field names could not be extracted');
+                fprintf(fid_debug, '\r\n\t\tError: %s', unhandledException.message);
+                
+                error = 4.0;
+                return
+            end
+            
             availableFields = length(fieldNamesFile);
             
             fieldData = zeros(length(mainIDs), length(requestedFields(requestedFields == true)));
