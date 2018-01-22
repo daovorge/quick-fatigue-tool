@@ -11,7 +11,7 @@ function [] = evaluateMaterial(fileName, material, error)
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials
 %   
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
 %   Last modified 26-Jun-2017 09:15:32 GMT
     
     %%
