@@ -12,7 +12,7 @@ function varargout = ExportTool(varargin)%#ok<*DEFNU>
 %      10.4 The ODB Interface
 %   
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 17-Jan-2018 11:19:25 GMT
+%   Last modified 22-Jan-2018 13:17:33 GMT
     
     %%
     
@@ -353,10 +353,32 @@ modelDatabasePath = get(handles.edit_modelFile, 'string');
 [~, modelDatabaseNameShort, EXT] = fileparts(modelDatabasePath);
 modelDatabaseName = [modelDatabaseNameShort, EXT];
 
-% Try to get the job name from the field output file
+% Check that the field output file is valid
 try
     fid = fopen(fieldDataPath, 'r');
-    fgetl(fid);
+    fileHeader = fgetl(fid);
+    
+    if strcmp(fileHeader, 'FIELDS [WHOLE MODEL]') == 0.0
+        message = sprintf('The selected field data is not a valid field output file.');
+        errordlg(message, 'Quick Fatigue Tool')
+        uiwait
+        
+        enableGUI(handles)
+        warning('on', 'all')
+        return
+    end
+catch
+    message = sprintf('An error occurred while opening the field data file.');
+    errordlg(message, 'Quick Fatigue Tool')
+    uiwait
+    
+    enableGUI(handles)
+    warning('on', 'all')
+    return
+end
+
+% Try to get the job name from the field output file
+try
     fileExtension = fgetl(fid);
     fileExtension = [fileExtension(6:end), 'Results'];
     
@@ -369,7 +391,7 @@ try
         temp = length(strtok(fileExtension, ' '));
         
         if temp ~= jobNameLength
-            message = sprintf('The job name cannot contain spaces. Rename the job in the field data file');
+            message = sprintf('The job name cannot contain spaces. Rename the job in the field data file.');
             errordlg(message, 'Quick Fatigue Tool')
             uiwait
             
@@ -508,7 +530,7 @@ end
 %}
 if exist([resultsDatabasePath, '/', resultsDatabaseName, '.odb'], 'file') == 2.0 && (get(handles.check_writeScriptOnly, 'value') == 0.0)
     % The file already exists, so prompt the user
-    msg = sprintf('The output directory ''%s'' already contains a file called ''%s''', resultsDatabasePath, [resultsDatabaseName, '.odb']);
+    msg = sprintf('The output directory ''%s'' already contains a file called ''%s''.', resultsDatabasePath, [resultsDatabaseName, '.odb']);
     response = questdlg(msg, 'Quick Fatigue Tool', 'Overwrite', 'Keep file', 'Abort procedure', 'Overwrite');
     
     if isempty(response) == 1.0 || strcmpi(response, 'Abort procedure') == 1.0
