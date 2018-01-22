@@ -338,6 +338,11 @@ while feof(fid) == 0.0
             % The keyword definition appears to be a numeric value
             kwData{matchingKw} = str2double(currentLine);
             
+            % If the value is NaN, evaluate it as a mathematical expression instead
+            if isnan(kwData{matchingKw}) == 1.0
+                kwData{matchingKw} = eval(currentLine);
+            end
+            
             break
         elseif strcmpi(currentChar, '{') == 1.0
             % The keyword definition appears to be a cell
@@ -355,14 +360,25 @@ while feof(fid) == 0.0
             break
         else
             %{
-                The keyword definition does not start as a square or curly
-                bracket or an apostrophe, and is not numeric. The
-                definition might be invalid, but it may also be intended as
-				a string vwhich isn't enclosed by apostrophes. Just assume
-				the definition is a string. QFT will throw an error or crash
-                later if the definition is invalid
+                The keyword definition does not start with a square or
+                curly bracket or an apostrophe, and is not numeric by
+                itself.
+ 
+                If the definition evaluates to a numeric value, assume that
+                the definition was entered as a mathematical expression
+                using MATLAB built-in functions.
+            
+                Otherwise, the definition might be invalid, but it may also
+                be intended as a string which isn't enclosed by apostrophes.
+                In this case, assume that the definition is a string; QFT
+                will throw an error or crash later if the definition is
+                invalid
             %}
-            kwData{matchingKw} = currentLine;
+            try eval(currentLine)
+                kwData{matchingKw} = eval(currentLine);
+            catch
+                kwData{matchingKw} = currentLine;
+            end
                 
             break
         end
