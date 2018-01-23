@@ -13,7 +13,7 @@ function varargout = MultiaxialGaugeFatigue(varargin)%#ok<*DEFNU>
 %      A3.2 Multiaxial Gauge Fatigue
 %   
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 22-Jan-2018 14:22:08 GMT
+%   Last modified 23-Jan-2018 09:53:00 GMT
     
     %%
     
@@ -147,9 +147,7 @@ if isappdata(0, 'panel_multiaxialFatigue_edit_gauge_0') == 1.0
             'Niemann-Winter-Cast-Iron-Nodular-Graphite.ktx',...
             'Niemann-Winter-Cast-Steel.ktx',...
             'Niemann-Winter-Malleable-Cast-Iron.ktx',...
-            'Niemann-Winter-Rolled-Steel.ktx',...
-            'Corroded in tap water.ktx',...
-            'Corroded in salt water.ktx'};
+            'Niemann-Winter-Rolled-Steel.ktx'};
         set(handles.pMenu_kt_list, 'string', stringList)
     else
         % Surface finish from list
@@ -638,7 +636,7 @@ end
 
 %% Calculate Kt factors for each value of Nf if applicable
 if getappdata(0, 'kt') ~= 1.0
-    ktn = analysis.getKtn(Nf);
+    ktn = analysis.getKtn(Nf, [], []);
 else
     ktn = ones(1.0, length(Nf));
 end
@@ -1154,9 +1152,7 @@ switch get(eventdata.NewValue, 'tag')
             'Niemann-Winter-Cast-Iron-Nodular-Graphite.ktx',...
             'Niemann-Winter-Cast-Steel.ktx',...
             'Niemann-Winter-Malleable-Cast-Iron.ktx',...
-            'Niemann-Winter-Rolled-Steel.ktx',...
-            'Corroded in tap water.ktx',...
-            'Corroded in salt water.ktx'};
+            'Niemann-Winter-Rolled-Steel.ktx'};
         set(handles.pMenu_kt_list, 'string', stringList)
         set(handles.pMenu_surfaceFinish, 'value', 1.0)
         set(handles.pMenu_surfaceFinish, 'string', 'N/A')

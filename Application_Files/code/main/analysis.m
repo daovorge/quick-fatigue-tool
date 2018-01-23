@@ -4,7 +4,7 @@ classdef analysis < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 14-Sep-2017 13:53:31 GMT
+%   Last modified 23-Jan-2018 09:53:00 GMT
     
     %%
     
@@ -623,19 +623,24 @@ classdef analysis < handle
         end
         
         %% Get the value of Kt for a given life N
-        function ktn = getKtn(N, constant, radius)
+        function ktn = getKtn(N, notchConstant, notchRadius)
             % Get the reference (un-notched) value of Kt
             kt = getappdata(0, 'kt');
+            
+            if (isempty(notchConstant) == 1.0) || (isempty(notchRadius) == 1.0)
+                ktn = 1.0 + ((kt - 1.0)./(0.915 + ((200.0)./((log10(N)).^4.0))));
+                return
+            end
             
             % Get the notch sensitivity method
             method = getappdata(0, 'notchFactorEstimation');
             
             % Warn the user if the notch factor could not be evaluated
-            if ((method ~= 1.0) && (method ~= 6.0)) && ((constant == 0.0) || (radius == 0.0))
+            if ((method ~= 1.0) && (method ~= 6.0)) && ((notchConstant == 0.0) || (notchRadius == 0.0))
                 messenger.writeMessage(220.0)
                 method = 1.0;
             end
-            if (method == 6.0) && (constant == 0.0)
+            if (method == 6.0) && (notchConstant == 0.0)
                 messenger.writeMessage(220.0)
                 method = 1.0;
             end
@@ -645,15 +650,15 @@ classdef analysis < handle
                 case 1.0 % Peterson (default)
                     ktn = 1.0 + ((kt - 1.0)./(0.915 + ((200.0)./((log10(N)).^4.0))));
                 case 2.0 % Peterson B
-                    ktn = 1.0 + ((kt - 1.0)/(1.0 + (constant/radius)));
+                    ktn = 1.0 + ((kt - 1.0)/(1.0 + (notchConstant/notchRadius)));
                 case 3.0 % Neuber
-                    ktn = 1.0 + ((kt - 1.0)/(1.0 + sqrt(constant/radius)));
+                    ktn = 1.0 + ((kt - 1.0)/(1.0 + sqrt(notchConstant/notchRadius)));
                 case 4.0 % Harris
-                    ktn = exp(-radius/constant) + kt^(1.0 - exp(-radius/constant));
+                    ktn = exp(-notchRadius/notchConstant) + kt^(1.0 - exp(-notchRadius/notchConstant));
                 case 5.0 % Heywood
-                    ktn = (kt)/(1.0 + 2.0*sqrt(constant/radius));
+                    ktn = (kt)/(1.0 + 2.0*sqrt(notchConstant/notchRadius));
                 case 6.0 % Notch sensitivity
-                    ktn = 1.0 + constant*(kt - 1.0);
+                    ktn = 1.0 + notchConstant*(kt - 1.0);
                 otherwise % Peterson (default)
                     ktn = 1.0 + ((kt - 1.0)./(0.915 + ((200.0)./((log10(N)).^4.0))));
             end
