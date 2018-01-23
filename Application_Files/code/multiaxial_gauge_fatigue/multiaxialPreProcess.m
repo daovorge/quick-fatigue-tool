@@ -13,7 +13,7 @@ classdef multiaxialPreProcess < handle
 %      A3.2 Multiaxial Gauge Fatigue
 %   
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 08-Oct-2017 12:50:10 GMT
+%   Last modified 23-Jan-2018 11:35:50 GMT
     
     %%
     
@@ -37,6 +37,11 @@ classdef multiaxialPreProcess < handle
                 set(handles.text_msc_user, 'enable', 'off')
                 set(handles.edit_msc_user, 'enable', 'off')
                 set(handles.pButton_msc_user, 'enable', 'off')
+            end
+            
+            if get(handles.rButton_kt_value, 'value') == 1.0
+                set(handles.text_surfaceFinish, 'enable', 'off')
+                set(handles.pMenu_surfaceFinish, 'enable', 'off')
             end
             
             if get(handles.check_kt_direct, 'value') == 0.0
