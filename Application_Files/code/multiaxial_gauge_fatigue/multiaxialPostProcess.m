@@ -13,7 +13,7 @@ classdef multiaxialPostProcess < handle
 %      A3.2 Multiaxial Gauge Fatigue
 %   
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 16-Oct-2017 09:28:25 GMT
+%   Last modified 23-Jan-2018 09:12:22 GMT
     
     %%
     
@@ -520,7 +520,7 @@ classdef multiaxialPostProcess < handle
             plot(shearOnCP, '-', 'LineWidth', 1.0, 'Color', [34/255, 139/255, 34/255])
             
             xlabel('Sample', 'FontSize', 12.0);
-            ylabel('Stress [MPa]', 'FontSize', 12.0)
+            ylabel('Strain', 'FontSize', 12.0)
             title(msg, 'FontSize', 14.0)
             set(gca, 'FontSize', 12.0)
             set(gca, 'XTick', linspace(1.0, signalLength, 4.0 + 1.0))
