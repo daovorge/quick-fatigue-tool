@@ -19,7 +19,7 @@ function [] = tutorial_A()
 %      1 Job file options
 %   
 %   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
-%   Last modified 03-Oct-2017 13:44:11 GMT
+%   Last modified 24-Jan-2018 15:17:50 GMT
 
 %% JOB
 
@@ -29,6 +29,11 @@ JOB_DESCRIPTION = 'Fatigue analysis of a welded plate in bending';
 
 CONTINUE_FROM = '';
 
+%{
+    0: Full analysis
+    1: Datacheck analysis
+    2: Full analysis (re-read fatigue load data)
+%}
 DATA_CHECK = 0.0;
 
 %% MATERIAL

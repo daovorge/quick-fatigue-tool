@@ -26,7 +26,7 @@ function [] = job(varargin)
 %      1 Job file options
 %   
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 18-Jan-2018 12:58:04 GMT
+%   Last modified 24-Jan-2018 15:17:50 GMT
     
     %%
     
@@ -46,6 +46,9 @@ switch nargin
         elseif strcmpi(varargin, 'datacheck') == 1.0
             datacheck = 1.0;
             varargin = cellstr(input('Input file: ', 's'));
+        elseif strcmpi(varargin, 'continue') == 1.0
+            datacheck = 2.0;
+            varargin = cellstr(input('Input file: ', 's'));
         else
             % Assume that VARARGIN is JOBNAME
         end
@@ -54,17 +57,28 @@ switch nargin
         if nargin > 3.0
             fprintf('ERROR: JOB was called with too many input arguments\n');
             return
-        elseif (strcmpi(varargin{1.0}, 'interactive') == 1.0) || (strcmpi(varargin{1.0}, 'datacheck') == 1.0)
+        elseif (strcmpi(varargin{1.0}, 'interactive') == 1.0) || (strcmpi(varargin{1.0}, 'datacheck') == 1.0) || (strcmpi(varargin{1.0}, 'continue') == 1.0)
             fprintf('ERROR: The command line option ''%s'' is misplaced\n       Whenever JOB is called with OPTION, the first argument must be the name of the job file\n', varargin{1.0});
             return
         else
+            datacheckAndContinue = 0.0;
+            
             for i = 2:nargin
                 if strcmpi(varargin{i}, 'interactive') == 1.0
                     setappdata(0, 'force_echoMessagesToCWIN', 1.0)
                 elseif strcmpi(varargin{i}, 'datacheck') == 1.0
+                    datacheckAndContinue = datacheckAndContinue + 1.0;
                     datacheck = 1.0;
+                elseif strcmpi(varargin{i}, 'continue') == 1.0
+                    datacheckAndContinue = datacheckAndContinue + 1.0;
+                    datacheck = 2.0;
                 else
-                    fprintf('ERROR: Invalid command line option ''%s''\n       Valid options are:\n[<jobName>, interactive, datacheck]\n', varargin{i});
+                    fprintf('ERROR: Invalid command line option ''%s''\n       Valid options are:\n[<jobName> | interactive | {datacheck | continue}]\n', varargin{i});
+                    return
+                end
+                
+                if datacheckAndContinue > 1.0
+                    fprintf('ERROR: The command line options ''datacheck'' and ''continue'' are mutually-exclusive\n       Valid options are:\n[<jobName> | interactive | {datacheck | continue}]\n');
                     return
                 end
             end
@@ -374,12 +388,21 @@ while feof(fid) == 0.0
                 will throw an error or crash later if the definition is
                 invalid
             %}
-            try eval(currentLine)
-                kwData{matchingKw} = eval(currentLine);
-            catch
+            
+            %{
+                Do not attempt to evaluate any expression that matches a
+                file name on the MATLAB path
+            %}
+            if exist(currentLine, 'file') ~= 2.0
+                try eval(currentLine)
+                    kwData{matchingKw} = eval(currentLine);
+                catch
+                    kwData{matchingKw} = currentLine;
+                end
+            else
                 kwData{matchingKw} = currentLine;
             end
-                
+            
             break
         end
     end

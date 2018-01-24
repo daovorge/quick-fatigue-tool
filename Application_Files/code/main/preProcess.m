@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 18-Dec-2017 09:21:04 GMT
+%   Last modified 24-Jan-2018 15:17:50 GMT
     
     %%
     
@@ -5856,6 +5856,34 @@ classdef preProcess < handle
                 
                 mainIDs = mainIDs2;
                 subIDs = subIDs2;
+            end
+        end
+        
+        %% SAVE THE FATIGUE LOADING TO A .MAT FILE
+        function [] = saveFatigueLoading(jobName, Sxx, Syy, Szz, Txy, Txz, Tyz, mainID, subID)
+            % Check that the directory exists
+            root = [pwd, '\Data\loadings'];
+            if exist(root, 'dir') == 0.0
+                mkdir(root)
+            end
+            
+            % Gather the fatigue loading into a structure
+            fatigueLoadingData = struct('S11', Sxx, 'S22', Syy, 'S33', Szz,...
+                'S12', Txy, 'S13', Txz, 'S23', Tyz,...
+                'mainID', mainID, 'subID', subID);
+            
+            if isappdata(0, 'SIGOriginalSignal') == 1.0
+                fatigueLoadingData.oldSignal = getappdata(0, 'SIGOriginalSignal');
+            else
+                fatigueLoadingData.oldSignal = Sxx; %#ok<STRNU>
+            end
+            
+            % Save the structure as a .mat file
+            try
+                save(sprintf('%s\\%s_fld.mat', [pwd, '\Data\loadings'], jobName), 'fatigueLoadingData')
+            catch exception
+                setappdata(0, 'warning_309_exception', exception.message)
+                messenger.writeMessage(309.0)
             end
         end
     end

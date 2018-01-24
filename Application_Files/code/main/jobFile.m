@@ -6,7 +6,7 @@ classdef jobFile < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 09-Jan-2017 13:40:51 GMT
+%   Last modified 24-Jan-2018 15:17:50 GMT
     
     %%
     
@@ -90,6 +90,9 @@ classdef jobFile < handle
             end
             
             if (isempty(dataCheck) == 1.0) || (ischar(dataCheck) == 1.0)
+                dataCheck = 0.0;
+                setappdata(0, 'dataCheck', dataCheck)
+            elseif (dataCheck ~= 0.0) && (dataCheck ~= 1.0) && (dataCheck ~= 2.0)
                 dataCheck = 0.0;
                 setappdata(0, 'dataCheck', dataCheck)
             end
@@ -1689,13 +1692,14 @@ classdef jobFile < handle
         end
         
         %% SCALE AND COMBINE THE LOADING
-        function [scale, offset, repeats, units, N, signalLength, Sxx, Syy, Szz, Txy, Tyz, Txz, mainID, subID, gateHistories, gateTensors, tensorGate, error] =...
-                getLoading(units, scale, algorithm, msCorrection,...
+        function [scale, offset, repeats, units, N, signalLength, Sxx, Syy, Szz, Txy, Tyz, Txz, mainID, subID, gateHistories, gateTensors, tensorGate, recoverFatigueLoading, error] =...
+                getLoading(units, scale, dataCheck, algorithm, msCorrection,...
                 userUnits, hfDataset, hfHistory, hfTime,...
                 hfScales, items, dataset, history, elementType, offset)
             
             N = [];
             signalLength = [];
+            recoverFatigueLoading = 0.0;
             
             % Define system of units
             switch units
@@ -1799,50 +1803,78 @@ classdef jobFile < handle
             setappdata(0, 'incorrectItemList', 0.0)
             
             % If using Uniaxial Stress-Life, no scale & combine is necessary
-            if (algorithm == 10.0) || (algorithm == 3.0)
-                [Sxx, Syy, Szz, Txy, Tyz, Txz, mainID, subID, error, oldSignal] = preProcess.uniaxialRead(history, gateHistories, historyGate, scale, offset);
-            else
-                [Sxx, Syy, Szz, Txy, Tyz, Txz, mainID, subID, error] = preProcess.scalecombine(dataset, history, items, gateHistories, historyGate, scale, offset, elementType);
-            end
-            
-            if error == true
-                return
-            end
-            
-            % If high frequency data is provided, superimpose it onto the low frequency block
-            if (isempty(hfDataset) == 0.0) || ((algorithm == 10.0 || algorithm == 3.0) && isempty(hfHistory) == 0.0)
-                %{
-                    This functionality requires the Signal Processing
-                    Toolbox. If the toolbox is not available, abort the
-                    analysis
-                %}
-                sptAvailable = checkToolbox('Signal Processing Toolbox');
-                
-                if sptAvailable ~= 1.0
-                    error = 1.0;
-                    setappdata(0, 'E009', 1.0)
-                    return
-                else
-                    [Sxx, Syy, Szz, Txy, Tyz, Txz, error] = highFrequency.main(Sxx, Syy, Szz, Txy, Tyz, Txz, hfDataset, hfHistory, hfTime, algorithm, items, hfScales);
+            if dataCheck == 2.0
+                try
+                    load(sprintf('%s\\%s_fld.mat', [pwd, '\Data\loadings'], getappdata(0, 'jobName')))
                     
-                    %{
-                        If high frequency datasets were used with the
-                        Uniaxial Stress-Life algorithm, update the
-                        OLDSIGNAL variable to reflect the newly
-                        superinposed data
-                    %}
-                    if algorithm == 10.0 || algorithm == 3.0
-                        oldSignal = Sxx;
-                    end
+                    Sxx = fatigueLoadingData.S11;
+                    Syy = fatigueLoadingData.S22;
+                    Szz = fatigueLoadingData.S33;
+                    Txy = fatigueLoadingData.S12;
+                    Txz = fatigueLoadingData.S13;
+                    Tyz = fatigueLoadingData.S23;
+                    
+                    oldSignal = fatigueLoadingData.oldSignal;
+                    
+                    mainID = fatigueLoadingData.mainID;
+                    subID = fatigueLoadingData.subID;
+                    
+                    clear('fatigueLoadingData')
+                    recoverFatigueLoading = 1.0;
+                catch exception
+                    recoverFatigueLoading = 0.0;
+                    
+                    setappdata(0, 'warning_310_exception', exception.message)
+                    messenger.writeMessage(310.0)
                 end
             end
             
-            if error == true
-                return
-            end            
-            
-            % Inform the user of the FEA data type
-            messenger.writeMessage(31.0)
+            if recoverFatigueLoading == 0.0
+                if (algorithm == 10.0) || (algorithm == 3.0)
+                    [Sxx, Syy, Szz, Txy, Tyz, Txz, mainID, subID, error, oldSignal] = preProcess.uniaxialRead(history, gateHistories, historyGate, scale, offset);
+                else
+                    [Sxx, Syy, Szz, Txy, Tyz, Txz, mainID, subID, error] = preProcess.scalecombine(dataset, history, items, gateHistories, historyGate, scale, offset, elementType);
+                end
+                
+                if error == true
+                    return
+                end
+                
+                % If high frequency data is provided, superimpose it onto the low frequency block
+                if (isempty(hfDataset) == 0.0) || ((algorithm == 10.0 || algorithm == 3.0) && isempty(hfHistory) == 0.0)
+                    %{
+                        This functionality requires the Signal Processing
+                        Toolbox. If the toolbox is not available, abort the
+                        analysis
+                    %}
+                    sptAvailable = checkToolbox('Signal Processing Toolbox');
+                    
+                    if sptAvailable ~= 1.0
+                        error = 1.0;
+                        setappdata(0, 'E009', 1.0)
+                        return
+                    else
+                        [Sxx, Syy, Szz, Txy, Tyz, Txz, error] = highFrequency.main(Sxx, Syy, Szz, Txy, Tyz, Txz, hfDataset, hfHistory, hfTime, algorithm, items, hfScales);
+                        
+                        %{
+                            If high frequency datasets were used with the
+                            Uniaxial Stress-Life algorithm, update the
+                            OLDSIGNAL variable to reflect the newly
+                            superinposed data
+                        %}
+                        if algorithm == 10.0 || algorithm == 3.0
+                            oldSignal = Sxx;
+                        end
+                    end
+                end
+                
+                if error == true
+                    return
+                end
+                
+                % Inform the user of the FEA data type
+                messenger.writeMessage(31.0)
+            end
             
             % Warn the user if the loading contained any complex values
             if any(isreal(Sxx) == 0.0) == 1.0 || any(isreal(Syy) == 0.0) == 1.0 ||...

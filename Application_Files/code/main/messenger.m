@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 23-Jan-2018 09:53:00 GMT
+%   Last modified 24-Jan-2018 15:17:50 GMT
 
     %%
 
@@ -1202,8 +1202,8 @@ classdef messenger < handle
                     case 129.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Composite criteria results have been written to ''%s\\Project\\output\\%s\\Data Files\\composite_criteria.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
                     case 130.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The surface definition file ''%s'' is inconsistent with the dataset', returnType{i}], getappdata(0, 'hotspotFile'));
-                        fprintf(fidType(i), ['-> The surface will be re-read from the output database', returnType{i}]);
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: The surface definition file could not be processed', returnType{i}]);
+                        fprintf(fidType(i), ['-> Error message: %s', returnType{i}], getappdata(0, 'message_130_exception'));
                     case 131.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The keyword *NO COMPRESSION is specified for material %s (group %.0f), but its usage is not recommended here', returnType{i}], getappdata(0, 'message_groupMaterial'), getappdata(0, 'message_group'));
                         fprintf(fidType(i), ['-> Composite analysis results for this analysis group may be inaccurate', returnType{i}]);
@@ -2212,10 +2212,7 @@ classdef messenger < handle
                         
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 287.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: Some items in the surface definition file could not be located in the stress dataset', returnType{i}]);
-                        fprintf(fidType(i), ['-> Verify that the results position in the surface definition is consistent with the model definition in the job file', returnType{i}]);
-                        
-                        setappdata(0, 'messageFileWarnings', 1.0)
+                        %_AVAILABLE_%
                     case 289.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The following elements are not supported by the surface detection algorithm: %s'], getappdata(0, 'message_289_unsupportedElements'));
                         fprintf(fidType(i), ['-> These elements have been skipped', returnType{i}]);
@@ -2264,6 +2261,17 @@ classdef messenger < handle
                     case 308.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Surface detection cannot be limited to dataset elements if more than one part instance is specified with the PART_INSTANCE option', returnType{i}], getappdata(0, 'message_275'));
                         fprintf(fidType(i), ['-> The whole part instance will be searched', returnType{i}]);
+                    case 309.0
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: The fatigue loading could not be archived', returnType{i}]);
+                        fprintf(fidType(i), ['-> Error message: %s', returnType{i}], getappdata(0, 'warning_309_exception'));
+                        
+                        setappdata(0, 'messageFileWarnings', 1.0)
+                    case 310.0
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: The fatigue loading could not be retrieved', returnType{i}]);
+                        fprintf(fidType(i), ['-> Error message: %s', returnType{i}], getappdata(0, 'warning_310_exception'));
+                        fprintf(fidType(i), ['-> The fatigue loading will be processed from scratch', returnType{i}]);
+                        
+                        setappdata(0, 'messageFileWarnings', 1.0)
                 end
             end
         end
@@ -2320,7 +2328,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2018\r\n');
-            fprintf(fid, 'Last modified 23-Jan-2018 09:53:00 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 24-Jan-2018 15:17:50 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

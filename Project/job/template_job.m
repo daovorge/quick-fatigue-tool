@@ -17,7 +17,7 @@ function [] = template_job()
 %      1 Job file options
 %   
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 18-Dec-2017 12:38:48 GMT
+%   Last modified 24-Jan-2018 15:17:50 GMT
 
 %% 1: JOB
 
@@ -27,6 +27,11 @@ JOB_DESCRIPTION = 'Template job file';
 
 CONTINUE_FROM = '';
 
+%{
+    0: Full analysis
+    1: Datacheck analysis
+    2: Full analysis (re-read fatigue load data)
+%}
 DATA_CHECK = 0.0;
 
 %% 2: MATERIAL

@@ -11,7 +11,7 @@ function [] = main(flags)
 %   Author contact: louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 23-Jan-2018 09:53:00 GMT
+%   Last modified 24-Jan-2018 15:17:50 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');    tic_pre = tic;
@@ -43,7 +43,7 @@ setappdata(0, 'messageFileWarnings', 0.0)
 %% PRINT COMMAND WINDOW HEADER
 fprintf('[NOTICE] Quick Fatigue Tool 6.11-11')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2018)')
-fprintf('\n[NOTICE] Last modified 23-Jan-2018 09:53:00 GMT')
+fprintf('\n[NOTICE] Last modified 24-Jan-2018 15:17:50 GMT')
 
 cleanExit = 0.0;
 
@@ -212,11 +212,12 @@ end
 fprintf('\n[PRE] Processing datasets')
 fprintf(fid_status, '\n[PRE] Processing datasets');
 setappdata(0, 'errorDuringLoading', 1.0)
+dataCheck = getappdata(0, 'dataCheck');
 
 [scale, offset, repeats, units, N, signalLength, Sxx, Syy, Szz, Txy, Tyz, Txz, mainID,...
-    subID, gateHistories, gateTensors, tensorGate, error]...
+    subID, gateHistories, gateTensors, tensorGate, recoverFatigueLoading, error]...
     ...
-    = jobFile.getLoading(units, scale,...
+    = jobFile.getLoading(units, scale, dataCheck,...
     algorithm, msCorrection, userUnits, hfDataset, hfHistory,...
     hfTime, hfScales, items, dataset, history, elementType, offset);
 
@@ -226,8 +227,15 @@ if error == 1.0
 end
 setappdata(0, 'errorDuringLoading', 0.0)
 
+%% SAVE THE FATIGUE LOADING TO A .MAT FILE
+if recoverFatigueLoading == 0.0
+    preProcess.saveFatigueLoading(jobName, Sxx, Syy, Szz, Txy, Txz, Tyz, mainID, subID)
+end
+
 %% DETECT SURFACE ITAMS IF APPLICABLE
-[mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz, fid_status);
+if (algorithm ~= 10.0) && (algorithm ~= 3.0)
+    [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz, fid_status);
+end
 
 %% WARN THE USER IF THERE ARE DUPLICATE ITEMS IN THE MODEL
 preProcess.checkDuplicateItems(N, mainID, subID)
@@ -369,8 +377,11 @@ if getappdata(0, 'compositeCriteria') == 1.0
         Composite/foam materials cannot be used for fatigue analysis. Abort
         the analysis here.
     %}
-    datacheckAbort(Sxx, Syy, Szz, Txy, Tyz, Txz, tic_pre, outputField, fid_status)
-    return
+    continueAnalysis = datacheckAbort(Sxx, Syy, Szz, Txy, Tyz, Txz, tic_pre, outputField, fid_status);
+    
+    if continueAnalysis == 0.0
+        return
+    end
 end
 
 %% INITIALISE THE CP SEARCH PARAMETERS
@@ -488,13 +499,16 @@ messenger.writeMessage(168.0)
 % Print a summary of the memory state
 messenger.writeMessage(133.0)
 
-if getappdata(0, 'dataCheck') > 0.0
+if dataCheck == 1.0
     %{
         If the job is a data check analysis, abort here. Print the
         principal stresses to a text file
     %}
-    datacheckAbort(Sxx, Syy, Szz, Txy, Tyz, Txz, tic_pre, outputField, fid_status)
-    return
+    continueAnalysis = datacheckAbort(Sxx, Syy, Szz, Txy, Tyz, Txz, tic_pre, outputField, fid_status);
+    
+    if continueAnalysis == 0.0
+        return
+    end
 end
 
 fprintf('\n[NOTICE] End analysis preprocessor')

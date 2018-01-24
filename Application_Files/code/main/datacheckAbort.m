@@ -1,13 +1,34 @@
-function [] = datacheckAbort(Sxx, Syy, Szz, Txy, Tyz, Txz, tic_pre, outputField, fid_status)
+function [continueAnalysis] = datacheckAbort(Sxx, Syy, Szz, Txy, Tyz, Txz, tic_pre, outputField, fid_status)
 %DATACHECKABORT    QFT function to abort analysis at data check phase.
 %
 %   DATACHECKABORT is used internally by Quick Fatigue Tool. The user
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 01-Dec-2017 12:42:06 GMT
+%   Last modified 24-Jan-2018 15:17:50 GMT
     
     %%   
+    
+% Check if user wishes to continue
+continueAnalysis = 0.0;
+
+if getappdata(0, 'analysisDialogues') > 0.0
+    message = sprintf('Results of the data check have been written to:\n\n''%s''', [pwd, '\Project\output\', getappdata(0, 'jobName')]);
+    
+    if (ispc == 1.0) && (ismac == 0.0)
+        answer = questdlg(message, 'Quick Fatigue Tool', 'Stop', 'Continue', 'Stop');
+    elseif (ispc == 0.0) && (ismac == 1.0)
+        answer = msgbox(message, 'Quick Fatigue Tool');
+    else
+        answer = -1.0;
+    end
+    
+    if strcmpi(answer, 'continue') == 1.0
+        continueAnalysis = 1.0;
+        setappdata(0, 'dataCheck', 0.0)
+        return
+    end
+end
 
 % Add output folder to current directory
 job = getappdata(0, 'jobName');
