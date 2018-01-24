@@ -9,8 +9,9 @@ function [] = job(varargin)
 %   JOB(JOBNAME, OPTION) submits the analyis job JOBNAME with additional
 %   options. Available options are:
 %
-%     'datacheck'   - Submits the analysis job as a data check analysis
-%     'interactive' - Prints an echo of the message (.msg) file to the
+%     'interactive' - print an echo of the message (.msg) file to the
+%     'datacheck'   - submit the analysis job as a data check analysis
+%     'recall' - recall fatigue load data from the previous analysis run of JOBNAME
 %     MATLAB commands window.
 %
 %   If the extention of the job file is '.inp', then the JOBNAME parameter
@@ -46,7 +47,7 @@ switch nargin
         elseif strcmpi(varargin, 'datacheck') == 1.0
             datacheck = 1.0;
             varargin = cellstr(input('Input file: ', 's'));
-        elseif strcmpi(varargin, 'continue') == 1.0
+        elseif strcmpi(varargin, 'recall') == 1.0
             datacheck = 2.0;
             varargin = cellstr(input('Input file: ', 's'));
         else
@@ -57,7 +58,7 @@ switch nargin
         if nargin > 3.0
             fprintf('ERROR: JOB was called with too many input arguments\n');
             return
-        elseif (strcmpi(varargin{1.0}, 'interactive') == 1.0) || (strcmpi(varargin{1.0}, 'datacheck') == 1.0) || (strcmpi(varargin{1.0}, 'continue') == 1.0)
+        elseif (strcmpi(varargin{1.0}, 'interactive') == 1.0) || (strcmpi(varargin{1.0}, 'datacheck') == 1.0) || (strcmpi(varargin{1.0}, 'recall') == 1.0)
             fprintf('ERROR: The command line option ''%s'' is misplaced\n       Whenever JOB is called with OPTION, the first argument must be the name of the job file\n', varargin{1.0});
             return
         else
@@ -69,16 +70,16 @@ switch nargin
                 elseif strcmpi(varargin{i}, 'datacheck') == 1.0
                     datacheckAndContinue = datacheckAndContinue + 1.0;
                     datacheck = 1.0;
-                elseif strcmpi(varargin{i}, 'continue') == 1.0
+                elseif strcmpi(varargin{i}, 'recall') == 1.0
                     datacheckAndContinue = datacheckAndContinue + 1.0;
                     datacheck = 2.0;
                 else
-                    fprintf('ERROR: Invalid command line option ''%s''\n       Valid options are:\n[<jobName> | interactive | {datacheck | continue}]\n', varargin{i});
+                    fprintf('ERROR: Invalid command line option ''%s''\n       Valid options are:\n[<jobName> | interactive | {datacheck | recall}]\n', varargin{i});
                     return
                 end
                 
                 if datacheckAndContinue > 1.0
-                    fprintf('ERROR: The command line options ''datacheck'' and ''continue'' are mutually-exclusive\n       Valid options are:\n[<jobName> | interactive | {datacheck | continue}]\n');
+                    fprintf('ERROR: The command line options ''datacheck'' and ''recall'' are mutually-exclusive\n       Valid options are:\n[<jobName> | interactive | {datacheck | recall}]\n');
                     return
                 end
             end
