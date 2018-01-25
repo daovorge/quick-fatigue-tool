@@ -2013,7 +2013,7 @@ classdef preProcess < handle
             %}
             if dataCheck == 2.0
                 try
-                    load(sprintf('%s\\%s_fld.mat', [pwd, '\Data\loadings'], getappdata(0, 'jobName')))
+                    load(sprintf('%s\\[J]%s_fd.mat', [pwd, '\Data\library'], getappdata(0, 'jobName')))
                     neData = fatigueLoadingData.neData;
                     
                     coldItems = neData.coldItems;
@@ -3981,7 +3981,7 @@ classdef preProcess < handle
             %}
             if dataCheck == 2.0
                 try
-                    load(sprintf('%s\\%s_fld.mat', [pwd, '\Data\loadings'], getappdata(0, 'jobName')))
+                    load(sprintf('%s\\[J]%s_fd.mat', [pwd, '\Data\library'], getappdata(0, 'jobName')))
                     invariants = fatigueLoadingData.invariants;
                     
                     setappdata(0, 'S1', invariants.S1)
@@ -5910,7 +5910,7 @@ classdef preProcess < handle
         %% SAVE THE FATIGUE LOADING TO A .MAT FILE
         function [] = saveFatigueLoading(jobName, Sxx, Syy, Szz, Txy, Txz, Tyz, mainID, subID)
             % Check that the directory exists
-            root = [pwd, '\Data\loadings'];
+            root = [pwd, '\Data\library'];
             if exist(root, 'dir') == 0.0
                 mkdir(root)
             end
@@ -5928,7 +5928,7 @@ classdef preProcess < handle
             
             % Save the structure as a .mat file
             try
-                save(sprintf('%s\\%s_fld.mat', [pwd, '\Data\loadings'], jobName), 'fatigueLoadingData')
+                save(sprintf('%s\\[J]%s_fd.mat', [pwd, '\Data\library'], jobName), 'fatigueLoadingData')
             catch exception
                 setappdata(0, 'warning_309_exception', exception.message)
                 messenger.writeMessage(309.0)
@@ -5938,7 +5938,7 @@ classdef preProcess < handle
         %% SAVE ELIMINATED ITEMS TO A .MAT FILE
         function [] = saveEliminatedItems(jobName, coldItems, removedItems, hotspotWarning)
             % Check that the file already exists
-            fld = [pwd, sprintf('\\Data\\loadings\\%s_fld.mat', jobName)];
+            fld = [pwd, sprintf('\\Data\\library\\[J]%s_fd.mat', jobName)];
             
             if exist(fld, 'file') ~= 2.0
                 %{
@@ -5956,7 +5956,7 @@ classdef preProcess < handle
             
             % Save the structure as a .mat file
             try
-                save(sprintf('%s\\%s_fld.mat', [pwd, '\Data\loadings'], jobName), 'fatigueLoadingData')
+                save(sprintf('%s\\[J]%s_fd.mat', [pwd, '\Data\library'], jobName), 'fatigueLoadingData')
             catch exception
                 setappdata(0, 'warning_309_exception', exception.message)
                 messenger.writeMessage(309.0)
@@ -5971,7 +5971,7 @@ classdef preProcess < handle
             S3 = getappdata(0, 'S3');
             
             % Check that the file already exists
-            fld = [pwd, sprintf('\\Data\\loadings\\%s_fld.mat', jobName)];
+            fld = [pwd, sprintf('\\Data\\library\\[J]%s_fd.mat', jobName)];
             
             if exist(fld, 'file') ~= 2.0
                 %{
@@ -5989,7 +5989,7 @@ classdef preProcess < handle
             
             % Save the structure as a .mat file
             try
-                save(sprintf('%s\\%s_fld.mat', [pwd, '\Data\loadings'], jobName), 'fatigueLoadingData')
+                save(sprintf('%s\\[J]%s_fd.mat', [pwd, '\Data\library'], jobName), 'fatigueLoadingData')
             catch exception
                 setappdata(0, 'warning_309_exception', exception.message)
                 messenger.writeMessage(309.0)

@@ -2260,7 +2260,7 @@ classdef messenger < handle
                         fprintf(fidType(i), ['-> The whole part instance will be searched', returnType{i}]);
                     case 309.0
                         if getappdata(0, 'suppress_ID309') == 0.0
-                            fprintf(fidType(i), [returnType{i}, '***WARNING: The fatigue loading definition file could not be written to the library', returnType{i}]);
+                            fprintf(fidType(i), [returnType{i}, '***WARNING: The fatigue definition file could not be written to the library', returnType{i}]);
                             fprintf(fidType(i), ['-> Error message: %s', returnType{i}], getappdata(0, 'warning_309_exception'));
 
                             if i == X
@@ -2271,9 +2271,9 @@ classdef messenger < handle
                         end
                     case 310.0
                         if getappdata(0, 'suppress_ID310') == 0.0
-                            fprintf(fidType(i), [returnType{i}, '***WARNING: The fatigue loading definition file could not be retrieved from the library', returnType{i}]);
+                            fprintf(fidType(i), [returnType{i}, '***WARNING: The fatigue definition file could not be retrieved from the library', returnType{i}]);
                             fprintf(fidType(i), ['-> Error message: %s', returnType{i}], getappdata(0, 'warning_310_exception'));
-                            fprintf(fidType(i), ['-> The fatigue loading will be processed from the job file definitions instead', returnType{i}]);
+                            fprintf(fidType(i), ['-> The fatigue definition will be processed from the job file instead', returnType{i}]);
 
                             if i == X
                                 setappdata(0, 'suppress_ID310', 1.0)
@@ -2282,7 +2282,7 @@ classdef messenger < handle
                             setappdata(0, 'messageFileWarnings', 1.0)
                         end
                     case 311.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: Whenever DATA_CHECK=2, the fatigue loading definition is recalled from the Quick Fatigue Tool library', returnType{i}]);
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: Whenever DATA_CHECK=2, the fatigue definition is recalled from the Quick Fatigue Tool library', returnType{i}]);
                         fprintf(fidType(i), ['-> Any changes to the model/loading definition or to the selected analysis algorithm may result in undesirable behaviour', returnType{i}]);
                         
                         setappdata(0, 'messageFileWarnings', 1.0)
