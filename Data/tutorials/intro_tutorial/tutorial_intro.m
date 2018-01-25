@@ -31,7 +31,7 @@ CONTINUE_FROM = '';
 %{
     0: Full analysis
     1: Datacheck analysis
-    2: Recall analysis
+    2: Use fatigue definition from library
 %}
 DATA_CHECK = 0.0;
 
