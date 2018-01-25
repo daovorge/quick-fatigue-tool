@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 24-Jan-2018 15:17:50 GMT
+%   Last modified 25-Jan-2018 06:58:20 GMT
     
     %%
     
@@ -2004,7 +2004,31 @@ classdef preProcess < handle
         
         %% Perform nodal elimination
         function [coldItems, removed, hotspotWarning] = nodalElimination(algorithm,...
-                msCorrection, items)
+                msCorrection, items, dataCheck)
+            
+            %{
+                If a fatigue loading file exists and a recall analysis is
+                specified, load the previous nodal elimination data
+                instead.
+            %}
+            if dataCheck == 2.0
+                try
+                    load(sprintf('%s\\%s_fld.mat', [pwd, '\Data\loadings'], getappdata(0, 'jobName')))
+                    neData = fatigueLoadingData.neData;
+                    
+                    coldItems = neData.coldItems;
+                    removed = neData.removedItems;
+                    hotspotWarning = neData.hotspotWarning;
+                    
+                    clear('fatigueLoadingData')
+                    clear('neData')
+                    
+                    return
+                catch exception
+                    setappdata(0, 'warning_310_exception', exception.message)
+                    messenger.writeMessage(310.0)
+                end
+            end
             
             % Get the number of groups for the analysis
             G = getappdata(0, 'numberOfGroups');
@@ -3950,7 +3974,31 @@ classdef preProcess < handle
         end
         
         %% Get the principal stress history for the loading
-        function [] = getPrincipalStress(N, Sxx, Syy, Szz, Txy, Tyz, Txz, algorithm, isFosIteration)
+        function [] = getPrincipalStress(N, Sxx, Syy, Szz, Txy, Tyz, Txz, algorithm, isFosIteration, dataCheck)
+            %{
+                If a fatigue loading file exists and a recall analysis is
+                specified, load the previous invariants instead.
+            %}
+            if dataCheck == 2.0
+                try
+                    load(sprintf('%s\\%s_fld.mat', [pwd, '\Data\loadings'], getappdata(0, 'jobName')))
+                    invariants = fatigueLoadingData.invariants;
+                    
+                    setappdata(0, 'S1', invariants.S1)
+                    setappdata(0, 'S2', invariants.S2)
+                    setappdata(0, 'S3', invariants.S3)
+                    setappdata(0, 'stressInvariantParameter', invariants.SIP)
+                    
+                    clear('fatigueLoadingData')
+                    clear('invariants')
+                    
+                    return
+                catch exception
+                    setappdata(0, 'warning_310_exception', exception.message)
+                    messenger.writeMessage(310.0)
+                end
+            end
+            
             % Get the number of groups for the analysis
             if isFosIteration == 1.0
                 G = 1.0;
@@ -5877,6 +5925,67 @@ classdef preProcess < handle
             else
                 fatigueLoadingData.oldSignal = Sxx; %#ok<STRNU>
             end
+            
+            % Save the structure as a .mat file
+            try
+                save(sprintf('%s\\%s_fld.mat', [pwd, '\Data\loadings'], jobName), 'fatigueLoadingData')
+            catch exception
+                setappdata(0, 'warning_309_exception', exception.message)
+                messenger.writeMessage(309.0)
+            end
+        end
+        
+        %% SAVE ELIMINATED ITEMS TO A .MAT FILE
+        function [] = saveEliminatedItems(jobName, coldItems, removedItems, hotspotWarning)
+            % Check that the file already exists
+            fld = [pwd, sprintf('\\Data\\loadings\\%s_fld.mat', jobName)];
+            
+            if exist(fld, 'file') ~= 2.0
+                %{
+                    For some reason, the original fatigue load data file
+                    was never written, so RETURN
+                %}
+                return
+            end
+            
+            % Load the current fatigue loading .mat file
+            load(fld)
+            
+            % Add the nodal elimination data to the fatigue loading data
+            fatigueLoadingData.neData = struct('coldItems', coldItems, 'removedItems', removedItems, 'hotspotWarning', hotspotWarning); %#ok<STRNU>
+            
+            % Save the structure as a .mat file
+            try
+                save(sprintf('%s\\%s_fld.mat', [pwd, '\Data\loadings'], jobName), 'fatigueLoadingData')
+            catch exception
+                setappdata(0, 'warning_309_exception', exception.message)
+                messenger.writeMessage(309.0)
+            end
+        end
+        
+        %% SAVE INVARIANT STRESSES TO A .MAT FILE
+        function [] = saveInvariants(jobName)
+            % Recall the principal stresses
+            S1 = getappdata(0, 'S1');
+            S2 = getappdata(0, 'S2');
+            S3 = getappdata(0, 'S3');
+            
+            % Check that the file already exists
+            fld = [pwd, sprintf('\\Data\\loadings\\%s_fld.mat', jobName)];
+            
+            if exist(fld, 'file') ~= 2.0
+                %{
+                    For some reason, the original fatigue load data file
+                    was never written, so RETURN
+                %}
+                return
+            end
+            
+            % Load the current fatigue loading .mat file
+            load(fld)
+            
+            % Add the nodal elimination data to the fatigue loading data
+            fatigueLoadingData.invariants = struct('S1', S1, 'S2', S2, 'S3', S3, 'SIP', getappdata(0, 'stressInvariantParameter')); %#ok<STRNU>
             
             % Save the structure as a .mat file
             try

@@ -2107,13 +2107,10 @@ classdef messenger < handle
                             fprintf(fidType(i), [returnType{i}, '***NOTE: Abaqus ODB Python script has been exported to ''%s\\Project\\output\\%s\\Data Files''', returnType{i}], pwd, jobName);
                         end
                     case 266.0
-                        if getappdata(0, 'suppress_ID266') == 0.0
-                            fprintf(fidType(i), [returnType{i}, '***NOTE: User-defined items were read from the file ''%s''', returnType{i}], getappdata(0, 'hotspotFile'));
-                            
-                            if i == X
-                                setappdata(0, 'suppress_ID266', 1.0)
-                            end
-                        end
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: The fatigue loading could not be archived', returnType{i}]);
+                        fprintf(fidType(i), ['-> Error message: %s', returnType{i}], getappdata(0, 'warning_309_exception'));
+                        
+                        setappdata(0, 'messageFileWarnings', 1.0)
                     case 267.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The environment variable ''noiseReduction'' is deprecated. Use ''gateTensors'' instead', returnType{i}]);
                         setappdata(0, 'messageFileWarnings', 1.0)
@@ -2262,16 +2259,28 @@ classdef messenger < handle
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Surface detection cannot be limited to dataset elements if more than one part instance is specified with the PART_INSTANCE option', returnType{i}], getappdata(0, 'message_275'));
                         fprintf(fidType(i), ['-> The whole part instance will be searched', returnType{i}]);
                     case 309.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: The fatigue loading could not be archived', returnType{i}]);
-                        fprintf(fidType(i), ['-> Error message: %s', returnType{i}], getappdata(0, 'warning_309_exception'));
-                        
-                        setappdata(0, 'messageFileWarnings', 1.0)
+                        if getappdata(0, 'suppress_ID309') == 0.0
+                            fprintf(fidType(i), [returnType{i}, '***WARNING: The fatigue loading could not be archived', returnType{i}]);
+                            fprintf(fidType(i), ['-> Error message: %s', returnType{i}], getappdata(0, 'warning_309_exception'));
+
+                            if i == X
+                                setappdata(0, 'suppress_ID309', 1.0)
+                            end
+
+                            setappdata(0, 'messageFileWarnings', 1.0)
+                        end
                     case 310.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: The fatigue loading could not be retrieved', returnType{i}]);
-                        fprintf(fidType(i), ['-> Error message: %s', returnType{i}], getappdata(0, 'warning_310_exception'));
-                        fprintf(fidType(i), ['-> The fatigue loading will be processed from scratch', returnType{i}]);
-                        
-                        setappdata(0, 'messageFileWarnings', 1.0)
+                        if getappdata(0, 'suppress_ID310') == 0.0
+                            fprintf(fidType(i), [returnType{i}, '***WARNING: The fatigue loading could not be retrieved', returnType{i}]);
+                            fprintf(fidType(i), ['-> Error message: %s', returnType{i}], getappdata(0, 'warning_310_exception'));
+                            fprintf(fidType(i), ['-> The fatigue loading will be processed from scratch', returnType{i}]);
+
+                            if i == X
+                                setappdata(0, 'suppress_ID310', 1.0)
+                            end
+
+                            setappdata(0, 'messageFileWarnings', 1.0)
+                        end
                 end
             end
         end
@@ -2303,6 +2312,8 @@ classdef messenger < handle
             setappdata(0, 'suppress_ID220', 0.0)
             setappdata(0, 'suppress_ID257', 0.0)
             setappdata(0, 'suppress_ID266', 0.0)
+            setappdata(0, 'suppress_ID309', 0.0)
+            setappdata(0, 'suppress_ID310', 0.0)
         end
 
         %% WRITE LOG FILE

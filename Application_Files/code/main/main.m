@@ -265,7 +265,12 @@ setappdata(0, 'subID', subID)
 fprintf('\n[PRE] Calculating invariants')
 fprintf(fid_status, '\n[PRE] Calculating invariants');
 
-preProcess.getPrincipalStress(N, Sxx, Syy, Szz, Txy, Tyz, Txz, algorithm, 0.0)
+preProcess.getPrincipalStress(N, Sxx, Syy, Szz, Txy, Tyz, Txz, algorithm, 0.0, dataCheck)
+
+% Save the principal stresses to a .MAT file
+if recoverFatigueLoading == 0.0
+    preProcess.saveInvariants(jobName)
+end
 
 %% GET THE VON MISES STRESS FOR THE LOADING
 if (algorithm == 7.0 && getappdata(0, 'stressInvariantParameter') == 1.0) || algorithm == 9.0 || outputField == 1.0 || outputHistory == 1.0 || outputFigure == 1.0
@@ -313,7 +318,7 @@ if (algorithm ~= 10.0) && (algorithm ~= 8.0) && (algorithm ~= 3.0) && (getappdat
         fprintf(fid_status, '\n[PRE] Optimizing datasets');
 
         [coldItems, removedItems, hotspotWarning] = preProcess.nodalElimination(algorithm,...
-            msCorrection, N);
+            msCorrection, N, dataCheck);
 
         setappdata(0, 'separateFieldOutput', 1.0)
         messenger.writeMessage(22.0)
@@ -352,6 +357,11 @@ if hotspotWarning == 1.0
 end
 
 setappdata(0, 'numberOfNodes', N)
+
+% Save eliminated items to a .mat file
+if recoverFatigueLoading == 0.0
+    preProcess.saveEliminatedItems(jobName, coldItems, removedItems, hotspotWarning)
+end
 
 %% CHECK USER FRF DIAGNOSTIC ITEM IDS
 mscFileUtils.checkFRFDiagnosticItems(N)
