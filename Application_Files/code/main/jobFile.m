@@ -1805,7 +1805,7 @@ classdef jobFile < handle
             % If using Uniaxial Stress-Life, no scale & combine is necessary
             if dataCheck == 2.0
                 try
-                    load(sprintf('%s\\%s_fld.mat', [pwd, '\Data\loadings'], getappdata(0, 'jobName')))
+                    load(sprintf('%s\\[J]%s_fd.mat', [pwd, '\Data\library'], getappdata(0, 'jobName')))
                     
                     Sxx = fatigueLoadingData.S11;
                     Syy = fatigueLoadingData.S22;
