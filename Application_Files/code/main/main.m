@@ -11,7 +11,7 @@ function [] = main(flags)
 %   Author contact: louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 25-Jan-2018 06:58:20 GMT
+%   Last modified 25-Jan-2018 13:39:46 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');    tic_pre = tic;
@@ -43,7 +43,7 @@ setappdata(0, 'messageFileWarnings', 0.0)
 %% PRINT COMMAND WINDOW HEADER
 fprintf('[NOTICE] Quick Fatigue Tool 6.11-11')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2018)')
-fprintf('\n[NOTICE] Last modified 25-Jan-2018 06:58:20 GMT')
+fprintf('\n[NOTICE] Last modified 25-Jan-2018 13:39:46 GMT')
 
 cleanExit = 0.0;
 
@@ -117,6 +117,13 @@ if getappdata(0, 'writeMessage_185') == 1.0
 end
 if getappdata(0, 'writeMessage_186') == 1.0
     messenger.writeMessage(186.0)
+end
+
+%% INFORM THE USER ABOUT DATACHECK SETTINGS
+dataCheck = getappdata(0, 'dataCheck');
+
+if dataCheck == 2.0
+    messenger.writeMessage(311.0)
 end
 
 %% CHECK THE CONTINUE_FROM FLAG
@@ -212,7 +219,6 @@ end
 fprintf('\n[PRE] Processing datasets')
 fprintf(fid_status, '\n[PRE] Processing datasets');
 setappdata(0, 'errorDuringLoading', 1.0)
-dataCheck = getappdata(0, 'dataCheck');
 
 [scale, offset, repeats, units, N, signalLength, Sxx, Syy, Szz, Txy, Tyz, Txz, mainID,...
     subID, gateHistories, gateTensors, tensorGate, recoverFatigueLoading, error]...

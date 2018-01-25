@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 25-Jan-2018 06:58:20 GMT
+%   Last modified 25-Jan-2018 13:39:46 GMT
 
     %%
 
@@ -2260,7 +2260,7 @@ classdef messenger < handle
                         fprintf(fidType(i), ['-> The whole part instance will be searched', returnType{i}]);
                     case 309.0
                         if getappdata(0, 'suppress_ID309') == 0.0
-                            fprintf(fidType(i), [returnType{i}, '***WARNING: The fatigue loading could not be archived', returnType{i}]);
+                            fprintf(fidType(i), [returnType{i}, '***WARNING: The fatigue loading definition file could not be written to the library', returnType{i}]);
                             fprintf(fidType(i), ['-> Error message: %s', returnType{i}], getappdata(0, 'warning_309_exception'));
 
                             if i == X
@@ -2271,9 +2271,9 @@ classdef messenger < handle
                         end
                     case 310.0
                         if getappdata(0, 'suppress_ID310') == 0.0
-                            fprintf(fidType(i), [returnType{i}, '***WARNING: The fatigue loading could not be retrieved', returnType{i}]);
+                            fprintf(fidType(i), [returnType{i}, '***WARNING: The fatigue loading definition file could not be retrieved from the library', returnType{i}]);
                             fprintf(fidType(i), ['-> Error message: %s', returnType{i}], getappdata(0, 'warning_310_exception'));
-                            fprintf(fidType(i), ['-> The fatigue loading will be processed from scratch', returnType{i}]);
+                            fprintf(fidType(i), ['-> The fatigue loading will be processed from the job file definitions instead', returnType{i}]);
 
                             if i == X
                                 setappdata(0, 'suppress_ID310', 1.0)
@@ -2281,6 +2281,11 @@ classdef messenger < handle
 
                             setappdata(0, 'messageFileWarnings', 1.0)
                         end
+                    case 311.0
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: Whenever DATA_CHECK=2, the fatigue loading definition is recalled from the Quick Fatigue Tool library', returnType{i}]);
+                        fprintf(fidType(i), ['-> Any changes to the model/loading definition or to the selected analysis algorithm may result in undesirable behaviour', returnType{i}]);
+                        
+                        setappdata(0, 'messageFileWarnings', 1.0)
                 end
             end
         end
@@ -2339,7 +2344,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2018\r\n');
-            fprintf(fid, 'Last modified 25-Jan-2018 06:58:20 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 25-Jan-2018 13:39:46 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

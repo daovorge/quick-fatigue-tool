@@ -6,7 +6,7 @@ classdef jobFile < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 24-Jan-2018 15:17:50 GMT
+%   Last modified 25-Jan-2018 13:39:46 GMT
     
     %%
     

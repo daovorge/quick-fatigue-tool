@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 25-Jan-2018 06:58:20 GMT
+%   Last modified 25-Jan-2018 13:39:46 GMT
     
     %%
     
@@ -4938,7 +4938,7 @@ classdef preProcess < handle
                     mkdir([dir, 'Data Files'])
                 end
                 
-                if (outputFigure == 1.0) && (datacheck == 0.0)
+                if (outputFigure == 1.0) && (datacheck ~= 1.0)
                     mkdir([dir, 'MATLAB Figures'])
                 end
             elseif exist(dir, 'dir') == 7.0
@@ -4989,7 +4989,7 @@ classdef preProcess < handle
                         end
                     end
                     
-                    if (outputFigure == 1.0) && (datacheck == 0.0)
+                    if (outputFigure == 1.0) && (datacheck ~= 1.0)
                         if exist([dir, 'MATLAB Figures'], 'dir') == 0.0
                             try
                                 mkdir([dir, 'MATLAB Figures'])
