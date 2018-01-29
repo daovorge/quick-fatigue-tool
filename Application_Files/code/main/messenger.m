@@ -2272,7 +2272,12 @@ classdef messenger < handle
                     case 310.0
                         if getappdata(0, 'suppress_ID310') == 0.0
                             fprintf(fidType(i), [returnType{i}, '***WARNING: The fatigue definition file could not be retrieved from the library', returnType{i}]);
-                            fprintf(fidType(i), ['-> Error message: %s', returnType{i}], getappdata(0, 'warning_310_exception'));
+                            if strcmpi(getappdata(0, 'warning_310_exception'), 'Reference to non-existent field ''uniaxial''.') == 1.0
+                                fprintf(fidType(i), ['-> The current analysis is uniaxial, but the fatigue definition file does not contain uniaxial load data', returnType{i}]);
+                                fprintf(fidType(i), ['-> Switching to a uniaxial method is not permitted when DATA_CHECK=2', returnType{i}]);
+                            else
+                                fprintf(fidType(i), ['-> Error message: %s', returnType{i}], getappdata(0, 'warning_310_exception'));
+                            end
                             fprintf(fidType(i), ['-> The fatigue definition will be processed from the job file instead', returnType{i}]);
 
                             if i == X

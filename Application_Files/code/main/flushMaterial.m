@@ -6,7 +6,7 @@ function [] = flushMaterial()
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 01-Dec-2017 12:42:06 GMT
+%   Last modified 29-Jan-2018 14:44:35 GMT
     
     %%
     
@@ -215,4 +215,27 @@ if isappdata(0, 'larc05_phi0') == 1.0
 end
 if isappdata(0, 'larc05_iterate') == 1.0
     rmappdata(0, 'larc05_iterate')
+end
+
+% Stress tensors
+if isappdata(0, 'Sxx') == 1.0
+    rmappdata(0, 'Sxx')
+end
+if isappdata(0, 'Syy') == 1.0
+    rmappdata(0, 'Syy')
+end
+if isappdata(0, 'Szz') == 1.0
+    rmappdata(0, 'Szz')
+end
+if isappdata(0, 'Txy') == 1.0
+    rmappdata(0, 'Txy')
+end
+if isappdata(0, 'Txz') == 1.0
+    rmappdata(0, 'Txz')
+end
+if isappdata(0, 'Tyz') == 1.0
+    rmappdata(0, 'Tyz')
+end
+if isappdata(0, 'SIGOriginalSignal') == 1.0
+    rmappdata(0, 'SIGOriginalSignal')
 end

@@ -1808,19 +1808,19 @@ classdef jobFile < handle
                     fatigueDefinitionFile = sprintf('%s\\[J]%s_fd.mat', [pwd, '\Data\library'], getappdata(0, 'jobName'));
                     load(fatigueDefinitionFile)
                     
-                    Sxx = fatigueLoadingData.S11;
-                    Syy = fatigueLoadingData.S22;
-                    Szz = fatigueLoadingData.S33;
-                    Txy = fatigueLoadingData.S12;
-                    Txz = fatigueLoadingData.S13;
-                    Tyz = fatigueLoadingData.S23;
+                    Sxx = fatigueDefinition.S11;
+                    Syy = fatigueDefinition.S22;
+                    Szz = fatigueDefinition.S33;
+                    Txy = fatigueDefinition.S12;
+                    Txz = fatigueDefinition.S13;
+                    Tyz = fatigueDefinition.S23;
                     
-                    oldSignal = fatigueLoadingData.uniaxial;
+                    oldSignal = fatigueDefinition.uniaxial;
                     
-                    mainID = fatigueLoadingData.mainID;
-                    subID = fatigueLoadingData.subID;
+                    mainID = fatigueDefinition.labels(:, 1.0);
+                    subID = fatigueDefinition.labels(:, 2.0);
                     
-                    clear('fatigueLoadingData')
+                    clear('fatigueDefinition')
                     recoverFatigueLoading = 1.0;
                     
 					% Inform user that the library was loaded successfully

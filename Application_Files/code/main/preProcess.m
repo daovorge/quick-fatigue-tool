@@ -2014,13 +2014,13 @@ classdef preProcess < handle
             if dataCheck == 2.0
                 try
                     load(sprintf('%s\\[J]%s_fd.mat', [pwd, '\Data\library'], getappdata(0, 'jobName')))
-                    neData = fatigueLoadingData.neData;
+                    neData = fatigueDefinition.neData;
                     
                     coldItems = neData.CI;
                     removed = neData.RI;
                     hotspotWarning = neData.W;
                     
-                    clear('fatigueLoadingData')
+                    clear('fatigueDefinition')
                     clear('neData')
                     
                     return
@@ -3982,14 +3982,14 @@ classdef preProcess < handle
             if dataCheck == 2.0
                 try
                     load(sprintf('%s\\[J]%s_fd.mat', [pwd, '\Data\library'], getappdata(0, 'jobName')))
-                    invariants = fatigueLoadingData.invariants;
+                    invariants = fatigueDefinition.invariants;
                     
                     setappdata(0, 'S1', invariants.S1)
                     setappdata(0, 'S2', invariants.S2)
                     setappdata(0, 'S3', invariants.S3)
                     setappdata(0, 'stressInvariantParameter', invariants.SIP)
                     
-                    clear('fatigueLoadingData')
+                    clear('fatigueDefinition')
                     clear('invariants')
                     
                     return
@@ -5916,19 +5916,17 @@ classdef preProcess < handle
             end
             
             % Gather the fatigue loading into a structure
-            fatigueLoadingData = struct('S11', Sxx, 'S22', Syy, 'S33', Szz,...
+            fatigueDefinition = struct('S11', Sxx, 'S22', Syy, 'S33', Szz,...
                 'S12', Txy, 'S13', Txz, 'S23', Tyz,...
-                'mainID', mainID, 'subID', subID);
+                'labels', [mainID, subID]);
             
             if isappdata(0, 'SIGOriginalSignal') == 1.0
-                fatigueLoadingData.uniaxial = getappdata(0, 'SIGOriginalSignal');
-            else
-                fatigueLoadingData.uniaxial = Sxx; %#ok<STRNU>
+                fatigueDefinition.uniaxial = getappdata(0, 'SIGOriginalSignal');
             end
             
             % Save the structure as a .mat file
             try
-                save(sprintf('%s\\[J]%s_fd.mat', [pwd, '\Data\library'], jobName), 'fatigueLoadingData')
+                save(sprintf('%s\\[J]%s_fd.mat', [pwd, '\Data\library'], jobName), 'fatigueDefinition')
             catch exception
                 setappdata(0, 'warning_309_exception', exception.message)
                 messenger.writeMessage(309.0)
@@ -5952,11 +5950,11 @@ classdef preProcess < handle
             load(fld)
             
             % Add the nodal elimination data to the fatigue loading data
-            fatigueLoadingData.neData = struct('CI', coldItems, 'RI', removedItems, 'W', hotspotWarning); %#ok<STRNU>
+            fatigueDefinition.neData = struct('CI', coldItems, 'RI', removedItems, 'W', hotspotWarning); %#ok<STRNU>
             
             % Save the structure as a .mat file
             try
-                save(sprintf('%s\\[J]%s_fd.mat', [pwd, '\Data\library'], jobName), 'fatigueLoadingData')
+                save(sprintf('%s\\[J]%s_fd.mat', [pwd, '\Data\library'], jobName), 'fatigueDefinition')
             catch exception
                 setappdata(0, 'warning_309_exception', exception.message)
                 messenger.writeMessage(309.0)
@@ -5985,11 +5983,11 @@ classdef preProcess < handle
             load(fld)
             
             % Add the nodal elimination data to the fatigue loading data
-            fatigueLoadingData.invariants = struct('S1', S1, 'S2', S2, 'S3', S3, 'SIP', getappdata(0, 'stressInvariantParameter')); %#ok<STRNU>
+            fatigueDefinition.invariants = struct('S1', S1, 'S2', S2, 'S3', S3, 'SIP', getappdata(0, 'stressInvariantParameter')); %#ok<STRNU>
             
             % Save the structure as a .mat file
             try
-                save(sprintf('%s\\[J]%s_fd.mat', [pwd, '\Data\library'], jobName), 'fatigueLoadingData')
+                save(sprintf('%s\\[J]%s_fd.mat', [pwd, '\Data\library'], jobName), 'fatigueDefinition')
             catch exception
                 setappdata(0, 'warning_309_exception', exception.message)
                 messenger.writeMessage(309.0)
