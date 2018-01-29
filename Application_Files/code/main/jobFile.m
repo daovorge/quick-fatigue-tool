@@ -6,7 +6,7 @@ classdef jobFile < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 25-Jan-2018 13:39:46 GMT
+%   Last modified 29-Jan-2018 12:57:56 GMT
     
     %%
     
@@ -1805,7 +1805,8 @@ classdef jobFile < handle
             % If using Uniaxial Stress-Life, no scale & combine is necessary
             if dataCheck == 2.0
                 try
-                    load(sprintf('%s\\[J]%s_fd.mat', [pwd, '\Data\library'], getappdata(0, 'jobName')))
+                    fatigueDefinitionFile = sprintf('%s\\[J]%s_fd.mat', [pwd, '\Data\library'], getappdata(0, 'jobName'));
+                    load(fatigueDefinitionFile)
                     
                     Sxx = fatigueLoadingData.S11;
                     Syy = fatigueLoadingData.S22;
@@ -1821,6 +1822,10 @@ classdef jobFile < handle
                     
                     clear('fatigueLoadingData')
                     recoverFatigueLoading = 1.0;
+                    
+					% Inform user that the library was loaded successfully
+                    setappdata(0, 'message_312_fdf', fatigueDefinitionFile)
+                    messenger.writeMessage(312.0)
                 catch exception
                     recoverFatigueLoading = 0.0;
                     

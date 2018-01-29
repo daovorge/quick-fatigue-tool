@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 26-Jan-2018 10:11:00 GMT
+%   Last modified 29-Jan-2018 12:57:56 GMT
 
     %%
 
@@ -2286,6 +2286,9 @@ classdef messenger < handle
                         fprintf(fidType(i), ['-> Any changes to the model/loading definition or to the selected analysis algorithm may result in undesirable behaviour', returnType{i}]);
                         
                         setappdata(0, 'messageFileWarnings', 1.0)
+                    case 312.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The fatigue definition has been read from ''%s''', returnType{i}], getappdata(0, 'message_312_fdf'));
+                        fprintf(fidType(i), ['-> Dataset and history definitions in the job file will be ignored', returnType{i}]);
                 end
             end
         end
@@ -2344,7 +2347,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2018\r\n');
-            fprintf(fid, 'Last modified 26-Jan-2018 10:11:00 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 29-Jan-2018 12:57:56 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
