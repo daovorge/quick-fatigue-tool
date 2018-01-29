@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 25-Jan-2018 13:39:46 GMT
+%   Last modified 29-Jan-2018 14:44:35 GMT
     
     %%
     
@@ -2016,9 +2016,9 @@ classdef preProcess < handle
                     load(sprintf('%s\\[J]%s_fd.mat', [pwd, '\Data\library'], getappdata(0, 'jobName')))
                     neData = fatigueLoadingData.neData;
                     
-                    coldItems = neData.coldItems;
-                    removed = neData.removedItems;
-                    hotspotWarning = neData.hotspotWarning;
+                    coldItems = neData.CI;
+                    removed = neData.RI;
+                    hotspotWarning = neData.W;
                     
                     clear('fatigueLoadingData')
                     clear('neData')
@@ -5921,9 +5921,9 @@ classdef preProcess < handle
                 'mainID', mainID, 'subID', subID);
             
             if isappdata(0, 'SIGOriginalSignal') == 1.0
-                fatigueLoadingData.oldSignal = getappdata(0, 'SIGOriginalSignal');
+                fatigueLoadingData.uniaxial = getappdata(0, 'SIGOriginalSignal');
             else
-                fatigueLoadingData.oldSignal = Sxx; %#ok<STRNU>
+                fatigueLoadingData.uniaxial = Sxx; %#ok<STRNU>
             end
             
             % Save the structure as a .mat file
@@ -5952,7 +5952,7 @@ classdef preProcess < handle
             load(fld)
             
             % Add the nodal elimination data to the fatigue loading data
-            fatigueLoadingData.neData = struct('coldItems', coldItems, 'removedItems', removedItems, 'hotspotWarning', hotspotWarning); %#ok<STRNU>
+            fatigueLoadingData.neData = struct('CI', coldItems, 'RI', removedItems, 'W', hotspotWarning); %#ok<STRNU>
             
             % Save the structure as a .mat file
             try

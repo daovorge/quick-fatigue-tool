@@ -6,7 +6,7 @@ classdef jobFile < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 29-Jan-2018 12:57:56 GMT
+%   Last modified 29-Jan-2018 14:44:35 GMT
     
     %%
     
@@ -1815,7 +1815,7 @@ classdef jobFile < handle
                     Txz = fatigueLoadingData.S13;
                     Tyz = fatigueLoadingData.S23;
                     
-                    oldSignal = fatigueLoadingData.oldSignal;
+                    oldSignal = fatigueLoadingData.uniaxial;
                     
                     mainID = fatigueLoadingData.mainID;
                     subID = fatigueLoadingData.subID;
