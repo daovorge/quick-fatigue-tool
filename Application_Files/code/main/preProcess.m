@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 29-Jan-2018 14:44:35 GMT
+%   Last modified 30-Jan-2018 09:57:29 GMT
     
     %%
     
@@ -4233,7 +4233,7 @@ classdef preProcess < handle
         end
         
         %% Determine if an analysis item experiences plasticity
-        function [] = getPlasticItems(N, algorithm)
+        function [] = getPlasticItems(N, algorithm, fid_status)
             % Only find yielded items if requested
             yieldCriteria = getappdata(0, 'yieldCriteria');
             
@@ -4246,6 +4246,9 @@ classdef preProcess < handle
                 setappdata(0, 'warning_063', 0.0)
                 return
             end
+            
+            fprintf('\n[PRE] Evaluating yield criterion')
+            fprintf(fid_status, '\n[PRE] Evaluating yield criterion');
             
             % Get the number of groups for the analysis
             G = getappdata(0, 'numberOfGroups');
@@ -5920,9 +5923,13 @@ classdef preProcess < handle
                 'S12', Txy, 'S13', Txz, 'S23', Tyz,...
                 'labels', [mainID, subID]);
             
+            % Save the uniaxial load history if applicable
             if isappdata(0, 'SIGOriginalSignal') == 1.0
                 fatigueDefinition.uniaxial = getappdata(0, 'SIGOriginalSignal');
             end
+            
+            % Save the stress data type
+            fatigueDefinition.type = getappdata(0, 'dataLabel');
             
             % Save the structure as a .mat file
             try

@@ -11,7 +11,7 @@ function [] = main(flags)
 %   Author contact: louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 29-Jan-2018 14:44:35 GMT
+%   Last modified 30-Jan-2018 09:57:29 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');    tic_pre = tic;
@@ -43,7 +43,7 @@ setappdata(0, 'messageFileWarnings', 0.0)
 %% PRINT COMMAND WINDOW HEADER
 fprintf('[NOTICE] Quick Fatigue Tool 6.11-11')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2018)')
-fprintf('\n[NOTICE] Last modified 29-Jan-2018 14:44:35 GMT')
+fprintf('\n[NOTICE] Last modified 30-Jan-2018 09:57:29 GMT')
 
 cleanExit = 0.0;
 
@@ -373,7 +373,7 @@ end
 mscFileUtils.checkFRFDiagnosticItems(N)
 
 %% DETERMINE IF THE MODEL IS YIELDING
-preProcess.getPlasticItems(N, algorithm);
+preProcess.getPlasticItems(N, algorithm, fid_status);
 
 if getappdata(0, 'warning_066') == 1.0
     postProcess.writeYieldingItems(jobName, mainID, subID)
@@ -607,9 +607,9 @@ for groups = 1:G
         % Save workspace to file
         if any(debugItems == totalCounter) == 1.0
             if cacheOverlay == 1.0
-                fileName = 'qft_data.mat';
+                fileName = sprintf('[J]%s_data.mat', jobName);
             else
-                fileName = sprintf('qft_data_%.0f.mat', totalCounter);
+                fileName = sprintf('[J]%s_data_%.0f.mat', jobName, totalCounter);
             end
 
             % Save variables
@@ -1127,9 +1127,9 @@ messenger.writeLog(jobName, jobDescription, dataset, material,...
 % SAVE WORKSPACE TO FILE
 if any(debugItems == totalCounter) == 1.0
     if cacheOverlay == 1.0
-        fileName = 'qft_data.mat';
+        fileName = sprintf('[J]%s_data.mat', jobName);
     else
-        fileName = sprintf('qft_data_%.0f.mat', totalCounter);
+        fileName = sprintf('[J]%s_data_%.0f.mat', jobName, totalCounter);
     end
 
     % Save variables

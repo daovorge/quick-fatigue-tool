@@ -6,7 +6,7 @@ classdef jobFile < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 29-Jan-2018 14:44:35 GMT
+%   Last modified 30-Jan-2018 09:57:29 GMT
     
     %%
     
@@ -1808,6 +1808,7 @@ classdef jobFile < handle
                     fatigueDefinitionFile = sprintf('%s\\[J]%s_fd.mat', [pwd, '\Data\library'], getappdata(0, 'jobName'));
                     load(fatigueDefinitionFile)
                     
+                    % Recall the fatigue loading
                     Sxx = fatigueDefinition.S11;
                     Syy = fatigueDefinition.S22;
                     Szz = fatigueDefinition.S33;
@@ -1815,7 +1816,13 @@ classdef jobFile < handle
                     Txz = fatigueDefinition.S13;
                     Tyz = fatigueDefinition.S23;
                     
-                    oldSignal = fatigueDefinition.uniaxial;
+                    % Recall the uniaxial history if applicable
+                    if (algorithm == 3.0) || (algorithm == 10.0)
+                        oldSignal = fatigueDefinition.uniaxial;
+                    end
+                    
+                    % recall the stress data type
+                    setappdata(0, 'dataLabel', fatigueDefinition.type)
                     
                     mainID = fatigueDefinition.labels(:, 1.0);
                     subID = fatigueDefinition.labels(:, 2.0);
@@ -1906,7 +1913,7 @@ classdef jobFile < handle
             Txy = Txy*conversionFactor;    Tyz = Tyz*conversionFactor;    Txz = Txz*conversionFactor;
             
             % Apply unit conversion factor to the old signal for Uniaxial Stress-Life
-            if algorithm == 10.0 || algorithm == 3.0
+            if (algorithm == 10.0) || (algorithm == 3.0)
                 setappdata(0, 'SIGOriginalSignal', oldSignal*conversionFactor)
             end
             

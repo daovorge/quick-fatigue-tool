@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 29-Jan-2018 14:44:35 GMT
+%   Last modified 30-Jan-2018 09:57:29 GMT
 
     %%
 
@@ -2352,7 +2352,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2018\r\n');
-            fprintf(fid, 'Last modified 29-Jan-2018 14:44:35 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 30-Jan-2018 09:57:29 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
@@ -2541,7 +2541,7 @@ classdef messenger < handle
                 fprintf(fid, '    Stress Dataset: ''%s''\r\n', dataset);
             end
             dataLabel = getappdata(0, 'dataLabel');
-            if dataLabel(1.0) == 4.0 || dataLabel(1) == 5.0 || (dataLabel(1) == 6.0 && elementType == 1.0) || dataLabel(1) == 9.0 || dataLabel(1) == 10.0
+            if dataLabel(1.0) == 4.0 || dataLabel(1.0) == 5.0 || (dataLabel(1.0) == 6.0 && elementType == 1.0) || dataLabel(1.0) == 9.0 || dataLabel(1.0) == 10.0
                 fprintf(fid, '    Allow Datasets with Plane Stress Elements: YES\r\n');
                 if dataLabel(1.0) == 9.0 || dataLabel(1.0) == 10.0
                     if getappdata(0, 'shellLocation') == 1.0
