@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 30-Jan-2018 09:57:29 GMT
+%   Last modified 30-Jan-2018 13:52:26 GMT
     
     %%
     
@@ -2011,9 +2011,9 @@ classdef preProcess < handle
                 specified, load the previous nodal elimination data
                 instead.
             %}
-            if dataCheck == 2.0
+            if (ischar(dataCheck) == 1.0) || (dataCheck == 2.0)
                 try
-                    load(sprintf('%s\\[J]%s_fd.mat', [pwd, '\Data\library'], getappdata(0, 'jobName')))
+                    load(getappdata(0, 'fatigueDefinitionFile'))
                     neData = fatigueDefinition.neData;
                     
                     coldItems = neData.CI;
@@ -3979,9 +3979,9 @@ classdef preProcess < handle
                 If a fatigue loading file exists and a recall analysis is
                 specified, load the previous invariants instead.
             %}
-            if dataCheck == 2.0
+            if (ischar(dataCheck) == 1.0) || (dataCheck == 2.0)
                 try
-                    load(sprintf('%s\\[J]%s_fd.mat', [pwd, '\Data\library'], getappdata(0, 'jobName')))
+                    load(getappdata(0, 'fatigueDefinitionFile'))
                     invariants = fatigueDefinition.invariants;
                     
                     setappdata(0, 'S1', invariants.S1)

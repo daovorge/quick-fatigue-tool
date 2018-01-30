@@ -17,7 +17,7 @@ function [] = template_job()
 %      1 Job file options
 %   
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 24-Jan-2018 15:17:50 GMT
+%   Last modified 30-Jan-2018 13:52:26 GMT
 
 %% 1: JOB
 
@@ -30,7 +30,8 @@ CONTINUE_FROM = '';
 %{
     0: Full analysis
     1: Datacheck analysis
-    2: Use fatigue definition from library
+    2: Use fatigue definition from job name
+    'file-name.mat': Specify fatigue definition file
 %}
 DATA_CHECK = 0.0;
 

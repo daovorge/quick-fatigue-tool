@@ -6,7 +6,7 @@ classdef jobFile < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 30-Jan-2018 09:57:29 GMT
+%   Last modified 30-Jan-2018 13:52:26 GMT
     
     %%
     
@@ -89,10 +89,16 @@ classdef jobFile < handle
                 return
             end
             
-            if (isempty(dataCheck) == 1.0) || (ischar(dataCheck) == 1.0)
+            if isempty(dataCheck) == 1.0
                 dataCheck = 0.0;
                 setappdata(0, 'dataCheck', dataCheck)
-            elseif (dataCheck ~= 0.0) && (dataCheck ~= 1.0) && (dataCheck ~= 2.0)
+            elseif (ischar(dataCheck) == 1.0) && (exist(dataCheck, 'file') ~= 2.0)
+                error = 1.0;
+                
+                fprintf('[ERROR] The value of DATA_CHECK (''%s'') is not a valid fatigue definition file\n', dataCheck)
+                fprintf('-> For instructions on specifying fatigue definition files, please consult Section 4.5.7 of the Quick Fatigue Tool User Guide\n');
+                return
+            elseif (isnumeric(dataCheck) == 1.0) && ((dataCheck ~= 0.0) && (dataCheck ~= 1.0) && (dataCheck ~= 2.0))
                 dataCheck = 0.0;
                 setappdata(0, 'dataCheck', dataCheck)
             end
@@ -506,7 +512,7 @@ classdef jobFile < handle
                         if (isempty(matchingMode) == 1.0) || (length(matchingMode) ~= 1.0)
                             % The result position could not be found in the library
                             error = 1.0;
-                            fprintf('[ERROR] The value of FAILURE_MODE (''%s'') is not recognized\n', failureMode)
+                            fprintf('[ERROR] The value of FAILURE_MODE (''%s'') was not recognized\n', failureMode)
                             fprintf('-> A list of available weld failure modes can be found in Section 1.2.12 of the Quick Fatigue Tool User Settings Reference Guide\n');
                             return
                         elseif length(failureWords{matchingMode}) ~= length(failureMode)
@@ -1803,9 +1809,14 @@ classdef jobFile < handle
             setappdata(0, 'incorrectItemList', 0.0)
             
             % If using Uniaxial Stress-Life, no scale & combine is necessary
-            if dataCheck == 2.0
+            if (ischar(dataCheck) == 1.0) || (dataCheck == 2.0)
                 try
-                    fatigueDefinitionFile = sprintf('%s\\[J]%s_fd.mat', [pwd, '\Data\library'], getappdata(0, 'jobName'));
+                    if ischar(dataCheck) == 1.0
+                        fatigueDefinitionFile = dataCheck;
+                    else
+                        fatigueDefinitionFile = sprintf('%s\\[J]%s_fd.mat', [pwd, '\Data\library'], getappdata(0, 'jobName'));
+                    end
+                    
                     load(fatigueDefinitionFile)
                     
                     % Recall the fatigue loading
@@ -1833,6 +1844,9 @@ classdef jobFile < handle
 					% Inform user that the library was loaded successfully
                     setappdata(0, 'message_312_fdf', fatigueDefinitionFile)
                     messenger.writeMessage(312.0)
+                    
+                    % Save the name of the fatigue definition file 
+                    setappdata(0, 'fatigueDefinitionFile', fatigueDefinitionFile)
                 catch exception
                     recoverFatigueLoading = 0.0;
                     

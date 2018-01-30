@@ -6,7 +6,7 @@ function [] = flushMaterial()
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 29-Jan-2018 14:44:35 GMT
+%   Last modified 30-Jan-2018 13:52:26 GMT
     
     %%
     
@@ -238,4 +238,7 @@ if isappdata(0, 'Tyz') == 1.0
 end
 if isappdata(0, 'SIGOriginalSignal') == 1.0
     rmappdata(0, 'SIGOriginalSignal')
+end
+if isappdata(0, 'fatigueDefinitionFile') == 1.0
+    rmappdata(0, 'fatigueDefinitionFile')
 end
