@@ -730,32 +730,129 @@ classdef postProcess < handle
             %%
             proportionalItems = getappdata(0, 'proportionalItems');
             
-            if proportionalItems(worstItem) == 0.0
-                %% CN (Normal stress on critical plane)
-                Sxx = getappdata(0, 'worstNodeSxx');
+            %% CN (Normal stress on critical plane)
+            normalOnCP = getappdata(0, 'CN');
+            shearOnCP = getappdata(0, 'CS');
+            
+            if getappdata(0, 'figure_CNS') == 1.0 && outputFigure == 1.0
+                if (algorithm == 10.0) || (algorithm == 7.0) || proportionalItems(worstItem) == 1.0
+                    msg = sprintf('CN, Maximum normal stress history for item %.0f.%.0f', mainID, subID);
+                else
+                    msg = sprintf('CN, Maximum normal stress history on critical plane for item %.0f.%.0f', mainID, subID);
+                end
                 
-                if getappdata(0, 'figure_CNS') == 1.0 && outputFigure == 1.0
-                    if algorithm == 10.0
-                        normalOnCP = 0.5*Sxx;
-                        setappdata(0, 'CN', normalOnCP);
-                        msg = sprintf('CN, Maximum normal (hydrostatic) stress history for item %.0f.%.0f', mainID, subID);
-                    elseif algorithm == 7.0
-                        normalOnCP = getappdata(0, 'CN');
-                        msg = sprintf('CN, Maximum normal (hydrostatic) stress history for item %.0f.%.0f', mainID, subID);
-                    else
-                        normalOnCP = getappdata(0, 'CN');
-                        msg = sprintf('CN, Maximum normal stress history on critical plane for item %.0f.%.0f', mainID, subID);
+                f5 = figure('visible', figureVisibility);
+                subplot(2.0, 1.0, 1.0)
+                plot(normalOnCP, '-', 'LineWidth', lineWidth, 'Color', fireBrick)
+                
+                ylabel('Stress [MPa]', 'FontSize', fontY)
+                title(msg, 'FontSize', fontTitle)
+                set(gca, 'FontSize', fontTicks)
+                set(gca, 'XTick', linspace(1.0, L, XTickPartition + 1.0))
+                set(gca, 'XTickLabel', round(linspace(1.0, L, XTickPartition + 1.0)));
+                
+                try
+                    axis tight
+                catch
+                    % Don't tighten the axis
+                end
+                
+                if strcmpi(gridLines, 'on') == 1.0 || str2double(gridLines) == 1.0
+                    grid on
+                end
+                
+                %% CS (Shear stress on critical plane)
+                if (algorithm == 10.0) || (algorithm == 7.0) || proportionalItems(worstItem) == 1.0
+                    msg = sprintf('CS, Maximum shear (Tresca) stress history for item %.0f.%.0f', mainID, subID);
+                    figureTitle = 'MATLAB Figures/CN + CS, Normal and shear stress at worst item';
+                else
+                    msg = sprintf('CS, Maximum shear stress history on critical plane for item %.0f.%.0f', mainID, subID);
+                    figureTitle = 'MATLAB Figures/CN + CS, Normal and shear stress on critical plane at worst item';
+                end
+                
+                subplot(2.0, 1.0, 2.0)
+                plot(shearOnCP, '-', 'LineWidth', lineWidth, 'Color', forestGreen)
+                
+                xlabel('Sample', 'FontSize', fontX);
+                ylabel('Stress [MPa]', 'FontSize', fontY)
+                title(msg, 'FontSize', fontTitle)
+                set(gca, 'FontSize', fontTicks)
+                set(gca, 'XTick', linspace(1.0, L, XTickPartition + 1.0))
+                set(gca, 'XTickLabel', round(linspace(1.0, L, XTickPartition + 1.0)));
+                
+                try
+                    axis tight
+                catch
+                    % Don't tighten the axis
+                end
+                
+                if strcmpi(gridLines, 'on') == 1.0 || str2double(gridLines) == 1.0
+                    grid on
+                end
+                
+                dir = [root, figureTitle];
+                saveas(f5, dir, figureFormat)
+                if strcmpi(figureFormat, 'fig') == true
+                    postProcess.makeVisible([dir, '.fig'])
+                end
+            end
+            
+            if (algorithm < 7.0) && (algorithm ~= 10.0) && (proportionalItems(worstItem) == 0.0)
+                thetaOnCP = getappdata(0, 'thetaOnCP');
+                
+                figureFormat = getappdata(0, 'figureFormat');
+                
+                root = getappdata(0, 'outputDirectory');
+                
+                midnightBlue = [25/255, 25/255, 112/255];
+                lineWidth = getappdata(0, 'defaultLineWidth');
+                fontX = getappdata(0, 'defaultFontSize_XAxis');
+                fontY = getappdata(0, 'defaultFontSize_YAxis');
+                fontTitle = getappdata(0, 'defaultFontSize_Title');
+                fontTicks = getappdata(0, 'defaultFontSize_Ticks');
+                gridLines = getappdata(0, 'gridLines');
+                
+                mainID = getappdata(0, 'worstMainID');
+                subID = getappdata(0, 'worstSubID');
+                
+                smoothness = getappdata(0, 'cpSample');
+                if isempty(smoothness)
+                    smoothness = 1.0;
+                elseif isnumeric(smoothness) == 0.0
+                    smoothness = 1.0;
+                elseif isnan(smoothness) || isreal(smoothness) == 0.0 || ...
+                        isinf(smoothness) || isreal(smoothness) == 0.0
+                    smoothness = 1.0;
+                end
+                
+                damageParameter = getappdata(0, 'worstNodeDamageParamCube');
+                damage = getappdata(0, 'worstNodeDamageCube');
+                
+                step = getappdata(0, 'stepSize');
+                
+                %% DPP-THETA (Damage parameter vs THETA)
+                
+                setappdata(0, 'DPT', damageParameter)
+                
+                if outputFigure == 1.0 && getappdata(0, 'figure_DPP') == 1.0
+                    f6 = figure('visible', figureVisibility);
+                    
+                    % Smooth the data
+                    if length(damageParameter) > 9.0 && (max(damageParameter) - min(damageParameter)) ~= 0.0 && smoothness > 1.0 && smoothness > 0.0
+                        damageParameter = interp(damageParameter, smoothness);
                     end
+                    x = linspace(0.0, 180.0, length(damageParameter));
                     
-                    f5 = figure('visible', figureVisibility);
-                    subplot(2.0, 1.0, 1.0)
-                    plot(normalOnCP, '-', 'LineWidth', lineWidth, 'Color', fireBrick)
+                    plot(x, damageParameter, '-', 'LineWidth', lineWidth, 'Color', midnightBlue);  hold on
+                    scatter(thetaOnCP, damageParameter((thetaOnCP+step)/step), 40, 'MarkerEdgeColor', [0.745, 0.0, 0.0],...
+                        'MarkerFaceColor', [1.0, 0.1, 0.1], 'LineWidth', 1.5);
                     
-                    ylabel('Stress [MPa]', 'FontSize', fontY)
+                    msg = sprintf('DPP-THETA, Damage parameter vs theta for item %.0f.%.0f', mainID, subID);
+                    xlabel('Angle [deg]', 'FontSize', fontX)
+                    ylabel('Damage parameter [MPa]', 'FontSize', fontY)
                     title(msg, 'FontSize', fontTitle)
                     set(gca, 'FontSize', fontTicks)
-                    set(gca, 'XTick', linspace(1.0, L, XTickPartition + 1.0))
-                    set(gca, 'XTickLabel', round(linspace(1.0, L, XTickPartition + 1.0)));
+                    set(gca, 'XTickLabel', 0:45:180);  set(gca, 'XTick', 0:45:180)
                     
                     try
                         axis tight
@@ -767,144 +864,126 @@ classdef postProcess < handle
                         grid on
                     end
                     
-                    %% CS (Shear stress on critical plane)
-                    if algorithm == 10.0
-                        shearOnCP = 0.5*(abs(Sxx));
-                        setappdata(0, 'CS', shearOnCP);
-                        msg = sprintf('CS, Maximum shear (Tresca) stress history for item %.0f.%.0f', mainID, subID);
-                        figureTitle = 'MATLAB Figures/CN + CS, Normal and shear stress at worst item';
-                    elseif algorithm == 7.0
-                        shearOnCP = getappdata(0, 'CS');
-                        msg = sprintf('CS, Maximum shear (Tresca) stress history for item %.0f.%.0f', mainID, subID);
-                        figureTitle = 'MATLAB Figures/CN + CS, Normal and shear stress at worst item';
-                    else
-                        shearOnCP = getappdata(0, 'CS');
-                        msg = sprintf('CS, Maximum shear stress history on critical plane for item %.0f.%.0f', mainID, subID);
-                        figureTitle = 'MATLAB Figures/CN + CS, Normal and shear stress on critical plane at worst item';
-                    end
-                    
-                    subplot(2.0, 1.0, 2.0)
-                    plot(shearOnCP, '-', 'LineWidth', lineWidth, 'Color', forestGreen)
-                    
-                    xlabel('Sample', 'FontSize', fontX);
-                    ylabel('Stress [MPa]', 'FontSize', fontY)
-                    title(msg, 'FontSize', fontTitle)
-                    set(gca, 'FontSize', fontTicks)
-                    set(gca, 'XTick', linspace(1.0, L, XTickPartition + 1.0))
-                    set(gca, 'XTickLabel', round(linspace(1.0, L, XTickPartition + 1.0)));
-                    
-                    try
-                        axis tight
-                    catch
-                        % Don't tighten the axis
-                    end
-                    
-                    if strcmpi(gridLines, 'on') == 1.0 || str2double(gridLines) == 1.0
-                        grid on
-                    end
-                    
-                    dir = [root, figureTitle];
-                    saveas(f5, dir, figureFormat)
+                    dir = [root, 'MATLAB Figures/DPP, Damage parameter vs angle at worst item'];
+                    saveas(f6, dir, figureFormat)
                     if strcmpi(figureFormat, 'fig') == true
                         postProcess.makeVisible([dir, '.fig'])
                     end
                 end
                 
-                if (algorithm < 7.0) && (algorithm ~= 10.0)
-                    thetaOnCP = getappdata(0, 'thetaOnCP');
+                %% DP-THETA (Damage vs THETA)
+                setappdata(0, 'DT', damage)
+                
+                if outputFigure == 1.0 && getappdata(0, 'figure_DP') == 1.0
+                    f7 = figure('visible', figureVisibility);
                     
-                    figureFormat = getappdata(0, 'figureFormat');
+                    % Smooth the data
+                    if length(damage) > 9.0 && (max(damage) - min(damage)) ~= 0.0 && smoothness > 0.0
+                        damageTheta2 = interp(damage, smoothness);
+                    else
+                        damageTheta2 = damage;
+                    end
+                    x = linspace(0.0, 180.0, length(damageTheta2));
                     
-                    root = getappdata(0, 'outputDirectory');
+                    plot(x, damageTheta2, '-', 'LineWidth', lineWidth, 'Color', midnightBlue);  hold on
+                    scatter(thetaOnCP, damageTheta2((thetaOnCP+step)/step), 40, 'MarkerEdgeColor', [0.745, 0.0, 0.0],...
+                        'MarkerFaceColor', [1.0, 0.1, 0.1], 'LineWidth', 1.5);
                     
-                    midnightBlue = [25/255, 25/255, 112/255];
-                    lineWidth = getappdata(0, 'defaultLineWidth');
-                    fontX = getappdata(0, 'defaultFontSize_XAxis');
-                    fontY = getappdata(0, 'defaultFontSize_YAxis');
-                    fontTitle = getappdata(0, 'defaultFontSize_Title');
-                    fontTicks = getappdata(0, 'defaultFontSize_Ticks');
-                    gridLines = getappdata(0, 'gridLines');
+                    msg = sprintf('DP-THETA, Damage vs theta for item %.0f.%.0f', mainID, subID);
+                    xlabel('Angle [deg]', 'FontSize', fontX)
+                    ylabel(sprintf('Damage [1/%s]', loadEqUnits), 'FontSize', fontY)
+                    title(msg, 'FontSize', fontTitle)
+                    set(gca, 'FontSize', fontTicks)
+                    set(gca, 'XTickLabel', 0:45:180);  set(gca, 'XTick', 0:45:180)
                     
-                    mainID = getappdata(0, 'worstMainID');
-                    subID = getappdata(0, 'worstSubID');
-                    
-                    smoothness = getappdata(0, 'cpSample');
-                    if isempty(smoothness)
-                        smoothness = 1.0;
-                    elseif isnumeric(smoothness) == 0.0
-                        smoothness = 1.0;
-                    elseif isnan(smoothness) || isreal(smoothness) == 0.0 || ...
-                            isinf(smoothness) || isreal(smoothness) == 0.0
-                        smoothness = 1.0;
+                    try
+                        axis tight
+                    catch
+                        % Don't tighten the axis
                     end
                     
-                    damageParameter = getappdata(0, 'worstNodeDamageParamCube');
-                    damage = getappdata(0, 'worstNodeDamageCube');
+                    if strcmpi(gridLines, 'on') == 1.0 || str2double(gridLines) == 1.0
+                        grid on
+                    end
                     
-                    step = getappdata(0, 'stepSize');
+                    dir = [root, 'MATLAB Figures/DP, Damage vs angle at worst item'];
+                    saveas(f7, dir, figureFormat)
+                    if strcmpi(figureFormat, 'fig') == true
+                        postProcess.makeVisible([dir, '.fig'])
+                    end
+                end
+                
+                %% LP-THETA (Life vs THETA)
+                
+                lifeTheta = 1.0./damage;
+                
+                setappdata(0, 'LT', lifeTheta)
+                
+                if outputFigure == 1.0 && getappdata(0, 'figure_LP') == 1.0
+                    f8 = figure('visible', figureVisibility);
                     
-                    %% DPP-THETA (Damage parameter vs THETA)
+                    % Smooth the data
+                    if length(lifeTheta) > 9.0 && (max(lifeTheta) - min(lifeTheta)) ~= 0.0 && smoothness > 0.0
+                        lifeTheta = interp(lifeTheta, smoothness);
+                    end
+                    x = linspace(0.0, 180.0, length(lifeTheta));
                     
-                    setappdata(0, 'DPT', damageParameter)
+                    plot(x, lifeTheta, '-', 'LineWidth', lineWidth, 'Color', midnightBlue);  hold on
+                    scatter(thetaOnCP, lifeTheta((thetaOnCP+step)/step), 40, 'MarkerEdgeColor', [0.745, 0.0, 0.0],...
+                        'MarkerFaceColor', [1.0, 0.1, 0.1], 'LineWidth', 1.5);
                     
-                    if outputFigure == 1.0 && getappdata(0, 'figure_DPP') == 1.0
-                        f6 = figure('visible', figureVisibility);
+                    msg = sprintf('LP-THETA, Life vs theta for item %.0f.%.0f', mainID, subID);
+                    xlabel('Angle [deg]', 'FontSize', fontX)
+                    ylabel(sprintf('Life [%s]', loadEqUnits), 'FontSize', fontY)
+                    title(msg, 'FontSize', fontTitle)
+                    set(gca, 'FontSize', fontTicks)
+                    set(gca, 'XTickLabel', 0:45:180);  set(gca, 'XTick', 0:45:180)
+                    
+                    try
+                        axis tight
+                    catch
+                        % Don't tighten the axis
+                    end
+                    
+                    if strcmpi(gridLines, 'on') == 1.0 || str2double(gridLines) == 1.0
+                        grid on
+                    end
+                    
+                    dir = [root, 'MATLAB Figures/LP, Life vs angle at worst item'];
+                    saveas(f8, dir, figureFormat)
+                    if strcmpi(figureFormat, 'fig') == true
+                        postProcess.makeVisible([dir, '.fig'])
+                    end
+                end
+                
+                %% SHEAR/NORMAL STRESS VS THETA
+                
+                if outputFigure == 1.0
+                    if getappdata(0, 'figure_CPS') == 1.0
+                        %% SHEAR STRESS VS THETA
+                        f9 = figure('visible', figureVisibility);
+                        
+                        shearStress = getappdata(0, 'shear_cp');
                         
                         % Smooth the data
-                        if length(damageParameter) > 9.0 && (max(damageParameter) - min(damageParameter)) ~= 0.0 && smoothness > 1.0 && smoothness > 0.0
-                            damageParameter = interp(damageParameter, smoothness);
+                        if length(shearStress) > 9.0 && any(isinf(shearStress)) == 0.0 && (max(shearStress) - min(shearStress)) ~= 0.0 && smoothness > 0.0
+                            shearStress = interp(shearStress, smoothness);
                         end
-                        x = linspace(0.0, 180.0, length(damageParameter));
+                        x = linspace(0.0, 180.0, length(shearStress));
                         
-                        plot(x, damageParameter, '-', 'LineWidth', lineWidth, 'Color', midnightBlue);  hold on
-                        scatter(thetaOnCP, damageParameter((thetaOnCP+step)/step), 40, 'MarkerEdgeColor', [0.745, 0.0, 0.0],...
+                        subplot(2.0, 1.0, 1.0)
+                        plot(x, shearStress, '-', 'LineWidth', lineWidth, 'Color', midnightBlue);  hold on
+                        scatter(thetaOnCP, shearStress((thetaOnCP+step)/step), 40, 'MarkerEdgeColor', [0.745, 0.0, 0.0],...
                             'MarkerFaceColor', [1.0, 0.1, 0.1], 'LineWidth', 1.5);
                         
-                        msg = sprintf('DPP-THETA, Damage parameter vs theta for item %.0f.%.0f', mainID, subID);
-                        xlabel('Angle [deg]', 'FontSize', fontX)
-                        ylabel('Damage parameter [MPa]', 'FontSize', fontY)
-                        title(msg, 'FontSize', fontTitle)
-                        set(gca, 'FontSize', fontTicks)
-                        set(gca, 'XTickLabel', 0:45:180);  set(gca, 'XTick', 0:45:180)
-                        
-                        try
-                            axis tight
-                        catch
-                            % Don't tighten the axis
-                        end
-                        
-                        if strcmpi(gridLines, 'on') == 1.0 || str2double(gridLines) == 1.0
-                            grid on
-                        end
-                        
-                        dir = [root, 'MATLAB Figures/DPP, Damage parameter vs angle at worst item'];
-                        saveas(f6, dir, figureFormat)
-                        if strcmpi(figureFormat, 'fig') == true
-                            postProcess.makeVisible([dir, '.fig'])
-                        end
-                    end
-                    
-                    %% DP-THETA (Damage vs THETA)
-                    setappdata(0, 'DT', damage)
-                    
-                    if outputFigure == 1.0 && getappdata(0, 'figure_DP') == 1.0
-                        f7 = figure('visible', figureVisibility);
-                        
-                        % Smooth the data
-                        if length(damage) > 9.0 && (max(damage) - min(damage)) ~= 0.0 && smoothness > 0.0
-                            damageTheta2 = interp(damage, smoothness);
+                        if getappdata(0, 'cpShearStress') == 1.0
+                            msg = sprintf('CPS-THETA, Maximum shear stress vs theta for item %.0f.%.0f', mainID, subID);
                         else
-                            damageTheta2 = damage;
+                            msg = sprintf('CPS-THETA, Resultant shear stress vs theta for item %.0f.%.0f', mainID, subID);
                         end
-                        x = linspace(0.0, 180.0, length(damageTheta2));
                         
-                        plot(x, damageTheta2, '-', 'LineWidth', lineWidth, 'Color', midnightBlue);  hold on
-                        scatter(thetaOnCP, damageTheta2((thetaOnCP+step)/step), 40, 'MarkerEdgeColor', [0.745, 0.0, 0.0],...
-                            'MarkerFaceColor', [1.0, 0.1, 0.1], 'LineWidth', 1.5);
-                        
-                        msg = sprintf('DP-THETA, Damage vs theta for item %.0f.%.0f', mainID, subID);
                         xlabel('Angle [deg]', 'FontSize', fontX)
-                        ylabel(sprintf('Damage [1/%s]', loadEqUnits), 'FontSize', fontY)
+                        ylabel('Stress [MPa]', 'FontSize', fontY)
                         title(msg, 'FontSize', fontTitle)
                         set(gca, 'FontSize', fontTicks)
                         set(gca, 'XTickLabel', 0:45:180);  set(gca, 'XTick', 0:45:180)
@@ -918,36 +997,26 @@ classdef postProcess < handle
                         if strcmpi(gridLines, 'on') == 1.0 || str2double(gridLines) == 1.0
                             grid on
                         end
-                        
-                        dir = [root, 'MATLAB Figures/DP, Damage vs angle at worst item'];
-                        saveas(f7, dir, figureFormat)
-                        if strcmpi(figureFormat, 'fig') == true
-                            postProcess.makeVisible([dir, '.fig'])
-                        end
                     end
                     
-                    %% LP-THETA (Life vs THETA)
-                    
-                    lifeTheta = 1.0./damage;
-                    
-                    setappdata(0, 'LT', lifeTheta)
-                    
-                    if outputFigure == 1.0 && getappdata(0, 'figure_LP') == 1.0
-                        f8 = figure('visible', figureVisibility);
+                    if getappdata(0, 'figure_CPN') == 1.0
+                        %% NORMAL STRESS VS THETA
+                        normalStress = getappdata(0, 'normal_cp');
                         
                         % Smooth the data
-                        if length(lifeTheta) > 9.0 && (max(lifeTheta) - min(lifeTheta)) ~= 0.0 && smoothness > 0.0
-                            lifeTheta = interp(lifeTheta, smoothness);
+                        if length(normalStress) > 9.0 && any(isinf(normalStress)) == 0.0 && (max(normalStress) - min(normalStress)) ~= 0.0 && smoothness > 0.0
+                            normalStress = interp(normalStress, smoothness);
                         end
-                        x = linspace(0.0, 180.0, length(lifeTheta));
+                        x = linspace(0.0, 180.0, length(normalStress));
                         
-                        plot(x, lifeTheta, '-', 'LineWidth', lineWidth, 'Color', midnightBlue);  hold on
-                        scatter(thetaOnCP, lifeTheta((thetaOnCP+step)/step), 40, 'MarkerEdgeColor', [0.745, 0.0, 0.0],...
+                        subplot(2.0, 1.0, 2.0)
+                        plot(x, normalStress, '-', 'LineWidth', lineWidth, 'Color', midnightBlue);  hold on
+                        scatter(thetaOnCP, normalStress((thetaOnCP+step)/step), 40, 'MarkerEdgeColor', [0.745, 0.0, 0.0],...
                             'MarkerFaceColor', [1.0, 0.1, 0.1], 'LineWidth', 1.5);
                         
-                        msg = sprintf('LP-THETA, Life vs theta for item %.0f.%.0f', mainID, subID);
+                        msg = sprintf('CPN-THETA, Normal stress vs theta for item %.0f.%.0f', mainID, subID);
                         xlabel('Angle [deg]', 'FontSize', fontX)
-                        ylabel(sprintf('Life [%s]', loadEqUnits), 'FontSize', fontY)
+                        ylabel('Stress [MPa]', 'FontSize', fontY)
                         title(msg, 'FontSize', fontTitle)
                         set(gca, 'FontSize', fontTicks)
                         set(gca, 'XTickLabel', 0:45:180);  set(gca, 'XTick', 0:45:180)
@@ -962,93 +1031,10 @@ classdef postProcess < handle
                             grid on
                         end
                         
-                        dir = [root, 'MATLAB Figures/LP, Life vs angle at worst item'];
-                        saveas(f8, dir, figureFormat)
+                        dir = [root, 'MATLAB Figures/CPS, Critical plane stresses vs angle at worst item'];
+                        saveas(f9, dir, figureFormat)
                         if strcmpi(figureFormat, 'fig') == true
                             postProcess.makeVisible([dir, '.fig'])
-                        end
-                    end
-                    
-                    %% SHEAR/NORMAL STRESS VS THETA
-                    
-                    if outputFigure == 1.0
-                        if getappdata(0, 'figure_CPS') == 1.0
-                            %% SHEAR STRESS VS THETA
-                            f9 = figure('visible', figureVisibility);
-                            
-                            shearStress = getappdata(0, 'shear_cp');
-                            
-                            % Smooth the data
-                            if length(shearStress) > 9.0 && any(isinf(shearStress)) == 0.0 && (max(shearStress) - min(shearStress)) ~= 0.0 && smoothness > 0.0
-                                shearStress = interp(shearStress, smoothness);
-                            end
-                            x = linspace(0.0, 180.0, length(shearStress));
-                            
-                            subplot(2.0, 1.0, 1.0)
-                            plot(x, shearStress, '-', 'LineWidth', lineWidth, 'Color', midnightBlue);  hold on
-                            scatter(thetaOnCP, shearStress((thetaOnCP+step)/step), 40, 'MarkerEdgeColor', [0.745, 0.0, 0.0],...
-                                'MarkerFaceColor', [1.0, 0.1, 0.1], 'LineWidth', 1.5);
-                            
-                            if getappdata(0, 'cpShearStress') == 1.0
-                                msg = sprintf('CPS-THETA, Maximum shear stress vs theta for item %.0f.%.0f', mainID, subID);
-                            else
-                                msg = sprintf('CPS-THETA, Resultant shear stress vs theta for item %.0f.%.0f', mainID, subID);
-                            end
-                            
-                            xlabel('Angle [deg]', 'FontSize', fontX)
-                            ylabel('Stress [MPa]', 'FontSize', fontY)
-                            title(msg, 'FontSize', fontTitle)
-                            set(gca, 'FontSize', fontTicks)
-                            set(gca, 'XTickLabel', 0:45:180);  set(gca, 'XTick', 0:45:180)
-                            
-                            try
-                                axis tight
-                            catch
-                                % Don't tighten the axis
-                            end
-                            
-                            if strcmpi(gridLines, 'on') == 1.0 || str2double(gridLines) == 1.0
-                                grid on
-                            end
-                        end
-                        
-                        if getappdata(0, 'figure_CPN') == 1.0
-                            %% NORMAL STRESS VS THETA
-                            normalStress = getappdata(0, 'normal_cp');
-                            
-                            % Smooth the data
-                            if length(normalStress) > 9.0 && any(isinf(normalStress)) == 0.0 && (max(normalStress) - min(normalStress)) ~= 0.0 && smoothness > 0.0
-                                normalStress = interp(normalStress, smoothness);
-                            end
-                            x = linspace(0.0, 180.0, length(normalStress));
-                            
-                            subplot(2.0, 1.0, 2.0)
-                            plot(x, normalStress, '-', 'LineWidth', lineWidth, 'Color', midnightBlue);  hold on
-                            scatter(thetaOnCP, normalStress((thetaOnCP+step)/step), 40, 'MarkerEdgeColor', [0.745, 0.0, 0.0],...
-                                'MarkerFaceColor', [1.0, 0.1, 0.1], 'LineWidth', 1.5);
-                            
-                            msg = sprintf('CPN-THETA, Normal stress vs theta for item %.0f.%.0f', mainID, subID);
-                            xlabel('Angle [deg]', 'FontSize', fontX)
-                            ylabel('Stress [MPa]', 'FontSize', fontY)
-                            title(msg, 'FontSize', fontTitle)
-                            set(gca, 'FontSize', fontTicks)
-                            set(gca, 'XTickLabel', 0:45:180);  set(gca, 'XTick', 0:45:180)
-                            
-                            try
-                                axis tight
-                            catch
-                                % Don't tighten the axis
-                            end
-                            
-                            if strcmpi(gridLines, 'on') == 1.0 || str2double(gridLines) == 1.0
-                                grid on
-                            end
-                            
-                            dir = [root, 'MATLAB Figures/CPS, Critical plane stresses vs angle at worst item'];
-                            saveas(f9, dir, figureFormat)
-                            if strcmpi(figureFormat, 'fig') == true
-                                postProcess.makeVisible([dir, '.fig'])
-                            end
                         end
                     end
                 end
@@ -1088,7 +1074,7 @@ classdef postProcess < handle
                             l1 = line([crossing(1.0), crossing(1.0)], [0.0, 1.0], 'lineWidth', lineWidth);
                             legend(l1, 'Infinite Life Envelope')
                         end
-
+                        
                         msg = sprintf('DAC, Cumulative damage for item %.0f.%.0f', mainID, subID);
                         xlabel('Cycle', 'FontSize', fontX)
                         ylabel('Normalised Damage', 'FontSize', fontY)
