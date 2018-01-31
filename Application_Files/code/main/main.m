@@ -11,7 +11,7 @@ function [] = main(flags)
 %   Author contact: louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 30-Jan-2018 13:52:26 GMT
+%   Last modified 31-Jan-2018 10:48:44 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');    tic_pre = tic;
@@ -43,7 +43,7 @@ setappdata(0, 'messageFileWarnings', 0.0)
 %% PRINT COMMAND WINDOW HEADER
 fprintf('[NOTICE] Quick Fatigue Tool 6.11-11')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2018)')
-fprintf('\n[NOTICE] Last modified 30-Jan-2018 13:52:26 GMT')
+fprintf('\n[NOTICE] Last modified 31-Jan-2018 10:48:44 GMT')
 
 cleanExit = 0.0;
 
@@ -239,9 +239,7 @@ if recoverFatigueLoading == 0.0
 end
 
 %% DETECT SURFACE ITAMS IF APPLICABLE
-if (algorithm ~= 10.0) && (algorithm ~= 3.0)
-    [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz, fid_status);
-end
+[mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz, fid_status, algorithm);
 
 %% WARN THE USER IF THERE ARE DUPLICATE ITEMS IN THE MODEL
 preProcess.checkDuplicateItems(N, mainID, subID)
@@ -921,7 +919,7 @@ if ((outputHistory == 1.0) || (outputField == 1.0) || (outputFigure == 1.0)) && 
 
     switch algorithm
         case 3.0 % UNIAXIAL STRAIN-LIFE
-            algorithm_uel.worstItemAnalysis(signalLength, nodalAmplitudes, nodalAmplitudes_strain, nodalPairs, nodalPairs_strain)
+            algorithm_uel.worstItemAnalysis(nodalAmplitudes, nodalAmplitudes_strain, nodalPairs, nodalPairs_strain)
         case 4.0
             % STRESS-BASED BROWN-MILLER
             algorithm_sbbm.worstItemAnalysis(worstNodeTensor, phiOnCP,...
@@ -955,8 +953,8 @@ if ((outputHistory == 1.0) || (outputField == 1.0) || (outputFigure == 1.0)) && 
                 worstNodeTensor, signalLength, s1i, s2i, s3i,...
                 signConvention, gateTensors, tensorGate, nasalifeParameter)
         case 10.0 % UNIAXIAL STRESS-LIFE
-            algorithm_usl.worstItemAnalysis(signalLength, msCorrection,...
-                nodalAmplitudes, nodalPairs)
+            algorithm_usl.worstItemAnalysis(msCorrection, nodalAmplitudes,...
+                nodalPairs, s1i, s3i)
         otherwise
     end
 end

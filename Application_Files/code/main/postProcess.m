@@ -11,7 +11,7 @@ classdef postProcess < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 17-Jan-2018 11:19:25 GMT
+%   Last modified 31-Jan-2018 10:48:44 GMT
     
     %%
     
@@ -1186,7 +1186,7 @@ classdef postProcess < handle
                 messenger.writeMessage(128.0)
             end
             
-            %% SIG UNIAXIAL STRESS HISTORY (BEFORE AND AFTER FILTERING *)
+            %% SIGS UNIAXIAL STRESS HISTORY (BEFORE AND AFTER FILTERING *)
             
             % *If applicable
             % Only if the Uniaxial Stress-Life algorithm is used
@@ -1243,7 +1243,7 @@ classdef postProcess < handle
                     grid on
                 end
                 
-                dir = [root, 'MATLAB Figures/SIG, Uniaxial load history before and after gating'];
+                dir = [root, 'MATLAB Figures/SIGS, Uniaxial load history before and after gating'];
                 saveas(f13, dir, figureFormat)
                 if strcmpi(figureFormat, 'fig') == true
                     postProcess.makeVisible([dir, '.fig'])
@@ -1254,7 +1254,7 @@ classdef postProcess < handle
                 
                 plot(oldSignal, '-', 'LineWidth', lineWidth, 'Color', midnightBlue);   hold on
                 
-                msg = sprintf('SIG, Uniaxial load history');
+                msg = sprintf('SIGS, Uniaxial load history');
                 xlabel('Sample', 'FontSize', fontX)
                 ylabel('Stress (MPa)', 'FontSize', fontY)
                 title(msg, 'FontSize', fontTitle)
@@ -1272,7 +1272,7 @@ classdef postProcess < handle
                     grid on
                 end
                 
-                dir = [root, 'MATLAB Figures/SIG, Uniaxial load history'];
+                dir = [root, 'MATLAB Figures/SIGS, Uniaxial load history'];
                 saveas(f12, dir, figureFormat)
                 if strcmpi(figureFormat, 'fig') == true
                     postProcess.makeVisible([dir, '.fig'])

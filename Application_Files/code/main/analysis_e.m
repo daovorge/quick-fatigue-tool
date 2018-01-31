@@ -4,7 +4,7 @@ classdef analysis_e < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 09-Jun-2017 17:02:26 GMT
+%   Last modified 31-Jan-2018 10:48:44 GMT
     
     %%
     

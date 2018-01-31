@@ -10,7 +10,7 @@ function [epsilon, sigma, error, warning] = css2e(sigma_e, E, kp, np)
 %	counting.
 %   
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 30-Aug-2017 15:40:20 GMT
+%   Last modified 31-Jan-2018 10:48:44 GMT
     
     %%
     
@@ -381,6 +381,7 @@ end
 
 % Remove the zero if necessary
 if appendedZero == 1.0
-    sigma = sigma(2.0:end);
+    sigma(1.0) = [];
+    epsilon(1.0) = [];
 end
 end

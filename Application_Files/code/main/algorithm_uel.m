@@ -14,7 +14,7 @@ classdef algorithm_uel < handle
 %      6.9 Uniaxial Strain-Life
 %   
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 30-Aug-2017 15:40:20 GMT
+%   Last modified 31-Jan-2018 10:48:44 GMT
     
     %%
     
@@ -263,7 +263,7 @@ classdef algorithm_uel < handle
         end
         
         %% POST ANALYSIS AT WORST ITEM
-        function [] = worstItemAnalysis(signalLength, nodalAmplitudes_stress, nodalAmplitudes_strain, nodalPairs, nodalPairs_strain)
+        function [] = worstItemAnalysis(nodalAmplitudes_stress, nodalAmplitudes_strain, nodalPairs, nodalPairs_strain)
             nodalPairs = nodalPairs{:};
             nodalPairs_strain = nodalPairs_strain{:};
             
@@ -271,8 +271,12 @@ classdef algorithm_uel < handle
             nodalAmplitudes_strain = nodalAmplitudes_strain{:};
             
             % Save data for history output
-            setappdata(0, 'CS', zeros(1.0, signalLength))
-            setappdata(0, 'CN', zeros(1.0, signalLength))
+            S1 = getappdata(0, 'S1');
+            S3 = getappdata(0, 'S3');
+            setappdata(0, 'CS', 0.5*(S1 - S3))
+            normalStress(abs(S1) >= abs(S3)) = S1(abs(S1) >= abs(S3));
+            normalStress(abs(S3) > abs(S1)) = S3(abs(S3) > abs(S1));
+            setappdata(0, 'CN', normalStress)
             
             setappdata(0, 'cyclesOnCP', nodalPairs)
             setappdata(0, 'cyclesOnCP_strain', nodalPairs_strain)

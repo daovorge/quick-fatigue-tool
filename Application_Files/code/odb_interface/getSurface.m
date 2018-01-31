@@ -1,4 +1,4 @@
-function [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz, fid_status)
+function [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz, fid_status, algorithm)
 %FOS    QFT function to find surface elements and nodes.
 %   This function uses the ODB file specified by OUTPUT_DATABASE to
 %   determine the elements and nodes which lie on the mesh surface.
@@ -13,12 +13,19 @@ function [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(ma
 %      4.5.3 Custom analysis items
 %
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 24-Jan-2018 15:17:50 GMT
+%   Last modified 31-Jan-2018 10:48:44 GMT
 
 %%
 
 %% Indicate if surface is read from file
 setappdata(0, 'surfaceFromFile', 0.0)
+
+%% Surface detection is not compatible with uniaxial methods
+if (algorithm == 10.0) || (algorithm == 3.0)
+    items = 'ALL';
+    setappdata(0, 'items', 'ALL')
+    return
+end
 
 %% Create string from part instances
 partInstance = getappdata(0, 'partInstance');
