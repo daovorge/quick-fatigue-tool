@@ -14,7 +14,7 @@ classdef algorithm_bs7608 < handle
 %      6.6 BS 7608 Fatigue of Welded Steel Joints
 %   
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 31-Jan-2018 10:48:44 GMT
+%   Last modified 31-Jan-2018 15:36:18 GMT
     
     %%
     
@@ -1290,7 +1290,7 @@ classdef algorithm_bs7608 < handle
                 plot(shearOnCP, '-', 'LineWidth', lineWidth, 'Color', forestGreen)
                 
                 if proportionalItems(worstItem) == 1.0
-                    msg = sprintf('CS, Maximum shear stress history for item %.0f.%.0f', mainID, subID);
+                    msg = sprintf('CS, Maximum shear (Tresca) stress history for item %.0f.%.0f', mainID, subID);
                 else
                     msg = sprintf('CS, Maximum shear stress history on critical plane for item %.0f.%.0f', mainID, subID);
                 end
