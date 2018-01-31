@@ -14,7 +14,7 @@ classdef algorithm_bs7608 < handle
 %      6.6 BS 7608 Fatigue of Welded Steel Joints
 %   
 %   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 08-Jan-2018 08:53:45 GMT
+%   Last modified 31-Jan-2018 10:48:44 GMT
     
     %%
     
@@ -1253,61 +1253,71 @@ classdef algorithm_bs7608 < handle
             %%
             proportionalItems = getappdata(0, 'proportionalItems');
             
-            if proportionalItems(worstItem) == 0.0
-                %% CN (Normal stress on critical plane)
-                if getappdata(0, 'figure_CNS') == 1.0 && outputFigure == 1.0
-                    normalOnCP = getappdata(0, 'CN');
-                    
-                    f7 = figure('visible', figureVisibility);
-                    subplot(2, 1, 1)
-                    plot(normalOnCP, '-', 'LineWidth', lineWidth, 'Color', fireBrick)
-                    
+            %% CN (Normal stress on critical plane)
+            if getappdata(0, 'figure_CNS') == 1.0 && outputFigure == 1.0
+                normalOnCP = getappdata(0, 'CN');
+                
+                f7 = figure('visible', figureVisibility);
+                subplot(2, 1, 1)
+                plot(normalOnCP, '-', 'LineWidth', lineWidth, 'Color', fireBrick)
+                
+                if proportionalItems(worstItem) == 1.0
+                    msg = sprintf('CN, Maximum normal stress history for item %.0f.%.0f', mainID, subID);
+                else
                     msg = sprintf('CN, Maximum normal stress history on critical plane for item %.0f.%.0f', mainID, subID);
-                    ylabel('Stress [MPa]', 'FontSize', fontY)
-                    title(msg, 'FontSize', fontTitle)
-                    set(gca, 'FontSize', fontTicks)
-                    set(gca, 'XTick', linspace(1.0, L, XTickPartition + 1.0))
-                    set(gca, 'XTickLabel', round(linspace(1.0, L, XTickPartition + 1.0)));
-                    
-                    try
-                        axis tight
-                    catch
-                        % Don't tighten the axis
-                    end
-                    
-                    if strcmpi(gridLines, 'on') == 1.0 || str2double(gridLines) == 1.0
-                        grid on
-                    end
-                    
-                    %% CS (Shear stress on critical plane)
-                    shearOnCP = getappdata(0, 'CS');
-                    
-                    subplot(2, 1, 2)
-                    plot(shearOnCP, '-', 'LineWidth', lineWidth, 'Color', forestGreen)
-                    
-                    msg = sprintf('CS, Maximum shear stress history on critical plane for item %.0f.%.0f', mainID, subID);
-                    xlabel('Sample', 'FontSize', fontX);
-                    ylabel('Stress [MPa]', 'FontSize', fontY)
-                    title(msg, 'FontSize', fontTitle)
-                    set(gca, 'FontSize', fontTicks)
-                    set(gca, 'XTick', linspace(1.0, L, XTickPartition + 1.0))
-                    set(gca, 'XTickLabel', round(linspace(1.0, L, XTickPartition + 1.0)));
-                    
-                    try
-                        axis tight
-                    catch
-                        % Don't tighten the axis
-                    end
-                    
-                    if strcmpi(gridLines, 'on') == 1.0 || str2double(gridLines) == 1.0
-                        grid on
-                    end
-                    
-                    dir = [root, 'MATLAB Figures/CN + CS, Normal and shear stress on critical plane at worst item'];
-                    saveas(f7, dir, 'fig')
-                    postProcess.makeVisible([dir, '.fig'])
                 end
                 
+                ylabel('Stress [MPa]', 'FontSize', fontY)
+                title(msg, 'FontSize', fontTitle)
+                set(gca, 'FontSize', fontTicks)
+                set(gca, 'XTick', linspace(1.0, L, XTickPartition + 1.0))
+                set(gca, 'XTickLabel', round(linspace(1.0, L, XTickPartition + 1.0)));
+                
+                try
+                    axis tight
+                catch
+                    % Don't tighten the axis
+                end
+                
+                if strcmpi(gridLines, 'on') == 1.0 || str2double(gridLines) == 1.0
+                    grid on
+                end
+                
+                %% CS (Shear stress on critical plane)
+                shearOnCP = getappdata(0, 'CS');
+                
+                subplot(2, 1, 2)
+                plot(shearOnCP, '-', 'LineWidth', lineWidth, 'Color', forestGreen)
+                
+                if proportionalItems(worstItem) == 1.0
+                    msg = sprintf('CS, Maximum shear stress history for item %.0f.%.0f', mainID, subID);
+                else
+                    msg = sprintf('CS, Maximum shear stress history on critical plane for item %.0f.%.0f', mainID, subID);
+                end
+                
+                xlabel('Sample', 'FontSize', fontX);
+                ylabel('Stress [MPa]', 'FontSize', fontY)
+                title(msg, 'FontSize', fontTitle)
+                set(gca, 'FontSize', fontTicks)
+                set(gca, 'XTick', linspace(1.0, L, XTickPartition + 1.0))
+                set(gca, 'XTickLabel', round(linspace(1.0, L, XTickPartition + 1.0)));
+                
+                try
+                    axis tight
+                catch
+                    % Don't tighten the axis
+                end
+                
+                if strcmpi(gridLines, 'on') == 1.0 || str2double(gridLines) == 1.0
+                    grid on
+                end
+                
+                dir = [root, 'MATLAB Figures/CN + CS, Normal and shear stress on critical plane at worst item'];
+                saveas(f7, dir, 'fig')
+                postProcess.makeVisible([dir, '.fig'])
+            end
+            
+            if proportionalItems(worstItem) == 0.0
                 %% CP PLOTS
                 figureFormat = getappdata(0, 'figureFormat');
                 
@@ -1337,8 +1347,7 @@ classdef algorithm_bs7608 < handle
                 damageParameter = getappdata(0, 'worstNodeDamageParamCube');
                 damage = getappdata(0, 'worstNodeDamageCube');
                 
-                steps = getappdata(0, 'stepSize');
-                step = steps(worstItem);
+                step = getappdata(0, 'stepSize');
                 
                 %% DPP-THETA (Damage parameter vs THETA)
                 
@@ -1842,8 +1851,7 @@ classdef algorithm_bs7608 < handle
             proportionalItems = getappdata(0, 'proportionalItems');
             
             if proportionalItems(worstItem) == 0.0
-                steps = getappdata(0, 'stepSize');
-                step = steps(getappdata(0, 'worstItem'));
+                step = getappdata(0, 'stepSize');
                 planes = 0:step:180;
                 
                 ST = getappdata(0, 'shear_cp');
