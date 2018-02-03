@@ -12,7 +12,7 @@
 %   Reference section in Quick Fatigue Tool User Settings Reference Guide
 %      2 Environment variables
 %   
-%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
 %   Last modified 17-Jan-2018 08:19:00 GMT
 
 %% GATE TENSORS
@@ -360,7 +360,7 @@ setappdata(0, 'figure_KDSN', 1.0)
 setappdata(0, 'figure_VM', 1.0)
 setappdata(0, 'figure_PS', 1.0)
 setappdata(0, 'figure_PE', 1.0)
-setappdata(0, 'figure_CNS', 0.0)
+setappdata(0, 'figure_CNS', 1.0)
 setappdata(0, 'figure_DPP', 1.0)
 setappdata(0, 'figure_DP', 1.0)
 setappdata(0, 'figure_LP', 1.0)

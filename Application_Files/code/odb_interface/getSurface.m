@@ -1,4 +1,4 @@
-function [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz, fid_status)
+function [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz, fid_status, algorithm)
 %FOS    QFT function to find surface elements and nodes.
 %   This function uses the ODB file specified by OUTPUT_DATABASE to
 %   determine the elements and nodes which lie on the mesh surface.
@@ -12,13 +12,20 @@ function [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(ma
 %   Reference section in Quick Fatigue Tool User Guide
 %      4.5.3 Custom analysis items
 %
-%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
-%   Last modified 21-Dec-2017 09:04:56 GMT
+%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
+%   Last modified 31-Jan-2018 10:48:44 GMT
 
 %%
 
 %% Indicate if surface is read from file
 setappdata(0, 'surfaceFromFile', 0.0)
+
+%% Surface detection is not compatible with uniaxial methods
+if (algorithm == 10.0) || (algorithm == 3.0)
+    items = 'ALL';
+    setappdata(0, 'items', 'ALL')
+    return
+end
 
 %% Create string from part instances
 partInstance = getappdata(0, 'partInstance');
@@ -48,27 +55,19 @@ outputDatabase = getappdata(0, 'outputDatabase');
 [~, name, ~] = fileparts(outputDatabase);
 name = ['[M]', name, '[I]', instanceStrings, '[P]', odbResultPosition];
 root = [pwd, '\Data\surfaces'];
-surfaceFile = [root, '\', name, '_surface.dat'];
+surfaceFile = [root, '\', name, '_surface.mat'];
 
 if (strcmpi(items, 'surface') == 1.0) && (exist(surfaceFile, 'file') == 2.0) && (getappdata(0, 'surfaceMode') == 1.0)
     
     setappdata(0, 'items', surfaceFile)
     setappdata(0, 'hotspotFile', surfaceFile)
     
-    [items, error, mainID, subID, ~] = preProcess.readItemsFile(surfaceFile, length(mainID), mainID, subID, 0.0);
-    
-    if error == 1.0
-        setappdata(0, 'E033', 0.0)
-        messenger.writeMessage(130.0)
-        items = 'surface';  setappdata(0, 'itemsFile', 'SURFACE')
-        setappdata(0, 'items', 'SURFACE')
-    elseif error == 2.0
-        messenger.writeMessage(287.0)
-        items = 'surface';  setappdata(0, 'itemsFile', 'SURFACE')
-    elseif error == 3.0
-        items = 'all';  setappdata(0, 'items', 'all')
-        messenger.writeMessage(286.0)
-    else
+    try
+        load(surfaceFile)
+        items = surfaceData.items; %#ok<NODEF>
+        mainID = surfaceData.mainID;
+        subID = surfaceData.subID;
+        
         setappdata(0, 'itemsFile', 'SURFACE')
         setappdata(0, 'surfaceFromFile', 1.0)
         messenger.writeMessage(285.0)
@@ -83,6 +82,10 @@ if (strcmpi(items, 'surface') == 1.0) && (exist(surfaceFile, 'file') == 2.0) && 
         N = length(items);
         
         return
+    catch exception
+        setappdata(0, 'message_130_exception', exception.message)
+        items = 'all';  setappdata(0, 'items', 'all')
+        messenger.writeMessage(130.0)
     end
 end
 
@@ -547,8 +550,6 @@ end
 setappdata(0, 'itemsFile', 'SURFACE')
 
 %% Write surface items to text file
-% Concatenate data
-data = [intersectingIndexes'; mainID'; subID']';
 
 % Check that the directory exists
 if exist(root, 'dir') == 0.0
@@ -560,15 +561,9 @@ end
 name = ['[M]', name, '[I]', instanceStrings, '[P]', odbResultPosition];
 
 % Create the file
-dir = [root, sprintf('\\%s_surface.dat', name)];
-fid = fopen(dir, 'w+');
-
-fprintf(fid, 'SURFACE ITEMS\r\n');
-
-fprintf(fid, 'Item #\tMain ID\tSub ID\r\n');
-fprintf(fid, '%.0f\t%.0f\t%.0f\r\n', data');
-
-fclose(fid);
+dir = [root, sprintf('\\%s_surface.mat', name)];
+surfaceData = struct('items', intersectingIndexes, 'mainID', mainID, 'subID', subID); %#ok<NASGU>
+save(sprintf('%s', dir), 'surfaceData')
 
 % Inform the user that hotpots have been written to file
 setappdata(0, 'message_278_name', name)

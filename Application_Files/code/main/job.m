@@ -9,9 +9,10 @@ function [] = job(varargin)
 %   JOB(JOBNAME, OPTION) submits the analyis job JOBNAME with additional
 %   options. Available options are:
 %
-%     'datacheck'   - Submits the analysis job as a data check analysis
-%     'interactive' - Prints an echo of the message (.msg) file to the
-%     MATLAB commands window.
+%     'interactive' - print an echo of the message (.msg) file to the
+%     MATLAB command window
+%     'datacheck'   - submit the analysis job as a data check analysis
+%     'library' - use the fatigue definition from JOBNAME (same as *DATA CHECK=2)
 %
 %   If the extention of the job file is '.inp', then the JOBNAME parameter
 %   can be speficied without the extention.
@@ -25,8 +26,8 @@ function [] = job(varargin)
 %   Reference section in Quick Fatigue Tool User Settings Reference Guide
 %      1 Job file options
 %   
-%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
-%   Last modified 01-Dec-2017 13:15:24 GMT
+%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
+%   Last modified 30-Jan-2018 13:52:26 GMT
     
     %%
     
@@ -46,6 +47,9 @@ switch nargin
         elseif strcmpi(varargin, 'datacheck') == 1.0
             datacheck = 1.0;
             varargin = cellstr(input('Input file: ', 's'));
+        elseif strcmpi(varargin, 'library') == 1.0
+            datacheck = 2.0;
+            varargin = cellstr(input('Input file: ', 's'));
         else
             % Assume that VARARGIN is JOBNAME
         end
@@ -54,17 +58,28 @@ switch nargin
         if nargin > 3.0
             fprintf('ERROR: JOB was called with too many input arguments\n');
             return
-        elseif (strcmpi(varargin{1.0}, 'interactive') == 1.0) || (strcmpi(varargin{1.0}, 'datacheck') == 1.0)
+        elseif (strcmpi(varargin{1.0}, 'interactive') == 1.0) || (strcmpi(varargin{1.0}, 'datacheck') == 1.0) || (strcmpi(varargin{1.0}, 'library') == 1.0)
             fprintf('ERROR: The command line option ''%s'' is misplaced\n       Whenever JOB is called with OPTION, the first argument must be the name of the job file\n', varargin{1.0});
             return
         else
+            datacheckAndContinue = 0.0;
+            
             for i = 2:nargin
                 if strcmpi(varargin{i}, 'interactive') == 1.0
                     setappdata(0, 'force_echoMessagesToCWIN', 1.0)
                 elseif strcmpi(varargin{i}, 'datacheck') == 1.0
+                    datacheckAndContinue = datacheckAndContinue + 1.0;
                     datacheck = 1.0;
+                elseif strcmpi(varargin{i}, 'library') == 1.0
+                    datacheckAndContinue = datacheckAndContinue + 1.0;
+                    datacheck = 2.0;
                 else
-                    fprintf('ERROR: Invalid command line option ''%s''\n       Valid options are:\n[<jobName>, interactive, datacheck]\n', varargin{i});
+                    fprintf('ERROR: Invalid command line option ''%s''\n       Valid options are:\n[<jobName> | interactive | {datacheck | library}]\n', varargin{i});
+                    return
+                end
+                
+                if datacheckAndContinue > 1.0
+                    fprintf('ERROR: The command line options ''datacheck'' and ''library'' are mutually-exclusive\n       Valid options are:\n[<jobName> | interactive | {datacheck | library}]\n');
                     return
                 end
             end
@@ -79,12 +94,15 @@ if isempty(getappdata(0, 'analysisDialogues')) == 1.0
     setappdata(0, 'analysisDialogues', 1.0)
 end
 
+% Set default flag for overwrite dialogues
+if isempty(getappdata(0, 'checkOverwrite')) == 1.0
+    setappdata(0, 'checkOverwrite', 1.0)
+end
+
 %% INITIALIZE BUFFERS
 [kwStr, kwStrSp, kwData] = keywords.initialize();
 
-if datacheck == 1.0
-    kwData{37.0} = 1.0;
-end
+kwData{37.0} = datacheck;
 
 % Flag indicating that text file processor was used
 setappdata(0, 'jobFromTextFile', 1.0)
@@ -179,9 +197,9 @@ while feof(fid) == 0.0
             %}
             if exist(['Data/material/local/', materialName, '.mat'], 'file') == 2.0
                 
-                if getappdata(0, 'analysisDialogues') > 0.0
+                if (getappdata(0, 'analysisDialogues') > 0.0) && (getappdata(0, 'checkOverwrite') > 0.0)
                     response = questdlg(sprintf('The material ''%s'' already exists in the local database. Do you wish to overwrite the material?', materialName), 'Quick Fatigue Tool', 'Overwrite', 'Keep file', 'Abort', 'Overwrite');
-                else
+                elseif getappdata(0, 'checkOverwrite') > 0.0
                     response = input(sprintf('The material ''%s'' already exists in the local database. Do you wish to overwrite the material? [<O>verwrite/<K>eep/<A>bort]: ', materialName), 's');
                     
                     if strcmpi(response, 'o') == 1.0
@@ -193,6 +211,8 @@ while feof(fid) == 0.0
                     else
                         response = 'Abort';
                     end
+                else
+                    response = 'Overwrite';
                 end
                 
                 if (strcmpi(response, 'Abort') == 1.0) || (isempty(response) == 1.0)
@@ -221,7 +241,7 @@ while feof(fid) == 0.0
             end
             
             % Advance the file by nTLINE to get past the material definition
-            for i = 1:nTLINE_material
+            for i = 1:nTLINE_material - 1.0
                 TLINE = fgetl(fid);
             end
             TOKEN = strtok(TLINE, '=');
@@ -251,7 +271,7 @@ while feof(fid) == 0.0
             %}
             if tokenLength == 1.0
                 emptyKeywords = emptyKeywords + 1.0;
-            else
+            elseif strcmpi(TOKEN, 'endmaterial') == 0.0
                 partialKw{index_pkw} = TOKEN;
                 
                 index_pkw = index_pkw + 1.0;
@@ -331,6 +351,11 @@ while feof(fid) == 0.0
             % The keyword definition appears to be a numeric value
             kwData{matchingKw} = str2double(currentLine);
             
+            % If the value is NaN, evaluate it as a mathematical expression instead
+            if isnan(kwData{matchingKw}) == 1.0
+                kwData{matchingKw} = eval(currentLine);
+            end
+            
             break
         elseif strcmpi(currentChar, '{') == 1.0
             % The keyword definition appears to be a cell
@@ -348,15 +373,35 @@ while feof(fid) == 0.0
             break
         else
             %{
-                The keyword definition does not start as a square or curly
-                bracket or an apostrophe, and is not numeric. The
-                definition might be invalid, but it may also be intended as
-				a string vwhich isn't enclosed by apostrophes. Just assume
-				the definition is a string. QFT will throw an error or crash
-                later if the definition is invalid
+                The keyword definition does not start with a square or
+                curly bracket or an apostrophe, and is not numeric by
+                itself.
+ 
+                If the definition evaluates to a numeric value, assume that
+                the definition was entered as a mathematical expression
+                using MATLAB built-in functions.
+            
+                Otherwise, the definition might be invalid, but it may also
+                be intended as a string which isn't enclosed by apostrophes.
+                In this case, assume that the definition is a string; QFT
+                will throw an error or crash later if the definition is
+                invalid
             %}
-            kwData{matchingKw} = currentLine;
-                
+            
+            %{
+                Do not attempt to evaluate any expression that matches a
+                file name on the MATLAB path
+            %}
+            if exist(currentLine, 'file') ~= 2.0
+                try eval(currentLine)
+                    kwData{matchingKw} = eval(currentLine);
+                catch
+                    kwData{matchingKw} = currentLine;
+                end
+            else
+                kwData{matchingKw} = currentLine;
+            end
+            
             break
         end
     end

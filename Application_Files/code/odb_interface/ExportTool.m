@@ -11,8 +11,8 @@ function varargout = ExportTool(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool User Guide
 %      10.4 The ODB Interface
 %   
-%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
-%   Last modified 16-Oct-2017 09:28:25 GMT
+%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
+%   Last modified 22-Jan-2018 13:17:33 GMT
     
     %%
     
@@ -353,10 +353,36 @@ modelDatabasePath = get(handles.edit_modelFile, 'string');
 [~, modelDatabaseNameShort, EXT] = fileparts(modelDatabasePath);
 modelDatabaseName = [modelDatabaseNameShort, EXT];
 
-% Try to get the job name from the field output file
+% Check that the field output file is valid
 try
     fid = fopen(fieldDataPath, 'r');
-    fgetl(fid);
+    fileHeader = fgetl(fid);
+    
+    if strcmp(fileHeader, 'FIELDS [WHOLE MODEL]') == 0.0
+        message = sprintf('The selected field data is not a valid field output file.');
+        errordlg(message, 'Quick Fatigue Tool')
+        uiwait
+        
+        enableGUI(handles)
+        warning('on', 'all')
+        return
+    end
+catch
+    if isempty(get(handles.edit_fieldData, 'string')) == 1.0
+        message = sprintf('Field data must be specified.');
+    else
+        message = sprintf('An error occurred while opening the field data file.');
+    end
+    errordlg(message, 'Quick Fatigue Tool')
+    uiwait
+    
+    enableGUI(handles)
+    warning('on', 'all')
+    return
+end
+
+% Try to get the job name from the field output file
+try
     fileExtension = fgetl(fid);
     fileExtension = [fileExtension(6:end), 'Results'];
     
@@ -369,7 +395,7 @@ try
         temp = length(strtok(fileExtension, ' '));
         
         if temp ~= jobNameLength
-            message = sprintf('The job name cannot contain spaces. Rename the job in the field data file');
+            message = sprintf('The job name cannot contain spaces. Rename the job in the field data file.');
             errordlg(message, 'Quick Fatigue Tool')
             uiwait
             
@@ -508,7 +534,7 @@ end
 %}
 if exist([resultsDatabasePath, '/', resultsDatabaseName, '.odb'], 'file') == 2.0 && (get(handles.check_writeScriptOnly, 'value') == 0.0)
     % The file already exists, so prompt the user
-    msg = sprintf('The output directory ''%s'' already contains a file called ''%s''', resultsDatabasePath, [resultsDatabaseName, '.odb']);
+    msg = sprintf('The output directory ''%s'' already contains a file called ''%s''.', resultsDatabasePath, [resultsDatabaseName, '.odb']);
     response = questdlg(msg, 'Quick Fatigue Tool', 'Overwrite', 'Keep file', 'Abort procedure', 'Overwrite');
     
     if isempty(response) == 1.0 || strcmpi(response, 'Abort procedure') == 1.0
@@ -610,8 +636,8 @@ end
 % Open the log file for writing
 fid_debug = fopen(sprintf('%s\\%s.log', resultsDatabasePath, resultsDatabaseName), 'w+');
 clc
-fprintf(fid_debug, 'Quick Fatigue Tool 6.11-10 ODB Interface Log');
-fprintf('Quick Fatigue Tool 6.11-10 ODB Interface Log\n');
+fprintf(fid_debug, 'Quick Fatigue Tool 6.11-11 ODB Interface Log');
+fprintf('Quick Fatigue Tool 6.11-11 ODB Interface Log\n');
 
 % Get the selected position
 userPosition = get(handles.pMenu_elementPosition, 'value');
@@ -641,7 +667,7 @@ for instanceNumber = 1:nInstances
     fprintf(fid_debug, '\r\n\r\nCollecting field data for instance ''%s''...', partInstanceName);
     fprintf('Collecting field data for instance ''%s''...\n', partInstanceName);
     [positionLabels, position, positionLabelData, positionID, connectivity,...
-        mainIDs, subIDs, stepDescription, fieldData, fieldNames,...
+        mainIDs, subIDs, stepDescription, fieldData, fieldNames, fieldDescriptions,...
         connectedElements, error] = python.getFieldData(fieldDataPath,...
         requestedFields, userPosition, partInstanceName,...
         autoPosition, fid_debug, resultsDatabasePath, resultsDatabaseName);
@@ -688,7 +714,7 @@ for instanceNumber = 1:nInstances
     [scriptFile, newLocation, stepName, error] = python.writePythonScript(resultsDatabaseName,...
         resultsDatabasePath, partInstanceName, positionLabels,...
         position, positionLabelData, positionID, connectivity, mainIDs,...
-        subIDs, stepDescription, fieldData, fieldNames, fid_debug, stepName,...
+        subIDs, stepDescription, fieldData, fieldNames, fieldDescriptions, fid_debug, stepName,...
         isExplicit, connectedElements, createODBSet, ODBSetName, stepType);
     
     % If there was an error while writing the field data, abort the export process

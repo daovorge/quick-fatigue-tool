@@ -13,8 +13,8 @@ classdef algorithm_usl < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.8 Uniaxial Stress-Life
 %   
-%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
-%   Last modified 21-Sep-2017 12:46:54 GMT
+%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
+%   Last modified 31-Jan-2018 10:48:44 GMT
     
     %%
     
@@ -196,13 +196,16 @@ classdef algorithm_usl < handle
         end
         
         %% POST ANALYSIS AT WORST ITEM
-        function [] = worstItemAnalysis(signalLength, msCorrection, nodalAmplitudes, nodalPairs)
+        function [] = worstItemAnalysis(msCorrection, nodalAmplitudes, nodalPairs, ps1, ps3)
             nodalPairs = nodalPairs{:};
             nodalAmplitudes = nodalAmplitudes{:};
             
             % Save data for history output
-            setappdata(0, 'CS', zeros(1.0, signalLength))
-            setappdata(0, 'CN', zeros(1.0, signalLength))
+            setappdata(0, 'CS', 0.5*(ps1 - ps3))
+            normalStress(abs(ps1) >= abs(ps3)) = ps1(abs(ps1) >= abs(ps3));
+            normalStress(abs(ps3) > abs(ps1)) = ps3(abs(ps3) > abs(ps1));
+            setappdata(0, 'CN', normalStress)
+            
             setappdata(0, 'cyclesOnCP', nodalPairs)
             setappdata(0, 'amplitudesOnCP', nodalAmplitudes)
             

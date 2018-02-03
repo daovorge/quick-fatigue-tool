@@ -5,8 +5,8 @@ classdef jobFile < handle
 %   JOBFILE is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
-%   Last modified 09-Jan-2017 13:40:51 GMT
+%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
+%   Last modified 30-Jan-2018 13:52:26 GMT
     
     %%
     
@@ -89,7 +89,16 @@ classdef jobFile < handle
                 return
             end
             
-            if (isempty(dataCheck) == 1.0) || (ischar(dataCheck) == 1.0)
+            if isempty(dataCheck) == 1.0
+                dataCheck = 0.0;
+                setappdata(0, 'dataCheck', dataCheck)
+            elseif (ischar(dataCheck) == 1.0) && (exist(dataCheck, 'file') ~= 2.0)
+                error = 1.0;
+                
+                fprintf('[ERROR] The value of DATA_CHECK (''%s'') is not a valid fatigue definition file\n', dataCheck)
+                fprintf('-> For instructions on specifying fatigue definition files, please consult Section 4.5.7 of the Quick Fatigue Tool User Guide\n');
+                return
+            elseif (isnumeric(dataCheck) == 1.0) && ((dataCheck ~= 0.0) && (dataCheck ~= 1.0) && (dataCheck ~= 2.0))
                 dataCheck = 0.0;
                 setappdata(0, 'dataCheck', dataCheck)
             end
@@ -503,7 +512,7 @@ classdef jobFile < handle
                         if (isempty(matchingMode) == 1.0) || (length(matchingMode) ~= 1.0)
                             % The result position could not be found in the library
                             error = 1.0;
-                            fprintf('[ERROR] The value of FAILURE_MODE (''%s'') is not recognized\n', failureMode)
+                            fprintf('[ERROR] The value of FAILURE_MODE (''%s'') was not recognized\n', failureMode)
                             fprintf('-> A list of available weld failure modes can be found in Section 1.2.12 of the Quick Fatigue Tool User Settings Reference Guide\n');
                             return
                         elseif length(failureWords{matchingMode}) ~= length(failureMode)
@@ -1689,13 +1698,14 @@ classdef jobFile < handle
         end
         
         %% SCALE AND COMBINE THE LOADING
-        function [scale, offset, repeats, units, N, signalLength, Sxx, Syy, Szz, Txy, Tyz, Txz, mainID, subID, gateHistories, gateTensors, tensorGate, error] =...
-                getLoading(units, scale, algorithm, msCorrection,...
+        function [scale, offset, repeats, units, N, signalLength, Sxx, Syy, Szz, Txy, Tyz, Txz, mainID, subID, gateHistories, gateTensors, tensorGate, recoverFatigueLoading, error] =...
+                getLoading(units, scale, dataCheck, algorithm, msCorrection,...
                 userUnits, hfDataset, hfHistory, hfTime,...
                 hfScales, items, dataset, history, elementType, offset)
             
             N = [];
             signalLength = [];
+            recoverFatigueLoading = 0.0;
             
             % Define system of units
             switch units
@@ -1799,50 +1809,98 @@ classdef jobFile < handle
             setappdata(0, 'incorrectItemList', 0.0)
             
             % If using Uniaxial Stress-Life, no scale & combine is necessary
-            if (algorithm == 10.0) || (algorithm == 3.0)
-                [Sxx, Syy, Szz, Txy, Tyz, Txz, mainID, subID, error, oldSignal] = preProcess.uniaxialRead(history, gateHistories, historyGate, scale, offset);
-            else
-                [Sxx, Syy, Szz, Txy, Tyz, Txz, mainID, subID, error] = preProcess.scalecombine(dataset, history, items, gateHistories, historyGate, scale, offset, elementType);
-            end
-            
-            if error == true
-                return
-            end
-            
-            % If high frequency data is provided, superimpose it onto the low frequency block
-            if (isempty(hfDataset) == 0.0) || ((algorithm == 10.0 || algorithm == 3.0) && isempty(hfHistory) == 0.0)
-                %{
-                    This functionality requires the Signal Processing
-                    Toolbox. If the toolbox is not available, abort the
-                    analysis
-                %}
-                sptAvailable = checkToolbox('Signal Processing Toolbox');
-                
-                if sptAvailable ~= 1.0
-                    error = 1.0;
-                    setappdata(0, 'E009', 1.0)
-                    return
-                else
-                    [Sxx, Syy, Szz, Txy, Tyz, Txz, error] = highFrequency.main(Sxx, Syy, Szz, Txy, Tyz, Txz, hfDataset, hfHistory, hfTime, algorithm, items, hfScales);
-                    
-                    %{
-                        If high frequency datasets were used with the
-                        Uniaxial Stress-Life algorithm, update the
-                        OLDSIGNAL variable to reflect the newly
-                        superinposed data
-                    %}
-                    if algorithm == 10.0 || algorithm == 3.0
-                        oldSignal = Sxx;
+            if (ischar(dataCheck) == 1.0) || (dataCheck == 2.0)
+                try
+                    if ischar(dataCheck) == 1.0
+                        fatigueDefinitionFile = dataCheck;
+                    else
+                        fatigueDefinitionFile = sprintf('%s\\[J]%s_fd.mat', [pwd, '\Data\library'], getappdata(0, 'jobName'));
                     end
+                    
+                    load(fatigueDefinitionFile)
+                    
+                    % Recall the fatigue loading
+                    Sxx = fatigueDefinition.S11;
+                    Syy = fatigueDefinition.S22;
+                    Szz = fatigueDefinition.S33;
+                    Txy = fatigueDefinition.S12;
+                    Txz = fatigueDefinition.S13;
+                    Tyz = fatigueDefinition.S23;
+                    
+                    % Recall the uniaxial history if applicable
+                    if (algorithm == 3.0) || (algorithm == 10.0)
+                        oldSignal = fatigueDefinition.uniaxial;
+                    end
+                    
+                    % recall the stress data type
+                    setappdata(0, 'dataLabel', fatigueDefinition.type)
+                    
+                    mainID = fatigueDefinition.labels(:, 1.0);
+                    subID = fatigueDefinition.labels(:, 2.0);
+                    
+                    clear('fatigueDefinition')
+                    recoverFatigueLoading = 1.0;
+                    
+					% Inform user that the library was loaded successfully
+                    setappdata(0, 'message_312_fdf', fatigueDefinitionFile)
+                    messenger.writeMessage(312.0)
+                    
+                    % Save the name of the fatigue definition file 
+                    setappdata(0, 'fatigueDefinitionFile', fatigueDefinitionFile)
+                catch exception
+                    recoverFatigueLoading = 0.0;
+                    
+                    setappdata(0, 'warning_310_exception', exception.message)
+                    messenger.writeMessage(310.0)
                 end
             end
             
-            if error == true
-                return
-            end            
-            
-            % Inform the user of the FEA data type
-            messenger.writeMessage(31.0)
+            if recoverFatigueLoading == 0.0
+                if (algorithm == 10.0) || (algorithm == 3.0)
+                    [Sxx, Syy, Szz, Txy, Tyz, Txz, mainID, subID, error, oldSignal] = preProcess.uniaxialRead(history, gateHistories, historyGate, scale, offset);
+                else
+                    [Sxx, Syy, Szz, Txy, Tyz, Txz, mainID, subID, error] = preProcess.scalecombine(dataset, history, items, gateHistories, historyGate, scale, offset, elementType);
+                end
+                
+                if error == true
+                    return
+                end
+                
+                % If high frequency data is provided, superimpose it onto the low frequency block
+                if (isempty(hfDataset) == 0.0) || ((algorithm == 10.0 || algorithm == 3.0) && isempty(hfHistory) == 0.0)
+                    %{
+                        This functionality requires the Signal Processing
+                        Toolbox. If the toolbox is not available, abort the
+                        analysis
+                    %}
+                    sptAvailable = checkToolbox('Signal Processing Toolbox');
+                    
+                    if sptAvailable ~= 1.0
+                        error = 1.0;
+                        setappdata(0, 'E009', 1.0)
+                        return
+                    else
+                        [Sxx, Syy, Szz, Txy, Tyz, Txz, error] = highFrequency.main(Sxx, Syy, Szz, Txy, Tyz, Txz, hfDataset, hfHistory, hfTime, algorithm, items, hfScales);
+                        
+                        %{
+                            If high frequency datasets were used with the
+                            Uniaxial Stress-Life algorithm, update the
+                            OLDSIGNAL variable to reflect the newly
+                            superinposed data
+                        %}
+                        if algorithm == 10.0 || algorithm == 3.0
+                            oldSignal = Sxx;
+                        end
+                    end
+                end
+                
+                if error == true
+                    return
+                end
+                
+                % Inform the user of the FEA data type
+                messenger.writeMessage(31.0)
+            end
             
             % Warn the user if the loading contained any complex values
             if any(isreal(Sxx) == 0.0) == 1.0 || any(isreal(Syy) == 0.0) == 1.0 ||...
@@ -1869,7 +1927,7 @@ classdef jobFile < handle
             Txy = Txy*conversionFactor;    Tyz = Tyz*conversionFactor;    Txz = Txz*conversionFactor;
             
             % Apply unit conversion factor to the old signal for Uniaxial Stress-Life
-            if algorithm == 10.0 || algorithm == 3.0
+            if (algorithm == 10.0) || (algorithm == 3.0)
                 setappdata(0, 'SIGOriginalSignal', oldSignal*conversionFactor)
             end
             

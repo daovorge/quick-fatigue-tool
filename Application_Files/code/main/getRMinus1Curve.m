@@ -6,7 +6,7 @@ function [] = getRMinus1Curve(useSN, msCorrection, nSets, G)
 %   GETRMINUS1CURVE is used internally by Quick Fatigue Tool. The user is
 %   not required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
 %   Last modified 08-Jun-2017 09:59:37 GMT
     
     %%

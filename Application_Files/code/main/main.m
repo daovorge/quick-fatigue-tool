@@ -10,8 +10,8 @@ function [] = main(flags)
 %
 %   Author contact: louisvallance@hotmail.co.uk
 %
-%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2018
-%   Last modified 17-Jan-2018 08:19:00 GMT
+%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
+%   Last modified 02-Feb-2018 09:50:06 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');    tic_pre = tic;
@@ -41,9 +41,9 @@ setappdata(0, 'messageFileNotes', 0.0)
 setappdata(0, 'messageFileWarnings', 0.0)
 
 %% PRINT COMMAND WINDOW HEADER
-fprintf('[NOTICE] Quick Fatigue Tool 6.11-10')
+fprintf('[NOTICE] Quick Fatigue Tool 6.11-11')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2018)')
-fprintf('\n[NOTICE] Last modified 17-Jan-2018 08:19:00 GMT')
+fprintf('\n[NOTICE] Last modified 02-Feb-2018 09:50:06 GMT')
 
 cleanExit = 0.0;
 
@@ -73,7 +73,7 @@ fileName = sprintf('Project/output/%s/%s.sta', jobName, jobName);
 fid_status = fopen(fileName, 'w+');
 setappdata(0, 'fid_status', fid_status)
 c = clock;
-fprintf(fid_status, '[NOTICE] Quick Fatigue Tool 6.11-10\t%s', datestr(datenum(c(1.0), c(2.0), c(3.0), c(4.0), c(5.0), c(6.0))));
+fprintf(fid_status, '[NOTICE] Quick Fatigue Tool 6.11-11\t%s', datestr(datenum(c(1.0), c(2.0), c(3.0), c(4.0), c(5.0), c(6.0))));
 
 fprintf('\n[NOTICE] The job ''%s'' has been submitted for analysis', jobName)
 fprintf(fid_status, '\n[NOTICE] The job file "%s.m" has been submitted for analysis', jobName);
@@ -117,6 +117,13 @@ if getappdata(0, 'writeMessage_185') == 1.0
 end
 if getappdata(0, 'writeMessage_186') == 1.0
     messenger.writeMessage(186.0)
+end
+
+%% INFORM THE USER ABOUT DATACHECK SETTINGS
+dataCheck = getappdata(0, 'dataCheck');
+
+if dataCheck == 2.0
+    messenger.writeMessage(311.0)
 end
 
 %% CHECK THE CONTINUE_FROM FLAG
@@ -214,9 +221,9 @@ fprintf(fid_status, '\n[PRE] Processing datasets');
 setappdata(0, 'errorDuringLoading', 1.0)
 
 [scale, offset, repeats, units, N, signalLength, Sxx, Syy, Szz, Txy, Tyz, Txz, mainID,...
-    subID, gateHistories, gateTensors, tensorGate, error]...
+    subID, gateHistories, gateTensors, tensorGate, recoverFatigueLoading, error]...
     ...
-    = jobFile.getLoading(units, scale,...
+    = jobFile.getLoading(units, scale, dataCheck,...
     algorithm, msCorrection, userUnits, hfDataset, hfHistory,...
     hfTime, hfScales, items, dataset, history, elementType, offset);
 
@@ -226,8 +233,13 @@ if error == 1.0
 end
 setappdata(0, 'errorDuringLoading', 0.0)
 
+%% SAVE THE FATIGUE LOADING TO A .MAT FILE
+if recoverFatigueLoading == 0.0
+    preProcess.saveFatigueLoading(jobName, Sxx, Syy, Szz, Txy, Txz, Tyz, mainID, subID)
+end
+
 %% DETECT SURFACE ITAMS IF APPLICABLE
-[mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz, fid_status);
+[mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz, fid_status, algorithm);
 
 %% WARN THE USER IF THERE ARE DUPLICATE ITEMS IN THE MODEL
 preProcess.checkDuplicateItems(N, mainID, subID)
@@ -257,7 +269,12 @@ setappdata(0, 'subID', subID)
 fprintf('\n[PRE] Calculating invariants')
 fprintf(fid_status, '\n[PRE] Calculating invariants');
 
-preProcess.getPrincipalStress(N, Sxx, Syy, Szz, Txy, Tyz, Txz, algorithm, 0.0)
+preProcess.getPrincipalStress(N, Sxx, Syy, Szz, Txy, Tyz, Txz, algorithm, 0.0, dataCheck)
+
+% Save the principal stresses to a .MAT file
+if recoverFatigueLoading == 0.0
+    preProcess.saveInvariants(jobName)
+end
 
 %% GET THE VON MISES STRESS FOR THE LOADING
 if (algorithm == 7.0 && getappdata(0, 'stressInvariantParameter') == 1.0) || algorithm == 9.0 || outputField == 1.0 || outputHistory == 1.0 || outputFigure == 1.0
@@ -305,7 +322,7 @@ if (algorithm ~= 10.0) && (algorithm ~= 8.0) && (algorithm ~= 3.0) && (getappdat
         fprintf(fid_status, '\n[PRE] Optimizing datasets');
 
         [coldItems, removedItems, hotspotWarning] = preProcess.nodalElimination(algorithm,...
-            msCorrection, N);
+            msCorrection, N, dataCheck);
 
         setappdata(0, 'separateFieldOutput', 1.0)
         messenger.writeMessage(22.0)
@@ -345,11 +362,16 @@ end
 
 setappdata(0, 'numberOfNodes', N)
 
+% Save eliminated items to a .mat file
+if recoverFatigueLoading == 0.0
+    preProcess.saveEliminatedItems(jobName, coldItems, removedItems, hotspotWarning)
+end
+
 %% CHECK USER FRF DIAGNOSTIC ITEM IDS
 mscFileUtils.checkFRFDiagnosticItems(N)
 
 %% DETERMINE IF THE MODEL IS YIELDING
-preProcess.getPlasticItems(N, algorithm);
+preProcess.getPlasticItems(N, algorithm, fid_status);
 
 if getappdata(0, 'warning_066') == 1.0
     postProcess.writeYieldingItems(jobName, mainID, subID)
@@ -369,8 +391,11 @@ if getappdata(0, 'compositeCriteria') == 1.0
         Composite/foam materials cannot be used for fatigue analysis. Abort
         the analysis here.
     %}
-    datacheckAbort(Sxx, Syy, Szz, Txy, Tyz, Txz, tic_pre, outputField, fid_status)
-    return
+    continueAnalysis = datacheckAbort(Sxx, Syy, Szz, Txy, Tyz, Txz, tic_pre, outputField, fid_status);
+    
+    if continueAnalysis == 0.0
+        return
+    end
 end
 
 %% INITIALISE THE CP SEARCH PARAMETERS
@@ -488,13 +513,16 @@ messenger.writeMessage(168.0)
 % Print a summary of the memory state
 messenger.writeMessage(133.0)
 
-if getappdata(0, 'dataCheck') > 0.0
+if dataCheck == 1.0
     %{
         If the job is a data check analysis, abort here. Print the
         principal stresses to a text file
     %}
-    datacheckAbort(Sxx, Syy, Szz, Txy, Tyz, Txz, tic_pre, outputField, fid_status)
-    return
+    continueAnalysis = datacheckAbort(Sxx, Syy, Szz, Txy, Tyz, Txz, tic_pre, outputField, fid_status);
+    
+    if continueAnalysis == 0.0
+        return
+    end
 end
 
 fprintf('\n[NOTICE] End analysis preprocessor')
@@ -577,9 +605,9 @@ for groups = 1:G
         % Save workspace to file
         if any(debugItems == totalCounter) == 1.0
             if cacheOverlay == 1.0
-                fileName = 'qft_data.mat';
+                fileName = sprintf('[J]%s_data.mat', jobName);
             else
-                fileName = sprintf('qft_data_%.0f.mat', totalCounter);
+                fileName = sprintf('[J]%s_data_%.0f.mat', jobName, totalCounter);
             end
 
             % Save variables
@@ -891,7 +919,7 @@ if ((outputHistory == 1.0) || (outputField == 1.0) || (outputFigure == 1.0)) && 
 
     switch algorithm
         case 3.0 % UNIAXIAL STRAIN-LIFE
-            algorithm_uel.worstItemAnalysis(signalLength, nodalAmplitudes, nodalAmplitudes_strain, nodalPairs, nodalPairs_strain)
+            algorithm_uel.worstItemAnalysis(nodalAmplitudes, nodalAmplitudes_strain, nodalPairs, nodalPairs_strain)
         case 4.0
             % STRESS-BASED BROWN-MILLER
             algorithm_sbbm.worstItemAnalysis(worstNodeTensor, phiOnCP,...
@@ -925,8 +953,8 @@ if ((outputHistory == 1.0) || (outputField == 1.0) || (outputFigure == 1.0)) && 
                 worstNodeTensor, signalLength, s1i, s2i, s3i,...
                 signConvention, gateTensors, tensorGate, nasalifeParameter)
         case 10.0 % UNIAXIAL STRESS-LIFE
-            algorithm_usl.worstItemAnalysis(signalLength, msCorrection,...
-                nodalAmplitudes, nodalPairs)
+            algorithm_usl.worstItemAnalysis(msCorrection, nodalAmplitudes,...
+                nodalPairs, s1i, s3i)
         otherwise
     end
 end
@@ -1097,9 +1125,9 @@ messenger.writeLog(jobName, jobDescription, dataset, material,...
 % SAVE WORKSPACE TO FILE
 if any(debugItems == totalCounter) == 1.0
     if cacheOverlay == 1.0
-        fileName = 'qft_data.mat';
+        fileName = sprintf('[J]%s_data.mat', jobName);
     else
-        fileName = sprintf('qft_data_%.0f.mat', totalCounter);
+        fileName = sprintf('[J]%s_data_%.0f.mat', jobName, totalCounter);
     end
 
     % Save variables

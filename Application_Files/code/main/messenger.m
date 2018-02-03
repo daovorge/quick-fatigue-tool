@@ -6,8 +6,8 @@ classdef messenger < handle
 %   MESSENGER is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %
-%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2018
-%   Last modified 17-Jan-2018 08:19:00 GMT
+%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
+%   Last modified 02-Feb-2018 09:50:06 GMT
 
     %%
 
@@ -1202,8 +1202,8 @@ classdef messenger < handle
                     case 129.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Composite criteria results have been written to ''%s\\Project\\output\\%s\\Data Files\\composite_criteria.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
                     case 130.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The surface definition file ''%s'' is inconsistent with the dataset', returnType{i}], getappdata(0, 'hotspotFile'));
-                        fprintf(fidType(i), ['-> The surface will be re-read from the output database', returnType{i}]);
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: The surface definition file could not be processed', returnType{i}]);
+                        fprintf(fidType(i), ['-> Error message: %s', returnType{i}], getappdata(0, 'message_130_exception'));
                     case 131.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The keyword *NO COMPRESSION is specified for material %s (group %.0f), but its usage is not recommended here', returnType{i}], getappdata(0, 'message_groupMaterial'), getappdata(0, 'message_group'));
                         fprintf(fidType(i), ['-> Composite analysis results for this analysis group may be inaccurate', returnType{i}]);
@@ -2107,13 +2107,10 @@ classdef messenger < handle
                             fprintf(fidType(i), [returnType{i}, '***NOTE: Abaqus ODB Python script has been exported to ''%s\\Project\\output\\%s\\Data Files''', returnType{i}], pwd, jobName);
                         end
                     case 266.0
-                        if getappdata(0, 'suppress_ID266') == 0.0
-                            fprintf(fidType(i), [returnType{i}, '***NOTE: User-defined items were read from the file ''%s''', returnType{i}], getappdata(0, 'hotspotFile'));
-                            
-                            if i == X
-                                setappdata(0, 'suppress_ID266', 1.0)
-                            end
-                        end
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: The fatigue loading could not be archived', returnType{i}]);
+                        fprintf(fidType(i), ['-> Error message: %s', returnType{i}], getappdata(0, 'warning_309_exception'));
+                        
+                        setappdata(0, 'messageFileWarnings', 1.0)
                     case 267.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The environment variable ''noiseReduction'' is deprecated. Use ''gateTensors'' instead', returnType{i}]);
                         setappdata(0, 'messageFileWarnings', 1.0)
@@ -2212,10 +2209,7 @@ classdef messenger < handle
                         
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 287.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: Some items in the surface definition file could not be located in the stress dataset', returnType{i}]);
-                        fprintf(fidType(i), ['-> Verify that the results position in the surface definition is consistent with the model definition in the job file', returnType{i}]);
-                        
-                        setappdata(0, 'messageFileWarnings', 1.0)
+                        %_AVAILABLE_%
                     case 289.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The following elements are not supported by the surface detection algorithm: %s'], getappdata(0, 'message_289_unsupportedElements'));
                         fprintf(fidType(i), ['-> These elements have been skipped', returnType{i}]);
@@ -2264,6 +2258,42 @@ classdef messenger < handle
                     case 308.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Surface detection cannot be limited to dataset elements if more than one part instance is specified with the PART_INSTANCE option', returnType{i}], getappdata(0, 'message_275'));
                         fprintf(fidType(i), ['-> The whole part instance will be searched', returnType{i}]);
+                    case 309.0
+                        if getappdata(0, 'suppress_ID309') == 0.0
+                            fprintf(fidType(i), [returnType{i}, '***WARNING: The fatigue definition file could not be written to the library', returnType{i}]);
+                            fprintf(fidType(i), ['-> Error message: %s', returnType{i}], getappdata(0, 'warning_309_exception'));
+
+                            if i == X
+                                setappdata(0, 'suppress_ID309', 1.0)
+                            end
+
+                            setappdata(0, 'messageFileWarnings', 1.0)
+                        end
+                    case 310.0
+                        if getappdata(0, 'suppress_ID310') == 0.0
+                            fprintf(fidType(i), [returnType{i}, '***WARNING: The fatigue definition file could not be retrieved from the library', returnType{i}]);
+                            if strcmpi(getappdata(0, 'warning_310_exception'), 'Reference to non-existent field ''uniaxial''.') == 1.0
+                                fprintf(fidType(i), ['-> The current analysis is uniaxial, but the fatigue definition file does not contain uniaxial load data', returnType{i}]);
+                                fprintf(fidType(i), ['-> Switching to a uniaxial method is not permitted when DATA_CHECK=2', returnType{i}]);
+                            else
+                                fprintf(fidType(i), ['-> Error message: %s', returnType{i}], getappdata(0, 'warning_310_exception'));
+                            end
+                            fprintf(fidType(i), ['-> The fatigue definition will be processed from the job file instead', returnType{i}]);
+
+                            if i == X
+                                setappdata(0, 'suppress_ID310', 1.0)
+                            end
+
+                            setappdata(0, 'messageFileWarnings', 1.0)
+                        end
+                    case 311.0
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: Whenever DATA_CHECK=2, the fatigue definition is recalled from the Quick Fatigue Tool library', returnType{i}]);
+                        fprintf(fidType(i), ['-> Any changes to the model/loading definition or to the selected analysis algorithm may result in undesirable behaviour', returnType{i}]);
+                        
+                        setappdata(0, 'messageFileWarnings', 1.0)
+                    case 312.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The fatigue definition has been read from ''%s''', returnType{i}], getappdata(0, 'message_312_fdf'));
+                        fprintf(fidType(i), ['-> Dataset and history definitions in the job file will be ignored', returnType{i}]);
                 end
             end
         end
@@ -2295,6 +2325,8 @@ classdef messenger < handle
             setappdata(0, 'suppress_ID220', 0.0)
             setappdata(0, 'suppress_ID257', 0.0)
             setappdata(0, 'suppress_ID266', 0.0)
+            setappdata(0, 'suppress_ID309', 0.0)
+            setappdata(0, 'suppress_ID310', 0.0)
         end
 
         %% WRITE LOG FILE
@@ -2314,13 +2346,13 @@ classdef messenger < handle
 
             % Write file header
             try
-                fprintf(fid, 'Quick Fatigue Tool 6.11-10 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
+                fprintf(fid, 'Quick Fatigue Tool 6.11-11 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
             catch
-                fprintf(fid, 'Quick Fatigue Tool 6.11-10\r\n');
+                fprintf(fid, 'Quick Fatigue Tool 6.11-11\r\n');
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2018\r\n');
-            fprintf(fid, 'Last modified 17-Jan-2018 08:19:00 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 02-Feb-2018 09:50:06 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
@@ -2504,12 +2536,12 @@ classdef messenger < handle
                         string{i} = sprintf('''%s'',', dataset{i-1});
                     end
                 end
-                fprintf(fid, strjoin(string));
+                fprintf(fid, '%s', strjoin(string));
             else
                 fprintf(fid, '    Stress Dataset: ''%s''\r\n', dataset);
             end
             dataLabel = getappdata(0, 'dataLabel');
-            if dataLabel(1.0) == 4.0 || dataLabel(1) == 5.0 || (dataLabel(1) == 6.0 && elementType == 1.0) || dataLabel(1) == 9.0 || dataLabel(1) == 10.0
+            if dataLabel(1.0) == 4.0 || dataLabel(1.0) == 5.0 || (dataLabel(1.0) == 6.0 && elementType == 1.0) || dataLabel(1.0) == 9.0 || dataLabel(1.0) == 10.0
                 fprintf(fid, '    Allow Datasets with Plane Stress Elements: YES\r\n');
                 if dataLabel(1.0) == 9.0 || dataLabel(1.0) == 10.0
                     if getappdata(0, 'shellLocation') == 1.0
@@ -2598,7 +2630,7 @@ classdef messenger < handle
                         end
                     end
                 end
-                fprintf(fid, strjoin(string));
+                fprintf(fid, '%s', strjoin(string));
             else
                 fprintf(fid, '    Load History: ''%s''\r\n', history);
             end

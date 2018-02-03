@@ -9,7 +9,7 @@ classdef postProcess_e < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      10 Output
 %   
-%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
 %   Last modified 22-Nov-2017 09:33:19 GMT
     
     %%
@@ -776,21 +776,11 @@ classdef postProcess_e < handle
             end
             
             %% CN (Elastic normal stress on critical plane)
-            
-            Sxx = getappdata(0, 'worstNodeSxx');
+            normalOnCP = getappdata(0, 'CN');
+            shearOnCP = getappdata(0, 'CS');
         
             if getappdata(0, 'figure_CNS') == 1.0 && outputFigure == 1.0
-                if algorithm == 3.0
-                    normalOnCP = 0.5*Sxx;
-                    setappdata(0, 'CN', normalOnCP);
-                    msg = sprintf('CN, Maximum elastic normal (hydrostatic) stress history for item %.0f.%.0f', mainID, subID);
-                elseif algorithm == 7.0
-                    normalOnCP = getappdata(0, 'CN');
-                    msg = sprintf('CN, Maximum elastic normal (hydrostatic) stress history for item %.0f.%.0f', mainID, subID);
-                else
-                    normalOnCP = getappdata(0, 'CN');
-                    msg = sprintf('CN, Maximum elastic normal stress history on critical plane for item %.0f.%.0f', mainID, subID);
-                end
+                msg = sprintf('CN, Maximum elastic normal stress history for item %.0f.%.0f', mainID, subID);
                     
                 f6 = figure('visible', figureVisibility);
                 subplot(2.0, 1.0, 1.0)
@@ -813,20 +803,8 @@ classdef postProcess_e < handle
                 end
                 
                 %% CS (Elastic shear stress on critical plane)
-                if algorithm == 3.0
-                    shearOnCP = 0.5*(abs(Sxx));
-                    setappdata(0, 'CS', shearOnCP);
-                    msg = sprintf('CS, Maximum elastic shear (Tresca) stress history for item %.0f.%.0f', mainID, subID);
-                    figureTitle = 'MATLAB Figures/CN + CS, Elastic normal and shear stress at worst item';
-                elseif algorithm == 7.0
-                    shearOnCP = getappdata(0, 'CS');
-                    msg = sprintf('CS, Maximum elastic shear (Tresca) stress history for item %.0f.%.0f', mainID, subID);
-                    figureTitle = 'MATLAB Figures/CN + CS, Elastic normal and shear stress at worst item';
-                else
-                    shearOnCP = getappdata(0, 'CS');
-                    msg = sprintf('CS, Maximum elastic shear stress history on critical plane for item %.0f.%.0f', mainID, subID);
-                    figureTitle = 'MATLAB Figures/CN + CS, Elastic normal and shear stress on critical plane at worst item';
-                end
+                msg = sprintf('CS, Maximum elastic shear (Tresca) stress history for item %.0f.%.0f', mainID, subID);
+                figureTitle = 'MATLAB Figures/CN + CS, Elastic normal and shear stress at worst item';
                 
                 subplot(2.0, 1.0, 2.0)
                 plot(shearOnCP, '-', 'LineWidth', lineWidth, 'Color', forestGreen)

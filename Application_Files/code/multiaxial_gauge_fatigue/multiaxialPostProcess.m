@@ -12,8 +12,8 @@ classdef multiaxialPostProcess < handle
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.2 Multiaxial Gauge Fatigue
 %   
-%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
-%   Last modified 16-Oct-2017 09:28:25 GMT
+%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
+%   Last modified 23-Jan-2018 09:12:22 GMT
     
     %%
     
@@ -41,8 +41,8 @@ classdef multiaxialPostProcess < handle
             
             %% Header
             % Write file header
-            fprintf(fid, 'Quick Fatigue Tool 6.11-10 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
-            fprintf(fid, '(Copyright Louis Vallance 2017)\r\n');
+            fprintf(fid, 'Quick Fatigue Tool 6.11-11 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
+            fprintf(fid, '(Copyright Louis Vallance 2018)\r\n');
             fprintf(fid, 'Last modified 08-Feb-2017 12:23:04 GMT\r\n\r\n');
             
             fprintf(fid, 'MULTIAXIAL GAUGE FATIGUE RESULTS (%s)\r\n\r\n', getappdata(0, 'dateString'));
@@ -520,7 +520,7 @@ classdef multiaxialPostProcess < handle
             plot(shearOnCP, '-', 'LineWidth', 1.0, 'Color', [34/255, 139/255, 34/255])
             
             xlabel('Sample', 'FontSize', 12.0);
-            ylabel('Stress [MPa]', 'FontSize', 12.0)
+            ylabel('Strain', 'FontSize', 12.0)
             title(msg, 'FontSize', 14.0)
             set(gca, 'FontSize', 12.0)
             set(gca, 'XTick', linspace(1.0, signalLength, 4.0 + 1.0))

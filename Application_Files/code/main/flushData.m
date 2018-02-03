@@ -1,12 +1,12 @@
-function [] = flushMaterial()
+function [] = flushData()
 %CLEANUP    QFT function to clear material data.
-%   This function removes material data.
+%   This function removes analysis data.
 %   
-%   CLEANUP is used internally by Quick Fatigue Tool. The user
+%   FLUSHDATA is used internally by Quick Fatigue Tool. The user
 %   is not required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
-%   Last modified 01-Dec-2017 12:42:06 GMT
+%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
+%   Last modified 02-Feb-2018 09:50:06 GMT
     
     %%
     
@@ -215,4 +215,30 @@ if isappdata(0, 'larc05_phi0') == 1.0
 end
 if isappdata(0, 'larc05_iterate') == 1.0
     rmappdata(0, 'larc05_iterate')
+end
+
+%% Remove loading data
+if isappdata(0, 'Sxx') == 1.0
+    rmappdata(0, 'Sxx')
+end
+if isappdata(0, 'Syy') == 1.0
+    rmappdata(0, 'Syy')
+end
+if isappdata(0, 'Szz') == 1.0
+    rmappdata(0, 'Szz')
+end
+if isappdata(0, 'Txy') == 1.0
+    rmappdata(0, 'Txy')
+end
+if isappdata(0, 'Txz') == 1.0
+    rmappdata(0, 'Txz')
+end
+if isappdata(0, 'Tyz') == 1.0
+    rmappdata(0, 'Tyz')
+end
+if isappdata(0, 'SIGOriginalSignal') == 1.0
+    rmappdata(0, 'SIGOriginalSignal')
+end
+if isappdata(0, 'fatigueDefinitionFile') == 1.0
+    rmappdata(0, 'fatigueDefinitionFile')
 end

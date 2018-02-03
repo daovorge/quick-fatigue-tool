@@ -9,7 +9,7 @@ function [fos_i, iterFine, iterCoarse, iterType] =...
 %   FOSUPDATE is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
 %   Last modified 04-Apr-2017 13:26:59 GMT
     
     %%

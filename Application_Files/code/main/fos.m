@@ -9,7 +9,7 @@ function [] = fos(gateTensors, tensorGate, coldItems, algorithm, msCorrection, N
 %   Reference section in Quick Fatigue Tool User Guide
 %      8.3 Factor of Strength
 %   
-%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
 %   Last modified 10-Jan-2017 09:33:05 GMT
     
     %%
@@ -245,7 +245,7 @@ for groups = 1:G
             
             % If necessray, re-calculate the principal stress history
             if (algorithm == 4.0) || (algorithm == 5.0) || (algorithm == 6.0) || (algorithm == 7.0) || (algorithm == 3.0)
-                preProcess.getPrincipalStress(1.0, Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, algorithm, 1.0)
+                preProcess.getPrincipalStress(1.0, Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, algorithm, 1.0, 0.0)
                 
                 s1i = getappdata(0, 'S1_FOS');
                 s2i = getappdata(0, 'S2_FOS');

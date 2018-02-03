@@ -6,7 +6,7 @@ classdef mscFileUtils < handle
 %   MSCFILEUTILS is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
 %   Last modified 18-Dec-2017 10:16:35 GMT
     
     %%

@@ -1,5 +1,5 @@
 ==========================
-QUICK FATIGUE TOOL 6.11-10
+QUICK FATIGUE TOOL 6.11-11
 ==========================
 Copyright Louis Vallance 2018
 
@@ -255,18 +255,18 @@ Quick Fatigue Tool User Guide.
 %       - ST, Stress tensor at worst item on the critical plane
 %       - HD, Haigh diagram for critical plane
 %       - VM, von Mises stress
-%       - PS1, Maximum (first) principal stress
-%       - PS2, Middle (second) principal stress
-%       - PS3, Minimum (third) principal stress
-%       - CN, Normal stress on critical plane
-%       - CS, Shear stress on critical plane
+%       - PS, Principal stresses (maximum, middle and minimum)
+%       - PE, Principal strains (maximum, middle and minimum)
+%       - CN, Maximum normal stress history
+%       - CS, Maximum shear stress history
 %       - DP, Damage vs. plane angle
 %       - DPP, Damage parameter vs. plane angle
 %       - LP, Life vs. plane angle
 %       - DAC, Damage accumulation at worst item
 %		- RHIST, Rainflow histogram of cycle counted stresses
 %		- RC, Stress range distribution
-%		- SIG, Uniaxial load history (before and after gating, if applicable)
+%		- SIGS, Uniaxial stress history (before and after gating if applicable)
+%		- SIGE, Uniaxial inelastic strain history
 %
 %   WHOLE MODEL VARIABLES
 %   A history of results for every analysis item in the model over the
@@ -303,5 +303,5 @@ Quick Fatigue Tool User Guide.
 %   M.Sc. Louis Vallance
 %   louisvallance@hotmail.co.uk
 %
-%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2018
-%   Last modified 17-Jan-2018 08:19:00 GMT
+%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
+%   Last modified 02-Feb-2018 09:50:06 GMT
