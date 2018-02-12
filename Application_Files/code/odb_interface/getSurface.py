@@ -28,7 +28,7 @@
 #	Since the Abaqus Python APIs do not supply the node face
 #	data for an element, the faces must be constructed manually
 #	depending on the element family. The node ordering and face
-#	numbering information was taken from "Part IV: Elements" of
+#	numbering information was taken from "Part VI: Elements" of
 #	the Abaqus Analysis User's Guide.
 #
 #   GETSURFACE.py is used internally by Quick Fatigue Tool. The user is not required to run this
@@ -37,8 +37,8 @@
 #   Reference sextion in Quick Fatigue Tool User Guide
 #      4.5.3 Custom analysis items
 #
-#   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-#   Last modified 18-Jan-2018 09:09:39 GMT
+#   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
+#   Last modified 12-Feb-2018 14:58:08 GMT
 
 import os
 from odbAccess import *
@@ -516,6 +516,98 @@ for instanceNumber in range(nInstances):
 				
 		# ELTYPE 2D Continuum quadrilateral elements:
 		elif ((element.type == 'CPE4') or (element.type == 'CPE4H') or (element.type == 'CPE4I') or (element.type == 'CPE4IH') or (element.type == 'CPE4R') or (element.type == 'CPE4RH') or (element.type == 'CPE8') or (element.type == 'CPE8H') or (element.type == 'CPE8R') or (element.type == 'CPE8RH') or (element.type == 'CPS4') or (element.type == 'CPS4I') or (element.type == 'CPS4R') or (element.type == 'CPS8') or (element.type == 'CPS8R') or (element.type == 'CPEG4') or (element.type == 'CPEG4H') or (element.type == 'CPEG4I') or (element.type == 'CPEG4IH') or (element.type == 'CPEG4R') or (element.type == 'CPEG4RH') or (element.type == 'CPEG8') or (element.type == 'CPEG8H') or (element.type == 'CPEG8R') or (element.type == 'CPEG8RH')):
+			
+			# Increment INDEX face node variable:
+			if (i > 0):
+				index = index + indexIncrement
+			
+			# Treat shell surface as shell faces:
+			if (SHELL_FACES.lower() == 'yes'):
+				
+				# Linear:
+				if (len(conn) == 4):
+					faces[index + 0][:] = itemgetter(*[0, 1])(conn)
+					faces[index + 1][:] = itemgetter(*[1, 2])(conn)
+					faces[index + 2][:] = itemgetter(*[2, 3])(conn)
+					faces[index + 3][:] = itemgetter(*[3, 0])(conn)
+					
+					linearAndQuad[0] = 1
+					
+				# Quadratic:
+				else:
+					faces[index + 0][:] = itemgetter(*[0, 1, 4])(conn)
+					faces[index + 1][:] = itemgetter(*[1, 2, 5])(conn)
+					faces[index + 2][:] = itemgetter(*[2, 3, 6])(conn)
+					faces[index + 3][:] = itemgetter(*[3, 0, 7])(conn)
+					
+					linearAndQuad[1] = 1
+					
+				indexIncrement = 4
+				
+			# Treat shell surface as whole shell:
+			else:
+				
+				# Linear:
+				if (len(conn) == 4.0):
+					faces[index + 0][:] = itemgetter(*[0, 1, 2, 3])(conn)
+					
+					linearAndQuad[0] = 1
+					
+				# Quadratic:
+				else:
+					faces[index + 0][:] = itemgetter(*[0, 1, 2, 3, 4, 5, 6, 7])(conn)
+					
+					linearAndQuad[1] = 1
+				
+				indexIncrement = 1
+				
+		# ELTYPE Axisymmetric solid triangular elements:
+		elif ((element.type == 'CAX3') or (element.type == 'CAX3H') or (element.type == 'CGAX3') or (element.type == 'CGAX3H') or (element.type == 'CAX3T') or (element.type == 'CGAX3T') or (element.type == 'CGAX3HT') or (element.type == 'CAX6') or (element.type == 'CAX6H') or (element.type == 'CAX6M') or (element.type == 'CAX6MH') or (element.type == 'CGAX6') or (element.type == 'CGAX6H') or (element.type == 'CGAX6M') or (element.type == 'CGAX6MH') or (element.type == 'CAX6MT') or (element.type == 'CAX6MHT') or (element.type == 'CGAX6MT') or (element.type == 'CGAX6MHT')):
+			
+			# Increment INDEX face node variable:
+			if (i > 0):
+				index = index + indexIncrement
+			
+			# Treat shell surface as shell faces:
+			if (SHELL_FACES.lower() == 'yes'):
+				
+				# Linear:
+				if (len(conn) == 3):
+					faces[index + 0][:] = itemgetter(*[0, 1])(conn)
+					faces[index + 1][:] = itemgetter(*[1, 2])(conn)
+					faces[index + 2][:] = itemgetter(*[2, 0])(conn)
+					
+					linearAndQuad[0] = 1
+					
+				# Quadratic:
+				else:
+					faces[index + 0][:] = itemgetter(*[0, 1, 3])(conn)
+					faces[index + 1][:] = itemgetter(*[1, 2, 4])(conn)
+					faces[index + 2][:] = itemgetter(*[2, 0, 5])(conn)
+					
+					linearAndQuad[1] = 1
+					
+				indexIncrement = 3
+				
+			# Treat shell surface as whole shell:
+			else:
+				
+				# Linear:
+				if (len(conn) == 4.0):
+					faces[index + 0][:] = itemgetter(*[0, 1, 2])(conn)
+					
+					linearAndQuad[0] = 1
+					
+				# Quadratic:
+				else:
+					faces[index + 0][:] = itemgetter(*[0, 1, 2, 3, 4, 5])(conn)
+					
+					linearAndQuad[1] = 1
+				
+				indexIncrement = 1
+				
+		# ELTYPE Axisymmetric solid quadrilateral elements:
+		elif ((element.type == 'CAX4') or (element.type == 'CAX4H') or (element.type == 'CAX4I') or (element.type == 'CAX4IH') or (element.type == 'CAX4R') or (element.type == 'CAX4RH') or (element.type == 'CGAX4') or (element.type == 'CGAX4H') or (element.type == 'CGAX4R') or (element.type == 'CGAX4RH') or (element.type == 'CAX4T') or (element.type == 'CAX4HT') or (element.type == 'CAX4RT') or (element.type == 'CAX4RHT') or (element.type == 'CGAX4T') or (element.type == 'CGAX4HT') or (element.type == 'CGAX4RT') or (element.type == 'CGAX4RHT') or (element.type == 'CAX8') or (element.type == 'CAX8H') or (element.type == 'CAX8R') or (element.type == 'CAX8RH') or (element.type == 'CGAX8') or (element.type == 'CGAX8H') or (element.type == 'CGAX8R') or (element.type == 'CGAX8RH') or (element.type == 'CAX8T') or (element.type == 'CAX8HT') or (element.type == 'CAX8RT') or (element.type == 'CAX8RHT') or (element.type == 'CGAX8T') or (element.type == 'CGAX8HT') or (element.type == 'CGAX8RT') or (element.type == 'CGAX8RHT')):
 			
 			# Increment INDEX face node variable:
 			if (i > 0):
