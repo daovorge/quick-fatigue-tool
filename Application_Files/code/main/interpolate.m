@@ -11,7 +11,7 @@ function [cumulativeDamage] = interpolate(cumulativeDamage, pairs, msCorrection,
 %   Reference section in Quick Fatigue Tool User Guide
 %      5.4 Using custom stress-life data
 %   
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
 %   Last modified 06-Nov-2017 18:43:35 GMT
     
     %%

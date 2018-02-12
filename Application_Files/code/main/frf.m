@@ -9,7 +9,7 @@ function [] = frf(algorithm, msCorrection, N, mainID, subID, use_sn)
 %   Reference section in Quick Fatigue Tool User Guide
 %      8.2 Fatigue Reserve Factor
 %   
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
 %   Last modified 18-Dec-2017 10:16:35 GMT
     
     %%

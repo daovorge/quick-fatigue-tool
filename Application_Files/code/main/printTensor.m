@@ -9,7 +9,7 @@ function [] = printTensor(Sxx, Syy, Szz, Txy, Tyz, Txz)
 %   Reference section in Quick Fatigue Tool User Guide
 %      2.4.2 Configuring a data check analysis
 %    
-%    Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
+%    Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
 %    Last modified 15-Jun-2017 12:32:06 GMT
     
     %%

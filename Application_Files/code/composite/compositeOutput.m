@@ -9,7 +9,7 @@ classdef compositeOutput < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      12.3 Composite failure criteria
 %   
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
 %   Last modified 17-Jan-2018 11:19:25 GMT
     
     %%
@@ -126,11 +126,11 @@ classdef compositeOutput < handle
             end
             
             if removeCarriageReturn == 1.0
-                fprintf('[POST] Starting Quick Fatigue Tool 6.11-11 ODB Interface');
-                fprintf(fid_status, '\n[POST] Starting Quick Fatigue Tool 6.11-11 ODB Interface');
+                fprintf('[POST] Starting Quick Fatigue Tool 6.11-12 ODB Interface');
+                fprintf(fid_status, '\n[POST] Starting Quick Fatigue Tool 6.11-12 ODB Interface');
             else
-                fprintf('[POST] Quick Fatigue Tool 6.11-11 ODB Interface');
-                fprintf(fid_status, '\n[POST] Quick Fatigue Tool 6.11-11 ODB Interface');
+                fprintf('[POST] Quick Fatigue Tool 6.11-12 ODB Interface');
+                fprintf(fid_status, '\n[POST] Quick Fatigue Tool 6.11-12 ODB Interface');
             end
             
             % Delete the upgrade log file
@@ -146,7 +146,7 @@ classdef compositeOutput < handle
             
             % Open the log file for writing
             fid_debug = fopen([sprintf('Project/output/%s/Data Files/', jobName), resultsDatabaseName, '.log'], 'w+');
-            fprintf(fid_debug, 'Quick Fatigue Tool 6.11-11 ODB Interface Log');
+            fprintf(fid_debug, 'Quick Fatigue Tool 6.11-12 ODB Interface Log');
             
             % Get the selected position
             userPosition = getappdata(0, 'odbResultPosition');
@@ -620,7 +620,7 @@ classdef compositeOutput < handle
             
             %% Get step description
             [job, loading] = fieldDataFile.textdata{2:3};
-            stepDescription = ['version 6.11-11; ', job, ', ', loading];
+            stepDescription = ['version 6.11-12; ', job, ', ', loading];
             
             %% Get the composite field data
             fieldNamesFile = fieldDataFile.colheaders(3.0:end);
