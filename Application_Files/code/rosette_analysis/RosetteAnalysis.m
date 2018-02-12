@@ -12,7 +12,7 @@ function varargout = RosetteAnalysis(varargin)%#ok<*DEFNU>
 %      A3.3 rosetteanalysis Analysis
 %   
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 16-Oct-2017 09:28:25 GMT
+%   Last modified 12-Feb-2018 08:52:17 GMT
     
     %%
     
@@ -101,9 +101,6 @@ if isAvailable == 0.0
 end
 
 [~] = checkToolbox('Symbolic Math Toolbox');
-
-% Save output definition type
-setappdata(0, 'rosette_pMenu_outputType', get(handles.pMenu_outputType, 'value'))
 
 %% Load the panel state
 if isappdata(0, 'rosette_edit_gaugeA') == 1.0
