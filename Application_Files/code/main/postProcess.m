@@ -11,7 +11,7 @@ classdef postProcess < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 31-Jan-2018 10:48:44 GMT
+%   Last modified 13-Feb-2018 20:14:48 GMT
     
     %%
     
@@ -1984,11 +1984,19 @@ classdef postProcess < handle
             % Try to upgrade the ODB
             if getappdata(0, 'autoExport_upgradeODB') == 1.0
                 [status, result] = system(sprintf('%s -upgrade -job "%s" -odb "%s"', abqCmd, [resultsDatabasePath, '/', resultsDatabaseName], modelDatabasePath(1.0:end - 4.0)));
-                
+
                 if status == 1.0
-                    % There is no Abaqus executable on the host machine
+                    % An exception occurred whilst upgrading the ODB file
                     fprintf('[POST] ODB Error: %s', result);
-                    fprintf(fid_status, '[POST] ODB Error: %s', result);
+                    fprintf(fid_status, '\n[POST] ODB Error: %s', result);
+                    
+                    if isempty(strfind(result, 'is not recognized as an internal or external command,')) == 0.0
+                        fprintf('\n[POST] Please ensure that the Abaqus command line argument points to a valid Abaqus batch file');
+                        fprintf('\n[POST] An Abaqus installation is required to write fatigue results to the output database (.odb) file');
+                        fprintf(fid_status, '\n[POST] Please ensure that the Abaqus command line argument points to a valid Abaqus batch file');
+                        fprintf(fid_status, '\n[POST] An Abaqus installation is required to write fatigue results to the output database (.odb) file');
+                    end
+                    
                     fprintf('\n[ERROR] ODB Interface exited with errors');
                     fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors');
                     return

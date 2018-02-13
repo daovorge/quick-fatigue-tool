@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 13-Feb-2018 18:34:35 GMT
+%   Last modified 13-Feb-2018 20:14:48 GMT
 
     %%
 
@@ -2149,11 +2149,14 @@ classdef messenger < handle
                         partInstance = getappdata(0, 'partInstance');
                         
                         fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: Surface detection failed on ''%s'' with the following error:', returnType{i}], getappdata(0, 'outputDatabase'));
-                        fprintf(fidType(i), '%s', message);
+                        fprintf(fidType(i), '%s\r\n', message);
                         
                         if isempty(strfind(message, 'The database is from a previous release of Abaqus.')) == 0.0
                             fprintf(fidType(i), ['-> The installed Abaqus API is from a more recent version of Abaqus than that which was used to generate the model ODB file', returnType{i}]);
                             fprintf(fidType(i), ['-> Set the environment variables ''autoExport_upgradeODB=1.0'' and ''autoExport_abqCmd=<abaqus-version>'', where <abaqus-version> is the identifier of the Abaqus version to which the ODB file is upgraded', returnType{i}]);
+                        elseif isempty(strfind(message, 'is not recognized as an internal or external command,')) == 0.0
+                            fprintf(fidType(i), ['-> Please ensure that the Abaqus command line argument points to a valid Abaqus batch file', returnType{i}]);
+                            fprintf(fidType(i), ['-> An Abaqus installation is required to extract the surface from the output database (.odb) file', returnType{i}]);
                         elseif iscell(partInstance) == 1.0
                             for j = 1:length(partInstance)
                                 if isempty(strfind(message, partInstance{j})) == 0.0
@@ -2354,7 +2357,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2018\r\n');
-            fprintf(fid, 'Last modified 13-Feb-2018 18:34:35 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 13-Feb-2018 20:14:48 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
