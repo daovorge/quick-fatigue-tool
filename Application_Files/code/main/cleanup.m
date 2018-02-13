@@ -6,7 +6,7 @@ function [] = cleanup(status)
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 13-Feb-2018 13:39:30 GMT
+%   Last modified 13-Feb-2018 18:34:35 GMT
     
     %%
     
@@ -61,7 +61,7 @@ if status == 1.0
     end
     fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
     fprintf(fid, 'Copyright Louis Vallance 2018\r\n');
-    fprintf(fid, 'Last modified 13-Feb-2018 13:39:30 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 13-Feb-2018 18:34:35 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');
@@ -468,7 +468,8 @@ if status == 1.0
     end
     if getappdata(0, 'E023') == 1.0
         fprintf(fid, '\r\n\r\n***ERROR: No stress datasets were specified');
-        fprintf(fid, '\r\n-> At least one stress dataset is required for multiaxial analysis');
+        fprintf(fid, '\r\n-> For multiaxial fatigue analysis, one or more stress datasets must be specified');
+        fprintf(fid, '\r\n-> For uniaxial fatigue analysis, select a uniaxial analysis algorithm: ALGORITHM=[3.0 | 10.0]');
         fprintf(fid, '\r\n\r\nError code: E023');
         rmappdata(0, 'E023')
     end
