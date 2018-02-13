@@ -3,7 +3,7 @@
 #   N_INSTANCES searches an Abaqus ODB file for the free surface at a given element position,
 #   search region and part instance.
 #
-#   ODB_NAME: Full path to the output databse file
+#   ODB_NAME: Full path to the output database file
 #   POSITION: Element position
 #   SEARCH_REGION: Search either the part instance or a list of element IDs
 #   SHELL_FACES: Treat shell surface as whole shell or free shell faces
