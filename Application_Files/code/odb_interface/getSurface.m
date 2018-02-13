@@ -247,6 +247,12 @@ if getappdata(0, 'autoExport_upgradeODB') == 1.0
             items = 'ALL';
             setappdata(0, 'items', 'ALL')
         end
+        
+        % Flush the element ID file if applicable
+        if exist([pwd, '/Application_Files/code/odb_interface/element_ids.dat'], 'file') == 2.0
+            delete([pwd, '/Application_Files/code/odb_interface/element_ids.dat'])
+        end
+        
         return
     end
     
