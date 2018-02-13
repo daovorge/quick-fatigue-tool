@@ -27,7 +27,7 @@ function [] = job(varargin)
 %      1 Job file options
 %   
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 30-Jan-2018 13:52:26 GMT
+%   Last modified 13-Feb-2018 13:39:30 GMT
     
     %%
     
@@ -392,7 +392,7 @@ while feof(fid) == 0.0
                 Do not attempt to evaluate any expression that matches a
                 file name on the MATLAB path
             %}
-            if exist(currentLine, 'file') ~= 2.0
+            if exist(currentLine, 'file') ~= 2.0 && exist(currentLine, 'builtin') ~= 5.0
                 try eval(currentLine)
                     kwData{matchingKw} = eval(currentLine);
                 catch
