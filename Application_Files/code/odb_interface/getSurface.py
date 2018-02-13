@@ -11,14 +11,14 @@
 #   N_INSTANCES: Number of part instances
 #
 #	The script is called as follows:
-#	<abaqus-id> python getSurface.py -- "\..\model-name.odb" {ELEMENTAL | NODAL | CENTROIDAL}
-#   {INSTANCE | DATASET} {YES | NO} "PART-1-1" 1
+#	<abaqus-id> python getSurface.py -- "\..\<model-name>.odb" {ELEMENTAL | NODAL | CENTROID}
+#   {INSTANCE | DATASET} {YES | NO} "<part-instance-name>" <number-of-instances>
 #
 #	Example using a single part instance:
-#	abaqus python \..\getSurface.py -- {preceding arguments} "PART-1-1" 1
+#	abaqus python \..\getSurface.py -- <preceding arguments> "PART-1-1" 1
 #
 #	Example using N part instances:
-#	abaqus python \..\getSurface.py -- {preceding arguments} "PART-1-1" "PART-2-1" ... "PART-N-1" N
+#	abaqus python \..\getSurface.py -- <preceding arguments> "PART-1-1" "PART-2-1" ... "PART-N-1" N
 #
 #	This surface detection algorithm relies on the principle
 #	that, if the set of nodes of element face A does not have
@@ -38,7 +38,7 @@
 #      4.5.3 Custom analysis items
 #
 #   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-#   Last modified 13-Feb-2018 11:42:05 GMT
+#   Last modified 13-Feb-2018 20:14:48 GMT
 
 import os
 from odbAccess import *
@@ -667,7 +667,7 @@ for instanceNumber in range(nInstances):
 	surfaceNodesAll[instanceNumber][:] = surfaceNodes
 	
 	# Get surface elements from surface nodes:
-	if (POSITION.lower() == 'elemental') or (POSITION.lower() == 'centroidal'):
+	if (POSITION.lower() == 'elemental') or (POSITION.lower() == 'centroid'):
 		surfaceElements = []
 		surfaceConnectingNodes = []
 		
@@ -739,7 +739,7 @@ elif (POSITION.lower() == 'elemental'):
 	string = '%s' % nodesToFile
 	f.write(string)
 	f.close()
-elif (POSITION.lower() == 'centroidal'):
+elif (POSITION.lower() == 'centroid'):
 	if (nInstances == 1):
 		elementsToFile = surfaceElementsAll[0]
 	else:

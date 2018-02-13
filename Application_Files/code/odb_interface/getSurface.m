@@ -13,7 +13,7 @@ function [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(ma
 %      4.5.3 Custom analysis items
 %
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 31-Jan-2018 10:48:44 GMT
+%   Last modified 13-Feb-2018 20:14:48 GMT
 
 %%
 
@@ -46,7 +46,7 @@ if strcmpi(odbResultPosition, 'element nodal') == 1.0
 elseif strcmpi(odbResultPosition, 'unique nodal') == 1.0
     odbResultPosition = 'NODAL';
 elseif strcmpi(odbResultPosition, 'centroid') == 1.0
-    odbResultPosition = 'CENTROIDAL';
+    odbResultPosition = 'CENTROID';
 end
 
 %% Check if a surface definition already exists
@@ -90,7 +90,7 @@ if (strcmpi(items, 'surface') == 1.0) && (exist(surfaceFile, 'file') == 2.0) && 
 end
 
 %% Check if surface detection can be used
-% Check intpus
+% Check inputs
 if isempty(outputDatabase) == 1.0
     if strcmpi(items, 'surface') == 1.0
         items = 'ALL';
