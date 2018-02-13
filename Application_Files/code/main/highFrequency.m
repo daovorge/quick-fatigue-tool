@@ -7,7 +7,7 @@ classdef highFrequency < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 24-Nov-2017 12:40:07 GMT
+%   Last modified 13-Feb-2018 11:42:05 GMT
     
     %%
     
@@ -1011,20 +1011,44 @@ classdef highFrequency < handle
                         
                         fieldData_i(:, 6:7) = 0.0;
                     case 4.0
-                        mainIDs_i = linspace(1.0, Ri, Ri)';
-                        X = 1.0;
-                        
-                        fieldData_i(:, 5:6) = 0.0;
+                        if elementType == 0.0
+                            mainIDs_i = linspace(1.0, Ri, Ri)';
+                            X = 1.0;
+                            
+                            fieldData_i(:, 5:6) = 0.0;
+                        else
+                            mainIDs_i = fieldData_i(:, 1.0);
+                            X = 3.0;
+                            
+                            fieldData_i(:, 5:8) = 0.0;
+                        end
                     case 3.0
-                        mainIDs_i = fieldData_i(:, 1.0);
-                        
-                        fieldData_i(:, 4:8) = 0.0;
+                        if elementType == 0.0
+                            mainIDs_i = fieldData_i(:, 1.0);
+                            X = 3.0;
+                            
+                            fieldData_i(:, 4:8) = 0.0;
+                        else
+                            mainIDs_i = fieldData_i(:, 1.0);
+                            X = 2.0;
+                            
+                            fieldData_i(:, 4:7) = 0.0;
+                        end
                     case 2.0
-                        mainIDs_i = fieldData_i(:, 1.0);
-                        
-                        fieldData_i(:, 3:7) = 0.0;
+                        if elementType == 0.0
+                            mainIDs_i = fieldData_i(:, 1.0);
+                            X = 2.0;
+                            
+                            fieldData_i(:, 3:7) = 0.0;
+                        else
+                            mainIDs_i = linspace(1.0, 1.0, Ri)';
+                            X = 1.0;
+                            
+                            fieldData_i(:, 3:6) = 0.0;
+                        end
                     case 1.0
                         mainIDs_i = linspace(1.0, 1.0, Ri)';
+                        X = 1.0;
                         
                         fieldData_i(:, 2:6) = 0.0;
                     otherwise

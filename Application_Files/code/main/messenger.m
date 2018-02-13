@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 12-Feb-2018 14:58:08 GMT
+%   Last modified 13-Feb-2018 11:42:05 GMT
 
     %%
 
@@ -943,6 +943,7 @@ classdef messenger < handle
                             case 1.0
                                 fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: No matching position labels were found in the model output database. Field data will not be exported', returnType{i}]);
                                 fprintf(fidType(i), ['-> Check the definitions of OUTPUT_DATABASE and PART_INSTANCE in the job file', returnType{i}]);
+                                fprintf(fidType(i), ['-> If the stress dataset contains plane stress or axisymmetric elements, ensure that PLANE_STRESS=1', returnType{i}]);
                             case 2.0
                                 fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: An error occurred while retrieving the connectivity matrix. Field data will not be exported', returnType{i}]);
                             case 3.0
@@ -2160,7 +2161,8 @@ classdef messenger < handle
                                 end
                             end
                         elseif isempty(strfind(message, getappdata(0, 'partInstance'))) == 0.0
-                            fprintf(fidType(i), ['-> The part instance name is either spelled incorrectly or it does not exist in the model', returnType{i}]);
+                            fprintf(fidType(i), ['-> The part instance name might be spelled incorrectly, or it does not exist in the model', returnType{i}]);
+                            fprintf(fidType(i), ['-> Ensure that the dataset format is compatible (consult Section 3.2 of the Quick Fatigue Tool User Guide for more information)', returnType{i}]);
                         end
                             
                         fprintf(fidType(i), ['-> All items will be analysed', returnType{i}]);
@@ -2352,7 +2354,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2018\r\n');
-            fprintf(fid, 'Last modified 12-Feb-2018 14:58:08 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 13-Feb-2018 11:42:05 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

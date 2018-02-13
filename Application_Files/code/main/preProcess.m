@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 30-Jan-2018 13:52:26 GMT
+%   Last modified 13-Feb-2018 11:42:05 GMT
     
     %%
     
@@ -3151,23 +3151,47 @@ classdef preProcess < handle
                         
                         fieldData_i(:, 6:7) = 0.0;
                     case 4.0
-                        nodeType = 0.0;
-                        subIDs_i = linspace(1.0, 1.0, Ri)';
-                        mainIDs_i = linspace(1.0, Ri, Ri)';
-                        
-                        fieldData_i(:, 5:6) = 0.0;
+                        if elementType == 0.0
+                            nodeType = 0.0;
+                            subIDs_i = linspace(1.0, 1.0, Ri)';
+                            mainIDs_i = linspace(1.0, Ri, Ri)';
+                            
+                            fieldData_i(:, 5:6) = 0.0;
+                        else
+                            nodeType = 2.0;
+                            subIDs_i = fieldData_i(:, 2.0);
+                            mainIDs_i = fieldData_i(:, 1.0);
+                            
+                            fieldData_i(:, 5:8) = 0.0;
+                        end
                     case 3.0
-                        nodeType = 2.0;
-                        mainIDs_i = fieldData_i(:, 1.0);
-                        subIDs_i = fieldData_i(:, 2.0);
-                        
-                        fieldData_i(:, 4:8) = 0.0;
+                        if elementType == 0.0
+                            nodeType = 2.0;
+                            mainIDs_i = fieldData_i(:, 1.0);
+                            subIDs_i = fieldData_i(:, 2.0);
+                            
+                            fieldData_i(:, 4:8) = 0.0;
+                        else
+                            nodeType = 1.0;
+                            mainIDs_i = fieldData_i(:, 1.0);
+                            subIDs_i = linspace(1.0, 1.0, Ri)';
+                            
+                            fieldData_i(:, 4:7) = 0.0;
+                        end
                     case 2.0
-                        nodeType = 1.0;
-                        mainIDs_i = fieldData_i(:, 1.0);
-                        subIDs_i = linspace(1.0, 1.0, Ri)';
-                        
-                        fieldData_i(:, 3:7) = 0.0;
+                        if elementType == 0.0
+                            nodeType = 1.0;
+                            mainIDs_i = fieldData_i(:, 1.0);
+                            subIDs_i = linspace(1.0, 1.0, Ri)';
+                            
+                            fieldData_i(:, 3:7) = 0.0;
+                        else
+                            nodeType = 0.0;
+                            mainIDs_i = linspace(1.0, 1.0, Ri)';
+                            subIDs_i = linspace(1.0, 1.0, Ri)';
+                            
+                            fieldData_i(:, 3:6) = 0.0;
+                        end
                     case 1.0
                         nodeType = 0.0;
                         mainIDs_i = linspace(1.0, 1.0, Ri)';
