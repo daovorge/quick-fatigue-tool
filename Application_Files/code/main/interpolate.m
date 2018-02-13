@@ -1,7 +1,7 @@
 function [cumulativeDamage] = interpolate(cumulativeDamage, pairs, msCorrection, numberOfCycles, cycles, scaleFactors, mscWarning, overflowCycles)
 %INTERPOLATE    QFT function to interpolate stress-life data.
 %   This function calculates the S-N curve based on the current load ratio
-%   if the R-ratio S-N Curves mean stress cirrection is used. The function
+%   if the R-ratio S-N Curves mean stress correction is used. The function
 %   also interpolates user stress-life data to calculate the fatigue damage
 %   of the current cycle in the loading.
 %   

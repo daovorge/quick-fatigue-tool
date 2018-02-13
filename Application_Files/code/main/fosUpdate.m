@@ -16,9 +16,9 @@ function [fos_i, iterFine, iterCoarse, iterType] =...
     
 %{
     This code compares the current FOS iteration to the previous FOS
-    iteration. If it looks unlikely that the FOS calulation will converge
+    iteration. If it looks unlikely that the FOS calculation will converge
     within the next few increments, augment the next increment. If the next
-    increment falls within the convergence tolerance, the calculaiton is
+    increment falls within the convergence tolerance, the calculation is
     terminated. Otherwise, the code reverts back to the original
     incrementation scheme.
 

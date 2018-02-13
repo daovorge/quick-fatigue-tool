@@ -15,10 +15,10 @@
 #   {INSTANCE | DATASET} {YES | NO} "PART-1-1" 1
 #
 #	Example using a single part instance:
-#	abaqus python \..\getSurface.py -- {preceeding arguments} "PART-1-1" 1
+#	abaqus python \..\getSurface.py -- {preceding arguments} "PART-1-1" 1
 #
 #	Example using N part instances:
-#	abaqus python \..\getSurface.py -- {preceeding arguments} "PART-1-1" "PART-2-1" ... "PART-N-1" N
+#	abaqus python \..\getSurface.py -- {preceding arguments} "PART-1-1" "PART-2-1" ... "PART-N-1" N
 #
 #	This surface detection algorithm relies on the principle
 #	that, if the set of nodes of element face A does not have
@@ -34,7 +34,7 @@
 #   GETSURFACE.py is used internally by Quick Fatigue Tool. The user is not required to run this
 #   file.
 #
-#   Reference sextion in Quick Fatigue Tool User Guide
+#   Reference section in Quick Fatigue Tool User Guide
 #      4.5.3 Custom analysis items
 #
 #   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018

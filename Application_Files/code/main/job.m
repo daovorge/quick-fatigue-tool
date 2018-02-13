@@ -6,7 +6,7 @@ function [] = job(varargin)
 %   JOB(JOBNAME) submits an analysis job from a text file 'JOBNAME.*'
 %   containing valid job file option and material definitions.
 %
-%   JOB(JOBNAME, OPTION) submits the analyis job JOBNAME with additional
+%   JOB(JOBNAME, OPTION) submits the analysis job JOBNAME with additional
 %   options. Available options are:
 %
 %     'interactive' - print an echo of the message (.msg) file to the
@@ -14,8 +14,8 @@ function [] = job(varargin)
 %     'datacheck'   - submit the analysis job as a data check analysis
 %     'library' - use the fatigue definition from JOBNAME (same as *DATA CHECK=2)
 %
-%   If the extention of the job file is '.inp', then the JOBNAME parameter
-%   can be speficied without the extention.
+%   If the extension of the job file is '.inp', then the JOBNAME parameter
+%   can be specified without the extension.
 %
 %   See also importMaterial, keywords, fetchMaterial.
 %
