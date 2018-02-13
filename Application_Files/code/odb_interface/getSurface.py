@@ -14,11 +14,11 @@
 #	<abaqus-id> python getSurface.py -- "\..\<model-name>.odb" {ELEMENTAL | NODAL | CENTROID}
 #   {INSTANCE | DATASET} {YES | NO} "<part-instance-name>" <number-of-instances>
 #
-#	Example using a single part instance:
-#	abaqus python \..\getSurface.py -- <preceding arguments> "PART-1-1" 1
+#	Example command line usage for a single part instance:
+#	abaqus python getSurface.py -- "..\<file-name>.odb" ELEMENTAL INSTANCE NO "PART-1-1" 1
 #
-#	Example using N part instances:
-#	abaqus python \..\getSurface.py -- <preceding arguments> "PART-1-1" "PART-2-1" ... "PART-N-1" N
+#	Example command line usage for N part instances:
+#	abaqus python getSurface.py -- <preceding arguments> "PART-1-1" "PART-2-1" ... "PART-N-1" N
 #
 #	This surface detection algorithm relies on the principle
 #	that, if the set of nodes of element face A does not have
