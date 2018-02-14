@@ -111,8 +111,8 @@ HF_SCALE = [];
 
 % ELEMENT STRESS ASSUMPTION
 %{
-    0: Assume 2D stress elements where appropriate
-    1: Assume plane stress elements where appropriate
+    0: Do not allow plane stress elements
+    1: Allow plane stress element assumption
 %}
 ELEMENT_TYPE = 0.0;
 
@@ -270,7 +270,7 @@ COMPOSITE_CRITERIA = 0.0;
 
 %% - DO NOT EDIT
 flags = {ITEMS, UNITS, SCALE, REPEATS, USE_SN, DESIGN_LIFE, ALGORITHM,...
-    MS_CORRECTION, LOAD_EQ, PLANE_STRESS, SN_SCALE, OUTPUT_FIELD,...
+    MS_CORRECTION, LOAD_EQ, ELEMENT_TYPE, SN_SCALE, OUTPUT_FIELD,...
     OUTPUT_HISTORY, OUTPUT_FIGURE, KT_DEF, KT_CURVE, RESIDUAL,...
     WELD_CLASS, DEVIATIONS_BELOW_MEAN, CHARACTERISTIC_LENGTH, SEA_WATER,...
     YIELD_STRENGTH, FAILURE_MODE, UTS, CONV, OUTPUT_DATABASE, PART_INSTANCE,...

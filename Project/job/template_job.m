@@ -110,8 +110,8 @@ HF_SCALE = [];
 
 % ELEMENT STRESS ASSUMPTION
 %{
-    0: Assume 2D stress elements where appropriate
-    1: Assume plane stress elements where appropriate
+    0: Do not allow plane stress elements
+    1: Allow plane stress element assumption
 %}
 ELEMENT_TYPE = 0.0;
 
