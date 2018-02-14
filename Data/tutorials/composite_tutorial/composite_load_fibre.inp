@@ -3,5 +3,5 @@
 **composite laminate loaded along the fibre (longitudinal)
 *MATERIAL = IM7 (8551-7)
 *DATASET = composite-dataset-longitudinal.dat
-*PLANE STRESS = 1
+*ELEMENT TYPE = 1
 *COMPOSITE CRITERIA = 1

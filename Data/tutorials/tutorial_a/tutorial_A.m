@@ -19,7 +19,7 @@ function [] = tutorial_A()
 %      1 Job file options
 %   
 %   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
-%   Last modified 24-Jan-2018 15:17:50 GMT
+%   Last modified 14-Feb-2018 10:15:26 GMT
 
 %% JOB
 
@@ -107,13 +107,14 @@ HF_TIME = {[], []};
 % SCALE FACTORS FOR HIGH FREQUENCY DATASETS
 HF_SCALE = [];
 
-%% ABAQUS RPT / DATASET FILE
+%% 5: DATASET PROCESSOR
 
+% ELEMENT STRESS ASSUMPTION
 %{
-    0: Allow dataset files with 3D stress elements only
-    1: Allow dataset files with plane stress elements
+    0: Assume 2D stress elements where appropriate
+    1: Assume plane stress elements where appropriate
 %}
-PLANE_STRESS = 1.0;
+ELEMENT_TYPE = 0.0;
 
 %% ANALYSIS
 
