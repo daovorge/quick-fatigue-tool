@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 13-Feb-2018 11:42:05 GMT
+%   Last modified 14-Feb-2018 10:15:26 GMT
     
     %%
     
@@ -3097,7 +3097,7 @@ classdef preProcess < handle
                 
                 [Ri, C] = size(fieldData_i);
                 switch C
-                    case 10.0
+                    case 10.0 % Plane stress with shell face data; element-nodal or integration point
                         nodeType = 2.0;
                         mainIDs_i = fieldData_i(:, 1.0);
                         subIDs_i = fieldData_i(:, 2.0);
@@ -3109,7 +3109,7 @@ classdef preProcess < handle
                         end
                         
                         fieldData_i(:, 7:8) = 0.0;
-                    case 9.0
+                    case 9.0 % Plane stress with shell face data; unique nodal or centroid
                         nodeType = 1.0;
                         mainIDs_i = fieldData_i(:, 1.0);
                         subIDs_i = linspace(1.0, 1.0, Ri)';
@@ -3121,20 +3121,20 @@ classdef preProcess < handle
                         end
                         
                         fieldData_i(:, 6:7) = 0.0;
-                    case 8.0
+                    case 8.0 % 3D stress; element-nodal or integration point
                         nodeType = 2.0;
                         mainIDs_i = fieldData_i(:, 1.0);
                         subIDs_i = fieldData_i(:, 2.0);
-                    case 7.0
+                    case 7.0 % 3D stress; unique-nodal or centroid
                         nodeType = 1.0;
                         subIDs_i = linspace(1.0, 1.0, Ri)';
                         mainIDs_i = fieldData_i(:, 1.0);
                     case 6.0
-                        if elementType == 0.0
+                        if elementType == 0.0 % 3D stress; unknown
                             nodeType = 0.0;
                             subIDs_i = linspace(1.0, 1.0, Ri)';
                             mainIDs_i = linspace(1.0, Ri, Ri)';
-                        else
+                        else % Plane stress; element-nodal or integration point
                             nodeType = 2.0;
                             mainIDs_i = fieldData_i(:, 1.0);
                             subIDs_i = fieldData_i(:, 2.0);
@@ -3144,34 +3144,34 @@ classdef preProcess < handle
                         
                         setappdata(0, 'message_181_elementType', elementType)
                         messenger.writeMessage(181.0)
-                    case 5.0
+                    case 5.0 % Plane stress; unique-nodal or centroid
                         nodeType = 1.0;
                         subIDs_i = linspace(1.0, 1.0, Ri)';
                         mainIDs_i = fieldData_i(:, 1.0);
                         
                         fieldData_i(:, 6:7) = 0.0;
                     case 4.0
-                        if elementType == 0.0
-                            nodeType = 0.0;
-                            subIDs_i = linspace(1.0, 1.0, Ri)';
-                            mainIDs_i = linspace(1.0, Ri, Ri)';
-                            
-                            fieldData_i(:, 5:6) = 0.0;
-                        else
+                        if elementType == 0.0 % 2D stress; element-nodal or integration point
                             nodeType = 2.0;
                             subIDs_i = fieldData_i(:, 2.0);
                             mainIDs_i = fieldData_i(:, 1.0);
                             
                             fieldData_i(:, 5:8) = 0.0;
+                        else % Plane stress; unknown
+                            nodeType = 0.0;
+                            subIDs_i = linspace(1.0, 1.0, Ri)';
+                            mainIDs_i = linspace(1.0, Ri, Ri)';
+                            
+                            fieldData_i(:, 5:6) = 0.0;
                         end
                     case 3.0
-                        if elementType == 0.0
+                        if elementType == 0.0 % 1D stress; element-nodal or integration point
                             nodeType = 2.0;
                             mainIDs_i = fieldData_i(:, 1.0);
                             subIDs_i = fieldData_i(:, 2.0);
                             
                             fieldData_i(:, 4:8) = 0.0;
-                        else
+                        else % 2D stress; unique-nodal or centroid
                             nodeType = 1.0;
                             mainIDs_i = fieldData_i(:, 1.0);
                             subIDs_i = linspace(1.0, 1.0, Ri)';
@@ -3179,20 +3179,20 @@ classdef preProcess < handle
                             fieldData_i(:, 4:7) = 0.0;
                         end
                     case 2.0
-                        if elementType == 0.0
+                        if elementType == 0.0 % 1D stress; unique-nodal or centroid
                             nodeType = 1.0;
                             mainIDs_i = fieldData_i(:, 1.0);
                             subIDs_i = linspace(1.0, 1.0, Ri)';
                             
                             fieldData_i(:, 3:7) = 0.0;
-                        else
+                        else % 2D stress; unknown
                             nodeType = 0.0;
                             mainIDs_i = linspace(1.0, 1.0, Ri)';
                             subIDs_i = linspace(1.0, 1.0, Ri)';
                             
                             fieldData_i(:, 3:6) = 0.0;
                         end
-                    case 1.0
+                    case 1.0 % 1D stress; unknown
                         nodeType = 0.0;
                         mainIDs_i = linspace(1.0, 1.0, Ri)';
                         subIDs_i = linspace(1.0, 1.0, Ri)';
