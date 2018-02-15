@@ -54,7 +54,7 @@ classdef algorithm_bs7608 < handle
             nodalPhiC(node) = phiC;
             nodalThetaC(node) = thetaC;
             
-            %% Perform a damage calcuacalculationltion on the current analysis item
+            %% Perform a damage calculation on the current analysis item
             nodalDamage(node) = algorithm_bs7608.damageCalculation(damageParamAll, pairs, repeats);
         end
         
@@ -479,7 +479,7 @@ classdef algorithm_bs7608 < handle
             % Get the maximum BS 7608 parameter over THETA for each value of PHI
             maximums = max(f);
             
-            % Find the PHI curve whcih contains the maximum BS 7608 paramter
+            % Find the PHI curve which contains the maximum BS 7608 parameter
             maxPhiCurve = find(maximums == max(maximums));
             maxPhiCurve = maxPhiCurve(1.0);
             

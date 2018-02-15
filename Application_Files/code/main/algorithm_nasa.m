@@ -175,7 +175,7 @@ classdef algorithm_nasa < handle
                         Sa = 0.5*sqrt(2.0)*sqrt((Sxa - Sya)^2 + (Sya - Sza)^2 + (Sza - Sxa)^2 + 6*(Txya^2 + Tyza^2 + Txza^2));
                 end
                 
-                % Add the residual stress to the mean stres
+                % Add the residual stress to the mean stress
                 Sm = Sm + residualStress;
                 
                 % Get the A-ratio and R-ratio
@@ -755,7 +755,7 @@ classdef algorithm_nasa < handle
                         Sa = 0.5*sqrt(2.0)*sqrt((Sxa - Sya)^2 + (Sya - Sza)^2 + (Sza - Sxa)^2 + 6*(Txya^2 + Tyza^2 + Txza^2));
                 end
                 
-                % Add the residual stress to the mean stres
+                % Add the residual stress to the mean stress
                 Sm = Sm + residualStress;
                 
                 % Get the A-ratio and R-ratio

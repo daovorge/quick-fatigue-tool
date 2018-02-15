@@ -59,7 +59,7 @@ classdef algorithm_uel < handle
                     previous load history.
                 %}
                 
-                % Check if there is a meterial state file
+                % Check if there is a materiel state file
                 [epsilon_pp, sigma_pp, sigma_pe, allowClosure, materialError, mmfe] = algorithm_uel.readMaterialState();
                 
                 % Convert elastic stress into inelastic stress-strain

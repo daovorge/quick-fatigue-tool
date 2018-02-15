@@ -306,7 +306,7 @@ classdef algorithm_sip < handle
                     %{
                         If the preferred stress invariant parameter is
                         different between two or more groups, warn the user
-                        and select a paramter based on priority (principal
+                        and select a parameter based on priority (principal
                         -> Tresca -> von Mises)
                     %}
                     if any(preferredParameter == 0.0) == 1.0

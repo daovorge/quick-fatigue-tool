@@ -393,7 +393,7 @@ classdef analysis < handle
                         %}
                         if cycle_index < 3.0
                             %{
-                                There are not enough hostory points behind
+                                There are not enough history points behind
                                 the current point to count a cycle. Move to
                                 the next point in the load history
                             %}
@@ -1126,7 +1126,7 @@ classdef analysis < handle
             [amplitudes_shear, ~] = analysis.getAmps(pairs_shear);
             [amplitudes_normal, ~] = analysis.getAmps(pairs_normal);
             
-            % Resample the amplitudes in case they are different lengths
+            % Re-sample the amplitudes in case they are different lengths
             lengthShear = length(amplitudes_shear);
             lengthNormal = length(amplitudes_normal);
             

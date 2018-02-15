@@ -158,7 +158,7 @@ while feof(fid) == 0.0
     % Get the current line in the file
     TLINE = fgetl(fid);
     
-    % If the current line is emtpy, skip to the next line
+    % If the current line is empty, skip to the next line
     if isempty(TLINE) == 1.0
         continue
     end
@@ -257,7 +257,7 @@ while feof(fid) == 0.0
         % Get the length of the token
         tokenLength = length(TOKEN);
         
-        % Remove spaces and usolate the keyword
+        % Remove spaces and isolate the keyword
         TOKEN(ismember(TOKEN,' *')) = [];
         TOKEN = strtok(lower(TOKEN), ',');
         
@@ -363,7 +363,7 @@ while feof(fid) == 0.0
             %{
                 The cell is represented as a single character array from
                 FGETL. In order to convert this array into a cell, use
-                regular expressions to match metacharacters to the FGETL
+                regular expressions to match meta characters to the FGETL
                 string
             %}
             C = keywords.interpretCell(currentLine, matchingKw);

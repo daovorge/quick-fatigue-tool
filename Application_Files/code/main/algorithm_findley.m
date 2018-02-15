@@ -174,7 +174,7 @@ classdef algorithm_findley < handle
             % Get the maximum Findley parameter over THETA for each value of PHI
             maximums = max(f);
             
-            % Find the PHI curve whcih contains the maximum Findley paramter
+            % Find the PHI curve which contains the maximum Findley parameter
             maxPhiCurve = find(maximums == max(maximums));
             maxPhiCurve = maxPhiCurve(1.0);
             
