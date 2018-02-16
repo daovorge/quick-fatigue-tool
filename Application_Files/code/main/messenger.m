@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 14-Feb-2018 19:58:29 GMT
+%   Last modified 16-Feb-2018 16:32:00 GMT
 
     %%
 
@@ -2164,7 +2164,7 @@ classdef messenger < handle
                                 end
                             end
                         elseif isempty(strfind(message, getappdata(0, 'partInstance'))) == 0.0
-                            fprintf(fidType(i), ['-> The part instance name might be spelled incorrectly, or it does not exist in the model', returnType{i}]);
+                            fprintf(fidType(i), ['-> The part instance name might be spelled incorrectly or it does not exist in the model, or the specified result position is incorrect.\n   Please verify the definitions of PART_INSTANCE and RESULT_POSITION', returnType{i}]);
                             fprintf(fidType(i), ['-> Ensure that the dataset format is compatible (consult Section 3.2 of the Quick Fatigue Tool User Guide for more information)', returnType{i}]);
                         end
                             
@@ -2357,7 +2357,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2018\r\n');
-            fprintf(fid, 'Last modified 14-Feb-2018 19:58:29 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 16-Feb-2018 16:32:00 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
