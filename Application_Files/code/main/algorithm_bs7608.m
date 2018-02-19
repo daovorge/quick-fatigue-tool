@@ -14,7 +14,7 @@ classdef algorithm_bs7608 < handle
 %      6.6 BS 7608 Fatigue of Welded Steel Joints
 %   
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 31-Jan-2018 15:36:18 GMT
+%   Last modified 19-Feb-2018 15:51:27 GMT
     
     %%
     
@@ -1629,10 +1629,10 @@ classdef algorithm_bs7608 < handle
             % This MATLAB figure requires the Statistics Toolbox
             isAvailable = checkToolbox('Statistics Toolbox');
             
-            if isAvailable == 1.0
-                if outputFigure == 1.0 && outputField == 1.0 && getappdata(0, 'figure_RHIST') == 1.0
+            if (isAvailable == 1.0) && (length(amplitudes) > 1.0)
+                if (outputFigure == 1.0) && (outputField == 1.0) && (getappdata(0, 'figure_RHIST') == 1.0)
                     f12 = figure('visible', figureVisibility);
-                    rhistData = [Sm'; 2.*amplitudes]';
+                    rhistData = [Sm'; 2.0.*amplitudes]';
                     nBins = getappdata(0, 'numberOfBins');
                     hist3(rhistData, [nBins, nBins])
                     

@@ -10,7 +10,7 @@ classdef postProcess_e < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 22-Nov-2017 09:33:19 GMT
+%   Last modified 19-Feb-2018 15:51:27 GMT
     
     %%
     
@@ -1143,10 +1143,10 @@ classdef postProcess_e < handle
             % This MATLAB figure requires the Statistics Toolbox
             isAvailable = checkToolbox('Statistics Toolbox');
             
-            if isAvailable == 1.0
-                if outputFigure == 1.0 && outputField == 1.0 && getappdata(0, 'figure_RHIST') == 1.0
+            if (isAvailable == 1.0) && (length(amplitudes) > 1.0)
+                if (outputFigure == 1.0) && (outputField == 1.0) && (getappdata(0, 'figure_RHIST') == 1.0)
                     f12 = figure('visible', figureVisibility);
-                    rhistData = [Sm'; 2.*amplitudes]';
+                    rhistData = [Sm'; 2.0.*amplitudes]';
                     nBins = getappdata(0, 'numberOfBins');
                     hist3(rhistData, [nBins, nBins])
                     
