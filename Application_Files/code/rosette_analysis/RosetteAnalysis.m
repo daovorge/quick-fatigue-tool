@@ -12,7 +12,7 @@ function varargout = RosetteAnalysis(varargin)%#ok<*DEFNU>
 %      A3.3 rosetteanalysis Analysis
 %   
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 12-Feb-2018 08:52:17 GMT
+%   Last modified 20-Feb-2018 18:56:19 GMT
     
     %%
     
@@ -102,6 +102,10 @@ end
 
 [~] = checkToolbox('Symbolic Math Toolbox');
 
+% if isappdata(0, 'rosette_pMenu_outputType') == 0.0
+%     setappdata(0, 'rosette_pMenu_outputType', 1.0)
+% end
+
 %% Load the panel state
 if isappdata(0, 'rosette_edit_gaugeA') == 1.0
     if (strcmpi(getappdata(0, 'rosette_edit_gaugeA'), sprintf('Strain history file or numerical expression...')) == 0.0) && (isempty(getappdata(0, 'rosette_edit_gaugeA')) == 0.0)
@@ -173,6 +177,13 @@ rosetteTools.blank(handles)
 pause(1e-6)
 
 warning('off', 'all')
+
+%% Get the output type
+if get(handles.pMenu_outputType, 'value') == 1.0
+    setappdata(0, 'pMenu_outputType', 1.0)
+else
+    setappdata(0, 'pMenu_outputType', 2.0)
+end
 
 %% Verify inputs
 [alpha, beta, gamma, E, v, outputLocation, gaugeA, gaugeB, gaugeC, error, errorMessage] = rosetteTools.verifyInput(handles);

@@ -11,7 +11,7 @@ classdef rosetteTools < handle
 %      A3.3 Rosette Analysis
 %   
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 14-Oct-2017 18:15:15 GMT
+%   Last modified 20-Feb-2018 18:56:19 GMT
     
     %%
     
@@ -27,7 +27,7 @@ classdef rosetteTools < handle
             
             set(handles.pButton_strainUnits, 'enable', 'inactive')
             
-            if getappdata(0, 'rosette_pMenu_outputType') == 1.0
+            if get(handles.pMenu_outputType, 'value') == 1.0
                 set(handles.text_E, 'enable', 'off')
                 set(handles.edit_E, 'enable', 'off')
                 set(handles.text_eUnits, 'enable', 'off')
@@ -281,7 +281,7 @@ classdef rosetteTools < handle
             end
             
             %% Check the definition of E and v
-            if getappdata(0, 'rosette_pMenu_outputType') == 2.0
+            if getappdata(0, 'pMenu_outputType') == 2.0
                 E = str2double(get(handles.edit_E, 'string'));
                 
                 if isempty(get(handles.edit_alpha, 'string')) == 1.0
@@ -491,7 +491,7 @@ classdef rosetteTools < handle
             end
             
             %% Get principal stresses if requested:
-            if getappdata(0, 'rosette_pMenu_outputType') == 2.0
+            if getappdata(0, 'pMenu_outputType') == 2.0
                 S1 = 1e-6.*((E./(1.0 - v^2)).*(E1 + v.*E2));
                 S2 = 1e-6*((E./(1.0 - v^2)).*(E2 + v.*E1));
                 
@@ -556,7 +556,7 @@ classdef rosetteTools < handle
             
             if referenceStrain == 1.0
                 if referenceOrientation == 1.0
-                    if getappdata(0, 'rosette_pMenu_outputType') == 1.0
+                    if getappdata(0, 'pMenu_outputType') == 1.0
                         tableA = [E1; E2; E12M; thetaP; thetaS; E11; E22; E12]';
                         
                         fprintf(fid, 'Strain units: uE\r\n');
@@ -570,7 +570,7 @@ classdef rosetteTools < handle
                         fprintf(fid, '%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\r\n', tableB');
                     end
                 else
-                    if getappdata(0, 'rosette_pMenu_outputType') == 1.0
+                    if getappdata(0, 'pMenu_outputType') == 1.0
                         tableA = [E1; E2; E12M; E11; E22; E12]';
                         
                         fprintf(fid, 'Strain units: uE\r\n');
@@ -586,7 +586,7 @@ classdef rosetteTools < handle
                 end
             else
                 if referenceOrientation == 1.0
-                    if getappdata(0, 'rosette_pMenu_outputType') == 1.0
+                    if getappdata(0, 'pMenu_outputType') == 1.0
                         tableA = [E1; E2; E12M; thetaP; thetaS]';
                         
                         fprintf(fid, 'Strain units: uE\r\n');
@@ -600,7 +600,7 @@ classdef rosetteTools < handle
                         fprintf(fid, '%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\r\n', tableB');
                     end
                 else
-                    if getappdata(0, 'rosette_pMenu_outputType') == 1.0
+                    if getappdata(0, 'pMenu_outputType') == 1.0
                         tableA = [E1; E2; E12M]';
                         
                         fprintf(fid, 'Strain units: uE\r\n');
