@@ -384,6 +384,9 @@ if getappdata(0, 'warning_066') == 1.0
     postProcess.writeYieldingItems(jobName, mainID, subID)
 end
 
+%% CALCULATE SIGNAL HISTORIES FROM VIRTUAL STRAIN GAUGES
+virtualStrainGauge(Sxx, Syy, Txy, Szz, Txz, Tyz)
+
 %% PERFORM COMPOSITE FAILURE CALCULATION IF REQUESTED
 if getappdata(0, 'compositeCriteria') == 1.0
     fprintf('\n[NOTICE] Begin composite failure assessment')
@@ -427,9 +430,6 @@ if getappdata(0, 'checkLoadProportionality') == 1.0 && (algorithm ~= 10.0 && alg
     proportionalItems = preProcess.getLoadProportionality(Sxx, Syy, Txy, N, proportionalItems, getappdata(0, 'proportionalityTolerance'));
 end
 setappdata(0, 'proportionalItems', proportionalItems)
-
-%% CALCULATE SIGNAL HISTORIES FROM VIRTUAL STRAIN GAUGES
-virtualStrainGauge(Sxx, Syy, Txy, Szz, Txz, Tyz)
 
 %% INITIALISE ANALYSIS VARIABLES
 % Set the default design life for the analysis
