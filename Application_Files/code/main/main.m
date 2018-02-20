@@ -11,10 +11,10 @@ function [] = main(flags)
 %   Author contact: louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 20-Feb-2018 15:43:20 GMT
+%   Last modified 20-Feb-2018 16:30:43 GMT
 
 % Begin main code - DO NOT EDIT
-format long;    clc;    warning('off', 'all');    tic_pre = tic;
+format long;    clc;    warning('off', 'all');
 
 %% READ SETTINGS FROM THE ENVIRONMENT FILE
 error = preProcess.readEnvironment(flags{42.0});
@@ -43,7 +43,7 @@ setappdata(0, 'messageFileWarnings', 0.0)
 %% PRINT COMMAND WINDOW HEADER
 fprintf('[NOTICE] Quick Fatigue Tool 6.11-12')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2018)')
-fprintf('\n[NOTICE] Last modified 20-Feb-2018 15:43:20 GMT')
+fprintf('\n[NOTICE] Last modified 20-Feb-2018 16:30:43 GMT')
 
 cleanExit = 0.0;
 
@@ -67,6 +67,12 @@ end
 if error == 1.0
     return
 end
+
+% Start the analysis timer
+tic_analysis = tic;
+
+% Start the pre-processor timer
+tic_pre = tic;
 
 % Open status file for writing
 fileName = sprintf('Project/output/%s/%s.sta', jobName, jobName);
@@ -833,6 +839,9 @@ setappdata(0, 'worstMainID', worstMainID)
 setappdata(0, 'worstSubID', worstSubID)
 setappdata(0, 'worstItem', worstAnalysisItem_original)
 
+setappdata(0, 'toc_main', toc(tic_main))
+messenger.writeMessage(287.0)
+
 %% ADDITIONAL ANALYSIS CODE FOR USER OUTPUT
 fprintf('\n[NOTICE] Begin analysis postprocessor')
 fprintf(fid_status, '\n[NOTICE] Begin analysis postprocessor');
@@ -1109,7 +1118,7 @@ messenger.writeMessage(-999.0)
 
 fprintf('\n[NOTICE] End analysis postprocessor')
 fprintf(fid_status, '\n[NOTICE] End analysis postprocessor');
-analysisTime = toc(tic_main);
+analysisTime = toc(tic_analysis);
 
 %% WRITE LOG FILE
 messenger.writeLog(jobName, jobDescription, dataset, material,...
