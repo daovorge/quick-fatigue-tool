@@ -11,7 +11,7 @@ classdef postProcess < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 19-Feb-2018 15:51:27 GMT
+%   Last modified 20-Feb-2018 15:43:20 GMT
     
     %%
     
@@ -233,22 +233,9 @@ classdef postProcess < handle
             % Get von Mises stress
             vonMises = getappdata(0, 'VM');
             
-            % Total counter
-            totalCounter = 0.0;
-            
-            % Initialize variable
-            triaxialityFactor = zeros(1.0, N);
-            
-            % Get the von Mises stress history for each analysis item
-            for i = 1.0:N
-                totalCounter = totalCounter + 1.0;
-                
-                % Get the triaxiality factors at the current analysis item
-                triaxialityFactors = hydroStress(totalCounter, :)./vonMises(totalCounter, :);
-                
-                % Get the maximum triaxiality factor in the loading at the current analysis item
-                triaxialityFactor(totalCounter) = max(triaxialityFactors);
-            end
+            % Get the triaxiality factor for each analysis item
+            triaxialityFactors = hydroStress./vonMises;
+            triaxialityFactor = max(triaxialityFactors, [], 2.0)';
             
             setappdata(0, 'TRF', triaxialityFactor)
             
@@ -338,61 +325,33 @@ classdef postProcess < handle
                     
                     fprintf(fid, 'FIELDS [ANALYSED ITEMS ONLY]\r\nJob:\t%s\r\nLoading:\t%.3g\t%s\r\n', getappdata(0, 'jobName'), getappdata(0, 'loadEqVal'), getappdata(0, 'loadEqUnits'));
                     
-                    mainID_i = zeros(1, length(mainID) - length(coldItems));
-                    subID_i = mainID_i;
-                    L_i = mainID_i;
-                    LL_i = mainID_i;
-                    D_i = mainID_i;
-                    DDL_i = mainID_i;
-                    FOS_i = mainID_i;
-                    SFA_i = mainID_i;
-                    FRFR_i = mainID_i;
-                    FRFH_i = mainID_i;
-                    FRFV_i = mainID_i;
-                    FRFW_i = mainID_i;
-                    SMAX_i = mainID_i;
-                    SMXP_i = mainID_i;
-                    SMXU_i = mainID_i;
-                    TRF_i = mainID_i;
-                    WCM_i = mainID_i;
-                    WCA_i = mainID_i;
-                    WCATAN_i = mainID_i;
-                    WCDP_i = mainID_i;
-                    YIELD_i = mainID_i;
-                    j = 1.0;
-                    for i = 1:length(mainID)
-                        if j > length(mainID_i)
-                            break
-                        end
-                        
-                        if any(i == coldItems) == 0.0
-                            mainID_i(j) = mainID(i);
-                            subID_i(j) = subID(i);
-                            L_i(j) = L(i);
-                            LL_i(j) = LL(i);
-                            D_i(j) = D(i);
-                            DDL_i(j) = DDL(i);
-                            FOS_i(j) = FOS(i);
-                            SFA_i(j) = SFA(i);
-                            FRFR_i(j) = FRFR(i);
-                            FRFH_i(j) = FRFH(i);
-                            FRFV_i(j) = FRFV(i);
-                            FRFW_i(j) = FRFW(i);
-                            SMAX_i(j) = SMAX(i);
-                            SMXP_i(j) = SMXP(i);
-                            SMXU_i(j) = SMXU(i);
-                            TRF_i(j) = TRF(i);
-                            WCM_i(j) = WCM(i);
-                            WCA_i(j) = WCA(i);
-                            WCATAN_i(j) = WCATAN(i);
-                            WCDP_i(j) = WCDP(i);
-                            YIELD_i(j) = YIELD(i);
-                            
-                            j = j + 1.0;
-                        end
-                    end
+                    itemNumbers = linspace(1.0, N, N);
+                    itemNumbers(coldItems) = [];
                     
-                    data_i = [mainID_i; subID_i; L_i; LL_i; D_i; DDL_i; FOS_i; SFA_i; FRFR_i; FRFH_i; FRFV_i; FRFW_i; SMAX_i; SMXP_i; SMXU_i; TRF_i; WCM_i; WCA_i; WCATAN_i; WCDP_i; YIELD_i]';
+                    mainID = mainID(itemNumbers);
+                    subID = subID(itemNumbers);
+                    
+                    L = L(itemNumbers);
+                    LL = LL(itemNumbers);
+                    D = D(itemNumbers);
+                    DDL = DDL(itemNumbers);
+                    FOS = FOS(itemNumbers);
+                    SFA = SFA(itemNumbers);
+                    FRFR = FRFR(itemNumbers);
+                    FRFH = FRFH(itemNumbers);
+                    FRFV = FRFV(itemNumbers);
+                    FRFW = FRFW(itemNumbers);
+                    SMAX = SMAX(itemNumbers);
+                    SMXP = SMXP(itemNumbers);
+                    SMXU = SMXU(itemNumbers);
+                    TRF = TRF(itemNumbers);
+                    WCM = WCM(itemNumbers);
+                    WCA = WCA(itemNumbers);
+                    WCATAN = WCATAN(itemNumbers);
+                    WCDP = WCDP(itemNumbers);
+                    YIELD = YIELD(itemNumbers);
+                    
+                    data_i = [mainID'; subID'; L; LL; D; DDL; FOS; SFA; FRFR; FRFH; FRFV; FRFW; SMAX; SMXP; SMXU; TRF; WCM; WCA; WCATAN; WCDP; YIELD]';
                     
                     fprintf(fid, 'Main ID\tSub ID\tL (%s)\tLL (%s)\tD\tDDL\tFOS\tSFA\tFRFR\tFRFH\tFRFV\tFRFW\tSMAX (MPa)\tSMXP\tSMXU\tTRF\tWCM (MPa)\tWCA (MPa)\tWCATAN (Deg)\tWCDP (MPa)\tYIELD\r\n', loadEqUnits, loadEqUnits);
                     fprintf(fid, sprintf('%%.0f\t%%.0f\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\t%%.0f\r\n',...
@@ -428,6 +387,9 @@ classdef postProcess < handle
             
             % Get knock-down data
             snKnockDown = getappdata(0, 'snKnockDown');
+            
+            % Get amplitudes
+            amplitudes = getappdata(0, 'amplitudesOnCP');
             
             L = getappdata(0, 'signalLength');
             
@@ -500,7 +462,6 @@ classdef postProcess < handle
                 Sm = 0.5*(cycles(:, 1.0) + cycles(:, 2.0));
                 setappdata(0, 'numberOfCycles', length(Sm))
                 setappdata(0, 'meansOnCP', Sm)
-                amplitudes = getappdata(0, 'amplitudesOnCP');
                 
                 if getappdata(0, 'figure_HD') == 1.0
                     if outputFigure == 1.0
@@ -2247,7 +2208,7 @@ classdef postProcess < handle
             s2 = getappdata(0, 'S2');
             s3 = getappdata(0, 'S3');
             
-            [N, L] = size(s1);
+            [N, ~] = size(s1);
             
             % Get the analysis items
             mainID = getappdata(0, 'mainID_original');
@@ -2255,44 +2216,28 @@ classdef postProcess < handle
             
             % Initialize variables
             SMAX_ABS = zeros(1.0, N);
-            hydroStress = zeros(N, L);
             
-            totalCounter = 0.0;
+            % Get the hydrostatic stress
+            hydroStress = (1.0/3.0).*(s1 + s2 + s3);
             
-            for i = 1:N
-                totalCounter = totalCounter + 1.0;
-                
-                S1j = s1(totalCounter, :);
-                S2j = s2(totalCounter, :);
-                S3j = s3(totalCounter, :);
-                
-                % Get the hydrostatic stress
-                hydroStress(totalCounter, :) = (1.0/3.0)*(S1j + S2j + S3j);
-                
-                nodalS1 = max(S1j);
-                nodalS3 = min(S3j);
-                
-                %{
-                    If the 3-D eigenvector calculation is enabled, this
-                    can produce numerical discrepancies which cause QFT
-                    to select the wrong stress. If the two stresses are
-                    very close, make them equal
-                %}
-                nodalS = [nodalS1, nodalS3];
-                diff = abs(1.0 - abs(max(nodalS)/min(nodalS)));
-                
-                if (diff > 0.0) &&  (diff < 1e-12)
-                    nodalS1 = -nodalS3;
-                end
-                
-                if abs(nodalS1) > abs(nodalS3)
-                    SMAX_ABS(totalCounter) = nodalS1;
-                elseif abs(nodalS1) == abs(nodalS3)
-                    SMAX_ABS(totalCounter) = nodalS1;
-                else
-                    SMAX_ABS(totalCounter) = nodalS3;
-                end
-            end
+            % Get the numerically largest principal stress for each analysis item
+            nodalS1 = max(s1, [], 2.0)';
+            nodalS3 = min(s3, [], 2.0)';
+            nodalS = [nodalS1, nodalS3];
+            
+            %{
+                The 3D Eigensolver can cause numerical artifacting, which
+                occasionally results in the incorrect value of maximum
+                stress. Resolve this by correcting any near-zero values
+            %}
+            diff = abs(1.0 - abs(max(nodalS, [], 2.0)./min(nodalS, [], 2.0)));
+            diffLowerBound = diff > 0.0;
+            diffUpperBound = diff < 1e-12;
+            nearZeroIndices = diffLowerBound == diffUpperBound;
+            nodalS1(nearZeroIndices) = -nodalS3(nearZeroIndices);
+            
+            SMAX_ABS(abs(nodalS1) >= abs(nodalS3)) = nodalS1(abs(nodalS1) >= abs(nodalS3));
+            SMAX_ABS(abs(nodalS1) < abs(nodalS3)) = nodalS3(abs(nodalS1) < abs(nodalS3));
             
             if abs(min(SMAX_ABS)) > abs(max(SMAX_ABS))
                 MAX_SMAX_ABS = min(SMAX_ABS);

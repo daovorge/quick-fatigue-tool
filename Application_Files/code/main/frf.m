@@ -10,7 +10,7 @@ function [] = frf(algorithm, msCorrection, N, mainID, subID, use_sn)
 %      8.2 Fatigue Reserve Factor
 %   
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 18-Dec-2017 10:16:35 GMT
+%   Last modified 20-Feb-2018 15:43:20 GMT
     
     %%
     
@@ -23,15 +23,24 @@ if N == 1.0
     frfDiagnostics = 1.0;
 end
 
+% Get items which were removed by nodal elimination
+coldItems = getappdata(0, 'nodalEliminationColdItems');
+
+% Get the envelope settings for the FRF
+frfMinValue = getappdata(0, 'frfMinValue');
+frfMaxValue = getappdata(0, 'frfMaxValue');
+
 % Initialize the FRF variables
 frfR = linspace(-1.0, -1.0, N);
 frfH = linspace(-1.0, -1.0, N);
 frfV = linspace(-1.0, -1.0, N);
 frfW = linspace(-1.0, -1.0, N);
 
-% Get the envelope settings for the FRF
-frfMinValue = getappdata(0, 'frfMinValue');
-frfMaxValue = getappdata(0, 'frfMaxValue');
+% Initialize nodal buffers
+frfR(coldItems) = frfMaxValue;
+frfH(coldItems) = frfMaxValue;
+frfV(coldItems) = frfMaxValue;
+frfW(coldItems) = frfMaxValue;
 
 % Get the worst mean stress and stress amplitude for each analysis item
 if algorithm == 6.0
@@ -89,9 +98,6 @@ if frfError == 1.0
     return
 end
 
-% Total counter
-totalCounter = 0.0;
-
 % Set failed FRF groups
 failedFRFGroups = 0.0;
 
@@ -127,7 +133,7 @@ for groups = 1:G
     end
     
     % Assign group parameters to the current set of analysis IDs
-    [N, ~] = group.switchProperties(groups, groupIDBuffer(groups));
+    [N, groupIDs] = group.switchProperties(groups, groupIDBuffer(groups));
     
     % Get the current FRF envelope
     frfEnvelope = getappdata(0, 'frfEnvelope');
@@ -279,8 +285,6 @@ for groups = 1:G
             setappdata(0, 'message_197_group', groups)
             setappdata(0, 'message_197_exception', exception.message)
             messenger.writeMessage(197.0)
-            
-            totalCounter = totalCounter + N;
             continue
         end
         
@@ -322,12 +326,20 @@ for groups = 1:G
     
     %% START THE FRF CALCULATION
     
+    % Get items number for the current group
+    [~, coldItems_group, ~] = intersect(groupIDs, coldItems);
+    itemNumbers = linspace(1.0, N, N);
+    itemNumbers(coldItems_group) = [];
+    N = length(itemNumbers);
+    
     for i = 1.0:N
-        totalCounter = totalCounter + 1.0;
+        % Get the item number
+        item = itemNumbers(i);
+        groupItem = groupIDs(item);
         
         % Get the totalCounter mean stress and stress amplitude for the current item
-        Smi = Sm(totalCounter) + residual;
-        Sai = Sa(totalCounter);
+        Smi = Sm(groupItem) + residual;
+        Sai = Sa(groupItem);
         
         switch frfEnvelope
             case 1.0
@@ -373,7 +385,7 @@ for groups = 1:G
                     frfRi = frfMinValue;
                 end
                 
-                frfR(totalCounter) = frfRi;
+                frfR(groupItem) = frfRi;
                 
                 % HORIZONTAL FRF
                 if ((Smi + Sai) <= 0.0) && (ndCompression == 1.0)
@@ -424,7 +436,7 @@ for groups = 1:G
                     frfHi = frfMinValue;
                 end
                 
-                frfH(totalCounter) = frfHi;
+                frfH(groupItem) = frfHi;
                 
                 % VERTICAL FRF
                 if ((Smi + Sai) <= 0.0) && (ndCompression == 1.0)
@@ -459,7 +471,7 @@ for groups = 1:G
                     frfVi = frfMinValue;
                 end
                 
-                frfV(totalCounter) = frfVi;
+                frfV(groupItem) = frfVi;
             case 2.0
                 %% GOODMAN B
                 
@@ -557,7 +569,7 @@ for groups = 1:G
                     frfRi = frfMinValue;
                 end
                 
-                frfR(totalCounter) = frfRi;
+                frfR(groupItem) = frfRi;
                 
                 % HORIZONTAL FRF
                 if ((Smi + Sai) <= 0.0) && (ndCompression == 1.0)
@@ -646,7 +658,7 @@ for groups = 1:G
                     frfHi = frfMinValue;
                 end
                 
-                frfH(totalCounter) = frfHi;
+                frfH(groupItem) = frfHi;
                 
                 % VERTICAL FRF
                 if ((Smi + Sai) <= 0.0) && (ndCompression == 1.0)
@@ -712,7 +724,7 @@ for groups = 1:G
                     frfVi = frfMinValue;
                 end
                 
-                frfV(totalCounter) = frfVi;
+                frfV(groupItem) = frfVi;
             case 3.0
                 %% GERBER
                 
@@ -759,7 +771,7 @@ for groups = 1:G
                     frfRi = frfMinValue;
                 end
                 
-                frfR(totalCounter) = frfRi;
+                frfR(groupItem) = frfRi;
                 
                 % HORIZONTAL FRF
                 if ((Smi + Sai) <= 0.0) && (ndCompression == 1.0)
@@ -810,7 +822,7 @@ for groups = 1:G
                     frfHi = frfMinValue;
                 end
                 
-                frfH(totalCounter) = frfHi;
+                frfH(groupItem) = frfHi;
                 
                 % VERTICAL FRF
                 if ((Smi + Sai) <= 0.0) && (ndCompression == 1.0)
@@ -843,7 +855,7 @@ for groups = 1:G
                     frfVi = frfMinValue;
                 end
                 
-                frfV(totalCounter) = frfVi;
+                frfV(groupItem) = frfVi;
             case -1.0
                 %% USER-DEFINED
                 
@@ -999,7 +1011,7 @@ for groups = 1:G
                     frfRi = frfMinValue;
                 end
                 
-                frfR(totalCounter) = frfRi;
+                frfR(groupItem) = frfRi;
                 
                 % HORIZONTAL FRF
                 if ((Smi_nn + Sai_nn) <= 0.0) && (ndCompression == 1.0)
@@ -1106,7 +1118,7 @@ for groups = 1:G
                     frfHi = frfMinValue;
                 end
                 
-                frfH(totalCounter) = frfHi;
+                frfH(groupItem) = frfHi;
                 
                 % VERTICAL FRF
                 if ((Smi_nn + Sai_nn) <= 0.0) && (ndCompression == 1.0)
@@ -1156,11 +1168,11 @@ for groups = 1:G
                     frfVi = frfMinValue;
                 end
                 
-                frfV(totalCounter) = frfVi;
+                frfV(groupItem) = frfVi;
                 
                 % DEBUG: Plot the current cycle on a Haigh diagram
-                if (any(totalCounter == frfDiagnostics) == 1.0) && (outputFigure == 1.0)
-                    mscFileUtils.plotUserFRFCycle(Smi, Sai, frfData_m, frfData_a, totalCounter, frfRi, frfHi, frfVi)
+                if (any(groupItem == frfDiagnostics) == 1.0) && (outputFigure == 1.0)
+                    mscFileUtils.plotUserFRFCycle(Smi, Sai, frfData_m, frfData_a, groupItem, frfRi, frfHi, frfVi)
                 end
         end
         
@@ -1178,9 +1190,9 @@ for groups = 1:G
         frfWi = min([frfRi, frfHi, frfVi]);
         
         if isinf(frfW) == 1.0
-            frfW(totalCounter) = -1.0;
+            frfW(groupItem) = -1.0;
         else
-            frfW(totalCounter) = frfWi;
+            frfW(groupItem) = frfWi;
         end
     end  
 end

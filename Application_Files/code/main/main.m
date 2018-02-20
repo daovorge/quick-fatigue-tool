@@ -11,7 +11,7 @@ function [] = main(flags)
 %   Author contact: louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 19-Feb-2018 15:51:27 GMT
+%   Last modified 20-Feb-2018 15:43:20 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');    tic_pre = tic;
@@ -43,7 +43,7 @@ setappdata(0, 'messageFileWarnings', 0.0)
 %% PRINT COMMAND WINDOW HEADER
 fprintf('[NOTICE] Quick Fatigue Tool 6.11-12')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2018)')
-fprintf('\n[NOTICE] Last modified 19-Feb-2018 15:51:27 GMT')
+fprintf('\n[NOTICE] Last modified 20-Feb-2018 15:43:20 GMT')
 
 cleanExit = 0.0;
 
@@ -354,6 +354,7 @@ else
     removedItems = 0.0;
     setappdata(0, 'separateFieldOutput', 0.0)
 end
+setappdata(0, 'nodalEliminationColdItems', coldItems)
 setappdata(0, 'nodalEliminationRemovedItems', removedItems)
 
 if hotspotWarning == 1.0
@@ -549,9 +550,6 @@ fprintf(fid_status, '\r\n\r\nProgress    Life         Item                   Inc
 % Get the group ID buffer
 groupIDBuffer = getappdata(0, 'groupIDBuffer');
 
-% Set a counter which runs from 1 to the total number of analysis items
-totalCounter = 0.0;
-
 % Calculate items at which debug information is to be written
 [debugItems, cacheOverlay] = qftWorkspace.initialize(N, [], jobName, []);
 
@@ -566,6 +564,10 @@ stressInvParamType = getappdata(0, 'stressInvariantParameter');
 
 % Get the NASALIFE parameter
 nasalifeParameter = getappdata(0, 'nasalifeParameter');
+
+% Initialize nodal buffers
+nodalAmplitudes(coldItems) = {0.0};
+nodalPairs(coldItems) = {[0.0, 0.0]};
 
 for groups = 1:G
     %{
@@ -597,17 +599,29 @@ for groups = 1:G
 
     % Save the current group number
     setappdata(0, 'getMaterial_currentGroup', groups)
+    
+    % Get items number for the current group
+    [~, coldItems_group, ~] = intersect(groupIDs, coldItems);
+    itemNumbers = linspace(1.0, N, N);
+    itemNumbers(coldItems_group) = [];
+    N = length(itemNumbers);
 
-    for item = 1:N
-        % Update the counter
-        totalCounter = totalCounter + 1.0;
+    for i = 1:N
+        % Get the item number
+        item = itemNumbers(i);
+        
+        %{
+            Convert the current item number to the current item ID in the
+            current group
+        %}
+        groupItem = groupIDs(item);
 
         % Save workspace to file
-        if any(debugItems == totalCounter) == 1.0
+        if any(debugItems == groupItem) == 1.0
             if cacheOverlay == 1.0
                 fileName = sprintf('[J]%s_data.mat', jobName);
             else
-                fileName = sprintf('[J]%s_data_%.0f.mat', jobName, totalCounter);
+                fileName = sprintf('[J]%s_data_%.0f.mat', jobName, groupItem);
             end
 
             % Save variables
@@ -618,23 +632,6 @@ for groups = 1:G
             save(sprintf('%s/Project/output/%s/Data Files/%s', pwd, jobName, fileName), 'APPDATA', '-append')
         end
 
-        %{
-            If groups are being used, convert the current item number to
-            the current item ID in the current group
-        %}
-        groupItem = groupIDs(item);
-
-        % Skip items which have been eliminated from the analysis
-        if any(totalCounter == coldItems) == 1.0
-            % Set damage to zero
-            nodalDamage(totalCounter) = 0.0;
-
-            % Store worst cycles for current item
-            nodalAmplitudes{totalCounter} = 0.0;
-            nodalPairs{totalCounter} = [0.0, 0.0];
-            continue
-        end
-
         % Number of items analysed so far
         analysedNodes = analysedNodes + 1.0;
 
@@ -643,7 +640,7 @@ for groups = 1:G
         Txyi = Txy(groupItem, :);   Tyzi = Tyz(groupItem, :);   Txzi = Txz(groupItem, :);
 
         % Get the principal stress history at the current item
-        s1i = s1(totalCounter, :);  s2i = s2(totalCounter, :);  s3i = s3(totalCounter, :);
+        s1i = s1(groupItem, :);  s2i = s2(groupItem, :);  s3i = s3(groupItem, :);
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%%%%%%%%%%%%%%%%%%%FATIGUE ANALYSIS ALGORITHM%%%%%%%%%%%%%%%%%%%%%%%
@@ -654,7 +651,7 @@ for groups = 1:G
                     nodalPairs_strain, nodalDamage, nodalDamageParameter,...
                     damageParameter, damageParameter_strain, error]...
                     = algorithm_uel.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, signalLength,...
-                    totalCounter, nodalDamage, msCorrection, nodalDamageParameter,...
+                    groupItem, nodalDamage, msCorrection, nodalDamageParameter,...
                     gateTensors, tensorGate, s1i, s2i, s3i);
                 
                 if error == 1.0
@@ -665,19 +662,19 @@ for groups = 1:G
                 [nodalDamageParameter, nodalAmplitudes, nodalPairs,...
                     nodalPhiC, nodalThetaC, nodalDamage, maxPhiCurve] =...
                     algorithm_sbbm.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi,...
-                    signalLength, step, proportionalItems(totalCounter),...
+                    signalLength, step, proportionalItems(groupItem),...
                     planePrecision, nodalDamageParameter, nodalAmplitudes,...
-                    nodalPairs, nodalPhiC, nodalThetaC, totalCounter, msCorrection,...
+                    nodalPairs, nodalPhiC, nodalThetaC, groupItem, msCorrection,...
                     nodalDamage, gateTensors, tensorGate, signConvention,...
                     s1i, s2i, s3i, maxPhiCurve, rainflowMode);
             case 5.0 % NORMAL STRESS
                 [nodalDamageParameter, nodalAmplitudes, nodalPairs,...
                     nodalPhiC, nodalThetaC, nodalDamage, maxPhiCurve] =...
                     algorithm_ns.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi,...
-                    s1i, s3i, signalLength, step, proportionalItems(totalCounter),...
+                    s1i, s3i, signalLength, step, proportionalItems(groupItem),...
                     planePrecision, nodalDamageParameter,...
                     nodalAmplitudes, nodalPairs, nodalPhiC, nodalThetaC,...
-                    totalCounter, msCorrection, nodalDamage, gateTensors,...
+                    groupItem, msCorrection, nodalDamage, gateTensors,...
                     tensorGate, maxPhiCurve);
             case 6.0 % FINDLEY'S METHOD
                 k = getappdata(0, 'k');
@@ -686,15 +683,15 @@ for groups = 1:G
                     algorithm_findley.main(Sxxi, Syyi, Szzi, Txyi, Tyzi,...
                     Txzi, signalLength, step, planePrecision,...
                     nodalDamageParameter, nodalAmplitudes, nodalPairs, nodalPhiC,...
-                    nodalThetaC, totalCounter, nodalDamage, msCorrection,...
+                    nodalThetaC, groupItem, nodalDamage, msCorrection,...
                     gateTensors, tensorGate, signConvention, s1i, s2i,...
                     s3i, maxPhiCurve, k);
             case 7.0 % STRESS INVARIANT PARAMETER
                 % Get the von Mises stress at the current item
-                stressInvParam_i = stressInvParam(totalCounter, :);
+                stressInvParam_i = stressInvParam(groupItem, :);
 
                 [nodalAmplitudes, nodalPairs, nodalDamage, nodalDamageParameter]...
-                    = algorithm_sip.main(s1i, s2i, s3i, signalLength, totalCounter,...
+                    = algorithm_sip.main(s1i, s2i, s3i, signalLength, groupItem,...
                     nodalDamage, msCorrection, nodalAmplitudes, nodalPairs,...
                     nodalDamageParameter, signConvention, gateTensors,...
                     tensorGate, stressInvParam_i, stressInvParamType,...
@@ -703,27 +700,27 @@ for groups = 1:G
                 [nodalDamageParameter, nodalAmplitudes, nodalPairs,...
                     nodalPhiC, nodalThetaC, nodalDamage, maxPhiCurve] =...
                     algorithm_bs7608.main(Sxxi, Syyi, Szzi, Txyi, Tyzi,...
-                    Txzi, signalLength, step, proportionalItems(totalCounter),...
+                    Txzi, signalLength, step, proportionalItems(groupItem),...
                     planePrecision, nodalDamageParameter,...
                     nodalAmplitudes, nodalPairs, nodalPhiC, nodalThetaC,...
-                    totalCounter, nodalDamage, failureMode, gateTensors,...
+                    groupItem, nodalDamage, failureMode, gateTensors,...
                     tensorGate, signConvention, s1i, s2i, s3i,...
                     maxPhiCurve, repeats);
             case 9.0 % NASALIFE
                 % Get the von Mises stress at the current item
-                vonMises_i = vonMises(totalCounter, :);
+                vonMises_i = vonMises(groupItem, :);
 
                 [nodalAmplitudes, nodalPairs, nodalDamage, nodalDamageParameter]...
                     = algorithm_nasa.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, signalLength,...
-                    totalCounter, nodalDamage, nodalAmplitudes, nodalPairs, nodalDamageParameter,...
+                    groupItem, nodalDamage, nodalAmplitudes, nodalPairs, nodalDamageParameter,...
                     s1i, s2i, s3i, signConvention, gateTensors, tensorGate, vonMises_i, nasalifeParameter);
             case 10.0 % UNIAXIAL STRESS-LIFE
                 [nodalAmplitudes, nodalPairs, nodalDamage, nodalDamageParameter, damageParameter]...
                     = algorithm_usl.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, signalLength,...
-                    totalCounter, nodalDamage, msCorrection, nodalAmplitudes, nodalPairs,...
+                    groupItem, nodalDamage, msCorrection, nodalAmplitudes, nodalPairs,...
                     nodalDamageParameter, gateTensors, tensorGate);
             case 11.0 % USER-DEFINED
-                [nodalDamageParameter, nodalAmplitudes, nodalPairs, nodalDamage] = algorithm_user.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, totalCounter, msCorrection);
+                [nodalDamageParameter, nodalAmplitudes, nodalPairs, nodalDamage] = algorithm_user.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, groupItem, msCorrection);
             otherwise
         end
 
@@ -739,10 +736,10 @@ for groups = 1:G
         end
 
         % Save the damage at the current node in the current group
-        groupNodalDamage(item) = nodalDamage(totalCounter);
+        groupNodalDamage(item) = nodalDamage(groupItem);
 
         % REPORT PROGRESS
-        [reported, x] = status(fid_status, analysedNodes, totalCounter, N2, nodalDamage, mainID, subID,...
+        [reported, x] = status(fid_status, analysedNodes, groupItem, N2, nodalDamage, mainID, subID,...
             reported, x0, x, tic_pre);
     end
 
@@ -1123,11 +1120,11 @@ messenger.writeLog(jobName, jobDescription, dataset, material,...
     hotspotWarning, loadEqVal, loadEqUnits, elementType, offset, analysisTime)
 
 % SAVE WORKSPACE TO FILE
-if any(debugItems == totalCounter) == 1.0
+if any(debugItems == groupItem) == 1.0
     if cacheOverlay == 1.0
         fileName = sprintf('[J]%s_data.mat', jobName);
     else
-        fileName = sprintf('[J]%s_data_%.0f.mat', jobName, totalCounter);
+        fileName = sprintf('[J]%s_data_%.0f.mat', jobName, groupItem);
     end
 
     % Save variables
