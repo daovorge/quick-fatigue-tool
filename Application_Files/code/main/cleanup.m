@@ -49,7 +49,7 @@ if status == 1.0
         end
     end
     
-    fprintf('\n[ERROR] Job %s exited with an error. Please see ''%s'' for details\n', job, [job, '.log'])
+    fprintf('\n[ERROR] Job %s exited with an error. Please see ''Project\\output\\%s'' for details\n', job, [job, '.log'])
     
     fid = fopen(errLogFile, 'w');
     
@@ -1310,9 +1310,9 @@ if status == 1.0
     % Prompt user if they would like to view the analysis log
     if getappdata(0, 'analysisDialogues') > 0.0
         if (ispc == 1.0) && (ismac == 0.0)
-            answer = questdlg('The analysis exited with an error - Please see the log file for more information.', 'Quick Fatigue Tool', 'View log', 'Close', 'View log');
+            answer = questdlg('The analysis exited with an error - Please see the log file for details.', 'Quick Fatigue Tool', 'View log', 'Close', 'View log');
         elseif (ispc == 0.0) && (ismac == 1.0)
-            answer = errordlg('The analysis exited with an error - Please see the log file for more information.', 'Quick Fatigue Tool');
+            answer = errordlg('The analysis exited with an error - Please see the log file for details.', 'Quick Fatigue Tool');
         else
             answer = -1.0;
         end
