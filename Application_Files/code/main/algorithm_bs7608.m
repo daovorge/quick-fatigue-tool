@@ -14,7 +14,7 @@ classdef algorithm_bs7608 < handle
 %      6.6 BS 7608 Fatigue of Welded Steel Joints
 %   
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 19-Feb-2018 15:51:27 GMT
+%   Last modified 21-Feb-2018 09:36:15 GMT
     
     %%
     
@@ -1686,7 +1686,7 @@ classdef algorithm_bs7608 < handle
                     saveas(f13, dir, 'fig')
                     postProcess.makeVisible([dir, '.fig'])
                 end
-            else
+            elseif isAvailable == 0.0
                 messenger.writeMessage(128.0)
             end
             

@@ -10,7 +10,7 @@ classdef postProcess_e < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 19-Feb-2018 15:51:27 GMT
+%   Last modified 21-Feb-2018 09:36:15 GMT
     
     %%
     
@@ -1204,7 +1204,7 @@ classdef postProcess_e < handle
                         postProcess.makeVisible([dir, '.fig'])
                     end
                 end
-            else
+            elseif isAvailable == 0.0
                 messenger.writeMessage(128.0)
             end
             
