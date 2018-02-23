@@ -11,7 +11,7 @@ classdef postProcess < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 23-Feb-2018 15:25:55 GMT
+%   Last modified 23-Feb-2018 17:06:14 GMT
     
     %%
     
@@ -1944,7 +1944,11 @@ classdef postProcess < handle
                 
                 if status == 1.0
                     % An exception occurred whilst getting installation info
-                    fprintf(fid_debug, '\r\n\r\nAbaqus installation info: UNAVAILABLE\r\n');
+                    fprintf(fid_debug, '\r\n\r\nError: Abaqus installation info was not found\r\n');
+                    fprintf(fid_debug, '\tPlease ensure that the Abaqus command line argument points to a valid Abaqus batch file');
+                    fprintf(fid_debug, '\r\n\tAn Abaqus installation is required to write fatigue results to the output database (.odb) file');
+                    fprintf(fid_debug, '\r\n\r\nFatigue results have not been written to the output database');
+                    fprintf(fid_debug, '\r\n\r\nEND OF FILE');
                 else
                     fprintf(fid_debug, '\r\n\r\nAbaqus installation info:\r\n%s', result);
                     fprintf(fid_debug, '(NOTE: The Abaqus version is determined by the autoExport_abqCmd environment variable)\r\n');
