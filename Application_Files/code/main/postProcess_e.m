@@ -10,7 +10,7 @@ classdef postProcess_e < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 21-Feb-2018 09:36:15 GMT
+%   Last modified 23-Feb-2018 10:44:27 GMT
     
     %%
     
@@ -455,6 +455,9 @@ classdef postProcess_e < handle
             % Get the worst analysis item
             worstItem = getappdata(0, 'worstItem');
             
+            % Get amplitudes
+            amplitudes = getappdata(0, 'amplitudesOnCP');
+            
             L = getappdata(0, 'signalLength');
             
             % Figure visibility
@@ -526,7 +529,6 @@ classdef postProcess_e < handle
                 Sm = 0.5*(cycles(:, 1.0) + cycles(:, 2.0));
                 setappdata(0, 'numberOfCycles', length(Sm))
                 setappdata(0, 'meansOnCP', Sm)
-                amplitudes = getappdata(0, 'amplitudesOnCP');
                 
                 if getappdata(0, 'figure_HD') == 1.0
                     if outputFigure == 1.0

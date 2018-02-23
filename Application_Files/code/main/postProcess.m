@@ -11,7 +11,7 @@ classdef postProcess < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 23-Feb-2018 09:17:44 GMT
+%   Last modified 23-Feb-2018 10:44:27 GMT
     
     %%
     

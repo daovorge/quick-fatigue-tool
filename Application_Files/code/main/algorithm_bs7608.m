@@ -14,7 +14,7 @@ classdef algorithm_bs7608 < handle
 %      6.6 BS 7608 Fatigue of Welded Steel Joints
 %   
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 21-Feb-2018 09:36:15 GMT
+%   Last modified 23-Feb-2018 10:44:27 GMT
     
     %%
     
@@ -1124,6 +1124,9 @@ classdef algorithm_bs7608 < handle
             % Figure visibility
             figureVisibility = getappdata(0, 'figureVisibility');
             
+            % Get amplitudes
+            amplitudes = getappdata(0, 'amplitudesOnCP');
+            
             %% VM (von Mises stress at worst item)
             worstItem = getappdata(0, 'worstItem');
             
@@ -1620,7 +1623,6 @@ classdef algorithm_bs7608 < handle
                 end
             end
             
-            amplitudes = getappdata(0, 'amplitudesOnCP');
             cycles = getappdata(0, 'cyclesOnCP');
             Sm = 0.5*(cycles(:, 1) + cycles(:, 2));
             
