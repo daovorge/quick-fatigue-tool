@@ -1793,6 +1793,10 @@ classdef postProcess < handle
         
         %% WRITE FIELD DATA TO AN .ODB FILE
         function [] = autoExportODB(fid_status, mainID)
+            % Print header
+            fprintf('\n[POST] Quick Fatigue Tool 6.11-12 ODB Interface');
+            fprintf(fid_status, '\n[POST] Quick Fatigue Tool 6.11-12 ODB Interface');
+            
             % Flag to indicate the ODB Interface is operating in auto mode
             setappdata(0, 'ODB_interface_auto', 1.0)
             
@@ -1823,8 +1827,6 @@ classdef postProcess < handle
             if length(mainID) == 1.0
                 messenger.writeMessage(204.0)
             end
-            
-            fprintf('\n');
             
             % Get the job name
             jobName = getappdata(0, 'jobName');
@@ -1965,11 +1967,9 @@ classdef postProcess < handle
             end
             
             % If the ODB is already up-to-date, try to copy the file instead
-            removeCarriageReturn = 0.0;
             if exist([resultsDatabasePath, '/', resultsDatabaseName, '.odb'], 'file') == 0.0
                 try
                     copyfile(modelDatabasePath, [resultsDatabasePath, '/', resultsDatabaseName, '.odb'])
-                    removeCarriageReturn = 1.0;
                 catch exception
                     % The file could not be copied
                     fprintf('[POST] ODB Error: %s', exception.message);
@@ -1978,15 +1978,7 @@ classdef postProcess < handle
                     fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors');
                     return
                 end
-            end
-            
-            if removeCarriageReturn == 1.0
-                fprintf('[POST] Starting Quick Fatigue Tool 6.11-12 ODB Interface');
-                fprintf(fid_status, '\n[POST] Starting Quick Fatigue Tool 6.11-12 ODB Interface');
-            else
-                fprintf('[POST] Quick Fatigue Tool 6.11-12 ODB Interface');
-                fprintf(fid_status, '\n[POST] Quick Fatigue Tool 6.11-12 ODB Interface');
-            end
+            end            
             
             % Delete the upgrade log file
             delete([resultsDatabasePath, '/', resultsDatabaseName, '-upgrade', '.log'])
