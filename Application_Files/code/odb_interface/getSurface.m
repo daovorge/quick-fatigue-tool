@@ -65,12 +65,25 @@ if (strcmpi(items, 'surface') == 1.0) && (exist(surfaceFile, 'file') == 2.0) && 
     try
         load(surfaceFile)
         items = surfaceData.items; %#ok<NODEF>
+        
+        % Save the original ID list in case of an error
+        mainID_old = mainID;
+        subID_old = subID;
+        
         mainID = surfaceData.mainID;
         subID = surfaceData.subID;
         
         setappdata(0, 'itemsFile', 'SURFACE')
         setappdata(0, 'surfaceFromFile', 1.0)
         messenger.writeMessage(285.0)
+        
+        % Save the original tensor in case of an error
+        Sxx_old = Sxx;
+        Syy_old = Syy;
+        Szz_old = Szz;
+        Txy_old = Txy;
+        Txz_old = Txz;
+        Tyz_old = Tyz;
         
         Sxx = Sxx(items, :);
         Syy = Syy(items, :);
@@ -83,6 +96,18 @@ if (strcmpi(items, 'surface') == 1.0) && (exist(surfaceFile, 'file') == 2.0) && 
         
         return
     catch exception
+        % Restore the original IDs
+        mainID = mainID_old;
+        subID = subID_old;
+        
+        % Restore the original tensor
+        Sxx = Sxx_old;
+        Syy = Syy_old;
+        Szz = Szz_old;
+        Txy = Txy_old;
+        Txz = Txz_old;
+        Tyz = Tyz_old;
+        
         setappdata(0, 'message_130_exception', exception.message)
         items = 'all';  setappdata(0, 'items', 'all')
         messenger.writeMessage(130.0)

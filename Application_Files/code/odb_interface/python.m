@@ -11,7 +11,7 @@ classdef python < handle
 %      10.4 The ODB Interface
 %   
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 22-Jan-2018 13:37:40 GMT
+%   Last modified 23-Feb-2018 09:17:44 GMT
     
     %%
     
@@ -1464,16 +1464,30 @@ classdef python < handle
             
             % Execute the python script
             try
-                [status, message] = system(sprintf('%s python Application_Files/code/odb_interface/tmp.py', getappdata(0, 'autoExport_abqCmd')));
+                [~, message] = system(sprintf('%s python Application_Files/code/odb_interface/tmp.py', getappdata(0, 'autoExport_abqCmd')));
                 
-                if status == 1.0
+                if isempty(message) == 0.0
                     % There is no Abaqus executable on the host machine
                     if getappdata(0, 'ODB_interface_auto') == 1.0
                         fprintf('\n[POST] ERROR: %s', message);
+                        fprintf(fid_debug, '\r\n\tError: %s', message);
                         rmappdata(0, 'ODB_interface_auto')
                         
                         if isempty(strfind(message, sprintf('KeyError: ''%s''', partInstance))) == 0.0
+                            fprintf('\n[POST] The part instance ''%s'' was not found in the output database. Check the definition of PART_INSTANCE in the job file', partInstance);
                             fprintf(fid_debug, '\r\n\tError: The part instance ''%s'' was not found in the output database. Check the definition of PART_INSTANCE in the job file', partInstance);
+                        elseif isempty(strfind(message, 'is not recognized as an internal or external command,')) == 0.0
+                            fprintf('\n[POST] Please ensure that the Abaqus command line argument points to a valid Abaqus batch file');
+                            fprintf('\n[POST] An Abaqus installation is required to write fatigue results to the output database (.odb) file');
+                            fprintf(fid_debug, '\r\n\tPlease ensure that the Abaqus command line argument points to a valid Abaqus batch file');
+                            fprintf(fid_debug, '\r\n\tAn Abaqus installation is required to write fatigue results to the output database (.odb) file');
+                        elseif isempty(strfind(message, 'OdbError: The database is from a previous release of Abaqus. ')) == 0.0
+                            fprintf('\n[POST] The model output database comes from a previous release of Abaqus');
+                            fprintf('\n       Either specify the Abaqus command for the model output database version with autoExport_abqCmd');
+                            fprintf('\n       or allow Quick Fatigue Tool to automatically upgrade the database with autoExport_upgradeODB=1');
+                            fprintf(fid_debug, '\r\n\tThe model output database comes from a previous release of Abaqus');
+                            fprintf(fid_debug, '\r\n\tEither specify the Abaqus command for the model output database version with autoExport_abqCmd');
+                            fprintf(fid_debug, '\r\n\tor allow Quick Fatigue Tool to automatically upgrade the database with autoExport_upgradeODB=1');
                         end
                         
                         connectivityData = 0.0;
@@ -1693,16 +1707,30 @@ classdef python < handle
             
             % Execute the python script
             try
-                [status, message] = system(sprintf('%s python Application_Files/code/odb_interface/tmp.py', getappdata(0, 'autoExport_abqCmd')));
+                [~, message] = system(sprintf('%s python Application_Files/code/odb_interface/tmp.py', getappdata(0, 'autoExport_abqCmd')));
                 
-                if status == 1.0
+                if isempty(message) == 0.0
                     % There is no Abaqus executable on the host machine
                     if getappdata(0, 'ODB_interface_auto') == 1.0
                         fprintf('[POST] ERROR: %s', message);
+                        fprintf(fid_debug, '\r\n\tError: %s', message);
                         rmappdata(0, 'ODB_interface_auto')
                         
                         if isempty(strfind(message, sprintf('KeyError: ''%s''', partInstance))) == 0.0
+                            fprintf('\n[POST] The part instance ''%s'' was not found in the output database. Check the definition of PART_INSTANCE in the job file', partInstance);
                             fprintf(fid_debug, '\r\n\tError: The part instance ''%s'' was not found in the output database. Check the definition of PART_INSTANCE in the job file', partInstance);
+                        elseif isempty(strfind(message, 'is not recognized as an internal or external command,')) == 0.0
+                            fprintf('\n[POST] Please ensure that the Abaqus command line argument points to a valid Abaqus batch file');
+                            fprintf('\n[POST] An Abaqus installation is required to write fatigue results to the output database (.odb) file');
+                            fprintf(fid_debug, '\r\n\tPlease ensure that the Abaqus command line argument points to a valid Abaqus batch file');
+                            fprintf(fid_debug, '\r\n\tAn Abaqus installation is required to write fatigue results to the output database (.odb) file');
+                        elseif isempty(strfind(message, 'OdbError: The database is from a previous release of Abaqus. ')) == 0.0
+                            fprintf('\n[POST] The model output database comes from a previous release of Abaqus');
+                            fprintf('\n       Either specify the Abaqus command for the model output database version with autoExport_abqCmd');
+                            fprintf('\n       or allow Quick Fatigue Tool to automatically upgrade the database with autoExport_upgradeODB=1');
+                            fprintf(fid_debug, '\r\n\tThe model output database comes from a previous release of Abaqus');
+                            fprintf(fid_debug, '\r\n\tEither specify the Abaqus command for the model output database version with autoExport_abqCmd');
+                            fprintf(fid_debug, '\r\n\tor allow Quick Fatigue Tool to automatically upgrade the database with autoExport_upgradeODB=1');
                         end
                         
                         connectivityData = 0.0;
