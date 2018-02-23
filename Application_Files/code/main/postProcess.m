@@ -11,7 +11,7 @@ classdef postProcess < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 23-Feb-2018 14:08:32 GMT
+%   Last modified 23-Feb-2018 15:25:55 GMT
     
     %%
     
@@ -1934,6 +1934,30 @@ classdef postProcess < handle
                     end
             end
             
+            % Open the log file for writing
+            fid_debug = fopen([sprintf('Project/output/%s/Data Files/', jobName), resultsDatabaseName, '.log'], 'w+');
+            fprintf(fid_debug, 'Quick Fatigue Tool 6.11-12 ODB Interface Log');
+            
+            % Print Abaqus installation info to the debug log file
+            try
+                [status, result] = system(sprintf('%s whereami', abqCmd));
+                
+                if status == 1.0
+                    % An exception occurred whilst getting installation info
+                    fprintf(fid_debug, '\r\n\r\nAbaqus installation info: UNAVAILABLE\r\n');
+                else
+                    fprintf(fid_debug, '\r\n\r\nAbaqus installation info:\r\n%s', result);
+                    fprintf(fid_debug, '(NOTE: The Abaqus version is determined by the autoExport_abqCmd environment variable)\r\n');
+                end
+            catch exception
+                % An unhandled exception was encountered
+                fprintf('[POST] ODB Error: %s', exception.message);
+                fprintf(fid_status, '[POST] ODB Error: %s', exception.message);
+                fprintf('\n[ERROR] ODB Interface exited with errors');
+                fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors');
+                return
+            end
+            
             % Verify the inputs
             error = python.verifyAuto(requestedFields,...
                 fieldDataPath, fieldDataName, resultsDatabasePath, partInstanceList);
@@ -1991,10 +2015,6 @@ classdef postProcess < handle
                 delete([resultsDatabasePath, '/', modelDatabaseNameShort, '.lck'])
             end
             
-            % Open the log file for writing
-            fid_debug = fopen([sprintf('Project/output/%s/Data Files/', jobName), resultsDatabaseName, '.log'], 'w+');
-            fprintf(fid_debug, 'Quick Fatigue Tool 6.11-12 ODB Interface Log');
-            
             % Get the selected position
             userPosition = getappdata(0, 'odbResultPosition');
             if strcmpi('unique nodal', userPosition) == 1.0
@@ -2012,21 +2032,26 @@ classdef postProcess < handle
                 end
             end
             
+            fprintf(fid_debug, '\r\nODB export summary:');
             positions = {'Element-Nodal', 'Unique Nodal', 'Integration Point', 'Centroidal'};
-            fprintf(fid_debug, '\r\n\r\nUser-selected results position: %s', positions{userPosition});
-            fprintf('\n[POST] User-selected results position: %s', positions{userPosition});
-            fprintf(fid_status, '\n[POST] User-selected results position: %s', positions{userPosition});
+            fprintf(fid_debug, '\r\nUser-selected results position: %s', positions{userPosition});
             
             % Check if position should be determined automatically
             autoPosition = getappdata(0, 'autoExport_autoPosition');
             if autoPosition == 1.0
                 fprintf(fid_debug, '\r\nAllow Quick Fatigue Tool to determine results position based on field IDs: YES');
-                fprintf('\n[POST] Allow Quick Fatigue Tool to determine results position based on field IDs: YES');
-                fprintf(fid_status, '\n[POST] Allow Quick Fatigue Tool to determine results position based on field IDs: YES');
             else
                 fprintf(fid_debug, '\r\nAllow Quick Fatigue Tool to determine results position based on field IDs: NO');
-                fprintf('\n[POST] Allow Quick Fatigue Tool to determine results position based on field IDs: NO');
-                fprintf(fid_status, '\n[POST] Allow Quick Fatigue Tool to determine results position based on field IDs: NO');
+            end
+            
+            fprintf(fid_debug, '\r\nStep name: %s', stepName);
+            switch getappdata(0, 'autoExport_selectionMode')
+                case 1.0
+                    fprintf(fid_debug, '\r\nField output request: SELECTED BY USER');
+                case 2.0
+                    fprintf(fid_debug, '\r\nField output request: PRESELECTED DEFAULTS');
+                case 3.0
+                    fprintf(fid_debug, '\r\nField output request: ALL');
             end
             
             for instanceNumber = 1:nInstances
@@ -2197,7 +2222,8 @@ classdef postProcess < handle
                 end
             end
             
-            fprintf(fid_debug, ' Success');
+            fprintf(fid_debug, ' Success\r\n\r\nFatigue results have been written to ''%s''', sprintf('%s/%s.odb', resultsDatabasePath, resultsDatabaseName));
+            fprintf(fid_debug, '\r\n\r\nEND OF FILE');
             fprintf('\n[POST] Export complete. Check the log file in Project/output/%s/Data Files for detailed information', getappdata(0, 'jobName'));
             fprintf(fid_status, '\n[POST] Export complete. Check the log file in Project/output/%s/Data Files for detailed information', getappdata(0, 'jobName'));
             fclose(fid_debug);
