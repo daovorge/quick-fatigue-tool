@@ -11,7 +11,7 @@ classdef postProcess < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 23-Feb-2018 10:44:27 GMT
+%   Last modified 23-Feb-2018 14:08:32 GMT
     
     %%
     
@@ -2135,12 +2135,19 @@ classdef postProcess < handle
                     fprintf(fid_status, '[POST] Writing field data to ODB');
                     
                     try
-                        [status, message] = system(sprintf('%s python %s', abqCmd, scriptFile));
+                        [~, message] = system(sprintf('%s python %s', abqCmd, scriptFile));
                         
-                        if status == 1.0
+                        if isempty(message) == 0.0
+                            fprintf(fid_status, '\n[POST] ODB Error: %s', message);
+                            
                             if isempty(strfind(message, sprintf('KeyError: ''%s''', stepName))) == 0.0
                                 % The step name is invalid
                                 fprintf('\n[POST] ODB Error: The step name ''%s'' could not be found in the ODB. Results will not be written to the output database.', stepName)
+                                fprintf(fid_status, '\n[POST] ODB Error: The step name ''%s'' could not be found in the ODB. Results will not be written to the output database.', stepName);
+                            elseif isempty(strfind(message, sprintf('KeyError: ''%s''', partInstanceName))) == 0.0
+                                % The part instance name is invalid
+                                fprintf('\n[POST] ODB Error: The part instance name ''%s'' could not be found in the ODB. Results will not be written to the output database.', partInstanceName)
+                                fprintf(fid_status, '\n[POST] ODB Error: The part instance name ''%s'' could not be found in the ODB. Results will not be written to the output database.', partInstanceName);
                             elseif isempty(strfind(message, 'OdbError: Invalid node label')) == 0.0
                                 %{
                                     The field data does not exactly match
@@ -2148,16 +2155,24 @@ classdef postProcess < handle
                                     element/node set could not be created
                                 %}
                                 fprintf('\n[POST] ODB Error: The ODB element/node set could not be written because the field data does not exactly match the specified part instance. Results will not be written to the output database.')
+                                fprintf(fid_status, '\n[POST] ODB Error: The ODB element/node set could not be written because the field data does not exactly match the specified part instance. Results will not be written to the output database.');
                             elseif isempty(strfind(message, 'is not recognized as an internal or external command')) == 0.0
                                 % There is no Abaqus executable on the host machine
                                 fprintf('\n[POST] ODB Error: The Abaqus command ''%s'' could not be found on the system. Check your Abaqus installation. Results will not be written to the output database.', abqCmd)
+                                fprintf(fid_status, '\n[POST] ODB Error: The Abaqus command ''%s'' could not be found on the system. Check your Abaqus installation. Results will not be written to the output database.', abqCmd);
                             else
                                 % Unkown exception
-                                fprintf('\n[POST] ODB Error: The Abaqus API returned the following error:\r\n\r\n%s\r\nResults will not be written to the output database.', message)
+                                fprintf('\n[POST] ODB Error: The Abaqus API returned the following error:\r\n%s\r\nResults will not be written to the output database.', message)
+                                fprintf(fid_status, '\n[POST] ODB Error: The Abaqus API returned the following error:\r\n%s\r\nResults will not be written to the output database.', message);
                             end
                             
                             if getappdata(0, 'autoExport_executionMode') == 1.0
                                 delete(scriptFile)
+                            end
+                            
+                            % Delete the results output database from the output directory if applicable
+                            if exist([pwd, sprintf('\\%s\\%s.odb', resultsDatabasePath, resultsDatabaseName)], 'file') == 2.0
+                                delete([pwd, sprintf('\\%s\\%s.odb', resultsDatabasePath, resultsDatabaseName)])
                             end
                             
                             fprintf('\n[ERROR] ODB Interface exited with errors');
@@ -2171,7 +2186,6 @@ classdef postProcess < handle
                         messenger.writeMessage(86.0)
                         
                         fclose(fid_debug);
-                        clc
                         
                         if getappdata(0, 'autoExport_executionMode') == 1.0
                             delete(scriptFile)
