@@ -2044,7 +2044,11 @@ classdef postProcess < handle
                 fprintf(fid_debug, '\r\nAllow Quick Fatigue Tool to determine results position based on field IDs: NO');
             end
             
-            fprintf(fid_debug, '\r\nStep name: %s', stepName);
+            if isempty(stepName) == 1.0
+                fprintf(fid_debug, '\r\nThe step name was not specified (a default name will be used)');
+            else
+                fprintf(fid_debug, '\r\nStep name: ''%s''', stepName);
+            end
             switch getappdata(0, 'autoExport_selectionMode')
                 case 1.0
                     fprintf(fid_debug, '\r\nField output request: SELECTED BY USER');
