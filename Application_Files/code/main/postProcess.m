@@ -11,7 +11,7 @@ classdef postProcess < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 23-Feb-2018 17:06:14 GMT
+%   Last modified 26-Feb-2018 13:33:58 GMT
     
     %%
     
@@ -2246,7 +2246,7 @@ classdef postProcess < handle
             clipboard('copy', [pwd, sprintf('/Project/output/%s/Data Files/%s.odb', jobName, resultsDatabaseName)])
         end
         
-        %% GET THE LARGEST STRESS IN THE LOADING
+        %% GET THE LARGEST STRESS IN THE LOADING (NEW)
         function [SMAX_item] = getMaximumStress()
             % Get the principal stress history
             s1 = getappdata(0, 'S1');
@@ -2268,7 +2268,7 @@ classdef postProcess < handle
             % Get the numerically largest principal stress for each analysis item
             nodalS1 = max(s1, [], 2.0)';
             nodalS3 = min(s3, [], 2.0)';
-            nodalS = [nodalS1, nodalS3];
+            nodalS = [nodalS1', nodalS3'];
             
             %{
                 The 3D Eigensolver can cause numerical artifacting, which
