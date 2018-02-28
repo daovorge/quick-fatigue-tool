@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 26-Feb-2018 13:33:58 GMT
+%   Last modified 28-Feb-2018 09:29:27 GMT
 
     %%
 
@@ -2297,6 +2297,18 @@ classdef messenger < handle
                     case 312.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The fatigue definition has been read from ''%s''', returnType{i}], getappdata(0, 'message_312_fdf'));
                         fprintf(fidType(i), ['-> Dataset and history definitions in the job file will be ignored', returnType{i}]);
+                    case 313.0
+                        if getappdata(0, 'suppress_ID313') == 0.0
+                            fprintf(fidType(i), [returnType{i}, '***WARNING: One or more gating criteria exceed 100%%', returnType{i}]);
+                            fprintf(fidType(i), ['-> These values have been reset to 100%%', returnType{i}]);
+                            fprintf(fidType(i), ['-> Please verify the definition of tensorGate and historyGate', returnType{i}]);
+
+                            if i == X
+                                setappdata(0, 'suppress_ID313', 1.0)
+                            end
+
+                            setappdata(0, 'messageFileWarnings', 1.0)
+                        end
                 end
             end
         end
@@ -2330,6 +2342,7 @@ classdef messenger < handle
             setappdata(0, 'suppress_ID266', 0.0)
             setappdata(0, 'suppress_ID309', 0.0)
             setappdata(0, 'suppress_ID310', 0.0)
+            setappdata(0, 'suppress_ID313', 0.0)
         end
 
         %% WRITE LOG FILE
@@ -2355,7 +2368,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2018\r\n');
-            fprintf(fid, 'Last modified 26-Feb-2018 13:33:58 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 28-Feb-2018 09:29:27 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

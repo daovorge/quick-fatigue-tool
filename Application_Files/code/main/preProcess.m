@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 14-Feb-2018 10:15:26 GMT
+%   Last modified 28-Feb-2018 09:29:27 GMT
     
     %%
     
@@ -5055,7 +5055,7 @@ classdef preProcess < handle
             Sxx = 0.0; Syy = 0.0; Szz = 0.0; Txy = 0.0; Tyz = 0.0; Txz = 0.0;
             
             % Check that the stress history is defined
-            if ischar(scales)
+            if ischar(scales) == 1.0
                 if isempty(scales) == 1.0
                     error = 1.0;
                     setappdata(0, 'E047', 1.0)
@@ -5240,15 +5240,9 @@ classdef preProcess < handle
                     
                     [peaks, valleys] = preProcess.peakdet(scale, historyGate);
                     
-                    if isempty(peaks) || isempty(valleys)
+                    if (isempty(peaks) == 1.0) || (isempty(valleys))
                         error = true;
-                        if ischar(scales)
-                            setappdata(0, 'E018', 1.0)
-                            setappdata(0, 'pvDetectionFailFile', scales)
-                        else
-                            setappdata(0, 'E018', 1.0)
-                            setappdata(0, 'pvDetectionFailFile', scale)
-                        end
+                        setappdata(0, 'E146', 1.0)
                         
                         mainID = -999.0;
                         subID = -999.0;
@@ -5321,7 +5315,13 @@ classdef preProcess < handle
         
         %% Automatically calculate the gating value for peak-valley detection
         function historyGate = autoGate(signal, historyGate)
-            %% Get the maximum value of the load history
+            % History gate value cannot be equal to or greater than 100%
+            if historyGate > 100.0
+                historyGate = 100.0;
+                messenger.writeMessage(313.0)
+            end
+            
+            % Get the maximum value of the load history
             maxTensor = max(abs(signal));
             historyGate = (historyGate/100)*maxTensor;
             
