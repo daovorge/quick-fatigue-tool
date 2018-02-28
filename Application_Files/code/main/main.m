@@ -11,7 +11,7 @@ function [] = main(flags)
 %   Author contact: louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 28-Feb-2018 14:29:10 GMT
+%   Last modified 28-Feb-2018 16:03:20 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');
@@ -43,7 +43,7 @@ setappdata(0, 'messageFileWarnings', 0.0)
 %% PRINT COMMAND WINDOW HEADER
 fprintf('[NOTICE] Quick Fatigue Tool 6.11-12')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2018)')
-fprintf('\n[NOTICE] Last modified 28-Feb-2018 14:29:10 GMT')
+fprintf('\n[NOTICE] Last modified 28-Feb-2018 16:03:20 GMT')
 
 cleanExit = 0.0;
 
