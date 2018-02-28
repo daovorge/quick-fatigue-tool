@@ -403,7 +403,6 @@ for groups = 1:G
             if (length(life_buffer) > 2.0) && (life_buffer(end) == life_buffer(end - 2.0))
                 % The FOS appears to be chattering
                 fosBreakAfterBracket = 1.0;
-                
                 autoBracket = 1.0;
             end
         end

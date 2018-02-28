@@ -11,7 +11,7 @@ classdef python < handle
 %      10.4 The ODB Interface
 %   
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 23-Feb-2018 09:17:44 GMT
+%   Last modified 28-Feb-2018 14:29:10 GMT
     
     %%
     
@@ -571,7 +571,7 @@ classdef python < handle
                             % Get the FOS accuracy as well
                             fieldDataFile_fosAccuracy = importdata(fosAccuracyFile, '\t');
                             fieldData(:, index + 1.0) = fieldDataFile_fosAccuracy.data(:, 3.0);
-                            fieldNames{index + 1.0} = sprintf('FACC, %%');
+                            fieldNames{index + 1.0} = sprintf('FACC-%%');
                             fieldDescriptions{index + 1.0} = sprintf('Factor of strength accuracy');
                             
                             index = index + 2.0;
