@@ -11,7 +11,7 @@ classdef postProcess < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 26-Feb-2018 13:33:58 GMT
+%   Last modified 01-Mar-2018 11:29:56 GMT
     
     %%
     
@@ -1793,10 +1793,6 @@ classdef postProcess < handle
         
         %% WRITE FIELD DATA TO AN .ODB FILE
         function [] = autoExportODB(fid_status, mainID)
-            % Print header
-            fprintf('\n[POST] Quick Fatigue Tool 6.11-12 ODB Interface');
-            fprintf(fid_status, '\n[POST] Quick Fatigue Tool 6.11-12 ODB Interface');
-            
             % Flag to indicate the ODB Interface is operating in auto mode
             setappdata(0, 'ODB_interface_auto', 1.0)
             
@@ -1822,6 +1818,10 @@ classdef postProcess < handle
                 return
             end
             [~, modelDatabaseNameShort, ~] = fileparts(modelDatabasePath);
+            
+            % Print header
+            fprintf('\n[POST] Quick Fatigue Tool 6.11-12 ODB Interface');
+            fprintf(fid_status, '\n[POST] Quick Fatigue Tool 6.11-12 ODB Interface');
             
             % Warn user if there is only one item in the model
             if length(mainID) == 1.0
