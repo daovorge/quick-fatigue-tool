@@ -133,7 +133,7 @@ GROUP = {'DEFAULT'};
     10: Uniaxial Stress-Life
     11: User-defined
 %}
-ALGORITHM = 4.0;
+ALGORITHM = 5.0;
 
 % MEAN STRESS CORRECTION
 %{
@@ -148,7 +148,7 @@ ALGORITHM = 4.0;
     8: None
     'file-name'.msc: User-defined
 %}
-MS_CORRECTION = 2.0;
+MS_CORRECTION = 8.0;
 
 % ANALYSIS REGION
 %{
