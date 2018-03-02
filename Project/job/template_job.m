@@ -29,7 +29,7 @@ CONTINUE_FROM = '';
 
 %{
     0: Full analysis
-    1: Datacheck analysis
+    1: Data check analysis
     2: Use fatigue definition from job name
     'file-name.mat': Specify fatigue definition file
 %}
@@ -42,7 +42,7 @@ MATERIAL = '';
 % STRESS-LIFE CURVE
 %{
     0: Coefficients (Sf' and b)
-    1: S-N datapoints
+    1: S-N data points
 %}
 USE_SN = 1.0;
 

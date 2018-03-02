@@ -17,7 +17,7 @@ function [] = tutorial_intro()
 %   Reference section in Quick Fatigue Tool User Settings Reference Guide
 %      1 Job file options
 %   
-%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2017
 %   Last modified 24-Jan-2018 15:17:50 GMT
 
 %% JOB
@@ -30,7 +30,7 @@ CONTINUE_FROM = '';
 
 %{
     0: Full analysis
-    1: Datacheck analysis
+    1: Data check analysis
     2: Use fatigue definition from library
 %}
 DATA_CHECK = 0.0;
@@ -42,7 +42,7 @@ MATERIAL = 'SAE-950C.mat';
 % STRESS-LIFE CURVE
 %{
     0: Coefficients (Sf' and b)
-    1: S-N datapoints
+    1: S-N data points
 %}
 USE_SN = 1.0;
 
