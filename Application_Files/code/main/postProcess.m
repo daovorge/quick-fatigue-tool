@@ -11,7 +11,7 @@ classdef postProcess < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 01-Mar-2018 11:29:56 GMT
+%   Last modified 04-Mar-2018 19:58:22 GMT
     
     %%
     
@@ -1066,7 +1066,7 @@ classdef postProcess < handle
             %% RHIST RAINFLOW HISTOGRAM OF CYCLES
             
             % This MATLAB figure requires the Statistics Toolbox
-            isAvailable = checkToolbox('Statistics Toolbox');
+            isAvailable = checkToolbox('Statistics and Machine Learning Toolbox');
             
             if (isAvailable == 1.0) && (length(amplitudes) > 1.0)
                 if (outputFigure == 1.0) && (outputField == 1.0) && (getappdata(0, 'figure_RHIST') == 1.0)
@@ -1100,7 +1100,7 @@ classdef postProcess < handle
                 
                 %% RC RANGE vs CYCLES
                 
-                if outputFigure == 1.0 && outputField == 1.0 && getappdata(0, 'figure_RC') == 1.0
+                if (outputFigure == 1.0) && (outputField == 1.0) && (getappdata(0, 'figure_RC') == 1.0)
                     f12 = figure('visible', figureVisibility);
                     msg = sprintf('RC, Stress range distribution for item %.0f.%.0f', mainID, subID);
                     title(msg, 'FontSize', fontTitle)
@@ -1129,7 +1129,7 @@ classdef postProcess < handle
                         postProcess.makeVisible([dir, '.fig'])
                     end
                 end
-            elseif isAvailable == 0.0
+            elseif (isAvailable == 0.0) && (outputFigure == 1.0)
                 messenger.writeMessage(128.0)
             end
             
