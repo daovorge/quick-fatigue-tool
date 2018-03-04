@@ -5,7 +5,7 @@ function [isAvailable] = checkToolbox(toolboxName)
 %   user is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-06 Copyright Louis Vallance 2017
-%   Last modified 14-Oct-2017 18:15:15 GMT
+%   Last modified 04-Mar-2018 19:58:22 GMT
     
     %%
     
@@ -19,7 +19,7 @@ function [isAvailable] = checkToolbox(toolboxName)
             tag = 'noIPT';
         case 'Symbolic Math Toolbox'
             tag = 'noSMT';
-        case 'Statistics Toolbox'
+        case 'Statistics and Machine Learning Toolbox'
             tag = 'noSMLT';
         case 'Signal Processing Toolbox'
             tag = 'noSPT';
