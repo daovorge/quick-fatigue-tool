@@ -4,8 +4,8 @@ function [continueAnalysis] = datacheckAbort(Sxx, Syy, Szz, Txy, Tyz, Txz, tic_p
 %   DATACHECKABORT is used internally by Quick Fatigue Tool. The user
 %   is not required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 24-Jan-2018 15:17:50 GMT
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
+%   Last modified 14-Feb-2018 19:58:29 GMT
     
     %%   
     
@@ -15,7 +15,7 @@ continueAnalysis = 0.0;
 if getappdata(0, 'analysisDialogues') > 0.0
     message = sprintf('Results of the data check have been written to:\n\n''%s''', [pwd, '\Project\output\', getappdata(0, 'jobName')]);
     
-    if (ispc == 1.0) && (ismac == 0.0)
+    if (ispc == 1.0) && (ismac == 0.0) && (getappdata(0, 'compositeCriteria') == 0.0)
         answer = questdlg(message, 'Quick Fatigue Tool', 'Stop', 'Continue', 'Stop');
     elseif (ispc == 0.0) && (ismac == 1.0)
         answer = msgbox(message, 'Quick Fatigue Tool');

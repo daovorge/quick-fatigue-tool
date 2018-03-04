@@ -3,7 +3,7 @@
 #   N_INSTANCES searches an Abaqus ODB file for the free surface at a given element position,
 #   search region and part instance.
 #
-#   ODB_NAME: Full path to the output databse file
+#   ODB_NAME: Full path to the output database file
 #   POSITION: Element position
 #   SEARCH_REGION: Search either the part instance or a list of element IDs
 #   SHELL_FACES: Treat shell surface as whole shell or free shell faces
@@ -11,14 +11,14 @@
 #   N_INSTANCES: Number of part instances
 #
 #	The script is called as follows:
-#	<abaqus-id> python getSurface.py -- "\..\model-name.odb" {ELEMENTAL | NODAL | CENTROIDAL}
-#   {INSTANCE | DATASET} {YES | NO} "PART-1-1" 1
+#	<abaqus-id> python getSurface.py -- "\..\<model-name>.odb" {ELEMENTAL | NODAL | CENTROID}
+#   {INSTANCE | DATASET} {YES | NO} "<part-instance-name>" <number-of-instances>
 #
-#	Example using a single part instance:
-#	abaqus python \..\getSurface.py -- {preceeding arguments} "PART-1-1" 1
+#	Example command line usage for a single part instance:
+#	abaqus python getSurface.py -- "..\<file-name>.odb" ELEMENTAL INSTANCE NO "PART-1-1" 1
 #
-#	Example using N part instances:
-#	abaqus python \..\getSurface.py -- {preceeding arguments} "PART-1-1" "PART-2-1" ... "PART-N-1" N
+#	Example command line usage for N part instances:
+#	abaqus python getSurface.py -- <preceding arguments> "PART-1-1" "PART-2-1" ... "PART-N-1" N
 #
 #	This surface detection algorithm relies on the principle
 #	that, if the set of nodes of element face A does not have
@@ -28,17 +28,17 @@
 #	Since the Abaqus Python APIs do not supply the node face
 #	data for an element, the faces must be constructed manually
 #	depending on the element family. The node ordering and face
-#	numbering information was taken from "Part IV: Elements" of
+#	numbering information was taken from "Part VI: Elements" of
 #	the Abaqus Analysis User's Guide.
 #
 #   GETSURFACE.py is used internally by Quick Fatigue Tool. The user is not required to run this
 #   file.
 #
-#   Reference sextion in Quick Fatigue Tool User Guide
+#   Reference section in Quick Fatigue Tool User Guide
 #      4.5.3 Custom analysis items
 #
-#   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-#   Last modified 18-Jan-2018 09:09:39 GMT
+#   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
+#   Last modified 13-Feb-2018 20:14:48 GMT
 
 import os
 from odbAccess import *
@@ -560,6 +560,98 @@ for instanceNumber in range(nInstances):
 					linearAndQuad[1] = 1
 				
 				indexIncrement = 1
+				
+		# ELTYPE Axisymmetric solid triangular elements:
+		elif ((element.type == 'CAX3') or (element.type == 'CAX3H') or (element.type == 'CGAX3') or (element.type == 'CGAX3H') or (element.type == 'CAX3T') or (element.type == 'CGAX3T') or (element.type == 'CGAX3HT') or (element.type == 'CAX6') or (element.type == 'CAX6H') or (element.type == 'CAX6M') or (element.type == 'CAX6MH') or (element.type == 'CGAX6') or (element.type == 'CGAX6H') or (element.type == 'CGAX6M') or (element.type == 'CGAX6MH') or (element.type == 'CAX6MT') or (element.type == 'CAX6MHT') or (element.type == 'CGAX6MT') or (element.type == 'CGAX6MHT') or (element.type == 'CAX6MP') or (element.type == 'CAX6MPH')):
+			
+			# Increment INDEX face node variable:
+			if (i > 0):
+				index = index + indexIncrement
+			
+			# Treat shell surface as shell faces:
+			if (SHELL_FACES.lower() == 'yes'):
+				
+				# Linear:
+				if (len(conn) == 3):
+					faces[index + 0][:] = itemgetter(*[0, 1])(conn)
+					faces[index + 1][:] = itemgetter(*[1, 2])(conn)
+					faces[index + 2][:] = itemgetter(*[2, 0])(conn)
+					
+					linearAndQuad[0] = 1
+					
+				# Quadratic:
+				else:
+					faces[index + 0][:] = itemgetter(*[0, 1, 3])(conn)
+					faces[index + 1][:] = itemgetter(*[1, 2, 4])(conn)
+					faces[index + 2][:] = itemgetter(*[2, 0, 5])(conn)
+					
+					linearAndQuad[1] = 1
+					
+				indexIncrement = 3
+				
+			# Treat shell surface as whole shell:
+			else:
+				
+				# Linear:
+				if (len(conn) == 4.0):
+					faces[index + 0][:] = itemgetter(*[0, 1, 2])(conn)
+					
+					linearAndQuad[0] = 1
+					
+				# Quadratic:
+				else:
+					faces[index + 0][:] = itemgetter(*[0, 1, 2, 3, 4, 5])(conn)
+					
+					linearAndQuad[1] = 1
+				
+				indexIncrement = 1
+				
+		# ELTYPE Axisymmetric solid quadrilateral elements:
+		elif ((element.type == 'CAX4') or (element.type == 'CAX4H') or (element.type == 'CAX4I') or (element.type == 'CAX4IH') or (element.type == 'CAX4R') or (element.type == 'CAX4RH') or (element.type == 'CGAX4') or (element.type == 'CGAX4H') or (element.type == 'CGAX4R') or (element.type == 'CGAX4RH') or (element.type == 'CAX4T') or (element.type == 'CAX4HT') or (element.type == 'CAX4RT') or (element.type == 'CAX4RHT') or (element.type == 'CGAX4T') or (element.type == 'CGAX4HT') or (element.type == 'CGAX4RT') or (element.type == 'CGAX4RHT') or (element.type == 'CAX4P') or (element.type == 'CAX4PH') or (element.type == 'CAX4RP') or (element.type == 'CAX4RPH') or (element.type == 'CAX4PT') or (element.type == 'CAX4RPT') or (element.type == 'CAX4RPHT') or (element.type == 'COHAX4') or (element.type == 'CAX8') or (element.type == 'CAX8H') or (element.type == 'CAX8R') or (element.type == 'CAX8RH') or (element.type == 'CGAX8') or (element.type == 'CGAX8H') or (element.type == 'CGAX8R') or (element.type == 'CGAX8RH') or (element.type == 'CAX8T') or (element.type == 'CAX8HT') or (element.type == 'CAX8RT') or (element.type == 'CAX8RHT') or (element.type == 'CGAX8T') or (element.type == 'CGAX8HT') or (element.type == 'CGAX8RT') or (element.type == 'CGAX8RHT') or (element.type == 'CAX8P') or (element.type == 'CAX8PH') or (element.type == 'CAX8RP') or (element.type == 'CAX8RPH')):
+			
+			# Increment INDEX face node variable:
+			if (i > 0):
+				index = index + indexIncrement
+			
+			# Treat shell surface as shell faces:
+			if (SHELL_FACES.lower() == 'yes'):
+				
+				# Linear:
+				if (len(conn) == 4):
+					faces[index + 0][:] = itemgetter(*[0, 1])(conn)
+					faces[index + 1][:] = itemgetter(*[1, 2])(conn)
+					faces[index + 2][:] = itemgetter(*[2, 3])(conn)
+					faces[index + 3][:] = itemgetter(*[3, 0])(conn)
+					
+					linearAndQuad[0] = 1
+					
+				# Quadratic:
+				else:
+					faces[index + 0][:] = itemgetter(*[0, 1, 4])(conn)
+					faces[index + 1][:] = itemgetter(*[1, 2, 5])(conn)
+					faces[index + 2][:] = itemgetter(*[2, 3, 6])(conn)
+					faces[index + 3][:] = itemgetter(*[3, 0, 7])(conn)
+					
+					linearAndQuad[1] = 1
+					
+				indexIncrement = 4
+				
+			# Treat shell surface as whole shell:
+			else:
+				
+				# Linear:
+				if (len(conn) == 4.0):
+					faces[index + 0][:] = itemgetter(*[0, 1, 2, 3])(conn)
+					
+					linearAndQuad[0] = 1
+					
+				# Quadratic:
+				else:
+					faces[index + 0][:] = itemgetter(*[0, 1, 2, 3, 4, 5, 6, 7])(conn)
+					
+					linearAndQuad[1] = 1
+				
+				indexIncrement = 1
 		else:
 			# This element is not supported by the surface detection algorithm
 			unsupportedElements.append(element.type)
@@ -575,7 +667,7 @@ for instanceNumber in range(nInstances):
 	surfaceNodesAll[instanceNumber][:] = surfaceNodes
 	
 	# Get surface elements from surface nodes:
-	if (POSITION.lower() == 'elemental') or (POSITION.lower() == 'centroidal'):
+	if (POSITION.lower() == 'elemental') or (POSITION.lower() == 'centroid'):
 		surfaceElements = []
 		surfaceConnectingNodes = []
 		
@@ -647,7 +739,7 @@ elif (POSITION.lower() == 'elemental'):
 	string = '%s' % nodesToFile
 	f.write(string)
 	f.close()
-elif (POSITION.lower() == 'centroidal'):
+elif (POSITION.lower() == 'centroid'):
 	if (nInstances == 1):
 		elementsToFile = surfaceElementsAll[0]
 	else:

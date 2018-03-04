@@ -13,7 +13,7 @@ classdef algorithm_sip < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.5 Stress Invariant Parameter
 %   
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
 %   Last modified 31-Jan-2018 10:48:44 GMT
     
     %%
@@ -306,7 +306,7 @@ classdef algorithm_sip < handle
                     %{
                         If the preferred stress invariant parameter is
                         different between two or more groups, warn the user
-                        and select a paramter based on priority (principal
+                        and select a parameter based on priority (principal
                         -> Tresca -> von Mises)
                     %}
                     if any(preferredParameter == 0.0) == 1.0

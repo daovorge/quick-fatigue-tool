@@ -13,7 +13,7 @@ classdef algorithm_sbbm < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.2 Stress-based Brown-Miller
 %   
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
 %   Last modified 16-Jan-2018 14:46:08 GMT
     
     %%
@@ -188,7 +188,7 @@ classdef algorithm_sbbm < handle
             % Get the maximum SBBM parameter over THETA for each value of PHI
             maximums = max(f);
             
-            % Find the PHI curve whcih contains the maximum SBBM paramter
+            % Find the PHI curve which contains the maximum SBBM parameter
             maxPhiCurve = find(maximums == max(maximums));
             maxPhiCurve = maxPhiCurve(1.0);
             
@@ -249,7 +249,7 @@ classdef algorithm_sbbm < handle
                         damageParamAll(i) = max(combinedStress(i, :));
                     end
                     
-                    %criticalPlane(i) = theta(find(combinedStress(i, :) == damageParameter(i), 1.0));
+                    %criticalPlane(i) = theta(find(combinedStress(n, :) == damageParameter(i), 1.0));
                 end
             end
             %%

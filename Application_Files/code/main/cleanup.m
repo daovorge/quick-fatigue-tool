@@ -5,8 +5,8 @@ function [] = cleanup(status)
 %   CLEANUP is used internally by Quick Fatigue Tool. The user
 %   is not required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 02-Feb-2018 09:50:06 GMT
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
+%   Last modified 01-Mar-2018 11:29:56 GMT
     
     %%
     
@@ -49,19 +49,19 @@ if status == 1.0
         end
     end
     
-    fprintf('\n[ERROR] Job %s exited with an error. Please see ''%s'' for details\n', job, [job, '.log'])
+    fprintf('\n[ERROR] Job %s exited with an error. Please see ''Project\\output\\%s'' for details\n', job, [job, '.log'])
     
     fid = fopen(errLogFile, 'w');
     
     % Write file header
     try
-        fprintf(fid, 'Quick Fatigue Tool 6.11-11 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
+        fprintf(fid, 'Quick Fatigue Tool 6.11-12 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
     catch
-        fprintf(fid, 'Quick Fatigue Tool 6.11-11\r\n');
+        fprintf(fid, 'Quick Fatigue Tool 6.11-12\r\n');
     end
     fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
     fprintf(fid, 'Copyright Louis Vallance 2018\r\n');
-    fprintf(fid, 'Last modified 02-Feb-2018 09:50:06 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 01-Mar-2018 11:29:56 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');
@@ -468,7 +468,8 @@ if status == 1.0
     end
     if getappdata(0, 'E023') == 1.0
         fprintf(fid, '\r\n\r\n***ERROR: No stress datasets were specified');
-        fprintf(fid, '\r\n-> At least one stress dataset is required for multiaxial analysis');
+        fprintf(fid, '\r\n-> For multiaxial fatigue analysis, one or more stress datasets must be specified');
+        fprintf(fid, '\r\n-> For uniaxial fatigue analysis, select a uniaxial analysis algorithm: ALGORITHM=[3.0 | 10.0]');
         fprintf(fid, '\r\n\r\nError code: E023');
         rmappdata(0, 'E023')
     end
@@ -1309,9 +1310,9 @@ if status == 1.0
     % Prompt user if they would like to view the analysis log
     if getappdata(0, 'analysisDialogues') > 0.0
         if (ispc == 1.0) && (ismac == 0.0)
-            answer = questdlg('The analysis exited with an error - Please see the log file for more information.', 'Quick Fatigue Tool', 'View log', 'Close', 'View log');
+            answer = questdlg('The analysis exited with an error - Please see the log file for details.', 'Quick Fatigue Tool', 'View log', 'Close', 'View log');
         elseif (ispc == 0.0) && (ismac == 1.0)
-            answer = errordlg('The analysis exited with an error - Please see the log file for more information.', 'Quick Fatigue Tool');
+            answer = errordlg('The analysis exited with an error - Please see the log file for details.', 'Quick Fatigue Tool');
         else
             answer = -1.0;
         end

@@ -2,7 +2,7 @@ function [trueStrain, trueStress, signal2] = css(signal, E, K, n)
 %CSS Iteratively solves the Ramberg-Osgood model for elastic stress and
 %strain data.
 %   [TRUESTRAIN, TRUESTRESS, SIGNAL2] = CSS(SIGNAL) returns 1xN vectors
-%   containing the nonlinear elsatic stress and strain from a 1xN vector of
+%   containing the nonlinear elastic stress and strain from a 1xN vector of
 %   elastic stress or strain, SIGNAL.
 %
 %   SIGNAL is a 1xN vector containing a time history of stresses or
@@ -15,7 +15,7 @@ function [trueStrain, trueStress, signal2] = css(signal, E, K, n)
 %   or simply 's'. Units of stress are in MPa.
 %
 %   TRUESTRAIN is a 1xN vector containing the true strain values which lie
-%   on the cyclic hystresis curve.
+%   on the cyclic hysteresis curve.
 %
 %   TRUESTRESS is a 1xN vector containing the true stress values which lie
 %   on the cyclic hysteresis curve.
@@ -35,7 +35,7 @@ function [trueStrain, trueStress, signal2] = css(signal, E, K, n)
 %   hysteresis loop, the material response reverts to the previous history
 %   point.
 
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
 %   Last modified 24-Jul-2015 10:43:07 GMT
 
 %% Convert to strain units:

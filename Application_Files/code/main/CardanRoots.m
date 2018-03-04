@@ -9,7 +9,7 @@ function roots = CardanRoots(varargin)
 % OUTPUT
 %   roots: (n x 3) array, each row correspond to the roots of P
 %
-% To adjust the parameter below which the the discriminant is considerered
+% To adjust the parameter below which the the discriminant is considered
 % as nil, use
 %   CardanRoots(P, tol)
 % Adjusting tol is useful to avoid the real roots become complex due to

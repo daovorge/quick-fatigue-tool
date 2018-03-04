@@ -9,7 +9,7 @@ function varargout = failStress(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials
 %   
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
 %   Last modified 01-Dec-2017 13:15:24 GMT
 
 % Begin initialization code - DO NOT EDIT

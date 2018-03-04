@@ -13,11 +13,11 @@ function [rfData, epsilon, sigma, error, warning, matMemFirstExcursion] = css2c(
 %   hysteresis point is assumed to be equal to the previous point. The rest
 %   of CSS2C is the same as CSS2.
 %
-%   CSS2C is the same as CSS2B, except that the rainlow cycle counting is
+%   CSS2C is the same as CSS2B, except that the rainflow cycle counting is
 %   performed by RAINFLOW_2(FT) instead of from the hysteresis loops
 %   directly inside CSS2C. This is found to be more reliable.
 %   
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
 %   Last modified 31-Jan-2018 10:48:44 GMT
     
     %%

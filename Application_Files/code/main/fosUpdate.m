@@ -9,16 +9,16 @@ function [fos_i, iterFine, iterCoarse, iterType] =...
 %   FOSUPDATE is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
 %   Last modified 04-Apr-2017 13:26:59 GMT
     
     %%
     
 %{
     This code compares the current FOS iteration to the previous FOS
-    iteration. If it looks unlikely that the FOS calulation will converge
+    iteration. If it looks unlikely that the FOS calculation will converge
     within the next few increments, augment the next increment. If the next
-    increment falls within the convergence tolerance, the calculaiton is
+    increment falls within the convergence tolerance, the calculation is
     terminated. Otherwise, the code reverts back to the original
     incrementation scheme.
 

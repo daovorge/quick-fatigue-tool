@@ -9,8 +9,8 @@ function [] = fos(gateTensors, tensorGate, coldItems, algorithm, msCorrection, N
 %   Reference section in Quick Fatigue Tool User Guide
 %      8.3 Factor of Strength
 %   
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 10-Jan-2017 09:33:05 GMT
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
+%   Last modified 28-Feb-2018 16:03:20 GMT
     
     %%
     
@@ -45,7 +45,7 @@ nodalDamage_original = nodalDamage;
 % Initialise the FOS variable
 fos = zeros(1.0, N);
 
-% Save thte total number of items
+% Save the total number of items
 Nt = N;
 
 % Get the rainflow type variable
@@ -91,6 +91,11 @@ nodal_tolerance_buffer = cell(1.0, N);
 iterFine_buffer = zeros(1.0, N);
 iterCoarse_buffer = zeros(1.0, N);
 
+% Set FOS values of eliminated nodes
+fos(coldItems) = fosMaxValue;
+itemNumbersAll = linspace(1.0, N, N);
+itemNumbersAll(coldItems) = [];
+
 % Get the number of groups
 G = getappdata(0, 'numberOfGroups');
 
@@ -99,9 +104,6 @@ groupIDBuffer = getappdata(0, 'groupIDBuffer');
 
 % Record each target life if necessary
 targetLife_buffer = zeros(1.0, G);
-
-% Total counter
-totalCounter = 0.0;
 
 % Flag indicating if the solution is bracketed
 bracketedSolution = 0.0;
@@ -141,21 +143,23 @@ for groups = 1:G
         targetLife_buffer(groups) = targetLife;
     end
     
+    % Get items number for the current group
+    [~, coldItems_group, ~] = intersect(groupIDs, coldItems);
+    itemNumbers = linspace(1.0, N, N);
+    itemNumbers(coldItems_group) = [];
+    N = length(itemNumbers);
+    
     for node = 1.0:N
+        % Get the item number
+        item = itemNumbers(node);
+        groupItem = groupIDs(item);
         
-        totalCounter = totalCounter + 1.0;
-        
-        %{
-            If groups are being used, convert the current item number to
-            the current item ID in the current group
-        %}
-        groupItem = groupIDs(node);
         
         % Skip items which have been eliminated from the analysis
-        if any(totalCounter == coldItems) == 1.0
+        if any(groupItem == coldItems) == 1.0
             % Update the FOS variable
-            fos(totalCounter) = fosMaxValue;
-            nodal_tolerance_buffer{totalCounter} = 0.0;
+            fos(groupItem) = fosMaxValue;
+            nodal_tolerance_buffer{groupItem} = 0.0;
             continue
         end
         
@@ -164,7 +168,7 @@ for groups = 1:G
         iterCoarse = 0.0;
         
         % Get the life for the current analysis item
-        life_i = 1.0/nodalDamage(totalCounter);
+        life_i = 1.0/nodalDamage(groupItem);
         
         % Calculate the initial FOS value
         if life_i < targetLife
@@ -189,14 +193,14 @@ for groups = 1:G
             end
         else
             % The initial FOS is correct
-            fos(totalCounter) = 1.0;
+            fos(groupItem) = 1.0;
             
             % Save the nodal buffers
-            nodal_fos_buffer{totalCounter} = 1.0;
-            nodal_life_buffer{totalCounter} = life_i;
-            nodal_tolerance_buffer{totalCounter} = 0.0;
-            iterFine_buffer(totalCounter) = 0.0;
-            iterCoarse_buffer(totalCounter) = 0.0;
+            nodal_fos_buffer{groupItem} = 1.0;
+            nodal_life_buffer{groupItem} = life_i;
+            nodal_tolerance_buffer{groupItem} = 0.0;
+            iterFine_buffer(groupItem) = 0.0;
+            iterCoarse_buffer(groupItem) = 0.0;
             
             continue
         end
@@ -255,30 +259,30 @@ for groups = 1:G
             switch algorithm
                 case 3.0 % UNIAXIAL STRAIN-LIFE
                     [~, ~, ~, ~, nodalDamage, nodalDamageParameter, ~, ~, ~] = algorithm_uel.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, L,...
-                        totalCounter, nodalDamage, msCorrection, nodalDamageParameter, gateTensors, tensorGate, s1i, s2i, s3i);
+                        groupItem, nodalDamage, msCorrection, nodalDamageParameter, gateTensors, tensorGate, s1i, s2i, s3i);
                 case 4.0 % STRESS-BASED BROWN-MILLER
                     [nodalDamageParameter, ~, ~, ~, ~, nodalDamage] = algorithm_sbbm.main(Sxxi, Syyi, Szzi,...
-                        Txyi, Tyzi, Txzi, L, step, proportionalItems(totalCounter), planePrecision,...
+                        Txyi, Tyzi, Txzi, L, step, proportionalItems(groupItem), planePrecision,...
                         nodalDamageParameter, nodalAmplitudes, nodalPairs, nodalPhiC,...
-                        nodalThetaC, totalCounter, msCorrection, nodalDamage, gateTensors, tensorGate,...
+                        nodalThetaC, groupItem, msCorrection, nodalDamage, gateTensors, tensorGate,...
                         signConvention, s1i, s2i, s3i, 1.0, rainflowMode);
                 case 5.0 % NORMAL STRESS
                     [nodalDamageParameter, ~, ~, ~, ~, nodalDamage] = algorithm_ns.main(Sxxi, Syyi, Szzi,...
-                        Txyi, Tyzi, Txzi, s1i, s3i, L, step, proportionalItems(totalCounter), planePrecision,...
+                        Txyi, Tyzi, Txzi, s1i, s3i, L, step, proportionalItems(groupItem), planePrecision,...
                         nodalDamageParameter, nodalAmplitudes, nodalPairs, nodalPhiC,...
-                        nodalThetaC, totalCounter, msCorrection, nodalDamage, gateTensors, tensorGate, 1.0);
+                        nodalThetaC, groupItem, msCorrection, nodalDamage, gateTensors, tensorGate, 1.0);
                 case 6.0 % FINDLEY'S METHOD
                     k = getappdata(0, 'k');
                     [nodalDamageParameter, ~, ~, ~, ~, nodalDamage] = algorithm_findley.main(Sxxi, Syyi, Szzi,...
                         Txyi, Tyzi, Txzi, L, step, planePrecision, nodalDamageParameter, nodalAmplitudes, nodalPairs, nodalPhiC,...
-                        nodalThetaC, totalCounter, nodalDamage, msCorrection, gateTensors, tensorGate,...
+                        nodalThetaC, groupItem, nodalDamage, msCorrection, gateTensors, tensorGate,...
                         signConvention, s1i, s2i, s3i, 1.0, k);
                 case 7.0 % STRESS INVARIANT PARAMETER
                     % Update the stress invariant parameter according to the new loading
                     stressInvParam = preProcess.getStressInvParam(1.0);
                     
                     [nodalAmplitudes, nodalPairs, nodalDamage, nodalDamageParameter] = algorithm_sip.main(s1i, s2i, s3i,...
-                        L, totalCounter, nodalDamage, msCorrection, nodalAmplitudes, nodalPairs, nodalDamageParameter,...
+                        L, groupItem, nodalDamage, msCorrection, nodalAmplitudes, nodalPairs, nodalDamageParameter,...
                         signConvention, gateTensors, tensorGate, stressInvParam, stressInvParamType, Sxxi, Syyi);
                 case 9.0 % NASALIFE
                     % Get the NASALIFE parameter
@@ -290,25 +294,25 @@ for groups = 1:G
                     
                     % Get the current principal stresses
                     % Get the principal stress history at the current item
-                    s1i = s1(totalCounter, :);  s2i = s2(totalCounter, :);  s3i = s3(totalCounter, :);
+                    s1i = s1(groupItem, :);  s2i = s2(groupItem, :);  s3i = s3(groupItem, :);
                     
                     [~, ~, nodalDamage, nodalDamageParameter] = algorithm_nasa.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi,...
-                        L, totalCounter, nodalDamage, nodalAmplitudes, nodalPairs, nodalDamageParameter, s1i, s2i, s3i,...
+                        L, groupItem, nodalDamage, nodalAmplitudes, nodalPairs, nodalDamageParameter, s1i, s2i, s3i,...
                         signConvention, gateTensors, tensorGate, vm, nasalifeParameter);
                 case 10.0 % UNIAXIAL STRESS-LIFE
                     [~, ~, nodalDamage, nodalDamageParameter, ~] = algorithm_usl.main(Sxxi, Syyi, Szzi, Txyi, Tyzi, Txzi, L,...
-                        totalCounter, nodalDamage, msCorrection, nodalAmplitudes, nodalPairs, nodalDamageParameter, gateTensors, tensorGate);
+                        groupItem, nodalDamage, msCorrection, nodalAmplitudes, nodalPairs, nodalDamageParameter, gateTensors, tensorGate);
                 otherwise
             end
             
             % Get the current life value
-            if nodalDamage(totalCounter) == 0.0
+            if nodalDamage(groupItem) == 0.0
                 fos_buffer = [fos_buffer, fosMaxValue]; %#ok<AGROW>
                 life_buffer = [life_buffer, inf]; %#ok<AGROW>
                 tolerance_buffer = [tolerance_buffer, inf]; %#ok<AGROW>
                 break
             else
-                life_i = 1.0/nodalDamage(totalCounter);
+                life_i = 1.0/nodalDamage(groupItem);
             end
             
             %{
@@ -403,7 +407,6 @@ for groups = 1:G
             if (length(life_buffer) > 2.0) && (life_buffer(end) == life_buffer(end - 2.0))
                 % The FOS appears to be chattering
                 fosBreakAfterBracket = 1.0;
-                
                 autoBracket = 1.0;
             end
         end
@@ -469,20 +472,20 @@ for groups = 1:G
                     FOS value on the other side of the target life is more
                     accurate, use that value instead
                 %}
-                fos(totalCounter) = fos_buffer(end - 1.0);
+                fos(groupItem) = fos_buffer(end - 1.0);
             else
-                fos(totalCounter) = fos_i;
+                fos(groupItem) = fos_i;
             end
         else
-            fos(totalCounter) = fos_i;
+            fos(groupItem) = fos_i;
         end
         
         %% Save the nodal buffers
-        nodal_fos_buffer{totalCounter} = fos_buffer;
-        nodal_life_buffer{totalCounter} = life_buffer;
-        nodal_tolerance_buffer{totalCounter} = tolerance_buffer;
-        iterFine_buffer(totalCounter) = iterFine;
-        iterCoarse_buffer(totalCounter) = iterCoarse;
+        nodal_fos_buffer{groupItem} = fos_buffer;
+        nodal_life_buffer{groupItem} = life_buffer;
+        nodal_tolerance_buffer{groupItem} = tolerance_buffer;
+        iterFine_buffer(groupItem) = iterFine;
+        iterCoarse_buffer(groupItem) = iterCoarse;
     end
 end
 
@@ -669,13 +672,15 @@ if getappdata(0, 'fosDiagnostics') == 1.0
     
     % Print FOS accuracy to a text file
     nodal_tolerance = zeros(1.0, Nt);
-    for i = 1:Nt
-        nodal_tolerances = nodal_tolerance_buffer{i};
-        nodal_tolerance(i) = nodal_tolerances(end);
+    for i = 1:length(itemNumbersAll)
+        j = itemNumbersAll(i);
+        nodal_tolerances = nodal_tolerance_buffer{j};
+        nodal_tolerance(j) = nodal_tolerances(end);
     end
     nodalAccuracy = 100.*(1.0 - nodal_tolerance);
     nodalAccuracy(nodalAccuracy < 0.0) = 0.0;
     nodalAccuracy(nodalAccuracy > 100.0) = 100.0;
+    nodalAccuracy(coldItems) = -1.0;
     
     data = [mainID'; subID'; nodalAccuracy]';
     

@@ -13,7 +13,7 @@ classdef algorithm_ns < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.3 Normal Stress
 %   
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
 %   Last modified 08-Jan-2018 08:53:45 GMT
     
     %%
@@ -64,7 +64,7 @@ classdef algorithm_ns < handle
             nodalPhiC(node) = phiC;
             nodalThetaC(node) = thetaC;
             
-            %% Perform a damage calcuacalculationltion on the current analysis item
+            %% Perform a damage calculation on the current analysis item
             nodalDamage(node) = algorithm_ns.damageCalculation(damageParamAll, msCorrection, pairs);
         end
         
@@ -177,7 +177,7 @@ classdef algorithm_ns < handle
             % Get the maximum normal stress over THETA for each value of PHI
             maximums = max(f);
             
-            % Find the PHI curve whcih contains the maximum normal stress
+            % Find the PHI curve which contains the maximum normal stress
             maxPhiCurve = find(maximums == max(maximums));
             maxPhiCurve = maxPhiCurve(1.0);
             

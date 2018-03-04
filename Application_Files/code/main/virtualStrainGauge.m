@@ -9,8 +9,8 @@ function [] = virtualStrainGauge(xx_o, yy_o, xy_o, zz, xz, yz)
 %   Reference section in Quick Fatigue Tool User Guide
 %      4.9 Virtual strain gauges
 %   
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 08-Jun-2017 12:59:03 GMT
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
+%   Last modified 20-Feb-2018 18:56:19 GMT
     
     %%
     
@@ -258,25 +258,25 @@ for gaugeNumber = 1:N
             diff = abs(length(xx_temp) - length(xx));
             if length(xx_temp) > length(xx)
                 xx_temp(1.0:diff) = [];
-                xx = xx_temp;
             end
         end
+        xx = xx_temp;
         
         if length(yy_temp) ~= length(yy)
             diff = abs(length(yy_temp) - length(yy));
             if length(yy_temp) > length(yy)
                 yy_temp(1.0:diff) = [];
-                yy = yy_temp;
             end
         end
+        yy = yy_temp;
         
         if length(xy_temp) ~= length(xy)
             diff = abs(length(xy_temp) - length(xy));
             if length(xy_temp) > length(xy)
                 xy_temp(1.0:diff) = [];
-                xy = xy_temp;
             end
         end
+        xy = xy_temp;
     end
     
     %% GET THE GAUGE HISTORIES
@@ -284,7 +284,7 @@ for gaugeNumber = 1:N
     B = 0.5*(xx + yy) + 0.5*(xx - yy)*cosd(2.0*(alpha + beta)) + xy*sind(2.0*(alpha + beta));
     C = 0.5*(xx + yy) + 0.5*(xx - yy)*cosd(2.0*(alpha + beta + gamma)) + xy*sind(2.0*(alpha + beta + gamma));
     
-    data = [A; B; C]';
+    data = 1e6.*[A; B; C]';
     
     %% WRITE THE GAUGE DATA TO A TEXT FILE
     dir = [root, sprintf('Data Files/virtual_strain_gauge_#%.0f.dat', gaugeNumber)];
@@ -292,7 +292,7 @@ for gaugeNumber = 1:N
     fid = fopen(dir, 'w+');
     
     fprintf(fid, 'VIRTUAL STRAIN GAUGE #%.0f (ITEM %.0f.%.0f)\r\n', gaugeNumber, mainID_g, subID_g);
-    fprintf(fid, 'Job:\t%s\r\nLoading:\t%.3g\t%s\r\nUnits:\tStrain\r\n', jobName, loadEqVal, loadEqUnits);
+    fprintf(fid, 'Job:\t%s\r\nLoading:\t%.3g\t%s\r\nUnits:\tMicrostrain\r\n', jobName, loadEqVal, loadEqUnits);
     
     fprintf(fid, 'Gauge A (%.3g Degrees)\tGauge B (%.3g Degrees)\tGauge C (%.3g Degrees)\r\n', alpha, (alpha + beta), (alpha + beta + gamma));
     fprintf(fid, '%f\t%f\t%f\r\n', data');

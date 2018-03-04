@@ -24,7 +24,7 @@ classdef algorithm_user < handle
 %      item N.
 %
 %   PAIRI
-%      Cycle pairs for the loading at the current analyis item. PAIRI is a
+%      Cycle pairs for the loading at the current analysis item. PAIRI is a
 %      Cx2 cell array where C is the number of cycles in the load history.
 %      PAIRI is defined as follows:
 %
@@ -45,27 +45,27 @@ classdef algorithm_user < handle
 %
 %   Variables passed in for information:
 %   S11
-%      Stress tensor history in the normal Certesian 1-direction for
+%      Stress tensor history in the normal Cartesian 1-direction for
 %      analysis item N.
 %
 %   S22
-%      Stress tensor history in the normal Certesian 2-direction for
+%      Stress tensor history in the normal Cartesian 2-direction for
 %      analysis item N.
 %
 %   S33
-%      Stress tensor history in the normal Certesian 3-direction for
+%      Stress tensor history in the normal Cartesian 3-direction for
 %      analysis item N.
 %
 %   S12
-%      Stress tensor history in the shear Certesian 12-direction for
+%      Stress tensor history in the shear Cartesian 12-direction for
 %      analysis item N.
 %
 %   S23
-%      Stress tensor history in the shear Certesian 23-direction for
+%      Stress tensor history in the shear Cartesian 23-direction for
 %      analysis item N.
 %
 %   S13
-%      Stress tensor history in the shear Certesian 13-direction for
+%      Stress tensor history in the shear Cartesian 13-direction for
 %      analysis item N.
 %
 %   N
@@ -84,7 +84,7 @@ classdef algorithm_user < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.10 User-defined algorithms
 %   
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
 %   Last modified 24-Nov-2017 09:30:36 GMT
     
     %%

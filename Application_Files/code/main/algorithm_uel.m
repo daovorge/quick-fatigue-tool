@@ -13,7 +13,7 @@ classdef algorithm_uel < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.9 Uniaxial Strain-Life
 %   
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
 %   Last modified 31-Jan-2018 10:48:44 GMT
     
     %%
@@ -59,7 +59,7 @@ classdef algorithm_uel < handle
                     previous load history.
                 %}
                 
-                % Check if there is a meterial state file
+                % Check if there is a materiel state file
                 [epsilon_pp, sigma_pp, sigma_pe, allowClosure, materialError, mmfe] = algorithm_uel.readMaterialState();
                 
                 % Convert elastic stress into inelastic stress-strain

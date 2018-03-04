@@ -16,8 +16,8 @@ function [] = default_job()
 %   Reference section in Quick Fatigue Tool User Settings Reference Guide
 %      1 Job file options
 %   
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 30-Jan-2018 13:52:26 GMT
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
+%   Last modified 14-Feb-2018 10:15:26 GMT
 
 %% 1: JOB
 
@@ -29,7 +29,7 @@ CONTINUE_FROM = '';
 
 %{
     0: Full analysis
-    1: Datacheck analysis
+    1: Data check analysis
     2: Use fatigue definition from job name
     'file-name.mat': Specify fatigue definition file
 %}
@@ -42,7 +42,7 @@ MATERIAL = '';
 % STRESS-LIFE CURVE
 %{
     0: Coefficients (Sf' and b)
-    1: S-N datapoints
+    1: S-N data points
 %}
 USE_SN = 1.0;
 
@@ -106,13 +106,14 @@ HF_TIME = {[], []};
 % SCALE FACTORS FOR HIGH FREQUENCY DATASETS
 HF_SCALE = [];
 
-%% 5: ABAQUS RPT / DATASET FILE
+%% 5: DATASET PROCESSOR
 
+% ELEMENT STRESS ASSUMPTION
 %{
-    0: Allow dataset files with 3D stress elements only
-    1: Allow dataset files with plane stress elements
+    0: Do not allow plane stress elements
+    1: Allow plane stress element assumption
 %}
-PLANE_STRESS = 0.0;
+ELEMENT_TYPE = 0.0;
 
 %% 6: ANALYSIS
 
@@ -268,7 +269,7 @@ COMPOSITE_CRITERIA = 0.0;
 
 %% - DO NOT EDIT
 flags = {ITEMS, UNITS, SCALE, REPEATS, USE_SN, DESIGN_LIFE, ALGORITHM,...
-    MS_CORRECTION, LOAD_EQ, PLANE_STRESS, SN_SCALE, OUTPUT_FIELD,...
+    MS_CORRECTION, LOAD_EQ, ELEMENT_TYPE, SN_SCALE, OUTPUT_FIELD,...
     OUTPUT_HISTORY, OUTPUT_FIGURE, KT_DEF, KT_CURVE, RESIDUAL,...
     WELD_CLASS, DEVIATIONS_BELOW_MEAN, CHARACTERISTIC_LENGTH, SEA_WATER,...
     YIELD_STRENGTH, FAILURE_MODE, UTS, CONV, OUTPUT_DATABASE, PART_INSTANCE,...

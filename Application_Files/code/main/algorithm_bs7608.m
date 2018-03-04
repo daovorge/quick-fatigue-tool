@@ -13,8 +13,8 @@ classdef algorithm_bs7608 < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.6 BS 7608 Fatigue of Welded Steel Joints
 %   
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 31-Jan-2018 15:36:18 GMT
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
+%   Last modified 23-Feb-2018 10:44:27 GMT
     
     %%
     
@@ -54,7 +54,7 @@ classdef algorithm_bs7608 < handle
             nodalPhiC(node) = phiC;
             nodalThetaC(node) = thetaC;
             
-            %% Perform a damage calcuacalculationltion on the current analysis item
+            %% Perform a damage calculation on the current analysis item
             nodalDamage(node) = algorithm_bs7608.damageCalculation(damageParamAll, pairs, repeats);
         end
         
@@ -479,7 +479,7 @@ classdef algorithm_bs7608 < handle
             % Get the maximum BS 7608 parameter over THETA for each value of PHI
             maximums = max(f);
             
-            % Find the PHI curve whcih contains the maximum BS 7608 paramter
+            % Find the PHI curve which contains the maximum BS 7608 parameter
             maxPhiCurve = find(maximums == max(maximums));
             maxPhiCurve = maxPhiCurve(1.0);
             
@@ -1124,6 +1124,9 @@ classdef algorithm_bs7608 < handle
             % Figure visibility
             figureVisibility = getappdata(0, 'figureVisibility');
             
+            % Get amplitudes
+            amplitudes = getappdata(0, 'amplitudesOnCP');
+            
             %% VM (von Mises stress at worst item)
             worstItem = getappdata(0, 'worstItem');
             
@@ -1620,7 +1623,6 @@ classdef algorithm_bs7608 < handle
                 end
             end
             
-            amplitudes = getappdata(0, 'amplitudesOnCP');
             cycles = getappdata(0, 'cyclesOnCP');
             Sm = 0.5*(cycles(:, 1) + cycles(:, 2));
             
@@ -1629,10 +1631,10 @@ classdef algorithm_bs7608 < handle
             % This MATLAB figure requires the Statistics Toolbox
             isAvailable = checkToolbox('Statistics Toolbox');
             
-            if isAvailable == 1.0
-                if outputFigure == 1.0 && outputField == 1.0 && getappdata(0, 'figure_RHIST') == 1.0
+            if (isAvailable == 1.0) && (length(amplitudes) > 1.0)
+                if (outputFigure == 1.0) && (outputField == 1.0) && (getappdata(0, 'figure_RHIST') == 1.0)
                     f12 = figure('visible', figureVisibility);
-                    rhistData = [Sm'; 2.*amplitudes]';
+                    rhistData = [Sm'; 2.0.*amplitudes]';
                     nBins = getappdata(0, 'numberOfBins');
                     hist3(rhistData, [nBins, nBins])
                     
@@ -1686,7 +1688,7 @@ classdef algorithm_bs7608 < handle
                     saveas(f13, dir, 'fig')
                     postProcess.makeVisible([dir, '.fig'])
                 end
-            else
+            elseif isAvailable == 0.0
                 messenger.writeMessage(128.0)
             end
             

@@ -12,8 +12,8 @@
 %   Reference section in Quick Fatigue Tool User Settings Reference Guide
 %      2 Environment variables
 %   
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 17-Jan-2018 08:19:00 GMT
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
+%   Last modified 22-Feb-2018 10:22:34 GMT
 
 %% GATE TENSORS
 %{
@@ -142,7 +142,7 @@ setappdata(0, 'cpSample', 0.0)
 
 % SHEAR STRESS DETERMINATION
 %{
-    1: Maximum chord method
+    1: Longest chord method
     2: Maximum resultant shear stress
 %}
 setappdata(0, 'cpShearStress', 1.0)

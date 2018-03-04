@@ -8,7 +8,7 @@ classdef overlay < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      4.8 Analysis continuation techniques
 %   
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
 %   Last modified 18-Dec-2017 13:56:33 GMT
     
     %%

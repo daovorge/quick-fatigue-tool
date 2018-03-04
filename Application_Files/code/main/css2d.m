@@ -16,7 +16,7 @@ function [rfData, epsilon, sigma, error, warning] = css2d(sigma_e, epsilon_pp, s
 %   CSS2D is the same as CSS2C, except that the material state is imported
 %   from a previous analysis defined by CONTINUE_FROM.
 %   
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
 %   Last modified 30-Aug-2017 15:40:20 GMT
     
     %%

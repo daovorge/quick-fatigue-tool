@@ -9,8 +9,8 @@ classdef postProcess_e < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      10 Output
 %   
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 22-Nov-2017 09:33:19 GMT
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
+%   Last modified 23-Feb-2018 10:44:27 GMT
     
     %%
     
@@ -455,6 +455,9 @@ classdef postProcess_e < handle
             % Get the worst analysis item
             worstItem = getappdata(0, 'worstItem');
             
+            % Get amplitudes
+            amplitudes = getappdata(0, 'amplitudesOnCP');
+            
             L = getappdata(0, 'signalLength');
             
             % Figure visibility
@@ -526,7 +529,6 @@ classdef postProcess_e < handle
                 Sm = 0.5*(cycles(:, 1.0) + cycles(:, 2.0));
                 setappdata(0, 'numberOfCycles', length(Sm))
                 setappdata(0, 'meansOnCP', Sm)
-                amplitudes = getappdata(0, 'amplitudesOnCP');
                 
                 if getappdata(0, 'figure_HD') == 1.0
                     if outputFigure == 1.0
@@ -1143,10 +1145,10 @@ classdef postProcess_e < handle
             % This MATLAB figure requires the Statistics Toolbox
             isAvailable = checkToolbox('Statistics Toolbox');
             
-            if isAvailable == 1.0
-                if outputFigure == 1.0 && outputField == 1.0 && getappdata(0, 'figure_RHIST') == 1.0
+            if (isAvailable == 1.0) && (length(amplitudes) > 1.0)
+                if (outputFigure == 1.0) && (outputField == 1.0) && (getappdata(0, 'figure_RHIST') == 1.0)
                     f12 = figure('visible', figureVisibility);
-                    rhistData = [Sm'; 2.*amplitudes]';
+                    rhistData = [Sm'; 2.0.*amplitudes]';
                     nBins = getappdata(0, 'numberOfBins');
                     hist3(rhistData, [nBins, nBins])
                     
@@ -1204,7 +1206,7 @@ classdef postProcess_e < handle
                         postProcess.makeVisible([dir, '.fig'])
                     end
                 end
-            else
+            elseif isAvailable == 0.0
                 messenger.writeMessage(128.0)
             end
             

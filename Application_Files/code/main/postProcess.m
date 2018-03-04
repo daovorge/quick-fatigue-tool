@@ -10,8 +10,8 @@ classdef postProcess < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      10 Output
 %   
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 31-Jan-2018 10:48:44 GMT
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
+%   Last modified 01-Mar-2018 11:29:56 GMT
     
     %%
     
@@ -233,22 +233,9 @@ classdef postProcess < handle
             % Get von Mises stress
             vonMises = getappdata(0, 'VM');
             
-            % Total counter
-            totalCounter = 0.0;
-            
-            % Initialize variable
-            triaxialityFactor = zeros(1.0, N);
-            
-            % Get the von Mises stress history for each analysis item
-            for i = 1.0:N
-                totalCounter = totalCounter + 1.0;
-                
-                % Get the triaxiality factors at the current analysis item
-                triaxialityFactors = hydroStress(totalCounter, :)./vonMises(totalCounter, :);
-                
-                % Get the maximum triaxiality factor in the loading at the current analysis item
-                triaxialityFactor(totalCounter) = max(triaxialityFactors);
-            end
+            % Get the triaxiality factor for each analysis item
+            triaxialityFactors = hydroStress./vonMises;
+            triaxialityFactor = max(triaxialityFactors, [], 2.0)';
             
             setappdata(0, 'TRF', triaxialityFactor)
             
@@ -338,61 +325,33 @@ classdef postProcess < handle
                     
                     fprintf(fid, 'FIELDS [ANALYSED ITEMS ONLY]\r\nJob:\t%s\r\nLoading:\t%.3g\t%s\r\n', getappdata(0, 'jobName'), getappdata(0, 'loadEqVal'), getappdata(0, 'loadEqUnits'));
                     
-                    mainID_i = zeros(1, length(mainID) - length(coldItems));
-                    subID_i = mainID_i;
-                    L_i = mainID_i;
-                    LL_i = mainID_i;
-                    D_i = mainID_i;
-                    DDL_i = mainID_i;
-                    FOS_i = mainID_i;
-                    SFA_i = mainID_i;
-                    FRFR_i = mainID_i;
-                    FRFH_i = mainID_i;
-                    FRFV_i = mainID_i;
-                    FRFW_i = mainID_i;
-                    SMAX_i = mainID_i;
-                    SMXP_i = mainID_i;
-                    SMXU_i = mainID_i;
-                    TRF_i = mainID_i;
-                    WCM_i = mainID_i;
-                    WCA_i = mainID_i;
-                    WCATAN_i = mainID_i;
-                    WCDP_i = mainID_i;
-                    YIELD_i = mainID_i;
-                    j = 1.0;
-                    for i = 1:length(mainID)
-                        if j > length(mainID_i)
-                            break
-                        end
-                        
-                        if any(i == coldItems) == 0.0
-                            mainID_i(j) = mainID(i);
-                            subID_i(j) = subID(i);
-                            L_i(j) = L(i);
-                            LL_i(j) = LL(i);
-                            D_i(j) = D(i);
-                            DDL_i(j) = DDL(i);
-                            FOS_i(j) = FOS(i);
-                            SFA_i(j) = SFA(i);
-                            FRFR_i(j) = FRFR(i);
-                            FRFH_i(j) = FRFH(i);
-                            FRFV_i(j) = FRFV(i);
-                            FRFW_i(j) = FRFW(i);
-                            SMAX_i(j) = SMAX(i);
-                            SMXP_i(j) = SMXP(i);
-                            SMXU_i(j) = SMXU(i);
-                            TRF_i(j) = TRF(i);
-                            WCM_i(j) = WCM(i);
-                            WCA_i(j) = WCA(i);
-                            WCATAN_i(j) = WCATAN(i);
-                            WCDP_i(j) = WCDP(i);
-                            YIELD_i(j) = YIELD(i);
-                            
-                            j = j + 1.0;
-                        end
-                    end
+                    itemNumbers = linspace(1.0, N, N);
+                    itemNumbers(coldItems) = [];
                     
-                    data_i = [mainID_i; subID_i; L_i; LL_i; D_i; DDL_i; FOS_i; SFA_i; FRFR_i; FRFH_i; FRFV_i; FRFW_i; SMAX_i; SMXP_i; SMXU_i; TRF_i; WCM_i; WCA_i; WCATAN_i; WCDP_i; YIELD_i]';
+                    mainID = mainID(itemNumbers);
+                    subID = subID(itemNumbers);
+                    
+                    L = L(itemNumbers);
+                    LL = LL(itemNumbers);
+                    D = D(itemNumbers);
+                    DDL = DDL(itemNumbers);
+                    FOS = FOS(itemNumbers);
+                    SFA = SFA(itemNumbers);
+                    FRFR = FRFR(itemNumbers);
+                    FRFH = FRFH(itemNumbers);
+                    FRFV = FRFV(itemNumbers);
+                    FRFW = FRFW(itemNumbers);
+                    SMAX = SMAX(itemNumbers);
+                    SMXP = SMXP(itemNumbers);
+                    SMXU = SMXU(itemNumbers);
+                    TRF = TRF(itemNumbers);
+                    WCM = WCM(itemNumbers);
+                    WCA = WCA(itemNumbers);
+                    WCATAN = WCATAN(itemNumbers);
+                    WCDP = WCDP(itemNumbers);
+                    YIELD = YIELD(itemNumbers);
+                    
+                    data_i = [mainID'; subID'; L; LL; D; DDL; FOS; SFA; FRFR; FRFH; FRFV; FRFW; SMAX; SMXP; SMXU; TRF; WCM; WCA; WCATAN; WCDP; YIELD]';
                     
                     fprintf(fid, 'Main ID\tSub ID\tL (%s)\tLL (%s)\tD\tDDL\tFOS\tSFA\tFRFR\tFRFH\tFRFV\tFRFW\tSMAX (MPa)\tSMXP\tSMXU\tTRF\tWCM (MPa)\tWCA (MPa)\tWCATAN (Deg)\tWCDP (MPa)\tYIELD\r\n', loadEqUnits, loadEqUnits);
                     fprintf(fid, sprintf('%%.0f\t%%.0f\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\t%%%s\t%%.0f\r\n',...
@@ -428,6 +387,9 @@ classdef postProcess < handle
             
             % Get knock-down data
             snKnockDown = getappdata(0, 'snKnockDown');
+            
+            % Get amplitudes
+            amplitudes = getappdata(0, 'amplitudesOnCP');
             
             L = getappdata(0, 'signalLength');
             
@@ -500,7 +462,6 @@ classdef postProcess < handle
                 Sm = 0.5*(cycles(:, 1.0) + cycles(:, 2.0));
                 setappdata(0, 'numberOfCycles', length(Sm))
                 setappdata(0, 'meansOnCP', Sm)
-                amplitudes = getappdata(0, 'amplitudesOnCP');
                 
                 if getappdata(0, 'figure_HD') == 1.0
                     if outputFigure == 1.0
@@ -1107,10 +1068,10 @@ classdef postProcess < handle
             % This MATLAB figure requires the Statistics Toolbox
             isAvailable = checkToolbox('Statistics Toolbox');
             
-            if isAvailable == 1.0
-                if outputFigure == 1.0 && outputField == 1.0 && getappdata(0, 'figure_RHIST') == 1.0
+            if (isAvailable == 1.0) && (length(amplitudes) > 1.0)
+                if (outputFigure == 1.0) && (outputField == 1.0) && (getappdata(0, 'figure_RHIST') == 1.0)
                     f11 = figure('visible', figureVisibility);
-                    rhistData = [Sm'; 2.*amplitudes]';
+                    rhistData = [Sm'; 2.0.*amplitudes]';
                     nBins = getappdata(0, 'numberOfBins');
                     hist3(rhistData, [nBins, nBins])
                     
@@ -1168,7 +1129,7 @@ classdef postProcess < handle
                         postProcess.makeVisible([dir, '.fig'])
                     end
                 end
-            else
+            elseif isAvailable == 0.0
                 messenger.writeMessage(128.0)
             end
             
@@ -1858,12 +1819,14 @@ classdef postProcess < handle
             end
             [~, modelDatabaseNameShort, ~] = fileparts(modelDatabasePath);
             
+            % Print header
+            fprintf('\n[POST] Quick Fatigue Tool 6.11-12 ODB Interface');
+            fprintf(fid_status, '\n[POST] Quick Fatigue Tool 6.11-12 ODB Interface');
+            
             % Warn user if there is only one item in the model
             if length(mainID) == 1.0
                 messenger.writeMessage(204.0)
             end
-            
-            fprintf('\n');
             
             % Get the job name
             jobName = getappdata(0, 'jobName');
@@ -1971,6 +1934,34 @@ classdef postProcess < handle
                     end
             end
             
+            % Open the log file for writing
+            fid_debug = fopen([sprintf('Project/output/%s/Data Files/', jobName), resultsDatabaseName, '.log'], 'w+');
+            fprintf(fid_debug, 'Quick Fatigue Tool 6.11-12 ODB Interface Log');
+            
+            % Print Abaqus installation info to the debug log file
+            try
+                [status, result] = system(sprintf('%s whereami', abqCmd));
+                
+                if status == 1.0
+                    % An exception occurred whilst getting installation info
+                    fprintf(fid_debug, '\r\n\r\nError: Abaqus installation info was not found\r\n');
+                    fprintf(fid_debug, '\tPlease ensure that the Abaqus command line argument points to a valid Abaqus batch file');
+                    fprintf(fid_debug, '\r\n\tAn Abaqus installation is required to write fatigue results to the output database (.odb) file');
+                    fprintf(fid_debug, '\r\n\r\nFatigue results have not been written to the output database');
+                    fprintf(fid_debug, '\r\n\r\nEND OF FILE');
+                else
+                    fprintf(fid_debug, '\r\n\r\nAbaqus installation info:\r\n%s', result);
+                    fprintf(fid_debug, '(NOTE: The Abaqus version is determined by the autoExport_abqCmd environment variable)\r\n');
+                end
+            catch exception
+                % An unhandled exception was encountered
+                fprintf('[POST] ODB Error: %s', exception.message);
+                fprintf(fid_status, '[POST] ODB Error: %s', exception.message);
+                fprintf('\n[ERROR] ODB Interface exited with errors');
+                fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors');
+                return
+            end
+            
             % Verify the inputs
             error = python.verifyAuto(requestedFields,...
                 fieldDataPath, fieldDataName, resultsDatabasePath, partInstanceList);
@@ -1984,11 +1975,19 @@ classdef postProcess < handle
             % Try to upgrade the ODB
             if getappdata(0, 'autoExport_upgradeODB') == 1.0
                 [status, result] = system(sprintf('%s -upgrade -job "%s" -odb "%s"', abqCmd, [resultsDatabasePath, '/', resultsDatabaseName], modelDatabasePath(1.0:end - 4.0)));
-                
+
                 if status == 1.0
-                    % There is no Abaqus executable on the host machine
+                    % An exception occurred whilst upgrading the ODB file
                     fprintf('[POST] ODB Error: %s', result);
-                    fprintf(fid_status, '[POST] ODB Error: %s', result);
+                    fprintf(fid_status, '\n[POST] ODB Error: %s', result);
+                    
+                    if isempty(strfind(result, 'is not recognized as an internal or external command,')) == 0.0
+                        fprintf('\n[POST] Please ensure that the Abaqus command line argument points to a valid Abaqus batch file');
+                        fprintf('\n[POST] An Abaqus installation is required to write fatigue results to the output database (.odb) file');
+                        fprintf(fid_status, '\n[POST] Please ensure that the Abaqus command line argument points to a valid Abaqus batch file');
+                        fprintf(fid_status, '\n[POST] An Abaqus installation is required to write fatigue results to the output database (.odb) file');
+                    end
+                    
                     fprintf('\n[ERROR] ODB Interface exited with errors');
                     fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors');
                     return
@@ -1996,11 +1995,9 @@ classdef postProcess < handle
             end
             
             % If the ODB is already up-to-date, try to copy the file instead
-            removeCarriageReturn = 0.0;
             if exist([resultsDatabasePath, '/', resultsDatabaseName, '.odb'], 'file') == 0.0
                 try
                     copyfile(modelDatabasePath, [resultsDatabasePath, '/', resultsDatabaseName, '.odb'])
-                    removeCarriageReturn = 1.0;
                 catch exception
                     % The file could not be copied
                     fprintf('[POST] ODB Error: %s', exception.message);
@@ -2009,15 +2006,7 @@ classdef postProcess < handle
                     fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors');
                     return
                 end
-            end
-            
-            if removeCarriageReturn == 1.0
-                fprintf('[POST] Starting Quick Fatigue Tool 6.11-11 ODB Interface');
-                fprintf(fid_status, '\n[POST] Starting Quick Fatigue Tool 6.11-11 ODB Interface');
-            else
-                fprintf('[POST] Quick Fatigue Tool 6.11-11 ODB Interface');
-                fprintf(fid_status, '\n[POST] Quick Fatigue Tool 6.11-11 ODB Interface');
-            end
+            end            
             
             % Delete the upgrade log file
             delete([resultsDatabasePath, '/', resultsDatabaseName, '-upgrade', '.log'])
@@ -2029,10 +2018,6 @@ classdef postProcess < handle
             if exist([resultsDatabasePath, '/', modelDatabaseNameShort, '.lck'], 'file') == 2.0
                 delete([resultsDatabasePath, '/', modelDatabaseNameShort, '.lck'])
             end
-            
-            % Open the log file for writing
-            fid_debug = fopen([sprintf('Project/output/%s/Data Files/', jobName), resultsDatabaseName, '.log'], 'w+');
-            fprintf(fid_debug, 'Quick Fatigue Tool 6.11-11 ODB Interface Log');
             
             % Get the selected position
             userPosition = getappdata(0, 'odbResultPosition');
@@ -2051,21 +2036,30 @@ classdef postProcess < handle
                 end
             end
             
+            fprintf(fid_debug, '\r\nODB export summary:');
             positions = {'Element-Nodal', 'Unique Nodal', 'Integration Point', 'Centroidal'};
-            fprintf(fid_debug, '\r\n\r\nUser-selected results position: %s', positions{userPosition});
-            fprintf('\n[POST] User-selected results position: %s', positions{userPosition});
-            fprintf(fid_status, '\n[POST] User-selected results position: %s', positions{userPosition});
+            fprintf(fid_debug, '\r\nUser-selected results position: %s', positions{userPosition});
             
             % Check if position should be determined automatically
             autoPosition = getappdata(0, 'autoExport_autoPosition');
             if autoPosition == 1.0
                 fprintf(fid_debug, '\r\nAllow Quick Fatigue Tool to determine results position based on field IDs: YES');
-                fprintf('\n[POST] Allow Quick Fatigue Tool to determine results position based on field IDs: YES');
-                fprintf(fid_status, '\n[POST] Allow Quick Fatigue Tool to determine results position based on field IDs: YES');
             else
                 fprintf(fid_debug, '\r\nAllow Quick Fatigue Tool to determine results position based on field IDs: NO');
-                fprintf('\n[POST] Allow Quick Fatigue Tool to determine results position based on field IDs: NO');
-                fprintf(fid_status, '\n[POST] Allow Quick Fatigue Tool to determine results position based on field IDs: NO');
+            end
+            
+            if isempty(stepName) == 1.0
+                fprintf(fid_debug, '\r\nThe step name was not specified (a default name will be used)');
+            else
+                fprintf(fid_debug, '\r\nStep name: ''%s''', stepName);
+            end
+            switch getappdata(0, 'autoExport_selectionMode')
+                case 1.0
+                    fprintf(fid_debug, '\r\nField output request: SELECTED BY USER');
+                case 2.0
+                    fprintf(fid_debug, '\r\nField output request: PRESELECTED DEFAULTS');
+                case 3.0
+                    fprintf(fid_debug, '\r\nField output request: ALL');
             end
             
             for instanceNumber = 1:nInstances
@@ -2089,6 +2083,11 @@ classdef postProcess < handle
                     
                     fprintf('\n[ERROR] ODB Interface exited with errors. Check the results log for details (Project/output/%s/Data Files/%s.log)', getappdata(0, 'jobName'), resultsDatabaseName);
                     fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors. Check the results log for details (Project/output/%s/Data Files/%s.log)', getappdata(0, 'jobName'), resultsDatabaseName);
+                    
+                    % Delete the results output database from the output directory if applicable
+                    if exist([pwd, sprintf('\\%s\\%s.odb', resultsDatabasePath, resultsDatabaseName)], 'file') == 2.0
+                        delete([pwd, sprintf('\\%s\\%s.odb', resultsDatabasePath, resultsDatabaseName)])
+                    end
                     
                     fclose(fid_debug);
                     return
@@ -2169,12 +2168,19 @@ classdef postProcess < handle
                     fprintf(fid_status, '[POST] Writing field data to ODB');
                     
                     try
-                        [status, message] = system(sprintf('%s python %s', abqCmd, scriptFile));
+                        [~, message] = system(sprintf('%s python %s', abqCmd, scriptFile));
                         
-                        if status == 1.0
+                        if isempty(message) == 0.0
+                            fprintf(fid_status, '\n[POST] ODB Error: %s', message);
+                            
                             if isempty(strfind(message, sprintf('KeyError: ''%s''', stepName))) == 0.0
                                 % The step name is invalid
                                 fprintf('\n[POST] ODB Error: The step name ''%s'' could not be found in the ODB. Results will not be written to the output database.', stepName)
+                                fprintf(fid_status, '\n[POST] ODB Error: The step name ''%s'' could not be found in the ODB. Results will not be written to the output database.', stepName);
+                            elseif isempty(strfind(message, sprintf('KeyError: ''%s''', partInstanceName))) == 0.0
+                                % The part instance name is invalid
+                                fprintf('\n[POST] ODB Error: The part instance name ''%s'' could not be found in the ODB. Results will not be written to the output database.', partInstanceName)
+                                fprintf(fid_status, '\n[POST] ODB Error: The part instance name ''%s'' could not be found in the ODB. Results will not be written to the output database.', partInstanceName);
                             elseif isempty(strfind(message, 'OdbError: Invalid node label')) == 0.0
                                 %{
                                     The field data does not exactly match
@@ -2182,16 +2188,24 @@ classdef postProcess < handle
                                     element/node set could not be created
                                 %}
                                 fprintf('\n[POST] ODB Error: The ODB element/node set could not be written because the field data does not exactly match the specified part instance. Results will not be written to the output database.')
+                                fprintf(fid_status, '\n[POST] ODB Error: The ODB element/node set could not be written because the field data does not exactly match the specified part instance. Results will not be written to the output database.');
                             elseif isempty(strfind(message, 'is not recognized as an internal or external command')) == 0.0
                                 % There is no Abaqus executable on the host machine
                                 fprintf('\n[POST] ODB Error: The Abaqus command ''%s'' could not be found on the system. Check your Abaqus installation. Results will not be written to the output database.', abqCmd)
+                                fprintf(fid_status, '\n[POST] ODB Error: The Abaqus command ''%s'' could not be found on the system. Check your Abaqus installation. Results will not be written to the output database.', abqCmd);
                             else
                                 % Unkown exception
-                                fprintf('\n[POST] ODB Error: The Abaqus API returned the following error:\r\n\r\n%s\r\nResults will not be written to the output database.', message)
+                                fprintf('\n[POST] ODB Error: The Abaqus API returned the following error:\r\n%s\r\nResults will not be written to the output database.', message)
+                                fprintf(fid_status, '\n[POST] ODB Error: The Abaqus API returned the following error:\r\n%s\r\nResults will not be written to the output database.', message);
                             end
                             
                             if getappdata(0, 'autoExport_executionMode') == 1.0
                                 delete(scriptFile)
+                            end
+                            
+                            % Delete the results output database from the output directory if applicable
+                            if exist([pwd, sprintf('\\%s\\%s.odb', resultsDatabasePath, resultsDatabaseName)], 'file') == 2.0
+                                delete([pwd, sprintf('\\%s\\%s.odb', resultsDatabasePath, resultsDatabaseName)])
                             end
                             
                             fprintf('\n[ERROR] ODB Interface exited with errors');
@@ -2205,7 +2219,6 @@ classdef postProcess < handle
                         messenger.writeMessage(86.0)
                         
                         fclose(fid_debug);
-                        clc
                         
                         if getappdata(0, 'autoExport_executionMode') == 1.0
                             delete(scriptFile)
@@ -2217,7 +2230,8 @@ classdef postProcess < handle
                 end
             end
             
-            fprintf(fid_debug, ' Success');
+            fprintf(fid_debug, ' Success\r\n\r\nFatigue results have been written to ''%s''', sprintf('%s/%s.odb', resultsDatabasePath, resultsDatabaseName));
+            fprintf(fid_debug, '\r\n\r\nEND OF FILE');
             fprintf('\n[POST] Export complete. Check the log file in Project/output/%s/Data Files for detailed information', getappdata(0, 'jobName'));
             fprintf(fid_status, '\n[POST] Export complete. Check the log file in Project/output/%s/Data Files for detailed information', getappdata(0, 'jobName'));
             fclose(fid_debug);
@@ -2232,14 +2246,14 @@ classdef postProcess < handle
             clipboard('copy', [pwd, sprintf('/Project/output/%s/Data Files/%s.odb', jobName, resultsDatabaseName)])
         end
         
-        %% GET THE LARGEST STRESS IN THE LOADING
+        %% GET THE LARGEST STRESS IN THE LOADING (NEW)
         function [SMAX_item] = getMaximumStress()
             % Get the principal stress history
             s1 = getappdata(0, 'S1');
             s2 = getappdata(0, 'S2');
             s3 = getappdata(0, 'S3');
             
-            [N, L] = size(s1);
+            [N, ~] = size(s1);
             
             % Get the analysis items
             mainID = getappdata(0, 'mainID_original');
@@ -2247,44 +2261,28 @@ classdef postProcess < handle
             
             % Initialize variables
             SMAX_ABS = zeros(1.0, N);
-            hydroStress = zeros(N, L);
             
-            totalCounter = 0.0;
+            % Get the hydrostatic stress
+            hydroStress = (1.0/3.0).*(s1 + s2 + s3);
             
-            for i = 1:N
-                totalCounter = totalCounter + 1.0;
-                
-                S1j = s1(totalCounter, :);
-                S2j = s2(totalCounter, :);
-                S3j = s3(totalCounter, :);
-                
-                % Get the hydrostatic stress
-                hydroStress(totalCounter, :) = (1.0/3.0)*(S1j + S2j + S3j);
-                
-                nodalS1 = max(S1j);
-                nodalS3 = min(S3j);
-                
-                %{
-                    If the 3-D eigenvector calculation is enabled, this
-                    can produce numerical discrepancies which cause QFT
-                    to select the wrong stress. If the two stresses are
-                    very close, make them equal
-                %}
-                nodalS = [nodalS1, nodalS3];
-                diff = abs(1.0 - abs(max(nodalS)/min(nodalS)));
-                
-                if (diff > 0.0) &&  (diff < 1e-12)
-                    nodalS1 = -nodalS3;
-                end
-                
-                if abs(nodalS1) > abs(nodalS3)
-                    SMAX_ABS(totalCounter) = nodalS1;
-                elseif abs(nodalS1) == abs(nodalS3)
-                    SMAX_ABS(totalCounter) = nodalS1;
-                else
-                    SMAX_ABS(totalCounter) = nodalS3;
-                end
-            end
+            % Get the numerically largest principal stress for each analysis item
+            nodalS1 = max(s1, [], 2.0)';
+            nodalS3 = min(s3, [], 2.0)';
+            nodalS = [nodalS1', nodalS3'];
+            
+            %{
+                The 3D Eigensolver can cause numerical artifacting, which
+                occasionally results in the incorrect value of maximum
+                stress. Resolve this by correcting any near-zero values
+            %}
+            diff = abs(1.0 - abs(max(nodalS, [], 2.0)./min(nodalS, [], 2.0)));
+            diffLowerBound = diff > 0.0;
+            diffUpperBound = diff < 1e-12;
+            nearZeroIndices = diffLowerBound == diffUpperBound;
+            nodalS1(nearZeroIndices) = -nodalS3(nearZeroIndices);
+            
+            SMAX_ABS(abs(nodalS1) >= abs(nodalS3)) = nodalS1(abs(nodalS1) >= abs(nodalS3));
+            SMAX_ABS(abs(nodalS1) < abs(nodalS3)) = nodalS3(abs(nodalS1) < abs(nodalS3));
             
             if abs(min(SMAX_ABS)) > abs(max(SMAX_ABS))
                 MAX_SMAX_ABS = min(SMAX_ABS);

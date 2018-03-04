@@ -13,7 +13,7 @@ classdef algorithm_nasa < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.7 NASALIFE
 %   
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
 %   Last modified 14-Dec-2017 08:08:52 GMT
     
     %%
@@ -175,7 +175,7 @@ classdef algorithm_nasa < handle
                         Sa = 0.5*sqrt(2.0)*sqrt((Sxa - Sya)^2 + (Sya - Sza)^2 + (Sza - Sxa)^2 + 6*(Txya^2 + Tyza^2 + Txza^2));
                 end
                 
-                % Add the residual stress to the mean stres
+                % Add the residual stress to the mean stress
                 Sm = Sm + residualStress;
                 
                 % Get the A-ratio and R-ratio
@@ -755,7 +755,7 @@ classdef algorithm_nasa < handle
                         Sa = 0.5*sqrt(2.0)*sqrt((Sxa - Sya)^2 + (Sya - Sza)^2 + (Sza - Sxa)^2 + 6*(Txya^2 + Tyza^2 + Txza^2));
                 end
                 
-                % Add the residual stress to the mean stres
+                % Add the residual stress to the mean stress
                 Sm = Sm + residualStress;
                 
                 % Get the A-ratio and R-ratio

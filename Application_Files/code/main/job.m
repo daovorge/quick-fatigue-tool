@@ -6,7 +6,7 @@ function [] = job(varargin)
 %   JOB(JOBNAME) submits an analysis job from a text file 'JOBNAME.*'
 %   containing valid job file option and material definitions.
 %
-%   JOB(JOBNAME, OPTION) submits the analyis job JOBNAME with additional
+%   JOB(JOBNAME, OPTION) submits the analysis job JOBNAME with additional
 %   options. Available options are:
 %
 %     'interactive' - print an echo of the message (.msg) file to the
@@ -14,8 +14,8 @@ function [] = job(varargin)
 %     'datacheck'   - submit the analysis job as a data check analysis
 %     'library' - use the fatigue definition from JOBNAME (same as *DATA CHECK=2)
 %
-%   If the extention of the job file is '.inp', then the JOBNAME parameter
-%   can be speficied without the extention.
+%   If the extension of the job file is '.inp', then the JOBNAME parameter
+%   can be specified without the extension.
 %
 %   See also importMaterial, keywords, fetchMaterial.
 %
@@ -26,8 +26,8 @@ function [] = job(varargin)
 %   Reference section in Quick Fatigue Tool User Settings Reference Guide
 %      1 Job file options
 %   
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 30-Jan-2018 13:52:26 GMT
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
+%   Last modified 13-Feb-2018 13:39:30 GMT
     
     %%
     
@@ -158,7 +158,7 @@ while feof(fid) == 0.0
     % Get the current line in the file
     TLINE = fgetl(fid);
     
-    % If the current line is emtpy, skip to the next line
+    % If the current line is empty, skip to the next line
     if isempty(TLINE) == 1.0
         continue
     end
@@ -257,7 +257,7 @@ while feof(fid) == 0.0
         % Get the length of the token
         tokenLength = length(TOKEN);
         
-        % Remove spaces and usolate the keyword
+        % Remove spaces and isolate the keyword
         TOKEN(ismember(TOKEN,' *')) = [];
         TOKEN = strtok(lower(TOKEN), ',');
         
@@ -363,7 +363,7 @@ while feof(fid) == 0.0
             %{
                 The cell is represented as a single character array from
                 FGETL. In order to convert this array into a cell, use
-                regular expressions to match metacharacters to the FGETL
+                regular expressions to match meta characters to the FGETL
                 string
             %}
             C = keywords.interpretCell(currentLine, matchingKw);
@@ -392,7 +392,7 @@ while feof(fid) == 0.0
                 Do not attempt to evaluate any expression that matches a
                 file name on the MATLAB path
             %}
-            if exist(currentLine, 'file') ~= 2.0
+            if exist(currentLine, 'file') ~= 2.0 && exist(currentLine, 'builtin') ~= 5.0
                 try eval(currentLine)
                     kwData{matchingKw} = eval(currentLine);
                 catch

@@ -11,8 +11,8 @@ function varargout = RosetteAnalysis(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.3 rosetteanalysis Analysis
 %   
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 16-Oct-2017 09:28:25 GMT
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
+%   Last modified 20-Feb-2018 18:56:19 GMT
     
     %%
     
@@ -102,8 +102,9 @@ end
 
 [~] = checkToolbox('Symbolic Math Toolbox');
 
-% Save output definition type
-setappdata(0, 'rosette_pMenu_outputType', get(handles.pMenu_outputType, 'value'))
+% if isappdata(0, 'rosette_pMenu_outputType') == 0.0
+%     setappdata(0, 'rosette_pMenu_outputType', 1.0)
+% end
 
 %% Load the panel state
 if isappdata(0, 'rosette_edit_gaugeA') == 1.0
@@ -176,6 +177,13 @@ rosetteTools.blank(handles)
 pause(1e-6)
 
 warning('off', 'all')
+
+%% Get the output type
+if get(handles.pMenu_outputType, 'value') == 1.0
+    setappdata(0, 'pMenu_outputType', 1.0)
+else
+    setappdata(0, 'pMenu_outputType', 2.0)
+end
 
 %% Verify inputs
 [alpha, beta, gamma, E, v, outputLocation, gaugeA, gaugeB, gaugeC, error, errorMessage] = rosetteTools.verifyInput(handles);

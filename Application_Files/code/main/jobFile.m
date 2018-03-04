@@ -5,8 +5,8 @@ classdef jobFile < handle
 %   JOBFILE is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 30-Jan-2018 13:52:26 GMT
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
+%   Last modified 23-Feb-2018 09:17:44 GMT
     
     %%
     
@@ -485,7 +485,8 @@ classdef jobFile < handle
                             % The result position could not be found in the library
                             error = 1.0;
                             fprintf('[ERROR] The value of RESULT_POSITION (''%s'') is not recognized\n', odbResultPosition)
-                            fprintf('-> A list of available result positions can be found in Section 1.2.10 of the Quick Fatigue Tool User Settings Reference Guide\n');
+                            fprintf('-> Available result positions are: ''ELEMENT NODAL'', ''UNIQUE NODAL'', ''INTEGRATION POINT'' and ''CENTROID''\n');
+                            fprintf('-> Defining output requests to an output database is discussed in Section 10.4 of the Quick Fatigue Tool User Guide\n');
                             return
                         elseif length(resultWords{matchingResults}) ~= length(odbResultPosition)
                             % The result position is a partial match

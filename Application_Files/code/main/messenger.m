@@ -6,8 +6,8 @@ classdef messenger < handle
 %   MESSENGER is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 02-Feb-2018 09:50:06 GMT
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
+%   Last modified 01-Mar-2018 11:29:56 GMT
 
     %%
 
@@ -943,6 +943,7 @@ classdef messenger < handle
                             case 1.0
                                 fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: No matching position labels were found in the model output database. Field data will not be exported', returnType{i}]);
                                 fprintf(fidType(i), ['-> Check the definitions of OUTPUT_DATABASE and PART_INSTANCE in the job file', returnType{i}]);
+                                fprintf(fidType(i), ['-> If the stress dataset contains plane stress or axisymmetric elements, ensure that PLANE_STRESS=1', returnType{i}]);
                             case 2.0
                                 fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: An error occurred while retrieving the connectivity matrix. Field data will not be exported', returnType{i}]);
                             case 3.0
@@ -1198,7 +1199,7 @@ classdef messenger < handle
                             rmappdata(0, 'noSMT')
                         end
                     case 128.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The output variables RHIST and RC require the Statistics and Machine Learning Toolbox.', returnType{i}]);
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The output variables RHIST and RC require the Statistics and Machine Learning Toolbox', returnType{i}]);
                     case 129.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Composite criteria results have been written to ''%s\\Project\\output\\%s\\Data Files\\composite_criteria.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
                     case 130.0
@@ -2148,11 +2149,14 @@ classdef messenger < handle
                         partInstance = getappdata(0, 'partInstance');
                         
                         fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: Surface detection failed on ''%s'' with the following error:', returnType{i}], getappdata(0, 'outputDatabase'));
-                        fprintf(fidType(i), '%s', message);
+                        fprintf(fidType(i), '%s\r\n', message);
                         
                         if isempty(strfind(message, 'The database is from a previous release of Abaqus.')) == 0.0
                             fprintf(fidType(i), ['-> The installed Abaqus API is from a more recent version of Abaqus than that which was used to generate the model ODB file', returnType{i}]);
                             fprintf(fidType(i), ['-> Set the environment variables ''autoExport_upgradeODB=1.0'' and ''autoExport_abqCmd=<abaqus-version>'', where <abaqus-version> is the identifier of the Abaqus version to which the ODB file is upgraded', returnType{i}]);
+                        elseif isempty(strfind(message, 'is not recognized as an internal or external command,')) == 0.0
+                            fprintf(fidType(i), ['-> Please ensure that the Abaqus command line argument points to a valid Abaqus batch file', returnType{i}]);
+                            fprintf(fidType(i), ['-> An Abaqus installation is required to extract the surface from the output database (.odb) file', returnType{i}]);
                         elseif iscell(partInstance) == 1.0
                             for j = 1:length(partInstance)
                                 if isempty(strfind(message, partInstance{j})) == 0.0
@@ -2160,7 +2164,8 @@ classdef messenger < handle
                                 end
                             end
                         elseif isempty(strfind(message, getappdata(0, 'partInstance'))) == 0.0
-                            fprintf(fidType(i), ['-> The part instance name is either spelled incorrectly or it does not exist in the model', returnType{i}]);
+                            fprintf(fidType(i), ['-> The part instance name might be spelled incorrectly or it does not exist in the model, or the specified result position is incorrect.\n   Please verify the definitions of PART_INSTANCE and RESULT_POSITION', returnType{i}]);
+                            fprintf(fidType(i), ['-> Ensure that the dataset format is compatible (consult Section 3.2 of the Quick Fatigue Tool User Guide for more information)', returnType{i}]);
                         end
                             
                         fprintf(fidType(i), ['-> All items will be analysed', returnType{i}]);
@@ -2209,7 +2214,7 @@ classdef messenger < handle
                         
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 287.0
-                        %_AVAILABLE_%
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Fatigue analysis completed in %fs', returnType{i}], getappdata(0, 'toc_main'));
                     case 289.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The following elements are not supported by the surface detection algorithm: %s'], getappdata(0, 'message_289_unsupportedElements'));
                         fprintf(fidType(i), ['-> These elements have been skipped', returnType{i}]);
@@ -2251,10 +2256,8 @@ classdef messenger < handle
                     case 306.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The LaRC05 damage initiation (fibre tensile) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'LARTFCRT'));
                     case 307.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: One or more regions in the model are in a highly triaxial state of stress (TRF > 2)', returnType{i}]);
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: One or more regions in the model are in a highly triaxial state of stress (TRF > 2)', returnType{i}]);
                         fprintf(fidType(i), ['-> The effective ductility at these regions is diminished and there is a higher likelihood of brittle fracture', returnType{i}]);
-                        
-                        setappdata(0, 'messageFileWarnings', 1.0)
                     case 308.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Surface detection cannot be limited to dataset elements if more than one part instance is specified with the PART_INSTANCE option', returnType{i}], getappdata(0, 'message_275'));
                         fprintf(fidType(i), ['-> The whole part instance will be searched', returnType{i}]);
@@ -2294,6 +2297,18 @@ classdef messenger < handle
                     case 312.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The fatigue definition has been read from ''%s''', returnType{i}], getappdata(0, 'message_312_fdf'));
                         fprintf(fidType(i), ['-> Dataset and history definitions in the job file will be ignored', returnType{i}]);
+                    case 313.0
+                        if getappdata(0, 'suppress_ID313') == 0.0
+                            fprintf(fidType(i), [returnType{i}, '***WARNING: One or more gating criteria exceed 100%%', returnType{i}]);
+                            fprintf(fidType(i), ['-> These values have been reset to 100%%', returnType{i}]);
+                            fprintf(fidType(i), ['-> Please verify the definition of tensorGate and historyGate', returnType{i}]);
+
+                            if i == X
+                                setappdata(0, 'suppress_ID313', 1.0)
+                            end
+
+                            setappdata(0, 'messageFileWarnings', 1.0)
+                        end
                 end
             end
         end
@@ -2327,6 +2342,7 @@ classdef messenger < handle
             setappdata(0, 'suppress_ID266', 0.0)
             setappdata(0, 'suppress_ID309', 0.0)
             setappdata(0, 'suppress_ID310', 0.0)
+            setappdata(0, 'suppress_ID313', 0.0)
         end
 
         %% WRITE LOG FILE
@@ -2346,13 +2362,13 @@ classdef messenger < handle
 
             % Write file header
             try
-                fprintf(fid, 'Quick Fatigue Tool 6.11-11 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
+                fprintf(fid, 'Quick Fatigue Tool 6.11-12 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
             catch
-                fprintf(fid, 'Quick Fatigue Tool 6.11-11\r\n');
+                fprintf(fid, 'Quick Fatigue Tool 6.11-12\r\n');
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2018\r\n');
-            fprintf(fid, 'Last modified 02-Feb-2018 09:50:06 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 01-Mar-2018 11:29:56 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

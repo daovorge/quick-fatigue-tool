@@ -12,8 +12,8 @@ function [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(ma
 %   Reference section in Quick Fatigue Tool User Guide
 %      4.5.3 Custom analysis items
 %
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
-%   Last modified 31-Jan-2018 10:48:44 GMT
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
+%   Last modified 13-Feb-2018 20:14:48 GMT
 
 %%
 
@@ -46,7 +46,7 @@ if strcmpi(odbResultPosition, 'element nodal') == 1.0
 elseif strcmpi(odbResultPosition, 'unique nodal') == 1.0
     odbResultPosition = 'NODAL';
 elseif strcmpi(odbResultPosition, 'centroid') == 1.0
-    odbResultPosition = 'CENTROIDAL';
+    odbResultPosition = 'CENTROID';
 end
 
 %% Check if a surface definition already exists
@@ -65,12 +65,25 @@ if (strcmpi(items, 'surface') == 1.0) && (exist(surfaceFile, 'file') == 2.0) && 
     try
         load(surfaceFile)
         items = surfaceData.items; %#ok<NODEF>
+        
+        % Save the original ID list in case of an error
+        mainID_old = mainID;
+        subID_old = subID;
+        
         mainID = surfaceData.mainID;
         subID = surfaceData.subID;
         
         setappdata(0, 'itemsFile', 'SURFACE')
         setappdata(0, 'surfaceFromFile', 1.0)
         messenger.writeMessage(285.0)
+        
+        % Save the original tensor in case of an error
+        Sxx_old = Sxx;
+        Syy_old = Syy;
+        Szz_old = Szz;
+        Txy_old = Txy;
+        Txz_old = Txz;
+        Tyz_old = Tyz;
         
         Sxx = Sxx(items, :);
         Syy = Syy(items, :);
@@ -83,6 +96,18 @@ if (strcmpi(items, 'surface') == 1.0) && (exist(surfaceFile, 'file') == 2.0) && 
         
         return
     catch exception
+        % Restore the original IDs
+        mainID = mainID_old;
+        subID = subID_old;
+        
+        % Restore the original tensor
+        Sxx = Sxx_old;
+        Syy = Syy_old;
+        Szz = Szz_old;
+        Txy = Txy_old;
+        Txz = Txz_old;
+        Tyz = Tyz_old;
+        
         setappdata(0, 'message_130_exception', exception.message)
         items = 'all';  setappdata(0, 'items', 'all')
         messenger.writeMessage(130.0)
@@ -90,7 +115,7 @@ if (strcmpi(items, 'surface') == 1.0) && (exist(surfaceFile, 'file') == 2.0) && 
 end
 
 %% Check if surface detection can be used
-% Check intpus
+% Check inputs
 if isempty(outputDatabase) == 1.0
     if strcmpi(items, 'surface') == 1.0
         items = 'ALL';
@@ -247,6 +272,12 @@ if getappdata(0, 'autoExport_upgradeODB') == 1.0
             items = 'ALL';
             setappdata(0, 'items', 'ALL')
         end
+        
+        % Flush the element ID file if applicable
+        if exist([pwd, '/Application_Files/code/odb_interface/element_ids.dat'], 'file') == 2.0
+            delete([pwd, '/Application_Files/code/odb_interface/element_ids.dat'])
+        end
+        
         return
     end
     

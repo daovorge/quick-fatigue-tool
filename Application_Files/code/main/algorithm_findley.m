@@ -13,7 +13,7 @@ classdef algorithm_findley < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.4 Findley's Method
 %   
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
 %   Last modified 10-Jan-2017 09:33:05 GMT
     
     %%
@@ -174,7 +174,7 @@ classdef algorithm_findley < handle
             % Get the maximum Findley parameter over THETA for each value of PHI
             maximums = max(f);
             
-            % Find the PHI curve whcih contains the maximum Findley paramter
+            % Find the PHI curve which contains the maximum Findley parameter
             maxPhiCurve = find(maximums == max(maximums));
             maxPhiCurve = maxPhiCurve(1.0);
             

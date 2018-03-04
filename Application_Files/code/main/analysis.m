@@ -3,7 +3,7 @@ classdef analysis < handle
 %   ANALYSIS is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-11 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
 %   Last modified 23-Jan-2018 09:53:00 GMT
     
     %%
@@ -393,7 +393,7 @@ classdef analysis < handle
                         %}
                         if cycle_index < 3.0
                             %{
-                                There are not enough hostory points behind
+                                There are not enough history points behind
                                 the current point to count a cycle. Move to
                                 the next point in the load history
                             %}
@@ -1126,7 +1126,7 @@ classdef analysis < handle
             [amplitudes_shear, ~] = analysis.getAmps(pairs_shear);
             [amplitudes_normal, ~] = analysis.getAmps(pairs_normal);
             
-            % Resample the amplitudes in case they are different lengths
+            % Re-sample the amplitudes in case they are different lengths
             lengthShear = length(amplitudes_shear);
             lengthNormal = length(amplitudes_normal);
             
