@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 04-Mar-2018 19:58:22 GMT
+%   Last modified 05-Mar-2018 12:59:21 GMT
 
     %%
 
@@ -1892,7 +1892,7 @@ classdef messenger < handle
                         fprintf(fidType(i), ['-> Virtual strain gauges will not be analysed', returnType{i}]);
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 231.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: Out-of-plane stresses were found at virtual strain gauge #%.0f (item %.0f.%.0f)', returnType{i}], getappdata(0, 'vGaugeNumber'), getappdata(0, 'vGaugeMainID'),getappdata(0, 'vGaugeSubID'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Out-of-plane stresses were found at virtual strain gauge #%.0f (item ID %.0f.%.0f)', returnType{i}], getappdata(0, 'vGaugeNumber'), getappdata(0, 'vGaugeMainID'),getappdata(0, 'vGaugeSubID'));
                         fprintf(fidType(i), ['-> These stresses will not be detected by the gauge', returnType{i}]);
                         fprintf(fidType(i), ['-> Plane stress elements are recommended for best accuracy', returnType{i}]);
                     case 232.0
@@ -2309,6 +2309,9 @@ classdef messenger < handle
 
                             setappdata(0, 'messageFileWarnings', 1.0)
                         end
+                    case 314.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: There are multiple virtual strain gauge definitions, but only a single gauge orientation was specified', returnType{i}]);
+                        fprintf(fidType(i), ['-> Please ensure that the gauge orientation is the same for every gauge definition', returnType{i}]);
                 end
             end
         end
@@ -2368,7 +2371,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2018\r\n');
-            fprintf(fid, 'Last modified 04-Mar-2018 19:58:22 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 05-Mar-2018 12:59:21 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

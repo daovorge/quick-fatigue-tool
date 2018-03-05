@@ -10,7 +10,7 @@ function [] = virtualStrainGauge(xx_o, yy_o, xy_o, zz, xz, yz)
 %      4.9 Virtual strain gauges
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 20-Feb-2018 18:56:19 GMT
+%   Last modified 05-Mar-2018 12:59:21 GMT
     
     %%
     
@@ -48,8 +48,19 @@ else
     
     if length(vGaugeOri) ~= length(vGaugeLoc)
         % The number of orienatations and locations does not match
-        messenger.writeMessage(223.0)
-        return
+        
+        if length(vGaugeOri) == 1.0
+            %{
+                The user specified one gauge orientation, so propagate this
+                definition across all gauges. Otherwise abort the virtual
+                strain gauge calculation
+            %}
+            vGaugeOri = repmat(vGaugeOri(1.0), 1.0, length(vGaugeLoc));
+            messenger.writeMessage(314.0)
+        else
+            messenger.writeMessage(223.0)
+            return
+        end
     end
 end
 
