@@ -1871,12 +1871,12 @@ classdef messenger < handle
                         fprintf(fidType(i), ['-> The value of REPEATS has been automatically adjusted to %.0f', returnType{i}], getappdata(0, 'repeats'));
                     case 227.0
                         if isempty(getappdata(0, 'vGauge_kp')) == 1.0
-                            fprintf(fidType(i), [returnType{i}, '***WARNING: The cyclic strain hardening coefficient (kp) is not defined for virtual strain gauge #%.0f', returnType{i}], getappdata(0, 'vGaugeNumber'));
+                            fprintf(fidType(i), [returnType{i}, '***NOTE: The cyclic strain hardening coefficient (kp) is not defined at virtual strain gauge #%.0f', returnType{i}], getappdata(0, 'vGaugeNumber'));
                         end
                         if isempty(getappdata(0, 'vGauge_np')) == 1.0
-                            fprintf(fidType(i), [returnType{i}, '***WARNING: The cyclic strain hardening exponent (np) is not defined for virtual strain gauge #%.0f', returnType{i}], getappdata(0, 'vGaugeNumber'));
+                            fprintf(fidType(i), [returnType{i}, '***NOTE: The cyclic strain hardening exponent (np) is not defined at virtual strain gauge #%.0f', returnType{i}], getappdata(0, 'vGaugeNumber'));
                         end
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The strains for virtual strain gauge #%.0f will not be corrected for the effect of plasticity. Results will be inaccurate for inelastic stresses', returnType{i}], getappdata(0, 'vGaugeNumber'));
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: The stresses measured at virtual strain gauge #%.0f are elastic. Results might be inaccurate', returnType{i}], getappdata(0, 'vGaugeNumber'));
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 228.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The definition of virtual gauge #%.0f was not recognised', returnType{i}], getappdata(0, 'vGaugeNumber'));
