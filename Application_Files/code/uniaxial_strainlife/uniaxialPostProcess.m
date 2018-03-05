@@ -11,7 +11,7 @@ classdef uniaxialPostProcess < handle
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.6 Uniaxial Strain-Life
 %   
-%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
 %   Last modified 16-Oct-2017 09:28:25 GMT
     
     %%
@@ -38,7 +38,7 @@ classdef uniaxialPostProcess < handle
             
             %% Header
             % Write file header
-            fprintf(fid, 'Quick Fatigue Tool 6.11-12 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
+            fprintf(fid, 'Quick Fatigue Tool 6.11-13 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
             fprintf(fid, '(Copyright Louis Vallance 2018)\r\n');
             fprintf(fid, 'Last modified 21-Sep-2017 09:00:05 GMT\r\n\r\n');
             

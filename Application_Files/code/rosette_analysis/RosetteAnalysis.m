@@ -11,7 +11,7 @@ function varargout = RosetteAnalysis(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.3 rosetteanalysis Analysis
 %   
-%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
 %   Last modified 20-Feb-2018 18:56:19 GMT
     
     %%

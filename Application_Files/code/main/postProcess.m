@@ -10,7 +10,7 @@ classdef postProcess < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      10 Output
 %   
-%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
 %   Last modified 04-Mar-2018 19:58:22 GMT
     
     %%
@@ -1820,8 +1820,8 @@ classdef postProcess < handle
             [~, modelDatabaseNameShort, ~] = fileparts(modelDatabasePath);
             
             % Print header
-            fprintf('\n[POST] Quick Fatigue Tool 6.11-12 ODB Interface');
-            fprintf(fid_status, '\n[POST] Quick Fatigue Tool 6.11-12 ODB Interface');
+            fprintf('\n[POST] Quick Fatigue Tool 6.11-13 ODB Interface');
+            fprintf(fid_status, '\n[POST] Quick Fatigue Tool 6.11-13 ODB Interface');
             
             % Warn user if there is only one item in the model
             if length(mainID) == 1.0
@@ -1936,7 +1936,7 @@ classdef postProcess < handle
             
             % Open the log file for writing
             fid_debug = fopen([sprintf('Project/output/%s/Data Files/', jobName), resultsDatabaseName, '.log'], 'w+');
-            fprintf(fid_debug, 'Quick Fatigue Tool 6.11-12 ODB Interface Log');
+            fprintf(fid_debug, 'Quick Fatigue Tool 6.11-13 ODB Interface Log');
             
             % Print Abaqus installation info to the debug log file
             try

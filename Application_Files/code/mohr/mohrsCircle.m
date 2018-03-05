@@ -11,7 +11,7 @@ function varargout = mohrsCircle(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool Appendices
 %      A3.5 Mohr Solver
 %   
-%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
 %   Last modified 04-Apr-2017 13:26:59 GMT
     
     %%
