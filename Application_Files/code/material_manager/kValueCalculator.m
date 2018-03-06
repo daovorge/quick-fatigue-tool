@@ -15,7 +15,7 @@ function varargout = kValueCalculator(varargin)%#ok<*DEFNU>
 %      6.4 Findley's Method
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 14-Oct-2017 18:15:15 GMT
+%   Last modified 06-Mar-2018 12:32:23 GMT
     
     %%
     
@@ -65,11 +65,29 @@ setappdata(0, 'simulia_blue', blue)
 setappdata(0, 'grey', grey)
 
 % Restore panel state
-if isappdata(0, 'k_solution_model')
-    set(handles.pMenu_solution, 'value', getappdata(0, 'k_solution_model'))
+materialName = getappdata(0, 'kValue_material');
+
+try
+    setappdata(0, sprintf('%s', materialName), 1.0)
+    rmappdata(0, sprintf('%s', materialName))
     
-    switch getappdata(0, 'k_solution_model')
-        case 1.0
+    if isempty(materialName) == 1.0
+        materialName = '';
+    else
+        materialName = [materialName, '_'];
+    end
+catch
+    materialName = '';
+end
+
+if isappdata(0, sprintf('%skValueCalculator_pMenu_solution', materialName)) == 1.0
+    set(handles.pMenu_solution, 'value', getappdata(0, sprintf('%skValueCalculator_pMenu_solution', materialName)))
+    set(handles.edit_r, 'string', getappdata(0, sprintf('%skValueCalculator_edit_r', materialName)))
+    set(handles.edit_fi, 'string', getappdata(0, sprintf('%skValueCalculator_edit_fi', materialName)))
+    set(handles.edit_t, 'string', getappdata(0, sprintf('%skValueCalculator_edit_t', materialName)))
+    set(handles.edit_uts, 'string', getappdata(0, sprintf('%skValueCalculator_edit_uts', materialName)))
+    
+    switch getappdata(0, 'kValueCalculator_pMenu_solution')
         case 2.0
             set(handles.text_r, 'enable', 'on');    set(handles.edit_r, 'enable', 'on', 'BackgroundColor', 'White')
             set(handles.text_fi, 'enable', 'on');    set(handles.edit_fi, 'enable', 'on', 'BackgroundColor', 'White');  set(handles.text_units_fi, 'enable', 'on')
@@ -91,19 +109,6 @@ if isappdata(0, 'k_solution_model')
             set(handles.text_t, 'enable', 'on');    set(handles.edit_t, 'enable', 'on', 'BackgroundColor', 'White');  set(handles.text_units_t, 'enable', 'on')
             set(handles.text_uts, 'enable', 'off');    set(handles.edit_uts, 'enable', 'inactive', 'BackgroundColor', grey);  set(handles.text_units_uts, 'enable', 'off')
     end
-end
-
-if isappdata(0, 'k_solution_r')
-    set(handles.edit_r, 'string', getappdata(0, 'k_solution_r'))
-end
-if isappdata(0, 'k_solution_fi')
-    set(handles.edit_fi, 'string', getappdata(0, 'k_solution_fi'))
-end
-if isappdata(0, 'k_solution_t')
-    set(handles.edit_t, 'string', getappdata(0, 'k_solution_t'))
-end
-if isappdata(0, 'k_solution_uts') && get(handles.pMenu_solution, 'value') == 4
-    set(handles.edit_uts, 'string', getappdata(0, 'k_solution_uts'))
 end
 
 % Check if the symbolic math toolbox is available
@@ -137,9 +142,15 @@ switch get(hObject, 'Value')
     case 2.0 % General formula
         % Check if SYMS works
         if getappdata(0, 'noSMT') == 1.0
+            % Blank the GUI
+            blank(handles)
+            
             errordlg('The General Formula derivation method requires the Symbolic Math Toolbox.', 'Quick Fatigue Tool')
             uiwait; set(handles.pMenu_solution, 'value', 1.0)
             pMenu_solution_Callback(hObject, eventdata, handles)
+            
+            % Enable the GUI
+            enable(handles)
             return
         end
         
@@ -291,9 +302,7 @@ end
 
 
 % --- Executes on button press in pButton_solve.
-function pButton_solve_Callback(hObject, eventdata, handles)
-set(handles.pButton_solve, 'enable', 'off');
-
+function pButton_solve_Callback(~, ~, handles)
 % Check validity of inputs
 error = 0.0;
 
@@ -302,7 +311,7 @@ if strcmpi(get(handles.edit_r, 'enable'), 'on')
     
     if isnumeric(r) == 0.0
         error = 1.0;
-    elseif isnan(r) || isinf(r) || isempty(r)
+    elseif isnan(r) == 1.0 || isinf(r) == 1.0 || isempty(r) == 1.0
         error = 1.0;
     end
 end
@@ -311,7 +320,7 @@ if strcmpi(get(handles.edit_fi, 'enable'), 'on')
     
     if isnumeric(fi) == 0.0
         error = 1.0;
-    elseif isnan(fi) || isinf(fi) || isempty(fi)
+    elseif (isnan(fi) == 1.0) || (isinf(fi) == 1.0) || (isempty(fi) == 1.0)
         error = 1.0;
     end
 end
@@ -320,7 +329,7 @@ if strcmpi(get(handles.edit_uts, 'enable'), 'on')
     
     if isnumeric(uts) == 0.0
         error = 1.0;
-    elseif isnan(uts) || isinf(uts) || isempty(uts)
+    elseif (isnan(uts) == 1.0) || (isinf(uts) == 1.0) || (isempty(uts) == 1.0)
         error = 1.0;
     end
 end
@@ -329,47 +338,40 @@ if strcmpi(get(handles.edit_t, 'enable'), 'on')
     
     if isnumeric(t) == 0.0
         error = 1.0;
-    elseif isnan(t) || isinf(t) || isempty(t)
+    elseif (isnan(t) == 1.0) || (isinf(t) == 1.0) || (isempty(t) == 1.0)
         error = 1.0;
     end
 end
+
+% Blank the GUI
+blank(handles)
+pause(1e-6)
 
 if error == 1.0
     errordlg('One or more inputs contain a syntax error.', 'Quick Fatigue Tool')
     uiwait
     set(handles.pButton_solve, 'enable', 'on')
+    enable(handles)
     return
 end
-
-% Disable the GUI
-disableGUI(hObject, eventdata, handles)
-
-pause(1e-6)
 
 % Solve for k
 switch get(handles.pMenu_solution, 'Value')
     case 1.0
-        % Save panel state
-        setappdata(0, 'k_solution_model', get(handles.pMenu_solution, 'value'))
-        setappdata(0, 'k_solution_r', get(handles.edit_r, 'string'))
-        setappdata(0, 'k_solution_fi', get(handles.edit_fi, 'string'))
-        setappdata(0, 'k_solution_t', get(handles.edit_t, 'string'))
-        setappdata(0, 'k_solution_uts', get(handles.edit_uts, 'string'))
-        
         setappdata(0, 'k_solution', 0.2857)
-        setappdata(0, 'updateKValue', 1)
+        setappdata(0, 'updateKValue', 1.0)
         close 'k-Value Calculator'
         return
     case 2.0
         syms k
-        eqn = (fi/t) == (2*sqrt(1 + k^2))/(sqrt(((2*k)/(1-r))^2 + 1) + ((2*k)/(1-r)));
+        eqn = (fi/t) == (2.0*sqrt(1.0 + k^2.0))/(sqrt(((2.0*k)/(1.0-r))^2.0 + 1.0) + ((2.0*k)/(1.0-r)));
         solk = eval(solve(eqn, k)); clc
     case 3.0
-        solk = ((3*t)/(fi)) - (3/2);
+        solk = ((3.0*t)/(fi)) - (3.0/2.0);
     case 4.0
-        solk = ((3*t*(uts + fi))/(uts*fi)) - sqrt(6);
+        solk = ((3.0*t*(uts + fi))/(uts*fi)) - sqrt(6.0);
     case 5.0
-        solk = ((3*t)/(fi)) - sqrt(3);
+        solk = ((3.0*t)/(fi)) - sqrt(3.0);
 end
 
 if isempty(solk) == 1.0
@@ -377,7 +379,7 @@ if isempty(solk) == 1.0
     
     uiwait
     % Enable the GUI
-    enableGUI(hObject, eventdata, handles)
+    enable(handles)
     
     return
 elseif isreal(solk) == 0.0
@@ -385,7 +387,7 @@ elseif isreal(solk) == 0.0
     
     uiwait
     % Enable the GUI
-    enableGUI(hObject, eventdata, handles)
+    enable(handles)
     
     return
 elseif isnan(solk) == 1.0
@@ -393,7 +395,7 @@ elseif isnan(solk) == 1.0
     
     uiwait
     % Enable the GUI
-    enableGUI(hObject, eventdata, handles)
+    enable(handles)
     
     return
 elseif isinf(solk) == 1.0
@@ -401,7 +403,7 @@ elseif isinf(solk) == 1.0
     
     uiwait
     % Enable the GUI
-    enableGUI(hObject, eventdata, handles)
+    enable(handles)
     
     return
 elseif solk < 0.0
@@ -409,93 +411,13 @@ elseif solk < 0.0
     
     uiwait
     % Enable the GUI
-    enableGUI(hObject, eventdata, handles)
+    enable(handles)
     
     return
 else
-    % Save panel state
-    setappdata(0, 'k_solution_model', get(handles.pMenu_solution, 'value'))
-    setappdata(0, 'k_solution_r', get(handles.edit_r, 'string'))
-    setappdata(0, 'k_solution_fi', get(handles.edit_fi, 'string'))
-    setappdata(0, 'k_solution_t', get(handles.edit_t, 'string'))
-    setappdata(0, 'k_solution_uts', get(handles.edit_uts, 'string'))
-    
     setappdata(0, 'k_solution', solk)
     setappdata(0, 'updateKValue', 1.0)
     close 'k-Value Calculator'
-end
-
-function disableGUI(~, ~, handles)
-set(handles.text_model, 'enable', 'off');
-set(handles.text_r, 'enable', 'off');
-set(handles.text_fi, 'enable', 'off');
-set(handles.text_t, 'enable', 'off');
-set(handles.text_uts, 'enable', 'off');
-set(handles.edit_r, 'enable', 'off');
-set(handles.edit_fi, 'enable', 'off');
-set(handles.edit_t, 'enable', 'off');
-set(handles.edit_uts, 'enable', 'off');
-set(handles.text_units_fi, 'enable', 'off');
-set(handles.text_units_t, 'enable', 'off');
-set(handles.text_units_uts, 'enable', 'off');
-set(handles.pMenu_solution, 'enable', 'off');
-set(handles.pButton_close, 'enable', 'off');
-
-
-function enableGUI(~, ~, handles)
-set(handles.pButton_solve, 'enable', 'on');
-set(handles.text_model, 'enable', 'on');
-set(handles.pButton_close, 'enable', 'on');
-set(handles.pMenu_solution, 'enable', 'on');
-
-switch get(handles.pMenu_solution, 'value');
-    case 2.0
-        set(handles.text_r, 'enable', 'on');
-        set(handles.text_fi, 'enable', 'on');
-        set(handles.text_t, 'enable', 'on');
-        
-        set(handles.edit_r, 'enable', 'on');
-        set(handles.edit_fi, 'enable', 'on');
-        set(handles.edit_t, 'enable', 'on');
-        
-        set(handles.text_units_fi, 'enable', 'on');
-        set(handles.text_units_t, 'enable', 'on');
-    case 3.0
-        set(handles.text_r, 'enable', 'on');
-        set(handles.text_fi, 'enable', 'on');
-        set(handles.text_t, 'enable', 'on');
-        
-        set(handles.edit_r, 'enable', 'inactive');
-        set(handles.edit_fi, 'enable', 'on');
-        set(handles.edit_t, 'enable', 'on');
-        
-        set(handles.text_units_fi, 'enable', 'on');
-        set(handles.text_units_t, 'enable', 'on');
-    case 4.0
-        set(handles.text_r, 'enable', 'on');
-        set(handles.text_fi, 'enable', 'on');
-        set(handles.text_t, 'enable', 'on');
-        set(handles.text_uts, 'enable', 'on');
-        
-        set(handles.edit_r, 'enable', 'inactive');
-        set(handles.edit_fi, 'enable', 'on');
-        set(handles.edit_t, 'enable', 'on');
-        set(handles.edit_uts, 'enable', 'on');
-        
-        set(handles.text_units_fi, 'enable', 'on');
-        set(handles.text_units_t, 'enable', 'on');
-        set(handles.text_units_uts, 'enable', 'on');
-    case 5.0
-        set(handles.text_r, 'enable', 'on');
-        set(handles.text_fi, 'enable', 'on');
-        set(handles.text_t, 'enable', 'on');
-        
-        set(handles.edit_r, 'enable', 'inactive');
-        set(handles.edit_fi, 'enable', 'on');
-        set(handles.edit_t, 'enable', 'on');
-        
-        set(handles.text_units_fi, 'enable', 'on');
-        set(handles.text_units_t, 'enable', 'on');
 end
 
 
@@ -505,12 +427,82 @@ close 'k-Value Calculator'
 
 
 % --- Executes when user attempts to close kValueCalculator.
-function kValueCalculator_CloseRequestFcn(hObject, ~, ~)
+function kValueCalculator_CloseRequestFcn(hObject, ~, handles)
 % hObject    handle to kValueCalculator (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 rmappdata(0, 'noSMT')
 
+% Get the name of the current material
+materialName = getappdata(0, 'kValue_material');
+
+%{
+    Save the panel state based on the name of the material. If the material
+    contains certain characters then the panel state will be savaed without
+    the material name
+%}
+try
+    setappdata(0, sprintf('%s', materialName), 1.0)
+    rmappdata(0, sprintf('%s', materialName))
+    
+    if isempty(materialName) == 1.0
+        materialName = '';
+    else
+        materialName = [materialName, '_'];
+    end
+catch
+    materialName = '';
+end
+
+setappdata(0, sprintf('%skValueCalculator_pMenu_solution', materialName), get(handles.pMenu_solution, 'value'))
+setappdata(0, sprintf('%skValueCalculator_edit_r', materialName), get(handles.edit_r, 'string'))
+setappdata(0, sprintf('%skValueCalculator_edit_fi', materialName), get(handles.edit_fi, 'string'))
+setappdata(0, sprintf('%skValueCalculator_edit_t', materialName), get(handles.edit_t, 'string'))
+setappdata(0, sprintf('%skValueCalculator_edit_uts', materialName), get(handles.edit_uts, 'string'))
+
+if isappdata(0, 'kValue_material') == 1.0
+    rmappdata(0, 'kValue_material')
+end
+
 % Hint: delete(hObject) closes the figure
 delete(hObject);
+
+
+function blank(handles)
+set(findall(handles.kValueCalculator, '-property', 'Enable'), 'Enable', 'off')
+
+
+function enable(handles)
+%set(findall(handles.kValueCalculator, '-property', 'Enable'), 'Enable', 'on')
+set(handles.text_model, 'enable', 'on')
+set(handles.pMenu_solution, 'enable', 'on')
+
+switch get(handles.pMenu_solution, 'value')
+    case 2.0 % General formula
+        set(findall(handles.kValueCalculator, '-property', 'Enable'), 'Enable', 'on')
+        
+        set(handles.text_uts, 'enable', 'off')
+        set(handles.edit_uts, 'enable', 'off')
+        set(handles.text_units_uts, 'enable', 'off')
+    case 3.0 % Dang van
+        set(findall(handles.kValueCalculator, '-property', 'Enable'), 'Enable', 'on')
+        
+        set(handles.text_uts, 'enable', 'off')
+        set(handles.edit_uts, 'enable', 'off')
+        set(handles.text_units_uts, 'enable', 'off')
+        
+        set(handles.edit_r, 'enable', 'inactive', 'backgroundColor', getappdata(0, 'simulia_blue'))
+    case 4.0 % Sines
+        set(findall(handles.kValueCalculator, '-property', 'Enable'), 'Enable', 'on')
+        
+        set(handles.edit_r, 'enable', 'inactive', 'backgroundColor', getappdata(0, 'simulia_blue'))
+    case 5.0 % Crossland
+        set(findall(handles.kValueCalculator, '-property', 'Enable'), 'Enable', 'on')
+        
+        set(handles.text_uts, 'enable', 'off')
+        set(handles.edit_uts, 'enable', 'off')
+        set(handles.text_units_uts, 'enable', 'off')
+        
+        set(handles.edit_r, 'enable', 'inactive', 'backgroundColor', getappdata(0, 'simulia_blue'))
+end

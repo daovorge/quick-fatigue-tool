@@ -1569,6 +1569,7 @@ if properties.material_properties.nssc_active == 1.0
     set(handles.edit_nssc, 'backgroundColor', [1.0, 1.0, 1.0], 'enable', 'on')
     set(handles.check_nssc, 'value', 1.0)
 end
+setappdata(0, 'nssc_value', properties.material_properties.nssc)
 
 set(handles.pMenu_class, 'value', properties.material_properties.class)
 
@@ -2273,6 +2274,9 @@ enable(handles)
 function pButton_k_Callback(~, ~, handles)
 % Blank the GUI
 blank(handles)
+
+% Get a copy of the current material name
+setappdata(0, 'kValue_material', get(handles.edit_name, 'string'))
 
 setappdata(0, 'updateKValue', 0)
 if isempty(get(handles.edit_uts, 'string')) == 0.0
