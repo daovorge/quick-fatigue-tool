@@ -11,7 +11,7 @@ function [] = createMaterialDirect()
 %%
 
 %% Variable name look-up table
-% <GENERAL PROPERTIES>
+% GENERAL PROPERTIES
 % Variable           | Meaning
 % ___________________|_____________________________________________________
 % default_algorithm  | Default analysis algorithm
@@ -20,47 +20,47 @@ function [] = createMaterialDirect()
 % behavior           | Material behaviour
 % reg_model          | Regression model
 % cael               | Constant amplitude endurance limit (2Nf)
-% cael_active        | 
+% cael_active        | Property flag for cael
 % ndCompression      | No damage for fully compressive cycles
 % comment            | User comment
 % ___________________|_____________________________________________________
-% <MECHANICAL PROPERTIES>
+% MECHANICAL PROPERTIES
 % Variable           | Meaning
 % ___________________|_____________________________________________________
 % e                  | Young's Modulus
-% e_active           | 
-% uts                | Ultimate tensile strengthr
+% e_active           | Property flag for e_active
+% uts                | Ultimate tensile strength
 % ucs                | Ultimate compressive strength
-% uts_active         | 
+% uts_active         | Property flag for uts_active
 % proof              | 0.2% strain proof stress
-% proof_active       | 
+% proof_active       | Property flag for proof_active
 % poisson            | Poisson's ratio
-% poisson_active     | 
+% poisson_active     | Property flag for poisson_active
 % ___________________|_____________________________________________________
-% <FATIGUE PROPERTIES>
+% FATIGUE PROPERTIES
 % Variable           | Meaning
 % ___________________|_____________________________________________________
 % s_values           | S-N data S-values
 % n_values           | S-N data N-values
 % r_values           | S-N data R-values
 % sf                 | Fatigue strength coefficient
-% sf_active          | 
+% sf_active          | Property flag for sf_active
 % b                  | Fatigue strength exponent
-% b_active           | 
+% b_active           | Property flag for b_active
 % b2                 | Second fatigue strength exponent
 % b2Nf               | Life above which to use b2
 % ef                 | Fatigue ductility coefficient
-% ef_active          | 
+% ef_active          | Property flag for ef_active
 % c                  | Fatigue ductility exponent
-% c_active           | 
+% c_active           | Property flag for c_active
 % kp                 | Cyclic strain-hardening coefficient
-% kp_active          | 
+% kp_active          | Property flag for kp_active
 % np                 | Cyclic strain-hardening exponent
-% np_active          | 
+% np_active          | Property flag for np_active
 % nssc               | Normal stress sensitivity constant
-% nssc_active        | 
+% nssc_active        | Property flag for nssc_active
 % ___________________|_____________________________________________________
-% <STRESS-BASED FAILURE CRITERIA>
+% STRESS-BASED FAILURE CRITERIA
 % Variable           | Meaning
 % ___________________|_____________________________________________________
 % failStress_tsfd    | Tensile stress, 11-direction
@@ -75,7 +75,7 @@ function [] = createMaterialDirect()
 % failStress_limit12 | Stress limit, 12-plane
 % failStress_limit23 | Stress limit, 23-plane
 % ___________________|_____________________________________________________
-% <MAXIMUM STRAIN FAILURE THEORY>
+% MAXIMUM STRAIN FAILURE THEORY
 % Variable           | Meaning
 % ___________________|_____________________________________________________
 % failStrain_tsfd    | Tensile strain, fibre direction
@@ -87,7 +87,7 @@ function [] = createMaterialDirect()
 % failStrain_e22     | Elastic modulus, transverse direction
 % failStrain_g12     | Shear modulus, 12-plane
 % ___________________|_____________________________________________________
-% <HASHIN'S DAMAGE INITIATION CRITERIA>
+% HASHIN'S DAMAGE INITIATION CRITERIA
 % Variable           | Meaning
 % ___________________|_____________________________________________________
 % hashin_alpha       | Shear influence parameter
@@ -95,10 +95,10 @@ function [] = createMaterialDirect()
 % hashin_lcs         | Longitudinal compressive strength
 % hashin_tts         | Transverse tensile strength
 % hashin_tcs         | Transverse compressive strength
-% hashin_lss         | Longutudinal shear strength
+% hashin_lss         | Longitudinal shear strength
 % hashin_tss         | Transverse shear strength
 % ___________________|_____________________________________________________
-% <LARC05 DAMAGE INITIATION CRITERIA>
+% LARC05 DAMAGE INITIATION CRITERIA
 % Variable           | Meaning
 % ___________________|_____________________________________________________
 % larc05_lts         | Longitudinal tensile strength
@@ -114,6 +114,12 @@ function [] = createMaterialDirect()
 % larc05_phi0        | Initial fibre misalignment angle
 % larc05_iterate     | Allow iterative solution for larc05_phi0
 % ___________________|_____________________________________________________
+% PROPERTY FLAGS
+% Variable           | Meaning
+% ___________________|_____________________________________________________
+% <property>_active  | 0: Derive <property> if applicable; otherwise, use
+%                    |    value specified by <property>
+%                    | 1: Always use value specified by <property>
 
 %% Material name
 materialName = 'Steel';
