@@ -121,10 +121,9 @@ function [] = createMaterialDirect()
 %                    |    value specified by <property>
 %                    | 1: Always use value specified by <property>
 
-%% Material name
+%% Define material data
 materialName = 'Steel';
 
-%% Material data
 material_properties = struct(...
 'default_algorithm', 7.0,...
 'default_msc', 4.0,...
