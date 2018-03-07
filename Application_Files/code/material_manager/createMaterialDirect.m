@@ -167,7 +167,7 @@ material_properties = struct(...
 'class', 1.0,...
 'behavior', 1.0,...
 'reg_model', 1.0,...
-'cael', 1e7,...
+'cael', 2e7,...
 'cael_active', 0.0,...
 'ndCompression', 0.0,...
 'e', [],...
@@ -239,4 +239,28 @@ material_properties = struct(...
 'larc05_iterate', 0.0); %#ok<NASGU>
 
 %% Save the material
-save([pwd, '\Data\material\local\', materialName, '.mat'], 'material_properties')
+
+% Check for illegal characters in the material name
+if isempty(regexp(materialName, '[/\\*:?"<>|]', 'once')) == 0.0
+    message1 = sprintf('The material name cannot contain any of the following characters:\n\n');
+    message2 = sprintf('/ \\ * : ? " < > | ');
+    waitfor(errordlg([message1, message2], 'Quick Fatigue Tool'))
+    return
+end
+
+% Check if the material already exists in the local database
+if exist([pwd, '\data\material\local\', materialName, '.mat'], 'file') == 2.0
+    msg = sprintf('''%s'' already exists in the local database. Do you wish to overwrite the material?', materialName);
+    response = questdlg(msg, 'Quick Fatigue Tool');
+    
+    if (strcmpi(response, 'no') == 1.0) || (strcmpi(response, 'cancel') == 1.0) || (isempty(response) == 1.0)
+        return
+    end
+end
+
+% Save the material to a .mat file in the local material database
+try
+    save([pwd, '\Data\material\local\', materialName, '.mat'], 'material_properties')
+catch exception
+    errordlg(sprintf('The material could not be saved.\n\n%s', exception.message))
+end
