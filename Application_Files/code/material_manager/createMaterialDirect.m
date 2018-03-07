@@ -14,15 +14,18 @@ function [] = createMaterialDirect()
 % GENERAL PROPERTIES
 % Variable           | Meaning
 % ___________________|_____________________________________________________
-% default_algorithm  | Default analysis algorithm
-% default_msc        | Default mean stress correction
-% class              | Material classification
-% behavior           | Material behaviour
-% reg_model          | Regression model
+% default_algorithm* | Default analysis algorithm
+% default_msc*       | Default mean stress correction
+% class*             | Material classification
+% behavior*          | Material behaviour
+% reg_model*         | Regression model
 % cael               | Constant amplitude endurance limit (2Nf)
 % cael_active        | Property flag for cael
 % ndCompression      | No damage for fully compressive cycles
 % comment            | User comment
+%
+%    * These variables require a key to denote their meaning.
+%    (See the VARIABLE KEY LOOK-UP TABLE for guidance)
 % ___________________|_____________________________________________________
 % MECHANICAL PROPERTIES
 % Variable           | Meaning
@@ -120,13 +123,47 @@ function [] = createMaterialDirect()
 % <property>_active  | 0: Derive <property> if applicable; otherwise, use
 %                    |    value specified by <property>
 %                    | 1: Always use value specified by <property>
+%
+%% Variable key look-up table
+%
+% Variable           | Keys                 | Definition
+% ___________________|______________________|______________________________
+% default_algorithm  | {2.0 | 3.0 | 4.0 |   | {Brown-Miller | Normal Strain |
+%                    | 6.0 | 7.0 | 8.0 |    | Maximum Shear Strain |
+%                    | 9.0 | 10.0 | 11.0 |  | Stress-based Brown-Miller |
+%                    | 13.0 | 14.0}         | Normal Stress | Findley's Method |
+%                    |                      | Stress Invariant Parameter |
+%                    |                      | NASALIFE | MMMcK Filipini |
+%                    |                      | Uniaxial Strain-Life |
+%                    |                      | Uniaxial Stress-Life}
+%____________________|______________________|______________________________
+% default_msc        | {1.0 | 2.0 | 3.0 |   | {Morrow | Goodman | Soderberg |
+%                    | 4.0 | 5.0 | 6.0 |    | Walker | Smith-Watson-Topper |
+%                    | 7.0 | 8.0}           | Gerber | R-ratio S-N curves |
+%                    |                      | None}
+%____________________|______________________|______________________________
+% class              | {1.0 | 2.0 | 3.0 |   | {Wrought steel and alloys |
+%                    | 4.0 | 5.0 | 6.0 |    | Ductile iron |
+%                    | 7.0}                 | Malleable iron - pearlitic structure |
+%                    |                      | Wrought iron | Cast iron |
+%                    |                      | Aluminium/copper and alloys |
+%                    |                      | Other}
+%____________________|______________________|______________________________
+% behavior           | {1.0 | 2.0 | 3.0}    | {Plain/alloy steel |
+%                    |                      | Aluminium alloy | Other}
+%____________________|______________________|______________________________
+% reg_model          | {1.0| 2.0 | 3.0 |    | {Uniform Law (Baumel & Seeger) |
+%                    | 4.0 | 5.0}           | Universal Slopes (Manson) |
+%                    |                      | Modified Universal Slopes (Muralidharan) |
+%                    |                      | 90/50 Rule | None}
+%____________________|______________________|______________________________
 
 %% Define material data
-materialName = 'Steel';
+materialName = 'Material-1';
 
 material_properties = struct(...
-'default_algorithm', 7.0,...
-'default_msc', 4.0,...
+'default_algorithm', 6.0,...
+'default_msc', 1.0,...
 'class', 1.0,...
 'behavior', 1.0,...
 'reg_model', 1.0,...
