@@ -126,37 +126,37 @@ function [] = createMaterialDirect()
 %
 %% Variable key look-up table
 %
-% Variable           | Keys                 | Definition
-% ___________________|______________________|______________________________
-% default_algorithm  | {2.0 | 3.0 | 4.0 |   | {Brown-Miller | Normal Strain |
-%                    | 6.0 | 7.0 | 8.0 |    | Maximum Shear Strain |
-%                    | 9.0 | 10.0 | 11.0 |  | Stress-based Brown-Miller |
-%                    | 13.0 | 14.0}         | Normal Stress | Findley's Method |
-%                    |                      | Stress Invariant Parameter |
-%                    |                      | NASALIFE | MMMcK Filipini |
-%                    |                      | Uniaxial Strain-Life |
-%                    |                      | Uniaxial Stress-Life}
-%____________________|______________________|______________________________
-% default_msc        | {1.0 | 2.0 | 3.0 |   | {Morrow | Goodman | Soderberg |
-%                    | 4.0 | 5.0 | 6.0 |    | Walker | Smith-Watson-Topper |
-%                    | 7.0 | 8.0}           | Gerber | R-ratio S-N curves |
-%                    |                      | None}
-%____________________|______________________|______________________________
-% class              | {1.0 | 2.0 | 3.0 |   | {Wrought steel and alloys |
-%                    | 4.0 | 5.0 | 6.0 |    | Ductile iron |
-%                    | 7.0}                 | Malleable iron - pearlitic structure |
-%                    |                      | Wrought iron | Cast iron |
-%                    |                      | Aluminium/copper and alloys |
-%                    |                      | Other}
-%____________________|______________________|______________________________
-% behavior           | {1.0 | 2.0 | 3.0}    | {Plain/alloy steel |
-%                    |                      | Aluminium alloy | Other}
-%____________________|______________________|______________________________
-% reg_model          | {1.0| 2.0 | 3.0 |    | {Uniform Law (Baumel & Seeger) |
-%                    | 4.0 | 5.0}           | Universal Slopes (Manson) |
-%                    |                      | Modified Universal Slopes (Muralidharan) |
-%                    |                      | 90/50 Rule | None}
-%____________________|______________________|______________________________
+% Variable           | Keys                | Definition
+% ___________________|_____________________|_______________________________
+% default_algorithm  | {2.0 | 3.0 | 4.0 |  | {Brown-Miller | Normal Strain |
+%                    | 6.0 | 7.0 | 8.0 |   | Maximum Shear Strain |
+%                    | 9.0 | 10.0 | 11.0 | | Stress-based Brown-Miller |
+%                    | 13.0 | 14.0}        | Normal Stress | Findley's Method |
+%                    |                     | Stress Invariant Parameter |
+%                    |                     | NASALIFE | MMMcK Filipini |
+%                    |                     | Uniaxial Strain-Life |
+%                    |                     | Uniaxial Stress-Life}
+%____________________|_____________________|_______________________________
+% default_msc        | {1.0 | 2.0 | 3.0 |  | {Morrow | Goodman | Soderberg |
+%                    | 4.0 | 5.0 | 6.0 |   | Walker | Smith-Watson-Topper |
+%                    | 7.0 | 8.0}          | Gerber | R-ratio S-N curves |
+%                    |                     | None}
+%____________________|_____________________|_______________________________
+% class              | {1.0 | 2.0 | 3.0 |  | {Wrought steel and alloys |
+%                    | 4.0 | 5.0 | 6.0 |   | Ductile iron |
+%                    | 7.0}                | Malleable iron - pearlitic structure |
+%                    |                     | Wrought iron | Cast iron |
+%                    |                     | Aluminium/copper and alloys |
+%                    |                     | Other}
+%____________________|_____________________|_______________________________
+% behavior           | {1.0 | 2.0 | 3.0}   | {Plain/alloy steel |
+%                    |                     | Aluminium alloy | Other}
+%____________________|_____________________|_______________________________
+% reg_model          | {1.0| 2.0 | 3.0 |   | {Uniform La_w (Baumel & Seeger) |
+%                    | 4.0 | 5.0}          | Universal Slopes (Manson) |
+%                    |                     | Modified Universal Slopes (Muralidharan) |
+%                    |                     | 90/50 Rule | None}
+%____________________|_____________________|_______________________________
 
 %% Define material data
 materialName = 'Material-1';
