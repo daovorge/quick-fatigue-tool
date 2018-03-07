@@ -23,10 +23,10 @@ function [] = createMaterialDirect()
 % cael_active        | Property flag for cael
 % ndCompression      | No damage for fully compressive cycles
 % comment            | User comment
-%
+%                    
 %    * These variables require a key to denote their meaning.
 %    (See the VARIABLE KEY LOOK-UP TABLE for guidance)
-% ___________________|_____________________________________________________
+% _________________________________________________________________________
 % MECHANICAL PROPERTIES
 % Variable           | Meaning
 % ___________________|_____________________________________________________
