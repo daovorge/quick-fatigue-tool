@@ -19,6 +19,8 @@ function [isAvailable] = checkToolbox(toolboxName)
             tag = 'noIPT';
         case 'Symbolic Math Toolbox'
             tag = 'noSMT';
+        case 'Statistics Toolbox'
+            tag = 'noSMLT';
         case 'Statistics and Machine Learning Toolbox'
             tag = 'noSMLT';
         case 'Signal Processing Toolbox'
