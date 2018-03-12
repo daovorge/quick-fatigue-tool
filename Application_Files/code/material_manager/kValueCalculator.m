@@ -87,7 +87,7 @@ if isappdata(0, sprintf('%skValueCalculator_pMenu_solution', materialName)) == 1
     set(handles.edit_t, 'string', getappdata(0, sprintf('%skValueCalculator_edit_t', materialName)))
     set(handles.edit_uts, 'string', getappdata(0, sprintf('%skValueCalculator_edit_uts', materialName)))
     
-    switch getappdata(0, 'kValueCalculator_pMenu_solution')
+    switch getappdata(0, sprintf('%skValueCalculator_pMenu_solution', materialName))
         case 2.0
             set(handles.text_r, 'enable', 'on');    set(handles.edit_r, 'enable', 'on', 'BackgroundColor', 'White')
             set(handles.text_fi, 'enable', 'on');    set(handles.edit_fi, 'enable', 'on', 'BackgroundColor', 'White');  set(handles.text_units_fi, 'enable', 'on')
