@@ -10,7 +10,7 @@ classdef postProcess_e < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 09-Mar-2018 14:55:09 GMT
+%   Last modified 12-Mar-2018 14:19:57 GMT
     
     %%
     
@@ -367,7 +367,7 @@ classdef postProcess_e < handle
                     
                     fprintf(fid, 'FIELDS [ANALYSED ITEMS ONLY]\r\nJob:\t%s\r\nLoading:\t%.3g\t%s\r\n', getappdata(0, 'jobName'), getappdata(0, 'loadEqVal'), getappdata(0, 'loadEqUnits'));
                     
-                    mainID_i = zeros(1, length(mainID) - length(coldItems));
+                    mainID_i = zeros(1.0, length(mainID) - length(coldItems));
                     subID_i = mainID_i;
                     L_i = mainID_i;
                     LL_i = mainID_i;

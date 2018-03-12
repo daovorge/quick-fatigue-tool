@@ -10,7 +10,7 @@ classdef compositeOutput < handle
 %      12.3 Composite failure criteria
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 17-Jan-2018 11:19:25 GMT
+%   Last modified 12-Mar-2018 14:19:57 GMT
     
     %%
     
@@ -283,43 +283,56 @@ classdef compositeOutput < handle
                     fprintf(fid_status, '[POST] Writing field data to ODB');
                     
                     try
-                        [status, message] = system(sprintf('%s python %s', abqCmd, scriptFile));
+                        [~, message] = system(sprintf('%s python %s', abqCmd, scriptFile));
                         
-                        if status == 1.0
-                            if isempty(strfind(message, sprintf('KeyError: ''%s''', stepName))) == 0.0 %#ok<*FNDSB>
+                        if isempty(message) == 0.0
+                            fprintf(fid_debug, '\nODB Error: %s', message);
+                            
+                            if isempty(strfind(message, sprintf('KeyError: ''%s''', stepName))) == 0.0
                                 % The step name is invalid
-                                fprintf('\n[POST] ODB Error: The step name ''%s'' could not be found in the ODB. Results will not be written to the output database.', stepName)
+                                fprintf(fid_debug, '\nODB Error: The step name ''%s'' could not be found in the ODB. Results will not be written to the output database.', stepName);
+                            elseif isempty(strfind(message, sprintf('KeyError: ''%s''', partInstanceName))) == 0.0
+                                % The part instance name is invalid
+                                fprintf(fid_debug, '\nODB Error: The part instance name ''%s'' could not be found in the ODB. Results will not be written to the output database.', partInstanceName);
                             elseif isempty(strfind(message, 'OdbError: Invalid node label')) == 0.0
                                 %{
                                     The field data does not exactly match
                                     the part instance name, so an ODB
                                     element/node set could not be created
                                 %}
-                                fprintf('\n[POST] ODB Error: The ODB element/node set could not be written because the field data does not exactly match the specified part instance. Results will not be written to the output database.')
+                                fprintf(fid_debug, '\nODB Error: The ODB element/node set could not be written because the field data does not exactly match the specified part instance. Results will not be written to the output database.');
                             elseif isempty(strfind(message, 'is not recognized as an internal or external command')) == 0.0
                                 % There is no Abaqus executable on the host machine
-                                fprintf('\n[POST] ODB Error: The Abaqus command ''%s'' could not be found on the system. Check your Abaqus installation. Results will not be written to the output database.', abqCmd)
+                                fprintf(fid_debug, '\nODB Error: The Abaqus command ''%s'' could not be found on the system. Check your Abaqus installation. Results will not be written to the output database.', abqCmd);
+                            elseif isempty(strfind(message, 'OdbError: illegal argument type for built-in operation')) == 0.0
+                                % There is no Abaqus executable on the host machine
+                                fprintf(fid_debug, '\nODB Error: The Abaqus API rejected the fatigue results data. For element-nodal and integration point data, results for at least one element are required. For centroidal and unique-nodal data, results for at least two centroids or nodes are required, respectively.');
                             else
                                 % Unkown exception
-                                fprintf('\n[POST] ODB Error: The Abaqus API returned the following error:\r\n\r\n%s\r\nResults will not be written to the output database.', message)
+                                fprintf(fid_debug, '\nThe cause of this error could not be determined. Please contact the developer at louisvallance@hotmail.co.uk for further assistance.');
                             end
                             
                             if getappdata(0, 'autoExport_executionMode') == 1.0
                                 delete(scriptFile)
                             end
                             
-                            fprintf('\n[ERROR] ODB Interface exited with errors');
+                            % Delete the results output database from the output directory if applicable
+                            if exist([pwd, sprintf('\\%s\\%s.odb', resultsDatabasePath, resultsDatabaseName)], 'file') == 2.0
+                                delete([pwd, sprintf('\\%s\\%s.odb', resultsDatabasePath, resultsDatabaseName)])
+                            end
+                            
+                            fprintf('\n[ERROR] ODB Interface exited with errors. Check %s for details', [sprintf('Project/output/%s/Data Files/', jobName), resultsDatabaseName, '.log']');
                             fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors');
+                            fprintf(fid_debug, '\n\nRESULTS WERE NOT WRITTEN TO THE OUTPUT DATABASE');
                             return
                         end
                     catch unhandledException
                         fprintf(fid_debug, '\r\nError: %s', unhandledException.message);
-                        fprintf('\n[POST] ODB Error: An unknown exception was encountered while writing field data to the output database')
-                        fprintf('\n[ERROR] ODB Interface exited with errors');
+                        fprintf('\n[POST] ODB Error: An unknown exception was encountered while writing field data to the output database. Please contact the developer at louisvallance@hotmail.co.uk for further assistance')
+                        fprintf('\n[ERROR] ODB Interface exited with errors. Check %s for details', [sprintf('Project/output/%s/Data Files/', jobName), resultsDatabaseName, '.log']);
                         messenger.writeMessage(86.0)
                         
                         fclose(fid_debug);
-                        clc
                         
                         if getappdata(0, 'autoExport_executionMode') == 1.0
                             delete(scriptFile)
@@ -726,7 +739,7 @@ classdef compositeOutput < handle
                     connectivitySorted = zeros(numberOfLabels, 20.0);
                     for i = 1:numberOfLabels
                         newIndex = find(positionLabels == positionLabelsSorted(i));
-                        connectivitySorted(i, :) = connectivity(newIndex, :);
+                        connectivitySorted(i, :) = connectivity(newIndex, :); %#ok<FNDSB>
                     end
                     connectivity = connectivitySorted;
                 end

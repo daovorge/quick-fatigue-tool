@@ -12,7 +12,7 @@ function varargout = ExportTool(varargin)%#ok<*DEFNU>
 %      10.4 The ODB Interface
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 23-Feb-2018 09:17:44 GMT
+%   Last modified 12-Mar-2018 14:19:57 GMT
     
     %%
     
@@ -750,26 +750,35 @@ for instanceNumber = 1:nInstances
         fprintf('Writing field data to ODB...\n');
         
         try
-            [status, message] = system(sprintf('%s python %s', abqCmd, scriptFile));
+            [~, message] = system(sprintf('%s python %s', abqCmd, scriptFile));
             
-            if status == 1.0
+            if isempty(message) == 0.0
+                messageA = sprintf('The Abaqus API returned the following error:\r\n\r\n%s\r\n\r\n', message);
+                
                 if isempty(strfind(message, sprintf('KeyError: ''%s''', stepName))) == 0.0
                     % The step name is invalid
-                    errordlg(sprintf('The step name ''%s'' could not be found in the ODB. Results will not be written to the output database.', stepName), 'Quick Fatigue Tool')
+                    messageB = sprintf('The step name ''%s'' could not be found in the ODB. Results will not be written to the output database.', stepName);
+                elseif isempty(strfind(message, sprintf('KeyError: ''%s''', partInstanceName))) == 0.0
+                    messageB = sprintf('The part instance name ''%s'' could not be found in the ODB. Results will not be written to the output database.', stepName);
                 elseif isempty(strfind(message, 'OdbError: Invalid node label')) == 0.0
                     %{
                         The field data does not exactly match the part
                         instance name, so an ODB element/node set could not
                         be created
                     %}
-                    errordlg(sprintf('The ODB element/node set could not be written because the field data does not exactly match the specified part instance. Results will not be written to the output database.'), 'Quick Fatigue Tool')
+                    messageB = sprintf('The ODB element/node set could not be written because the field data does not exactly match the specified part instance. Results will not be written to the output database.');
                 elseif isempty(strfind(message, 'is not recognized as an internal or external command')) == 0.0
                     % There is no Abaqus executable on the host machine
-                    errordlg(sprintf('The Abaqus command ''%s'' could not be found on the system. Check your Abaqus installation. Results will not be written to the output database.', abqCmd), 'Quick Fatigue Tool')
+                    messageB = sprintf('The Abaqus command ''%s'' could not be found on the system. Check your Abaqus installation. Results will not be written to the output database.', abqCmd);
+                elseif isempty(strfind(message, 'OdbError: illegal argument type for built-in operation')) == 0.0
+                    messageB = sprintf('The Abaqus API rejected the fatigue results data.\r\n\r\nFor element-nodal and integration point data, results for at least one element are required. For centroidal and unique-nodal data, results for at least two centroids or nodes are required, respectively.\r\n\r\nResults will not be written to the output database.');
                 else
                     % Unkown exception
-                    errordlg(sprintf('The Abaqus API returned the following error:\r\n\r\n%s\r\nResults will not be written to the output database.', message), 'Quick Fatigue Tool')
+                    messageB = sprintf('The cause of this error could not be determined. Please contact the developer at louisvallance@hotmail.co.uk for further assistance. Results will not be written to the output database.');
                 end
+                
+                errorMessage = [messageA, messageB];
+                errordlg(errorMessage, 'Quick Fatigue Tool')
                 
                 uiwait
                 delete(scriptFile)
