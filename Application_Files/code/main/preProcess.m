@@ -2204,6 +2204,7 @@ classdef preProcess < handle
             elseif none == 1.0
                 % No items were removed
                 removed = 0.0;
+				coldItems = [];
                 return
             end
         end

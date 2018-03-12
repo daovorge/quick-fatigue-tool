@@ -1012,7 +1012,7 @@ classdef postProcess < handle
                     
                     % If the maximum damage is zero or INF, skip this variable
                     if (max(cumulativeDamage) == 0.0) || (max(cumulativeDamage) == inf)
-                        messenger.writeMessage(299.0)
+                        messenger.writeMessage(316.0)
                     else
                         % Check whether damage crosses the infinite life envelope
                         crossing = -999.0;

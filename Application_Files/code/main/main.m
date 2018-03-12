@@ -11,7 +11,7 @@ function [] = main(flags)
 %   Author contact: louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 12-Mar-2018 14:19:57 GMT
+%   Last modified 12-Mar-2018 18:35:16 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');
@@ -43,7 +43,7 @@ setappdata(0, 'messageFileWarnings', 0.0)
 %% PRINT COMMAND WINDOW HEADER
 fprintf('[NOTICE] Quick Fatigue Tool 6.11-13')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2018)')
-fprintf('\n[NOTICE] Last modified 12-Mar-2018 14:19:57 GMT')
+fprintf('\n[NOTICE] Last modified 12-Mar-2018 18:35:16 GMT')
 
 cleanExit = 0.0;
 
@@ -339,10 +339,6 @@ if (algorithm ~= 10.0) && (algorithm ~= 8.0) && (algorithm ~= 3.0) && (getappdat
         %}
         if (removedItems > 0.0) && (G > 1.0)
             group.checkEliminatedGroupItems(coldItems, mainID, subID, G)
-        end
-        
-        if length(coldItems) == 1.0 && coldItems == 0.0
-            coldItems = [];
         end
     else
         coldItems = [];
