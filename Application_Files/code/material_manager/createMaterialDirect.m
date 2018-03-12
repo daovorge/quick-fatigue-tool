@@ -158,7 +158,7 @@ function [] = createMaterialDirect()
 %                    |                     | 90/50 Rule | None}
 %____________________|_____________________|_______________________________
 
-%% Define material data
+%% User material data
 materialName = 'Material-1';
 
 material_properties = struct(...
@@ -238,7 +238,7 @@ material_properties = struct(...
 'larc05_phi0', 0.0,...
 'larc05_iterate', 0.0); %#ok<NASGU>
 
-%% Save the material
+%% Save the material - DO NOT EDIT
 
 % Check for illegal characters in the material name
 if isempty(regexp(materialName, '[/\\*:?"<>|]', 'once')) == 0.0
