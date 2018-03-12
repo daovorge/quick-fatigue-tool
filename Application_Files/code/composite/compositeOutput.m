@@ -94,6 +94,34 @@ classdef compositeOutput < handle
             % Get the step name
             stepName = getappdata(0, 'stepName');
             
+            % Open the log file for writing
+            fid_debug = fopen([sprintf('Project/output/%s/Data Files/', jobName), resultsDatabaseName, '.log'], 'w+');
+            fprintf(fid_debug, 'Quick Fatigue Tool 6.11-13 ODB Interface Log');
+            
+            % Print Abaqus installation info to the debug log file
+            try
+                [status, result] = system(sprintf('%s whereami', abqCmd));
+                
+                if status == 1.0
+                    % An exception occurred whilst getting installation info
+                    fprintf(fid_debug, '\r\n\r\nError: Abaqus installation info was not found\r\n');
+                    fprintf(fid_debug, '\tPlease ensure that the Abaqus command line argument points to a valid Abaqus batch file');
+                    fprintf(fid_debug, '\r\n\tAn Abaqus installation is required to write fatigue results to the output database (.odb) file');
+                    fprintf(fid_debug, '\r\n\r\nFatigue results have not been written to the output database');
+                    fprintf(fid_debug, '\r\n\r\nEND OF FILE');
+                else
+                    fprintf(fid_debug, '\r\n\r\nAbaqus installation info:\r\n%s', result);
+                    fprintf(fid_debug, '(NOTE: The Abaqus version is determined by the autoExport_abqCmd environment variable)\r\n');
+                end
+            catch exception
+                % An unhandled exception was encountered
+                fprintf('[POST] ODB Error: %s', exception.message);
+                fprintf(fid_status, '[POST] ODB Error: %s', exception.message);
+                fprintf('\n[ERROR] ODB Interface exited with errors');
+                fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors');
+                return
+            end
+            
             % Verify the inputs
             error = python.verifyAuto(1.0, fieldDataPath, fieldDataName,...
                 resultsDatabasePath, partInstanceList);
@@ -144,10 +172,6 @@ classdef compositeOutput < handle
                 delete([resultsDatabasePath, '/', modelDatabaseNameShort, '.lck'])
             end
             
-            % Open the log file for writing
-            fid_debug = fopen([sprintf('Project/output/%s/Data Files/', jobName), resultsDatabaseName, '.log'], 'w+');
-            fprintf(fid_debug, 'Quick Fatigue Tool 6.11-13 ODB Interface Log');
-            
             % Get the selected position
             userPosition = getappdata(0, 'odbResultPosition');
             if strcmpi('unique nodal', userPosition) == 1.0
@@ -174,13 +198,16 @@ classdef compositeOutput < handle
             autoPosition = getappdata(0, 'autoExport_autoPosition');
             if autoPosition == 1.0
                 fprintf(fid_debug, '\r\nAllow Quick Fatigue Tool to determine results position based on field IDs: YES');
-                fprintf('\n[POST] Allow Quick Fatigue Tool to determine results position based on field IDs: YES');
-                fprintf(fid_status, '\n[POST] Allow Quick Fatigue Tool to determine results position based on field IDs: YES');
             else
                 fprintf(fid_debug, '\r\nAllow Quick Fatigue Tool to determine results position based on field IDs: NO');
-                fprintf('\n[POST] Allow Quick Fatigue Tool to determine results position based on field IDs: NO');
-                fprintf(fid_status, '\n[POST] Allow Quick Fatigue Tool to determine results position based on field IDs: NO');
             end
+            
+            if isempty(stepName) == 1.0
+                fprintf(fid_debug, '\r\nThe step name was not specified (a default name will be used)');
+            else
+                fprintf(fid_debug, '\r\nStep name: ''%s''', stepName);
+            end
+            fprintf(fid_debug, '\r\nField output request: COMPOSITE FAILURE MEASURE COMPONENTS ONLY');
             
             for instanceNumber = 1:nInstances
                 partInstanceName = partInstanceList{instanceNumber};
@@ -344,9 +371,10 @@ classdef compositeOutput < handle
                 end
             end
             
-            fprintf(fid_debug, ' Success');
-            fprintf('\n[POST] Export complete. Check the log file in Project/output/%s/Data Files for detailed information', getappdata(0, 'jobName'));
-            fprintf(fid_status, '\n[POST] Export complete. Check the log file in Project/output/%s/Data Files for detailed information', getappdata(0, 'jobName'));
+            fprintf(fid_debug, ' Success\r\n\r\nFatigue results have been written to ''%s''', sprintf('%s/%s.odb', resultsDatabasePath, resultsDatabaseName));
+            fprintf(fid_debug, '\r\n\r\nEND OF FILE');
+            fprintf('\n[POST] Export complete. Check %s for details ', [sprintf('Project/output/%s/Data Files/', jobName), resultsDatabaseName, '.log']);
+            fprintf(fid_status, '\n[POST] Export complete. Check %s for details', [sprintf('Project/output/%s/Data Files/', jobName), resultsDatabaseName, '.log']);
             fclose(fid_debug);
             
             % Update the message file

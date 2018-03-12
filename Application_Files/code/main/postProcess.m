@@ -2232,8 +2232,8 @@ classdef postProcess < handle
             
             fprintf(fid_debug, ' Success\r\n\r\nFatigue results have been written to ''%s''', sprintf('%s/%s.odb', resultsDatabasePath, resultsDatabaseName));
             fprintf(fid_debug, '\r\n\r\nEND OF FILE');
-            fprintf('\n[POST] Export complete. Check the log file in Project/output/%s/Data Files for detailed information', getappdata(0, 'jobName'));
-            fprintf(fid_status, '\n[POST] Export complete. Check the log file in Project/output/%s/Data Files for detailed information', getappdata(0, 'jobName'));
+            fprintf('\n[POST] Export complete. Check %s for details ', [sprintf('Project/output/%s/Data Files/', jobName), resultsDatabaseName, '.log']);
+            fprintf(fid_status, '\n[POST] Export complete. Check %s for details', [sprintf('Project/output/%s/Data Files/', jobName), resultsDatabaseName, '.log']);
             fclose(fid_debug);
             
             % Update the message file
