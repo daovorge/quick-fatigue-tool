@@ -1992,6 +1992,8 @@ classdef postProcess < handle
                     fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors');
                     fprintf(fid_debug, '\n\nRESULTS WERE NOT WRITTEN TO THE OUTPUT DATABASE');
                     return
+                elseif strcmp(message, sprintf('ODB FILE UPGRADE COMPLETED\n')) == 1.0
+                    fprintf(fid_debug, '\n%s', message);
                 end
             end
             
