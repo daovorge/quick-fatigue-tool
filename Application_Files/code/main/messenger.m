@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 13-Mar-2018 12:42:29 GMT
+%   Last modified 13-Mar-2018 15:47:07 GMT
 
     %%
 
@@ -939,22 +939,7 @@ classdef messenger < handle
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 85.0
-                        switch getappdata(0, 'warning_061_number')
-                            case 1.0
-                                fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: No matching position labels were found in the model output database. Field data will not be exported', returnType{i}]);
-                                fprintf(fidType(i), ['-> Check the definitions of OUTPUT_DATABASE and PART_INSTANCE in the job file', returnType{i}]);
-                                fprintf(fidType(i), ['-> If the stress dataset contains plane stress or axisymmetric elements, ensure that PLANE_STRESS=1', returnType{i}]);
-                            case 2.0
-                                fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: An error occurred while retrieving the connectivity matrix. Field data will not be exported', returnType{i}]);
-                            case 3.0
-                                fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: An error occurred while reading the connectivity matrix. Field data will not be exported', returnType{i}]);
-                                fprintf(fidType(i), ['-> Check the PART_INSTANCE definition in the job file', returnType{i}]);
-                            case 4.0
-                                fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: An error occurred while reading the field data file. Field data will not be exported', returnType{i}]);
-                            otherwise
-                        end
-
-                        setappdata(0, 'messageFileWarnings', 1.0)
+                        %_AVAILABLE_%
                     case 86.0
                         fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: An error occurred while writing field data to the output database. Field data will not be exported', returnType{i}]);
 
@@ -2392,7 +2377,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2018\r\n');
-            fprintf(fid, 'Last modified 13-Mar-2018 12:42:29 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 13-Mar-2018 15:47:07 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

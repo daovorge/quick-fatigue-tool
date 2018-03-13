@@ -10,7 +10,7 @@ classdef compositeOutput < handle
 %      12.3 Composite failure criteria
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 13-Mar-2018 12:42:29 GMT
+%   Last modified 13-Mar-2018 15:47:07 GMT
     
     %%
     
@@ -152,7 +152,7 @@ classdef compositeOutput < handle
                     end
                     
                     fprintf('\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
-                    fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors');
+                    fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
                     fprintf(fid_debug, '\n\nRESULTS WERE NOT WRITTEN TO THE OUTPUT DATABASE');
                     return
                 elseif strcmp(message, sprintf('ODB FILE UPGRADE COMPLETED\n')) == 1.0
@@ -170,7 +170,7 @@ classdef compositeOutput < handle
                     fprintf(fid_debug, '\nThe cause of this error could not be determined. Please contact the developer at louisvallance@hotmail.co.uk for further assistance.');
                     
                     fprintf('\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
-                    fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors');
+                    fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
                     fprintf(fid_debug, '\n\nRESULTS WERE NOT WRITTEN TO THE OUTPUT DATABASE');
                     return
                 end
@@ -240,12 +240,27 @@ classdef compositeOutput < handle
                     fid_debug, resultsDatabasePath, resultsDatabaseName);
                 
                 if error > 0.0
-                    setappdata(0, 'warning_061_number', error)
-                    messenger.writeMessage(85.0)
+                    switch error
+                        case 1.0
+                            fprintf(fid_debug, 'No matching position labels were found in the model output database. Check the log file for details.');
+                        case 2.0
+                            fprintf(fid_debug, 'An error occurred while retrieving the connectivity matrix. Check the log file for details.');
+                        case 3.0
+                            fprintf(fid_debug, 'An error occurred while reading the connectivity matrix. Check the log file for details.');
+                        case 4.0
+                            fprintf(fid_debug, 'An error occurred while reading the field data file. Check the log file for details.');
+                        case 5.0
+                            fprintf(fid_debug, 'No matching position labels were found in the model output database. Check the log file for details.');
+                    end
                     
                     fprintf('\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
-                    fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors');
+                    fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
                     fprintf(fid_debug, '\n\nRESULTS WERE NOT WRITTEN TO THE OUTPUT DATABASE');
+                    
+                    % Delete the results output database from the output directory if applicable
+                    if exist([pwd, sprintf('\\%s\\%s.odb', resultsDatabasePath, resultsDatabaseName)], 'file') == 2.0
+                        delete([pwd, sprintf('\\%s\\%s.odb', resultsDatabasePath, resultsDatabaseName)])
+                    end
                     
                     fclose(fid_debug);
                     return
@@ -291,7 +306,7 @@ classdef compositeOutput < handle
                     end
                     
                     fprintf('\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
-                    fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors');
+                    fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
                     fprintf(fid_debug, '\n\nRESULTS WERE NOT WRITTEN TO THE OUTPUT DATABASE');
                     
                     fclose(fid_debug);
@@ -361,7 +376,7 @@ classdef compositeOutput < handle
                             end
                             
                             fprintf('\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName');
-                            fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors');
+                            fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
                             fprintf(fid_debug, '\n\nRESULTS WERE NOT WRITTEN TO THE OUTPUT DATABASE');
                             return
                         end
