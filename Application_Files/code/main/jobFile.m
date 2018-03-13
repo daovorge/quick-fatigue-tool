@@ -6,7 +6,7 @@ classdef jobFile < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 23-Feb-2018 09:17:44 GMT
+%   Last modified 13-Mar-2018 10:39:43 GMT
     
     %%
     
@@ -1984,6 +1984,9 @@ classdef jobFile < handle
             error = 0.0;
             
             if getappdata(0, 'analysisDialogues') == 0.0
+                if outputField == 0.0
+                    setappdata(0, 'autoExport_ODB', 0.0)
+                end
                 return
             end
             
@@ -2098,6 +2101,8 @@ classdef jobFile < handle
                     elseif strcmpi('Enable field output', response)
                         outputField = 1.0;
                         setappdata(0, 'outputField', 1.0)
+                    else
+                        setappdata(0, 'autoExport_ODB', 0.0)
                     end
                 end
                 
@@ -2196,6 +2201,8 @@ classdef jobFile < handle
                 elseif strcmpi('Enable automatic export', response)
                     outputField = 1.0;
                     setappdata(0, 'autoExport_ODB', 1.0)
+                else
+                    setappdata(0, 'autoExport_ODB', 0.0)
                 end
             end
         end
