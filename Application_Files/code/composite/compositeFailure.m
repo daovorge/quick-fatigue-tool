@@ -12,7 +12,7 @@ function [] = compositeFailure(N, L, mainID, fid_status)
 %      12.3 Composite failure criteria
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 13-Mar-2018 09:04:47 GMT
+%   Last modified 13-Mar-2018 16:24:24 GMT
     
     %%
 
@@ -376,7 +376,8 @@ LARTFCRT(abs(LARTFCRT - 1.0) < 1e-6) = 1.0;
     N_LARKFCRT, N_LARSFCRT, N_LARTFCRT] =...
     compositeOutput.getCompositeSummary(MSTRS, MSTRN, TSAIH, TSAIW,...
     TSAIWTT, AZZIT, HSNFTCRT, HSNFCCRT, HSNMTCRT, HSNMCCRT, LARPFCRT,...
-    LARMFCRT, LARKFCRT, LARSFCRT, LARTFCRT, k);
+    LARMFCRT, LARKFCRT, LARSFCRT, LARTFCRT, k, failStressGeneral,...
+    tsaiWuTT, failStrain, hashin, larc05);
 
 %% Report results summary to the message file
 messenger.writeMessage(315.0)

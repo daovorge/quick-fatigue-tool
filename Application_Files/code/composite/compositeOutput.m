@@ -10,7 +10,7 @@ classdef compositeOutput < handle
 %      12.3 Composite failure criteria
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 13-Mar-2018 15:47:07 GMT
+%   Last modified 13-Mar-2018 16:24:24 GMT
     
     %%
     
@@ -52,8 +52,6 @@ classdef compositeOutput < handle
             if length(mainID) == 1.0
                 messenger.writeMessage(204.0)
             end
-            
-            fprintf('\n');
             
             % Get the job name
             jobName = getappdata(0, 'jobName');
@@ -809,7 +807,8 @@ classdef compositeOutput < handle
                 N_LARTFCRT] =...
                 getCompositeSummary(MSTRS, MSTRN, TSAIH, TSAIW, TSAIWTT,...
                 AZZIT, HSNFTCRT, HSNFCCRT, HSNMTCRT, HSNMCCRT, LARPFCRT,...
-                LARMFCRT, LARKFCRT, LARSFCRT, LARTFCRT, k)
+                LARMFCRT, LARKFCRT, LARSFCRT, LARTFCRT, k,...
+                failStressGeneral, tsaiWuTT, failStrain, hashin, larc05)
             
             %% Get the number of PASS/FAIL items            
             N_MSTRS = length(MSTRS(MSTRS >= 1.0));
@@ -828,157 +827,256 @@ classdef compositeOutput < handle
             N_LARSFCRT = length(LARSFCRT(LARSFCRT >= 1.0));
             N_LARTFCRT = length(LARTFCRT(LARTFCRT >= 1.0));
             
-            if N_MSTRS == 0.0
-                setappdata(0, 'MSTRS_NL', 'ALL')
+            % General stress-based failure criteria
+            if failStressGeneral == 1.0
+                if N_MSTRS == 0.0
+                    setappdata(0, 'MSTRS_NL', 'ALL')
+                else
+                    setappdata(0, 'MSTRS_NL', sprintf('%s', num2str(N_MSTRS)))
+                end
+                
+                if N_TSAIH == 0.0
+                    setappdata(0, 'TSAIH_NL', 'ALL')
+                else
+                    setappdata(0, 'TSAIH_NL', sprintf('%s', num2str(N_TSAIH)))
+                end
+                
+                if N_TSAIW == 0.0
+                    setappdata(0, 'TSAIW_NL', 'ALL')
+                else
+                    setappdata(0, 'TSAIW_NL', sprintf('%s', num2str(N_TSAIW)))
+                end
+                
+                if N_AZZIT == 0.0
+                    setappdata(0, 'AZZIT_NL', 'ALL')
+                else
+                    setappdata(0, 'AZZIT_NL', sprintf('%s', num2str(N_AZZIT)))
+                end
             else
-                setappdata(0, 'MSTRS_NL', sprintf('%s', num2str(N_MSTRS)))
+                setappdata(0, 'MSTRS_NL', 'N/A')
+                setappdata(0, 'TSAIH_NL', 'N/A')
+                setappdata(0, 'TSAIW_NL', 'N/A')
+                setappdata(0, 'AZZIT_NL', 'N/A')
             end
-            if N_MSTRN == 0.0
-                setappdata(0, 'MSTRN_NL', 'ALL')
+            
+            % Tsai-Wu for PVC foam
+            if tsaiWuTT == 1.0
+                if N_TSAIWTT == 0.0
+                    setappdata(0, 'TSAIWTT_NL', 'ALL')
+                else
+                    setappdata(0, 'TSAIWTT_NL', sprintf('%s', num2str(N_TSAIWTT)))
+                end
             else
-                setappdata(0, 'MSTRN_NL', sprintf('%s', num2str(N_MSTRN)))
+                setappdata(0, 'TSAIWTT_NL', 'N/A')
             end
-            if N_TSAIH == 0.0
-                setappdata(0, 'TSAIH_NL', 'ALL')
+            
+            % Maximum strain failure theory
+            if failStrain == 1.0
+                if N_MSTRN == 0.0
+                    setappdata(0, 'MSTRN_NL', 'ALL')
+                else
+                    setappdata(0, 'MSTRN_NL', sprintf('%s', num2str(N_MSTRN)))
+                end
             else
-                setappdata(0, 'TSAIH_NL', sprintf('%s', num2str(N_TSAIH)))
+                setappdata(0, 'MSTRN_NL', 'N/A')
             end
-            if N_TSAIW == 0.0
-                setappdata(0, 'TSAIW_NL', 'ALL')
+            
+            % Hashin's damage initiation criteria
+            if hashin == 1.0
+                if N_HSNFTCRT == 0.0
+                    setappdata(0, 'HSNFTCRT_NL', 'ALL')
+                else
+                    setappdata(0, 'HSNFTCRT_NL', sprintf('%s', num2str(N_HSNFTCRT)))
+                end
+                
+                if N_HSNFCCRT == 0.0
+                    setappdata(0, 'HSNFCCRT_NL', 'ALL')
+                else
+                    setappdata(0, 'HSNFCCRT_NL', sprintf('%s', num2str(N_HSNFCCRT)))
+                end
+                
+                if N_HSNMTCRT == 0.0
+                    setappdata(0, 'HSNMTCRT_NL', 'ALL')
+                else
+                    setappdata(0, 'HSNMTCRT_NL', sprintf('%s', num2str(N_HSNMTCRT)))
+                end
+                
+                if N_HSNMCCRT == 0.0
+                    setappdata(0, 'HSNMCCRT_NL', 'ALL')
+                else
+                    setappdata(0, 'HSNMCCRT_NL', sprintf('%s', num2str(N_HSNMCCRT)))
+                end
             else
-                setappdata(0, 'TSAIW_NL', sprintf('%s', num2str(N_TSAIW)))
+                setappdata(0, 'HSNFTCRT_NL', 'N/A')
+                setappdata(0, 'HSNFCCRT_NL', 'N/A')
+                setappdata(0, 'HSNMTCRT_NL', 'N/A')
+                setappdata(0, 'HSNMCCRT_NL', 'N/A')
             end
-            if N_TSAIWTT == 0.0
-                setappdata(0, 'TSAIWTT_NL', 'ALL')
+            
+            % LaRC05 damage initiation criteria
+            if larc05 == 1.0
+                if N_LARPFCRT == 0.0
+                    setappdata(0, 'LARPFCRT_NL', 'ALL')
+                else
+                    setappdata(0, 'LARPFCRT_NL', sprintf('%s', num2str(N_LARPFCRT)))
+                end
+                
+                if N_LARMFCRT == 0.0
+                    setappdata(0, 'LARMFCRT_NL', 'ALL')
+                else
+                    setappdata(0, 'LARMFCRT_NL', sprintf('%s', num2str(N_LARMFCRT)))
+                end
+                
+                if N_LARKFCRT == 0.0
+                    setappdata(0, 'LARKFCRT_NL', 'ALL')
+                else
+                    setappdata(0, 'LARKFCRT_NL', sprintf('%s', num2str(N_LARKFCRT)))
+                end
+                
+                if N_LARSFCRT == 0.0
+                    setappdata(0, 'LARSFCRT_NL', 'ALL')
+                else
+                    setappdata(0, 'LARSFCRT_NL', sprintf('%s', num2str(N_LARSFCRT)))
+                end
+                
+                if N_LARTFCRT == 0.0
+                    setappdata(0, 'LARTFCRT_NL', 'ALL')
+                else
+                    setappdata(0, 'LARTFCRT_NL', sprintf('%s', num2str(N_LARTFCRT)))
+                end
             else
-                setappdata(0, 'TSAIWTT_NL', sprintf('%s', num2str(N_TSAIWTT)))
-            end
-            if N_AZZIT == 0.0
-                setappdata(0, 'AZZIT_NL', 'ALL')
-            else
-                setappdata(0, 'AZZIT_NL', sprintf('%s', num2str(N_AZZIT)))
-            end
-            if N_HSNFTCRT == 0.0
-                setappdata(0, 'HSNFTCRT_NL', 'ALL')
-            else
-                setappdata(0, 'HSNFTCRT_NL', sprintf('%s', num2str(N_HSNFTCRT)))
-            end
-            if N_HSNFCCRT == 0.0
-                setappdata(0, 'HSNFCCRT_NL', 'ALL')
-            else
-                setappdata(0, 'HSNFCCRT_NL', sprintf('%s', num2str(N_HSNFCCRT)))
-            end
-            if N_HSNMTCRT == 0.0
-                setappdata(0, 'HSNMTCRT_NL', 'ALL')
-            else
-                setappdata(0, 'HSNMTCRT_NL', sprintf('%s', num2str(N_HSNMTCRT)))
-            end
-            if N_HSNMCCRT == 0.0
-                setappdata(0, 'HSNMCCRT_NL', 'ALL')
-            else
-                setappdata(0, 'HSNMCCRT_NL', sprintf('%s', num2str(N_HSNMCCRT)))
-            end
-            if N_LARPFCRT == 0.0
-                setappdata(0, 'LARPFCRT_NL', 'ALL')
-            else
-                setappdata(0, 'LARPFCRT_NL', sprintf('%s', num2str(N_LARPFCRT)))
-            end
-            if N_LARMFCRT == 0.0
-                setappdata(0, 'LARMFCRT_NL', 'ALL')
-            else
-                setappdata(0, 'LARMFCRT_NL', sprintf('%s', num2str(N_LARMFCRT)))
-            end
-            if N_LARKFCRT == 0.0
-                setappdata(0, 'LARKFCRT_NL', 'ALL')
-            else
-                setappdata(0, 'LARKFCRT_NL', sprintf('%s', num2str(N_LARKFCRT)))
-            end
-            if N_LARSFCRT == 0.0
-                setappdata(0, 'LARSFCRT_NL', 'ALL')
-            else
-                setappdata(0, 'LARSFCRT_NL', sprintf('%s', num2str(N_LARSFCRT)))
-            end
-            if N_LARTFCRT == 0.0
-                setappdata(0, 'LARTFCRT_NL', 'ALL')
-            else
-                setappdata(0, 'LARTFCRT_NL', sprintf('%s', num2str(N_LARTFCRT)))
+                setappdata(0, 'LARPFCRT_NL', 'N/A')
+                setappdata(0, 'LARMFCRT_NL', 'N/A')
+                setappdata(0, 'LARKFCRT_NL', 'N/A')
+                setappdata(0, 'LARSFCRT_NL', 'N/A')
+                setappdata(0, 'LARTFCRT_NL', 'N/A')
             end
             
             %% Get PASS/FAIL status
-            if N_MSTRS > 0.0
-                setappdata(0, 'MSTRS_STAT', 'FAIL')
+            
+            % General stress-based failure criteria
+            if failStressGeneral == 1.0
+                if N_MSTRS > 0.0
+                    setappdata(0, 'MSTRS_STAT', 'FAIL')
+                else
+                    setappdata(0, 'MSTRS_STAT', 'PASS')
+                end
+                
+                if N_TSAIH > 0.0
+                    setappdata(0, 'TSAIH_STAT', 'FAIL')
+                else
+                    setappdata(0, 'TSAIH_STAT', 'PASS')
+                end
+                
+                if N_TSAIW > 0.0
+                    setappdata(0, 'TSAIW_STAT', 'FAIL')
+                else
+                    setappdata(0, 'TSAIW_STAT', 'PASS')
+                end
+                
+                if N_AZZIT > 0.0
+                    setappdata(0, 'AZZIT_STAT', 'FAIL')
+                else
+                    setappdata(0, 'AZZIT_STAT', 'PASS')
+                end
             else
-                setappdata(0, 'MSTRS_STAT', 'PASS')
+                setappdata(0, 'MSTRS_STAT', 'N/A')
+                setappdata(0, 'TSAIH_STAT', 'N/A')
+                setappdata(0, 'TSAIW_STAT', 'N/A')
+                setappdata(0, 'AZZIT_STAT', 'N/A')
             end
-            if N_MSTRN > 0.0
-                setappdata(0, 'MSTRN_STAT', 'FAIL')
+            
+            % Tsai-Wu for PVC foam
+            if tsaiWuTT == 1.0
+                if N_TSAIWTT > 0.0
+                    setappdata(0, 'TSAIWTT_STAT', 'FAIL')
+                else
+                    setappdata(0, 'TSAIWTT_STAT', 'PASS')
+                end
             else
-                setappdata(0, 'MSTRN_STAT', 'PASS')
+                setappdata(0, 'TSAIWTT_STAT', 'N/A')
             end
-            if N_TSAIH > 0.0
-                setappdata(0, 'TSAIH_STAT', 'FAIL')
+            
+            % Maximum strain failure theory
+            if failStrain == 1.0
+                if N_MSTRN > 0.0
+                    setappdata(0, 'MSTRN_STAT', 'FAIL')
+                else
+                    setappdata(0, 'MSTRN_STAT', 'PASS')
+                end
             else
-                setappdata(0, 'TSAIH_STAT', 'PASS')
+                setappdata(0, 'MSTRN_STAT', 'N/A')
             end
-            if N_TSAIW > 0.0
-                setappdata(0, 'TSAIW_STAT', 'FAIL')
+            
+            % Hashin's damage initiation criteria
+            if hashin == 1.0
+                if N_HSNFTCRT > 0.0
+                    setappdata(0, 'HSNFTCRT_STAT', 'FAIL')
+                else
+                    setappdata(0, 'HSNFTCRT_STAT', 'PASS')
+                end
+                
+                if N_HSNFCCRT > 0.0
+                    setappdata(0, 'HSNFCCRT_STAT', 'FAIL')
+                else
+                    setappdata(0, 'HSNFCCRT_STAT', 'PASS')
+                end
+                
+                if N_HSNMTCRT > 0.0
+                    setappdata(0, 'HSNMTCRT_STAT', 'FAIL')
+                else
+                    setappdata(0, 'HSNMTCRT_STAT', 'PASS')
+                end
+                
+                if N_HSNMCCRT > 0.0
+                    setappdata(0, 'HSNMCCRT_STAT', 'FAIL')
+                else
+                    setappdata(0, 'HSNMCCRT_STAT', 'PASS')
+                end
             else
-                setappdata(0, 'TSAIW_STAT', 'PASS')
+                setappdata(0, 'HSNFTCRT_STAT', 'N/A')
+                setappdata(0, 'HSNFCCRT_STAT', 'N/A')
+                setappdata(0, 'HSNMTCRT_STAT', 'N/A')
+                setappdata(0, 'HSNMCCRT_STAT', 'N/A')
             end
-            if N_TSAIWTT > 0.0
-                setappdata(0, 'TSAIWTT_STAT', 'FAIL')
+            
+            % LaRC05 damage initiation criteria
+            if larc05 == 1.0
+                if N_LARPFCRT > 0.0
+                    setappdata(0, 'LARPFCRT_STAT', 'FAIL')
+                else
+                    setappdata(0, 'LARPFCRT_STAT', 'PASS')
+                end
+                
+                if N_LARMFCRT > 0.0
+                    setappdata(0, 'LARMFCRT_STAT', 'FAIL')
+                else
+                    setappdata(0, 'LARMFCRT_STAT', 'PASS')
+                end
+                
+                if N_LARKFCRT > 0.0
+                    setappdata(0, 'LARKFCRT_STAT', 'FAIL')
+                else
+                    setappdata(0, 'LARKFCRT_STAT', 'PASS')
+                end
+                
+                if N_LARSFCRT > 0.0
+                    setappdata(0, 'LARSFCRT_STAT', 'FAIL')
+                else
+                    setappdata(0, 'LARSFCRT_STAT', 'PASS')
+                end
+                
+                if N_LARTFCRT > 0.0
+                    setappdata(0, 'LARTFCRT_STAT', 'FAIL')
+                else
+                    setappdata(0, 'LARTFCRT_STAT', 'PASS')
+                end
             else
-                setappdata(0, 'TSAIWTT_STAT', 'PASS')
-            end
-            if N_AZZIT > 0.0
-                setappdata(0, 'AZZIT_STAT', 'FAIL')
-            else
-                setappdata(0, 'AZZIT_STAT', 'PASS')
-            end
-            if N_HSNFTCRT > 0.0
-                setappdata(0, 'HSNFTCRT_STAT', 'FAIL')
-            else
-                setappdata(0, 'HSNFTCRT_STAT', 'PASS')
-            end
-            if N_HSNFCCRT > 0.0
-                setappdata(0, 'HSNFCCRT_STAT', 'FAIL')
-            else
-                setappdata(0, 'HSNFCCRT_STAT', 'PASS')
-            end
-            if N_HSNMTCRT > 0.0
-                setappdata(0, 'HSNMTCRT_STAT', 'FAIL')
-            else
-                setappdata(0, 'HSNMTCRT_STAT', 'PASS')
-            end
-            if N_HSNMCCRT > 0.0
-                setappdata(0, 'HSNMCCRT_STAT', 'FAIL')
-            else
-                setappdata(0, 'HSNMCCRT_STAT', 'PASS')
-            end
-            if N_LARPFCRT > 0.0
-                setappdata(0, 'LARPFCRT_STAT', 'FAIL')
-            else
-                setappdata(0, 'LARPFCRT_STAT', 'PASS')
-            end
-            if N_LARMFCRT > 0.0
-                setappdata(0, 'LARMFCRT_STAT', 'FAIL')
-            else
-                setappdata(0, 'LARMFCRT_STAT', 'PASS')
-            end
-            if N_LARKFCRT > 0.0
-                setappdata(0, 'LARKFCRT_STAT', 'FAIL')
-            else
-                setappdata(0, 'LARKFCRT_STAT', 'PASS')
-            end
-            if N_LARSFCRT > 0.0
-                setappdata(0, 'LARSFCRT_STAT', 'FAIL')
-            else
-                setappdata(0, 'LARSFCRT_STAT', 'PASS')
-            end
-            if N_LARTFCRT > 0.0
-                setappdata(0, 'LARTFCRT_STAT', 'FAIL')
-            else
-                setappdata(0, 'LARTFCRT_STAT', 'PASS')
+                setappdata(0, 'LARPFCRT_STAT', 'N/A')
+                setappdata(0, 'LARMFCRT_STAT', 'N/A')
+                setappdata(0, 'LARKFCRT_STAT', 'N/A')
+                setappdata(0, 'LARSFCRT_STAT', 'N/A')
+                setappdata(0, 'LARTFCRT_STAT', 'N/A')
             end
             
             %% Get maximum value of each criterion
@@ -987,71 +1085,85 @@ classdef compositeOutput < handle
             else
                 setappdata(0, 'MSTRS_MV', sprintf('%s', num2str(max(MSTRS))))
             end
+            
             if max(MSTRN) == -1.0
                 setappdata(0, 'MSTRN_MV', 'N/A')
             else
                 setappdata(0, 'MSTRN_MV', sprintf('%s', num2str(max(MSTRN))))
             end
+            
             if max(TSAIH) == -1.0
                 setappdata(0, 'TSAIH_MV', 'N/A')
             else
                 setappdata(0, 'TSAIH_MV', sprintf('%s', num2str(max(TSAIH))))
             end
+            
             if max(TSAIW) == -1.0
                 setappdata(0, 'TSAIW_MV', 'N/A')
             else
                 setappdata(0, 'TSAIW_MV', sprintf('%s', num2str(max(TSAIW))))
             end
+            
             if max(TSAIWTT) == -1.0
                 setappdata(0, 'TSAIWTT_MV', 'N/A')
             else
                 setappdata(0, 'TSAIWTT_MV', sprintf('%s', num2str(max(TSAIWTT))))
             end
+            
             if max(AZZIT) == -1.0
                 setappdata(0, 'AZZIT_MV', 'N/A')
             else
                 setappdata(0, 'AZZIT_MV', sprintf('%s', num2str(max(AZZIT))))
             end
+            
             if max(HSNFTCRT) == -1.0
                 setappdata(0, 'HSNFTCRT_MV', 'N/A')
             else
                 setappdata(0, 'HSNFTCRT_MV', sprintf('%s', num2str(max(HSNFTCRT))))
             end
+            
             if max(HSNFCCRT) == -1.0
                 setappdata(0, 'HSNFCCRT_MV', 'N/A')
             else
                 setappdata(0, 'HSNFCCRT_MV', sprintf('%s', num2str(max(HSNFCCRT))))
             end
+            
             if max(HSNMTCRT) == -1.0
                 setappdata(0, 'HSNMTCRT_MV', 'N/A')
             else
                 setappdata(0, 'HSNMTCRT_MV', sprintf('%s', num2str(max(HSNMTCRT))))
             end
+            
             if max(HSNMCCRT) == -1.0
                 setappdata(0, 'HSNMCCRT_MV', 'N/A')
             else
                 setappdata(0, 'HSNMCCRT_MV', sprintf('%s', num2str(max(HSNMCCRT))))
             end
+            
             if max(LARPFCRT) == -1.0
                 setappdata(0, 'LARPFCRT_MV', 'N/A')
             else
                 setappdata(0, 'LARPFCRT_MV', sprintf('%s', num2str(max(LARPFCRT))))
             end
+            
             if max(LARMFCRT) == -1.0
                 setappdata(0, 'LARMFCRT_MV', 'N/A')
             else
                 setappdata(0, 'LARMFCRT_MV', sprintf('%s', num2str(max(LARMFCRT))))
             end
+            
             if max(LARKFCRT) == -1.0
                 setappdata(0, 'LARKFCRT_MV', 'N/A')
             else
                 setappdata(0, 'LARKFCRT_MV', sprintf('%s', num2str(max(LARKFCRT))))
             end
+            
             if max(LARSFCRT) == -1.0
                 setappdata(0, 'LARSFCRT_MV', 'N/A')
             else
                 setappdata(0, 'LARSFCRT_MV', sprintf('%s', num2str(max(LARSFCRT))))
             end
+            
             if max(LARTFCRT) == -1.0
                 setappdata(0, 'LARTFCRT_MV', 'N/A')
             else
