@@ -11,7 +11,7 @@ classdef postProcess < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 13-Mar-2018 15:47:07 GMT
+%   Last modified 13-Mar-2018 18:58:10 GMT
     
     %%
     
@@ -1947,18 +1947,16 @@ classdef postProcess < handle
                 
                 if status == 1.0
                     % An exception occurred whilst getting installation info
-                    fprintf(fid_debug, '\r\n\r\nError: Abaqus installation info was not found\r\n');
+                    fprintf(fid_debug, '\r\n\r\n[QFT Error]: Abaqus installation info was not found\r\n');
                     fprintf(fid_debug, '\tPlease ensure that the Abaqus command line argument points to a valid Abaqus batch file');
                     fprintf(fid_debug, '\r\n\tAn Abaqus installation is required to write fatigue results to the output database (.odb) file');
-                    fprintf(fid_debug, '\r\n\r\nFatigue results have not been written to the output database');
-                    fprintf(fid_debug, '\r\n\r\nEND OF FILE');
                 else
                     fprintf(fid_debug, '\r\n\r\nAbaqus installation info:\r\n%s', message);
                     fprintf(fid_debug, '(NOTE: The Abaqus version is determined by the autoExport_abqCmd environment variable)\r\n');
                 end
             catch exception
                 % An unhandled exception was encountered
-                fprintf(fid_debug, '\nODB Error: %s', exception.message);
+                fprintf(fid_debug, '\n[Abaqus Error]: %s', exception.message);
                 fprintf('\n[ERROR] ODB Interface exited with errors');
                 fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors');
                 fprintf(fid_debug, '\n\nRESULTS WERE NOT WRITTEN TO THE OUTPUT DATABASE');
@@ -1981,11 +1979,11 @@ classdef postProcess < handle
 
                 if status == 1.0
                     % An exception occurred whilst upgrading the ODB file
-                    fprintf(fid_debug, '\nODB Error: %s', message);
+                    fprintf(fid_debug, '\n[Abaqus Error]: %s', message);
                     
                     if isempty(strfind(message, 'is not recognized as an internal or external command,')) == 0.0
                         % There is no Abaqus executable on the host machine
-                        fprintf(fid_debug, '\nODB Error: The Abaqus command ''%s'' could not be found on the system. Check your Abaqus installation. Results will not be written to the output database.', abqCmd);
+                        fprintf(fid_debug, '\n[QFT Error]: The Abaqus command ''%s'' could not be found on the system. Check your Abaqus installation. Results will not be written to the output database.', abqCmd);
                     end
                     
                     fprintf('\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
@@ -2003,7 +2001,7 @@ classdef postProcess < handle
                     copyfile(modelDatabasePath, [resultsDatabasePath, '/', resultsDatabaseName, '.odb'])
                 catch exception
                     % The file could not be copied
-                    fprintf(fid_debug, '\nODB Error: %s', exception.message);
+                    fprintf(fid_debug, '\n[Abaqus Error]: %s', exception.message);
                     fprintf(fid_debug, '\nThe cause of this error could not be determined. Please contact the developer at louisvallance@hotmail.co.uk for further assistance.');
                     
                     fprintf('\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
@@ -2183,27 +2181,27 @@ classdef postProcess < handle
                         [~, message] = system(sprintf('%s python %s', abqCmd, scriptFile));
                         
                         if isempty(message) == 0.0
-                            fprintf(fid_debug, '\nODB Error: %s', message);
+                            fprintf(fid_debug, '\n[Abaqus Error]: %s', message);
                             
                             if isempty(strfind(message, sprintf('KeyError: ''%s''', stepName))) == 0.0
                                 % The step name is invalid
-                                fprintf(fid_debug, '\nODB Error: The step name ''%s'' could not be found in the ODB. Results will not be written to the output database.', stepName);
+                                fprintf(fid_debug, '\n[QFT Error]: The step name ''%s'' could not be found in the ODB. Results will not be written to the output database.', stepName);
                             elseif isempty(strfind(message, sprintf('KeyError: ''%s''', partInstanceName))) == 0.0
                                 % The part instance name is invalid
-                                fprintf(fid_debug, '\nODB Error: The part instance name ''%s'' could not be found in the ODB. Results will not be written to the output database.', partInstanceName);
+                                fprintf(fid_debug, '\n[QFT Error]: The part instance name ''%s'' could not be found in the ODB. Results will not be written to the output database.', partInstanceName);
                             elseif isempty(strfind(message, 'OdbError: Invalid node label')) == 0.0
                                 %{
                                     The field data does not exactly match
                                     the part instance name, so an ODB
                                     element/node set could not be created
                                 %}
-                                fprintf(fid_debug, '\nODB Error: The ODB element/node set could not be written because the field data does not exactly match the specified part instance. Results will not be written to the output database.');
+                                fprintf(fid_debug, '\n[QFT Error]: The ODB element/node set could not be written because the field data does not exactly match the specified part instance. Results will not be written to the output database.');
                             elseif isempty(strfind(message, 'is not recognized as an internal or external command')) == 0.0
                                 % There is no Abaqus executable on the host machine
-                                fprintf(fid_debug, '\nODB Error: The Abaqus command ''%s'' could not be found on the system. Check your Abaqus installation. Results will not be written to the output database.', abqCmd);
+                                fprintf(fid_debug, '\n[QFT Error]: The Abaqus command ''%s'' could not be found on the system. Check your Abaqus installation. Results will not be written to the output database.', abqCmd);
                             elseif isempty(strfind(message, 'OdbError: illegal argument type for built-in operation')) == 0.0
                                 % There is no Abaqus executable on the host machine
-                                fprintf(fid_debug, '\nODB Error: The Abaqus API rejected the fatigue results data. For element-nodal and integration point data, results for at least one element are required. For centroidal and unique-nodal data, results for at least two centroids or nodes are required, respectively.');
+                                fprintf(fid_debug, '\n[QFT Error]: The Abaqus API rejected the fatigue results data. For element-nodal and integration point data, results for at least one element are required. For centroidal and unique-nodal data, results for at least two centroids or nodes are required, respectively.');
                             else
                                 % Unkown exception
                                 fprintf(fid_debug, '\nThe cause of this error could not be determined. Please contact the developer at louisvallance@hotmail.co.uk for further assistance.');
@@ -2225,7 +2223,7 @@ classdef postProcess < handle
                         end
                     catch unhandledException
                         fprintf(fid_debug, '\r\nError: %s', unhandledException.message);
-                        fprintf('\n[POST] ODB Error: An unknown exception was encountered while writing field data to the output database. Please contact the developer at louisvallance@hotmail.co.uk for further assistance')
+                        fprintf('\n[POST] [QFT Error]: An unknown exception was encountered while writing field data to the output database. Please contact the developer at louisvallance@hotmail.co.uk for further assistance')
                         fprintf('\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
                         messenger.writeMessage(86.0)
                         
