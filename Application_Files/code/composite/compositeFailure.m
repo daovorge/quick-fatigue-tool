@@ -12,7 +12,7 @@ function [] = compositeFailure(N, L, mainID, fid_status)
 %      12.3 Composite failure criteria
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 12-Mar-2018 18:35:16 GMT
+%   Last modified 13-Mar-2018 09:04:47 GMT
     
     %%
 
@@ -370,192 +370,13 @@ LARKFCRT(abs(LARKFCRT - 1.0) < 1e-6) = 1.0;
 LARSFCRT(abs(LARSFCRT - 1.0) < 1e-6) = 1.0;
 LARTFCRT(abs(LARTFCRT - 1.0) < 1e-6) = 1.0;
 
-%% Get the number of failed items
-N_MSTRS = length(MSTRS(MSTRS >= 1.0));
-N_MSTRN = length(MSTRN(MSTRN >= 1.0));
-N_TSAIH = length(TSAIH(TSAIH >= 1.0));
-N_TSAIW = length(TSAIW(TSAIW >= 1.0));
-N_TSAIWTT = length(TSAIWTT(TSAIWTT >= (1.0 - k.^2.0)));
-N_AZZIT = length(AZZIT(AZZIT >= 1.0));
-N_HSNFTCRT = length(HSNFTCRT(HSNFTCRT >= 1.0));
-N_HSNFCCRT = length(HSNFCCRT(HSNFCCRT >= 1.0));
-N_HSNMTCRT = length(HSNMTCRT(HSNMTCRT >= 1.0));
-N_HSNMCCRT = length(HSNMCCRT(HSNMCCRT >= 1.0));
-N_LARPFCRT = length(LARPFCRT(LARPFCRT >= 1.0));
-N_LARMFCRT = length(LARMFCRT(LARMFCRT >= 1.0));
-N_LARKFCRT = length(LARKFCRT(LARKFCRT >= 1.0));
-N_LARSFCRT = length(LARSFCRT(LARSFCRT >= 1.0));
-N_LARTFCRT = length(LARTFCRT(LARTFCRT >= 1.0));
-
-if N_MSTRS == 0.0
-    setappdata(0, 'MSTRS_NL', 'N/A')
-else
-    setappdata(0, 'MSTRS_NL', sprintf('%s', num2str(N_MSTRS)))
-end
-if N_MSTRN == 0.0
-    setappdata(0, 'MSTRN_NL', 'N/A')
-else
-    setappdata(0, 'MSTRN_NL', sprintf('%s', num2str(N_MSTRN)))
-end
-if N_TSAIH == 0.0
-    setappdata(0, 'TSAIH_NL', 'N/A')
-else
-    setappdata(0, 'TSAIH_NL', sprintf('%s', num2str(N_TSAIH)))
-end
-if N_TSAIW == 0.0
-    setappdata(0, 'TSAIW_NL', 'N/A')
-else
-    setappdata(0, 'TSAIW_NL', sprintf('%s', num2str(N_TSAIW)))
-end
-if N_TSAIWTT == 0.0
-    setappdata(0, 'TSAIWTT_NL', 'N/A')
-else
-    setappdata(0, 'TSAIWTT_NL', sprintf('%s', num2str(N_TSAIWTT)))
-end
-if N_AZZIT == 0.0
-    setappdata(0, 'AZZIT_NL', 'N/A')
-else
-    setappdata(0, 'AZZIT_NL', sprintf('%s', num2str(N_AZZIT)))
-end
-if N_HSNFTCRT == 0.0
-    setappdata(0, 'HSNFTCRT_NL', 'N/A')
-else
-    setappdata(0, 'HSNFTCRT_NL', sprintf('%s', num2str(N_HSNFTCRT)))
-end
-if N_HSNFCCRT == 0.0
-    setappdata(0, 'HSNFCCRT_NL', 'N/A')
-else
-    setappdata(0, 'HSNFCCRT_NL', sprintf('%s', num2str(N_HSNFCCRT)))
-end
-if N_HSNMTCRT == 0.0
-    setappdata(0, 'HSNMTCRT_NL', 'N/A')
-else
-    setappdata(0, 'HSNMTCRT_NL', sprintf('%s', num2str(N_HSNMTCRT)))
-end
-if N_HSNMCCRT == 0.0
-    setappdata(0, 'HSNMCCRT_NL', 'N/A')
-else
-    setappdata(0, 'HSNMCCRT_NL', sprintf('%s', num2str(N_HSNMCCRT)))
-end
-if N_LARPFCRT == 0.0
-    setappdata(0, 'LARPFCRT_NL', 'N/A')
-else
-    setappdata(0, 'LARPFCRT_NL', sprintf('%s', num2str(N_LARPFCRT)))
-end
-if N_LARMFCRT == 0.0
-    setappdata(0, 'LARMFCRT_NL', 'N/A')
-else
-    setappdata(0, 'LARMFCRT_NL', sprintf('%s', num2str(N_LARMFCRT)))
-end
-if N_LARKFCRT == 0.0
-    setappdata(0, 'LARKFCRT_NL', 'N/A')
-else
-    setappdata(0, 'LARKFCRT_NL', sprintf('%s', num2str(N_LARKFCRT)))
-end
-if N_LARSFCRT == 0.0
-    setappdata(0, 'LARSFCRT_NL', 'N/A')
-else
-    setappdata(0, 'LARSFCRT_NL', sprintf('%s', num2str(N_LARSFCRT)))
-end
-if N_LARTFCRT == 0.0
-    setappdata(0, 'LARTFCRT_NL', 'N/A')
-else
-    setappdata(0, 'LARTFCRT_NL', sprintf('%s', num2str(N_LARTFCRT)))
-end
-
-%% Get PASS/FAIL status
-if N_MSTRS > 0.0
-    setappdata(0, 'MSTRS_STAT', 'FAIL')
-else
-    setappdata(0, 'MSTRS_STAT', 'PASS')
-end
-if N_MSTRN > 0.0
-    setappdata(0, 'MSTRN_STAT', 'FAIL')
-else
-    setappdata(0, 'MSTRN_STAT', 'PASS')
-end
-if N_TSAIH > 0.0
-    setappdata(0, 'TSAIH_STAT', 'FAIL')
-else
-    setappdata(0, 'TSAIH_STAT', 'PASS')
-end
-if N_TSAIW > 0.0
-    setappdata(0, 'TSAIW_STAT', 'FAIL')
-else
-    setappdata(0, 'TSAIW_STAT', 'PASS')
-end
-if N_TSAIWTT > 0.0
-    setappdata(0, 'TSAIWTT_STAT', 'FAIL')
-else
-    setappdata(0, 'TSAIWTT_STAT', 'PASS')
-end
-if N_AZZIT > 0.0
-    setappdata(0, 'AZZIT_STAT', 'FAIL')
-else
-    setappdata(0, 'AZZIT_STAT', 'PASS')
-end
-if N_HSNFTCRT > 0.0
-    setappdata(0, 'HSNFTCRT_STAT', 'FAIL')
-else
-    setappdata(0, 'HSNFTCRT_STAT', 'PASS')
-end
-if N_HSNFCCRT > 0.0
-    setappdata(0, 'HSNFCCRT_STAT', 'FAIL')
-else
-    setappdata(0, 'HSNFCCRT_STAT', 'PASS')
-end
-if N_HSNMTCRT > 0.0
-    setappdata(0, 'HSNMTCRT_STAT', 'FAIL')
-else
-    setappdata(0, 'HSNMTCRT_STAT', 'PASS')
-end
-if N_HSNMCCRT > 0.0
-    setappdata(0, 'HSNMCCRT_STAT', 'FAIL')
-else
-    setappdata(0, 'HSNMCCRT_STAT', 'PASS')
-end
-if N_LARPFCRT > 0.0
-    setappdata(0, 'LARPFCRT_STAT', 'FAIL')
-else
-    setappdata(0, 'LARPFCRT_STAT', 'PASS')
-end
-if N_LARMFCRT > 0.0
-    setappdata(0, 'LARMFCRT_STAT', 'FAIL')
-else
-    setappdata(0, 'LARMFCRT_STAT', 'PASS')
-end
-if N_LARKFCRT > 0.0
-    setappdata(0, 'LARKFCRT_STAT', 'FAIL')
-else
-    setappdata(0, 'LARKFCRT_STAT', 'PASS')
-end
-if N_LARSFCRT > 0.0
-    setappdata(0, 'LARSFCRT_STAT', 'FAIL')
-else
-    setappdata(0, 'LARSFCRT_STAT', 'PASS')
-end
-if N_LARTFCRT > 0.0
-    setappdata(0, 'LARTFCRT_STAT', 'FAIL')
-else
-    setappdata(0, 'LARTFCRT_STAT', 'PASS')
-end
-
-%% Get maximum value of each criterion
-setappdata(0, 'MSTRS_MV', max(MSTRS))
-setappdata(0, 'MSTRN_MV', max(MSTRN))
-setappdata(0, 'TSAIH_MV', max(TSAIH))
-setappdata(0, 'TSAIW_MV', max(TSAIW))
-setappdata(0, 'TSAIWTT_MV', max(TSAIWTT))
-setappdata(0, 'AZZIT_MV', max(AZZIT))
-setappdata(0, 'HSNFTCRT_MV', max(HSNFTCRT))
-setappdata(0, 'HSNFCCRT_MV', max(HSNFCCRT))
-setappdata(0, 'HSNMTCRT_MV', max(HSNMTCRT))
-setappdata(0, 'HSNMCCRT_MV', max(HSNMCCRT))
-setappdata(0, 'LARPFCRT_MV', max(LARPFCRT))
-setappdata(0, 'LARMFCRT_MV', max(LARMFCRT))
-setappdata(0, 'LARKFCRT_MV', max(LARKFCRT))
-setappdata(0, 'LARSFCRT_MV', max(LARSFCRT))
-setappdata(0, 'LARTFCRT_MV', max(LARTFCRT))
+%% Get whole model model summary for message file
+[N_MSTRS, N_MSTRN, N_TSAIH, N_TSAIW, N_TSAIWTT, N_AZZIT, N_HSNFTCRT,...
+    N_HSNFCCRT, N_HSNMTCRT, N_HSNMCCRT, N_LARPFCRT, N_LARMFCRT,...
+    N_LARKFCRT, N_LARSFCRT, N_LARTFCRT] =...
+    compositeOutput.getCompositeSummary(MSTRS, MSTRN, TSAIH, TSAIW,...
+    TSAIWTT, AZZIT, HSNFTCRT, HSNFCCRT, HSNMTCRT, HSNMCCRT, LARPFCRT,...
+    LARMFCRT, LARKFCRT, LARSFCRT, LARTFCRT, k);
 
 %% Report results summary to the message file
 messenger.writeMessage(315.0)
