@@ -270,7 +270,7 @@ if status == 1.0
     if getappdata(0, 'E008') == 1.0
         fprintf(fid, '\r\n\r\n***ERROR: Some damage values are non-numeric');
         fprintf(fid, '\r\n-> Check the job for syntax errors');
-        fprintf(fid, '\r\n-> If the problem persists, please contact the author for assistance: louisvallance@hotmail.co.uk');
+        fprintf(fid, '\r\n-> If the problem persists, please contact the developer for assistance: louisvallance@hotmail.co.uk');
         fprintf(fid, '\r\n\r\nError code: E008');
         rmappdata(0, 'E008')
     end
@@ -1225,7 +1225,7 @@ if status == 1.0
     if getappdata(0, 'E143') == 1.0
         fprintf(fid, '\r\n\r\n***ERROR: The input file reader encountered an exception while trying to access the message (.msg) file');
         fprintf(fid, '\r\n-> This can happen if %%APPDATA%% was not cleared after the previous analysis. Please restart MATLAB and re-run the analysis');
-        fprintf(fid, '\r\n-> If the problem persists, please contact the author for assistance: louisvallance@hotmail.co.uk');
+        fprintf(fid, '\r\n-> If the problem persists, please contact the developer for assistance: louisvallance@hotmail.co.uk');
         fprintf(fid, '\r\n\r\nError code: E143');
         rmappdata(0, 'E143')
     end
@@ -1275,7 +1275,7 @@ if status == 1.0
     if getappdata(0, 'E150') == 1.0
         fprintf(fid, '\r\n\r\n***ERROR: After applying the plasticity correction, there is only one point in the load history');
         fprintf(fid, '\r\n-> Please check the load history for issues');
-        fprintf(fid, '\r\n-> If the problem persists, please contact the author for assistance: louisvallance@hotmail.co.uk');
+        fprintf(fid, '\r\n-> If the problem persists, please contact the developer for assistance: louisvallance@hotmail.co.uk');
         
         fprintf(fid, '\r\n\r\nError code: E150');
         rmappdata(0, 'E150')

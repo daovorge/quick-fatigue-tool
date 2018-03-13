@@ -8,7 +8,7 @@ function [] = main(flags)
 %   For a detailed reference to the use of the code and its features,
 %   please refer to the Quick Fatigue Tool User Guide.
 %
-%   Author contact: louisvallance@hotmail.co.uk
+%   Developer contact: louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
 %   Last modified 12-Mar-2018 18:35:16 GMT

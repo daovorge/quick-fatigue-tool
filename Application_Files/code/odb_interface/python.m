@@ -1026,7 +1026,7 @@ classdef python < handle
             % Write the file header
             fprintf(fid, '#AUTOMATICALLY GENERATED PYTHON SCRIPT FOR THE QUICK FATIGUE TOOL ODB INTERFACE');
             fprintf(fid, '\r\n#');
-            fprintf(fid, '\r\n#   Author contact:');
+            fprintf(fid, '\r\n#   Developer contact:');
             fprintf(fid, '\r\n#');
             fprintf(fid, '\r\n#   M.Sc. Louis Vallance, AMIMechE');
             fprintf(fid, '\r\n#   louisvallance@hotmail.co.uk');
@@ -1415,7 +1415,7 @@ classdef python < handle
             % Write the file header
             fprintf(fid, '#PYTHON SCRIPT FOR NODAL CONNECTIVITY MATRIX');
             fprintf(fid, '\r\n#');
-            fprintf(fid, '\r\n#   Author contact:');
+            fprintf(fid, '\r\n#   Developer contact:');
             fprintf(fid, '\r\n#');
             fprintf(fid, '\r\n#   M.Sc. Louis Vallance');
             fprintf(fid, '\r\n#   louisvallance@hotmail.co.uk');
@@ -1657,7 +1657,7 @@ classdef python < handle
             % Write the file header
             fprintf(fid, '#PYTHON SCRIPT FOR INTEGRATION POINT CONNECTIVITY MATRIX');
             fprintf(fid, '\r\n#');
-            fprintf(fid, '\r\n#   Author contact:');
+            fprintf(fid, '\r\n#   Developer contact:');
             fprintf(fid, '\r\n#');
             fprintf(fid, '\r\n#   M.Sc. Louis Vallance');
             fprintf(fid, '\r\n#   Technical Specialist SIMULIA');

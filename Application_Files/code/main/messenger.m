@@ -1235,7 +1235,7 @@ classdef messenger < handle
                         end
                     case 134.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: PLEASE READ THE MANUAL ACCOMPANYING THIS RELEASE', returnType{i}]);
-                        fprintf(fidType(i), ['-> For assistance or any other information please contact the author: louisvallance@hotmail.co.uk', returnType{i}]);
+                        fprintf(fidType(i), ['-> For assistance or any other information please contact the developer: louisvallance@hotmail.co.uk', returnType{i}]);
                         fprintf(fidType(i), ['-> Please rate this submission on the file exchange: http://www.mathworks.com/matlabcentral/fileexchange/51041-quick-fatigue-tool', returnType{i}]);
 
                         setappdata(0, 'messageFileNotes', 1.0)
@@ -1963,7 +1963,7 @@ classdef messenger < handle
                         fprintf(fidType(i), ['-> It is recommended that the minimum and maximum non-zero mean stress values are defined at zero stress amplitude', returnType{i}]);
                     case 242.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The yield calculation failed in group %.0f (''%s'')', returnType{i}], getappdata(0, 'message_242_groupNumber'), getappdata(0, 'message_242_groupName'));
-                        fprintf(fidType(i), ['-> An exception was encountered during the calculation. Please contact the author.', returnType{i}]);
+                        fprintf(fidType(i), ['-> An exception was encountered during the calculation. Please contact the developer.', returnType{i}]);
                     case 243.0
                         if getappdata(0, 'outputField') == 1.0
                             fprintf(fidType(i), [returnType{i}, '***WARNING: The FRF normalization parameter ''%s'' was not recognised', returnType{i}], getappdata(0, 'message_243_paramOld'));
@@ -1985,7 +1985,7 @@ classdef messenger < handle
                         reason = getappdata(0, 'message_247_breakCondition');
                         if reason == 0.0
                             fprintf(fidType(i), [returnType{i}, '***WARNING: The FOS calculation has been stopped for an unknown reason', returnType{i}]);
-                            fprintf(fidType(i), ['-> Please contact the author for further assistance', returnType{i}]);
+                            fprintf(fidType(i), ['-> Please contact the developer for further assistance', returnType{i}]);
                             setappdata(0, 'messageFileWarnings', 1.0)
                         else
                             fprintf(fidType(i), [returnType{i}, '***NOTE: The FOS calculation has reached the following stop condition:', returnType{i}]);
