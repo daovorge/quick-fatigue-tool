@@ -7,7 +7,7 @@ classdef preProcess < handle
 %
 %   See also postProcess.
 %
-%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
 %   Last modified 28-Feb-2018 09:29:27 GMT
     
     %%
@@ -2204,6 +2204,7 @@ classdef preProcess < handle
             elseif none == 1.0
                 % No items were removed
                 removed = 0.0;
+				coldItems = [];
                 return
             end
         end
@@ -2280,7 +2281,7 @@ classdef preProcess < handle
             end
             
             %% If the user specified a dataset sequence, a scale and combine loading is not required
-            if isempty(scales)
+            if isempty(scales) == 1.0
                 [error, mainID, subID, Sxx, Syy, Szz, Txy, Tyz, Txz] = preProcess.datasetSequence(channels, items, elementType, loadingScale, loadingOffset);
                 
                 %% Warn the user if there are any duplicate IDs in the model

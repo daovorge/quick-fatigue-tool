@@ -10,8 +10,8 @@ classdef python < handle
 %   Reference section in Quick Fatigue Tool Appendices
 %      10.4 The ODB Interface
 %   
-%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 28-Feb-2018 14:29:10 GMT
+%   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
+%   Last modified 13-Mar-2018 15:47:07 GMT
     
     %%
     
@@ -366,7 +366,7 @@ classdef python < handle
                 return
             end
             loadingUnits = char(c{3});
-            stepDescription = ['version 6.11-12; ', job, ', ', loading];
+            stepDescription = ['version 6.11-13; ', job, ', ', loading];
             
             %% Get the requested field data
             fprintf(fid_debug, ' %.0f fields requested', length(requestedFields(requestedFields == true)));
@@ -1026,12 +1026,12 @@ classdef python < handle
             % Write the file header
             fprintf(fid, '#AUTOMATICALLY GENERATED PYTHON SCRIPT FOR THE QUICK FATIGUE TOOL ODB INTERFACE');
             fprintf(fid, '\r\n#');
-            fprintf(fid, '\r\n#   Author contact:');
+            fprintf(fid, '\r\n#   Developer contact:');
             fprintf(fid, '\r\n#');
             fprintf(fid, '\r\n#   M.Sc. Louis Vallance, AMIMechE');
             fprintf(fid, '\r\n#   louisvallance@hotmail.co.uk');
             fprintf(fid, '\r\n#');
-            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018');
+            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018');
             fprintf(fid, '\r\n#   Last modified 17-Jan-2018 11:19:25 GMT');
             
             % Write Abaqus import header
@@ -1210,7 +1210,7 @@ classdef python < handle
                             % Add the current node to the list of matching node IDs
                             matchingNodeID(i, j) = intersectValue;
                         else
-                            fprintf(fid_debug, '\r\n\tError: No matching element in the field data could be found for element %.0f in the connectivity matrix', connectedElements(i));
+                            fprintf(fid_debug, '\r\n\tODB Error: No matching element in the field data could be found for element %.0f in the connectivity matrix', connectedElements(i));
                             fprintf(fid_debug, '\r\n\tExport of field data will be aborted');
                             setappdata(0, 'warning_179_problemElement', connectedElements(i))
                             
@@ -1237,7 +1237,7 @@ classdef python < handle
                     error when field data is written to the variable dataField
                 %}
                 if any(matchingNodeID == 0.0) == 1.0
-                    fprintf(fid_debug, '\r\n\tError: Consistent element-node IDs for instance ''%s'' could not be found between the model output database and the field data (matching node IDs contain zero-valued indices)', partInstance);
+                    fprintf(fid_debug, '\r\n\tODB Error: Consistent element-node IDs for instance ''%s'' could not be found between the model output database and the field data (matching node IDs contain zero-valued indices)', partInstance);
                     fprintf(fid_debug, '\r\n\tThis can occur when an invalid part instance is specified');
                     fprintf(fid_debug, '\r\n\tExport of field data will be aborted');
                     setappdata(0, 'warning_067_partInstance', partInstance)
@@ -1415,12 +1415,12 @@ classdef python < handle
             % Write the file header
             fprintf(fid, '#PYTHON SCRIPT FOR NODAL CONNECTIVITY MATRIX');
             fprintf(fid, '\r\n#');
-            fprintf(fid, '\r\n#   Author contact:');
+            fprintf(fid, '\r\n#   Developer contact:');
             fprintf(fid, '\r\n#');
             fprintf(fid, '\r\n#   M.Sc. Louis Vallance');
             fprintf(fid, '\r\n#   louisvallance@hotmail.co.uk');
             fprintf(fid, '\r\n#');
-            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018');
+            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018');
             fprintf(fid, '\r\n#   Last modified 17-Jan-2018 11:19:25 GMT');
             
             % Write Abaqus import header
@@ -1469,22 +1469,15 @@ classdef python < handle
                 if isempty(message) == 0.0
                     % There is no Abaqus executable on the host machine
                     if getappdata(0, 'ODB_interface_auto') == 1.0
-                        fprintf('\n[POST] ERROR: %s', message);
-                        fprintf(fid_debug, '\r\n\tError: %s', message);
+                        fprintf(fid_debug, '\nODB Error: %s', message);
                         rmappdata(0, 'ODB_interface_auto')
                         
                         if isempty(strfind(message, sprintf('KeyError: ''%s''', partInstance))) == 0.0
-                            fprintf('\n[POST] The part instance ''%s'' was not found in the output database. Check the definition of PART_INSTANCE in the job file', partInstance);
-                            fprintf(fid_debug, '\r\n\tError: The part instance ''%s'' was not found in the output database. Check the definition of PART_INSTANCE in the job file', partInstance);
+                            fprintf(fid_debug, '\r\n\tThe part instance ''%s'' was not found in the output database. Check the definition of PART_INSTANCE in the job file', partInstance);
                         elseif isempty(strfind(message, 'is not recognized as an internal or external command,')) == 0.0
-                            fprintf('\n[POST] Please ensure that the Abaqus command line argument points to a valid Abaqus batch file');
-                            fprintf('\n[POST] An Abaqus installation is required to write fatigue results to the output database (.odb) file');
                             fprintf(fid_debug, '\r\n\tPlease ensure that the Abaqus command line argument points to a valid Abaqus batch file');
                             fprintf(fid_debug, '\r\n\tAn Abaqus installation is required to write fatigue results to the output database (.odb) file');
                         elseif isempty(strfind(message, 'OdbError: The database is from a previous release of Abaqus. ')) == 0.0
-                            fprintf('\n[POST] The model output database comes from a previous release of Abaqus');
-                            fprintf('\n       Either specify the Abaqus command for the model output database version with autoExport_abqCmd');
-                            fprintf('\n       or allow Quick Fatigue Tool to automatically upgrade the database with autoExport_upgradeODB=1');
                             fprintf(fid_debug, '\r\n\tThe model output database comes from a previous release of Abaqus');
                             fprintf(fid_debug, '\r\n\tEither specify the Abaqus command for the model output database version with autoExport_abqCmd');
                             fprintf(fid_debug, '\r\n\tor allow Quick Fatigue Tool to automatically upgrade the database with autoExport_upgradeODB=1');
@@ -1657,13 +1650,13 @@ classdef python < handle
             % Write the file header
             fprintf(fid, '#PYTHON SCRIPT FOR INTEGRATION POINT CONNECTIVITY MATRIX');
             fprintf(fid, '\r\n#');
-            fprintf(fid, '\r\n#   Author contact:');
+            fprintf(fid, '\r\n#   Developer contact:');
             fprintf(fid, '\r\n#');
             fprintf(fid, '\r\n#   M.Sc. Louis Vallance');
             fprintf(fid, '\r\n#   Technical Specialist SIMULIA');
             fprintf(fid, '\r\n#   louisvallance@hotmail.co.uk');
             fprintf(fid, '\r\n#');
-            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018');
+            fprintf(fid, '\r\n#   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018');
             fprintf(fid, '\r\n#   Last modified 17-Jan-2018 11:19:25 GMT');
             
             % Write Abaqus import header

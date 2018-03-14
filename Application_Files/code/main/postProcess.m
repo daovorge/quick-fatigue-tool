@@ -10,8 +10,8 @@ classdef postProcess < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      10 Output
 %   
-%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 04-Mar-2018 19:58:22 GMT
+%   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
+%   Last modified 13-Mar-2018 18:58:10 GMT
     
     %%
     
@@ -1012,7 +1012,7 @@ classdef postProcess < handle
                     
                     % If the maximum damage is zero or INF, skip this variable
                     if (max(cumulativeDamage) == 0.0) || (max(cumulativeDamage) == inf)
-                        messenger.writeMessage(299.0)
+                        messenger.writeMessage(316.0)
                     else
                         % Check whether damage crosses the infinite life envelope
                         crossing = -999.0;
@@ -1066,9 +1066,10 @@ classdef postProcess < handle
             %% RHIST RAINFLOW HISTOGRAM OF CYCLES
             
             % This MATLAB figure requires the Statistics Toolbox
-            isAvailable = checkToolbox('Statistics and Machine Learning Toolbox');
+            isAvailableA = checkToolbox('Statistics and Machine Learning Toolbox');
+            isAvailableB = checkToolbox('Statistics Toolbox');
             
-            if (isAvailable == 1.0) && (length(amplitudes) > 1.0)
+            if (isAvailableA == 1.0 || isAvailableB == 1.0) && (length(amplitudes) > 1.0)
                 if (outputFigure == 1.0) && (outputField == 1.0) && (getappdata(0, 'figure_RHIST') == 1.0)
                     f11 = figure('visible', figureVisibility);
                     rhistData = [Sm'; 2.0.*amplitudes]';
@@ -1129,7 +1130,7 @@ classdef postProcess < handle
                         postProcess.makeVisible([dir, '.fig'])
                     end
                 end
-            elseif (isAvailable == 0.0) && (outputFigure == 1.0)
+            elseif (isAvailableA == 0.0 && isAvailableB == 0.0) && (outputFigure == 1.0)
                 messenger.writeMessage(128.0)
             end
             
@@ -1793,6 +1794,7 @@ classdef postProcess < handle
         
         %% WRITE FIELD DATA TO AN .ODB FILE
         function [] = autoExportODB(fid_status, mainID)
+            %% Pre-processing tasks
             % Flag to indicate the ODB Interface is operating in auto mode
             setappdata(0, 'ODB_interface_auto', 1.0)
             
@@ -1820,8 +1822,8 @@ classdef postProcess < handle
             [~, modelDatabaseNameShort, ~] = fileparts(modelDatabasePath);
             
             % Print header
-            fprintf('\n[POST] Quick Fatigue Tool 6.11-12 ODB Interface');
-            fprintf(fid_status, '\n[POST] Quick Fatigue Tool 6.11-12 ODB Interface');
+            fprintf('\n[POST] Quick Fatigue Tool 6.11-13 ODB Interface');
+            fprintf(fid_status, '\n[POST] Quick Fatigue Tool 6.11-13 ODB Interface');
             
             % Warn user if there is only one item in the model
             if length(mainID) == 1.0
@@ -1872,7 +1874,7 @@ classdef postProcess < handle
             % Get the step name
             stepName = getappdata(0, 'stepName');
             
-            % Collect requested fields
+            %% Collect requested fields
             %{
                 Set the requested fields based on the output selection
                 mode. If preselection is enabled, modify the default
@@ -1935,34 +1937,33 @@ classdef postProcess < handle
             end
             
             % Open the log file for writing
-            fid_debug = fopen([sprintf('Project/output/%s/Data Files/', jobName), resultsDatabaseName, '.log'], 'w+');
-            fprintf(fid_debug, 'Quick Fatigue Tool 6.11-12 ODB Interface Log');
+            debugFileName = [sprintf('Project/output/%s/Data Files/', jobName), resultsDatabaseName, '.log'];
+            fid_debug = fopen(debugFileName, 'w+');
+            fprintf(fid_debug, 'Quick Fatigue Tool 6.11-13 ODB Interface Log');
             
-            % Print Abaqus installation info to the debug log file
+            %% Print Abaqus installation info to the debug log file
             try
-                [status, result] = system(sprintf('%s whereami', abqCmd));
+                [status, message] = system(sprintf('%s whereami', abqCmd));
                 
                 if status == 1.0
                     % An exception occurred whilst getting installation info
-                    fprintf(fid_debug, '\r\n\r\nError: Abaqus installation info was not found\r\n');
+                    fprintf(fid_debug, '\r\n\r\n[QFT Error]: Abaqus installation info was not found\r\n');
                     fprintf(fid_debug, '\tPlease ensure that the Abaqus command line argument points to a valid Abaqus batch file');
                     fprintf(fid_debug, '\r\n\tAn Abaqus installation is required to write fatigue results to the output database (.odb) file');
-                    fprintf(fid_debug, '\r\n\r\nFatigue results have not been written to the output database');
-                    fprintf(fid_debug, '\r\n\r\nEND OF FILE');
                 else
-                    fprintf(fid_debug, '\r\n\r\nAbaqus installation info:\r\n%s', result);
+                    fprintf(fid_debug, '\r\n\r\nAbaqus installation info:\r\n%s', message);
                     fprintf(fid_debug, '(NOTE: The Abaqus version is determined by the autoExport_abqCmd environment variable)\r\n');
                 end
             catch exception
                 % An unhandled exception was encountered
-                fprintf('[POST] ODB Error: %s', exception.message);
-                fprintf(fid_status, '[POST] ODB Error: %s', exception.message);
+                fprintf(fid_debug, '\n[Abaqus Error]: %s', exception.message);
                 fprintf('\n[ERROR] ODB Interface exited with errors');
                 fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors');
+                fprintf(fid_debug, '\n\nRESULTS WERE NOT WRITTEN TO THE OUTPUT DATABASE');
                 return
             end
             
-            % Verify the inputs
+            %% Verify the inputs
             error = python.verifyAuto(requestedFields,...
                 fieldDataPath, fieldDataName, resultsDatabasePath, partInstanceList);
             
@@ -1974,23 +1975,23 @@ classdef postProcess < handle
             % Copy the model output database to the abaqus directory
             % Try to upgrade the ODB
             if getappdata(0, 'autoExport_upgradeODB') == 1.0
-                [status, result] = system(sprintf('%s -upgrade -job "%s" -odb "%s"', abqCmd, [resultsDatabasePath, '/', resultsDatabaseName], modelDatabasePath(1.0:end - 4.0)));
+                [status, message] = system(sprintf('%s -upgrade -job "%s" -odb "%s"', abqCmd, [resultsDatabasePath, '/', resultsDatabaseName], modelDatabasePath(1.0:end - 4.0)));
 
                 if status == 1.0
                     % An exception occurred whilst upgrading the ODB file
-                    fprintf('[POST] ODB Error: %s', result);
-                    fprintf(fid_status, '\n[POST] ODB Error: %s', result);
+                    fprintf(fid_debug, '\n[Abaqus Error]: %s', message);
                     
-                    if isempty(strfind(result, 'is not recognized as an internal or external command,')) == 0.0
-                        fprintf('\n[POST] Please ensure that the Abaqus command line argument points to a valid Abaqus batch file');
-                        fprintf('\n[POST] An Abaqus installation is required to write fatigue results to the output database (.odb) file');
-                        fprintf(fid_status, '\n[POST] Please ensure that the Abaqus command line argument points to a valid Abaqus batch file');
-                        fprintf(fid_status, '\n[POST] An Abaqus installation is required to write fatigue results to the output database (.odb) file');
+                    if isempty(strfind(message, 'is not recognized as an internal or external command,')) == 0.0
+                        % There is no Abaqus executable on the host machine
+                        fprintf(fid_debug, '\n[QFT Error]: The Abaqus command ''%s'' could not be found on the system. Check your Abaqus installation. Results will not be written to the output database.', abqCmd);
                     end
                     
-                    fprintf('\n[ERROR] ODB Interface exited with errors');
-                    fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors');
+                    fprintf('\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
+                    fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
+                    fprintf(fid_debug, '\n\nRESULTS WERE NOT WRITTEN TO THE OUTPUT DATABASE');
                     return
+                elseif strcmp(message, sprintf('ODB FILE UPGRADE COMPLETED\n')) == 1.0
+                    fprintf(fid_debug, '\n%s', message);
                 end
             end
             
@@ -2000,13 +2001,15 @@ classdef postProcess < handle
                     copyfile(modelDatabasePath, [resultsDatabasePath, '/', resultsDatabaseName, '.odb'])
                 catch exception
                     % The file could not be copied
-                    fprintf('[POST] ODB Error: %s', exception.message);
-                    fprintf(fid_status, '[POST] ODB Error: %s', exception.message);
-                    fprintf('\n[ERROR] ODB Interface exited with errors');
-                    fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors');
+                    fprintf(fid_debug, '\n[Abaqus Error]: %s', exception.message);
+                    fprintf(fid_debug, '\nThe cause of this error could not be determined. Please contact the developer at louisvallance@hotmail.co.uk for further assistance.');
+                    
+                    fprintf('\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
+                    fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
+                    fprintf(fid_debug, '\n\nRESULTS WERE NOT WRITTEN TO THE OUTPUT DATABASE');
                     return
                 end
-            end            
+            end
             
             % Delete the upgrade log file
             delete([resultsDatabasePath, '/', resultsDatabaseName, '-upgrade', '.log'])
@@ -2019,7 +2022,7 @@ classdef postProcess < handle
                 delete([resultsDatabasePath, '/', modelDatabaseNameShort, '.lck'])
             end
             
-            % Get the selected position
+            %% Get the selected position
             userPosition = getappdata(0, 'odbResultPosition');
             if strcmpi('unique nodal', userPosition) == 1.0
                 userPosition = 2.0;
@@ -2078,11 +2081,22 @@ classdef postProcess < handle
                     autoPosition, fid_debug, resultsDatabasePath, resultsDatabaseName);
                 
                 if error > 0.0
-                    setappdata(0, 'warning_061_number', error)
-                    messenger.writeMessage(85.0)
+                    switch error
+                        case 1.0
+                            fprintf(fid_debug, 'No matching position labels were found in the model output database. Check the log file for details.');
+                        case 2.0
+                            fprintf(fid_debug, 'An error occurred while retrieving the connectivity matrix. Check the log file for details.');
+                        case 3.0
+                            fprintf(fid_debug, 'An error occurred while reading the connectivity matrix. Check the log file for details.');
+                        case 4.0
+                            fprintf(fid_debug, 'An error occurred while reading the field data file. Check the log file for details.');
+                        case 5.0
+                            fprintf(fid_debug, 'No matching position labels were found in the model output database. Check the log file for details.');
+                    end
                     
-                    fprintf('\n[ERROR] ODB Interface exited with errors. Check the results log for details (Project/output/%s/Data Files/%s.log)', getappdata(0, 'jobName'), resultsDatabaseName);
-                    fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors. Check the results log for details (Project/output/%s/Data Files/%s.log)', getappdata(0, 'jobName'), resultsDatabaseName);
+                    fprintf('\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
+                    fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
+                    fprintf(fid_debug, '\n\nRESULTS WERE NOT WRITTEN TO THE OUTPUT DATABASE');
                     
                     % Delete the results output database from the output directory if applicable
                     if exist([pwd, sprintf('\\%s\\%s.odb', resultsDatabasePath, resultsDatabaseName)], 'file') == 2.0
@@ -2093,7 +2107,7 @@ classdef postProcess < handle
                     return
                 end
                 
-                % Create the Python script
+                %% Create the Python script
                 fprintf(fid_debug, '\r\n\r\nPreparing field data...');
                 fprintf('\n[POST] Preparing field data:\n');
                 fprintf(fid_status, '\n[POST] Preparing field data\n');
@@ -2123,22 +2137,18 @@ classdef postProcess < handle
                     stepName, isExplicit, connectedElements, createODBSet,...
                     ODBSetName, stepType);
                 
-                % If there was an error while writing the field data, abort the
-                % export process
-                if error == 1.0
-                    setappdata(0, 'warning_087_partInstance', partInstanceName)
-                    messenger.writeMessage(87.0)
+                % If there was an error while writing the field data, abort the export process
+                if (error == 1.0) || (error == 2.0)
+                    if error == 1.0
+                        setappdata(0, 'warning_087_partInstance', partInstanceName)
+                        messenger.writeMessage(87.0)
+                    elseif error == 2.0
+                        messenger.writeMessage(179.0)
+                    end
                     
-                    fprintf('\n[ERROR] ODB Interface exited with errors. Check the results log for details (Project/output/%s/Data Files/%s.log)', getappdata(0, 'jobName'), resultsDatabaseName');
-                    fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors. Check the results log for details (Project/output/%s/Data Files/%s.log)', getappdata(0, 'jobName'), resultsDatabaseName');
-                    
-                    fclose(fid_debug);
-                    return
-                elseif error == 2.0
-                    messenger.writeMessage(179.0)
-                    
-                    fprintf('\n[ERROR] ODB Interface exited with errors. Check the results log for details (Project/output/%s/Data Files/%s.log)', getappdata(0, 'jobName'), resultsDatabaseName');
-                    fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors. Check the results log for details (Project/output/%s/Data Files/%s.log)', getappdata(0, 'jobName'), resultsDatabaseName');
+                    fprintf('\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
+                    fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
+                    fprintf(fid_debug, '\n\nRESULTS WERE NOT WRITTEN TO THE OUTPUT DATABASE');
                     
                     fclose(fid_debug);
                     return
@@ -2161,7 +2171,7 @@ classdef postProcess < handle
                     end
                 end
                 
-                % System command to execute python script
+                %% System command to execute python script
                 if getappdata(0, 'autoExport_executionMode') < 3.0
                     fprintf(fid_debug, '\r\n\r\nWriting field data to ODB...');
                     fprintf('[POST] Writing field data to ODB');
@@ -2171,32 +2181,30 @@ classdef postProcess < handle
                         [~, message] = system(sprintf('%s python %s', abqCmd, scriptFile));
                         
                         if isempty(message) == 0.0
-                            fprintf(fid_status, '\n[POST] ODB Error: %s', message);
+                            fprintf(fid_debug, '\n[Abaqus Error]: %s', message);
                             
                             if isempty(strfind(message, sprintf('KeyError: ''%s''', stepName))) == 0.0
                                 % The step name is invalid
-                                fprintf('\n[POST] ODB Error: The step name ''%s'' could not be found in the ODB. Results will not be written to the output database.', stepName)
-                                fprintf(fid_status, '\n[POST] ODB Error: The step name ''%s'' could not be found in the ODB. Results will not be written to the output database.', stepName);
+                                fprintf(fid_debug, '\n[QFT Error]: The step name ''%s'' could not be found in the ODB. Results will not be written to the output database.', stepName);
                             elseif isempty(strfind(message, sprintf('KeyError: ''%s''', partInstanceName))) == 0.0
                                 % The part instance name is invalid
-                                fprintf('\n[POST] ODB Error: The part instance name ''%s'' could not be found in the ODB. Results will not be written to the output database.', partInstanceName)
-                                fprintf(fid_status, '\n[POST] ODB Error: The part instance name ''%s'' could not be found in the ODB. Results will not be written to the output database.', partInstanceName);
+                                fprintf(fid_debug, '\n[QFT Error]: The part instance name ''%s'' could not be found in the ODB. Results will not be written to the output database.', partInstanceName);
                             elseif isempty(strfind(message, 'OdbError: Invalid node label')) == 0.0
                                 %{
                                     The field data does not exactly match
                                     the part instance name, so an ODB
                                     element/node set could not be created
                                 %}
-                                fprintf('\n[POST] ODB Error: The ODB element/node set could not be written because the field data does not exactly match the specified part instance. Results will not be written to the output database.')
-                                fprintf(fid_status, '\n[POST] ODB Error: The ODB element/node set could not be written because the field data does not exactly match the specified part instance. Results will not be written to the output database.');
+                                fprintf(fid_debug, '\n[QFT Error]: The ODB element/node set could not be written because the field data does not exactly match the specified part instance. Results will not be written to the output database.');
                             elseif isempty(strfind(message, 'is not recognized as an internal or external command')) == 0.0
                                 % There is no Abaqus executable on the host machine
-                                fprintf('\n[POST] ODB Error: The Abaqus command ''%s'' could not be found on the system. Check your Abaqus installation. Results will not be written to the output database.', abqCmd)
-                                fprintf(fid_status, '\n[POST] ODB Error: The Abaqus command ''%s'' could not be found on the system. Check your Abaqus installation. Results will not be written to the output database.', abqCmd);
+                                fprintf(fid_debug, '\n[QFT Error]: The Abaqus command ''%s'' could not be found on the system. Check your Abaqus installation. Results will not be written to the output database.', abqCmd);
+                            elseif isempty(strfind(message, 'OdbError: illegal argument type for built-in operation')) == 0.0
+                                % There is no Abaqus executable on the host machine
+                                fprintf(fid_debug, '\n[QFT Error]: The Abaqus API rejected the fatigue results data. For element-nodal and integration point data, results for at least one element are required. For centroidal and unique-nodal data, results for at least two centroids or nodes are required, respectively.');
                             else
                                 % Unkown exception
-                                fprintf('\n[POST] ODB Error: The Abaqus API returned the following error:\r\n%s\r\nResults will not be written to the output database.', message)
-                                fprintf(fid_status, '\n[POST] ODB Error: The Abaqus API returned the following error:\r\n%s\r\nResults will not be written to the output database.', message);
+                                fprintf(fid_debug, '\nThe cause of this error could not be determined. Please contact the developer at louisvallance@hotmail.co.uk for further assistance.');
                             end
                             
                             if getappdata(0, 'autoExport_executionMode') == 1.0
@@ -2208,14 +2216,15 @@ classdef postProcess < handle
                                 delete([pwd, sprintf('\\%s\\%s.odb', resultsDatabasePath, resultsDatabaseName)])
                             end
                             
-                            fprintf('\n[ERROR] ODB Interface exited with errors');
-                            fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors');
+                            fprintf('\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
+                            fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
+                            fprintf(fid_debug, '\n\nRESULTS WERE NOT WRITTEN TO THE OUTPUT DATABASE');
                             return
                         end
                     catch unhandledException
                         fprintf(fid_debug, '\r\nError: %s', unhandledException.message);
-                        fprintf('\n[POST] ODB Error: An unknown exception was encountered while writing field data to the output database')
-                        fprintf('\n[ERROR] ODB Interface exited with errors');
+                        fprintf('\n[POST] [QFT Error]: An unknown exception was encountered while writing field data to the output database. Please contact the developer at louisvallance@hotmail.co.uk for further assistance')
+                        fprintf('\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
                         messenger.writeMessage(86.0)
                         
                         fclose(fid_debug);
@@ -2230,10 +2239,11 @@ classdef postProcess < handle
                 end
             end
             
+            %% Additional tasks
             fprintf(fid_debug, ' Success\r\n\r\nFatigue results have been written to ''%s''', sprintf('%s/%s.odb', resultsDatabasePath, resultsDatabaseName));
             fprintf(fid_debug, '\r\n\r\nEND OF FILE');
-            fprintf('\n[POST] Export complete. Check the log file in Project/output/%s/Data Files for detailed information', getappdata(0, 'jobName'));
-            fprintf(fid_status, '\n[POST] Export complete. Check the log file in Project/output/%s/Data Files for detailed information', getappdata(0, 'jobName'));
+            fprintf('\n[POST] Export complete. Check %s for details ', debugFileName);
+            fprintf(fid_status, '\n[POST] Export complete. Check %s for details', debugFileName);
             fclose(fid_debug);
             
             % Update the message file

@@ -17,7 +17,7 @@ function [] = tutorial_intro()
 %   Reference section in Quick Fatigue Tool User Settings Reference Guide
 %      1 Job file options
 %   
-%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2017
 %   Last modified 24-Jan-2018 15:17:50 GMT
 
 %% JOB

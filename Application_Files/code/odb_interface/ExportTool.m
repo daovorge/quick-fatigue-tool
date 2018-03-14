@@ -11,8 +11,8 @@ function varargout = ExportTool(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool User Guide
 %      10.4 The ODB Interface
 %   
-%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 23-Feb-2018 09:17:44 GMT
+%   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
+%   Last modified 13-Mar-2018 18:58:10 GMT
     
     %%
     
@@ -328,6 +328,7 @@ blankGUI(handles)
 pause(1e-6)
 warning('off', 'all')
 
+%% Pre-processing tasks
 % Flag to indicate the ODB Interface is operating in app mode
 setappdata(0, 'ODB_interface_auto', 0.0)
 
@@ -347,6 +348,13 @@ end
 fieldDataPath = get(handles.edit_fieldData, 'string');
 [~, fieldDataName, EXT] = fileparts(fieldDataPath);
 fieldDataName = [fieldDataName, EXT];
+
+% Get the Abaqus command line argument
+abqCmd = get(handles.edit_abqCmd, 'string');
+if isempty(abqCmd) == 1.0
+    abqCmd = 'abaqus';
+end
+setappdata(0, 'autoExport_abqCmd', abqCmd)
 
 % Get path and name of model output database
 modelDatabasePath = get(handles.edit_modelFile, 'string');
@@ -487,7 +495,7 @@ if (get(handles.check_createODBSet, 'value') == 1.0) && (nInstances == 1.0)
     createODBSet = 1.0;
 end
 
-% Collect requested fields
+%% Collect requested fields
 if get(handles.rButton_selectFromList, 'value') == 1.0
     requestedFields = [get(handles.check_LL, 'value'),...
         get(handles.check_L, 'value'),...
@@ -516,7 +524,35 @@ else
         1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0];
 end
 
-% Verify the inputs
+% Open the log file for writing
+debugFileName = sprintf('%s\\%s.log', resultsDatabasePath, resultsDatabaseName);
+fid_debug = fopen(debugFileName, 'w+');
+fprintf(fid_debug, 'Quick Fatigue Tool 6.11-13 ODB Interface Log');
+clc
+fprintf('Quick Fatigue Tool 6.11-13 ODB Interface Log\n');
+
+%% Print Abaqus installation info to the debug log file
+try
+    [status, message] = system(sprintf('%s whereami', abqCmd));
+    
+    if status == 1.0
+        % An exception occurred whilst getting installation info
+        fprintf(fid_debug, '\r\n\r\n[QFT Error]: Abaqus installation info was not found\r\n');
+        fprintf(fid_debug, '\tPlease ensure that the Abaqus command line argument points to a valid Abaqus batch file');
+        fprintf(fid_debug, '\r\n\tAn Abaqus installation is required to write fatigue results to the output database (.odb) file');
+    else
+        fprintf(fid_debug, '\r\n\r\nAbaqus installation info:\r\n%s', message);
+        fprintf(fid_debug, '(NOTE: The Abaqus version is determined by the autoExport_abqCmd environment variable)\r\n');
+    end
+catch exception
+    % An unhandled exception was encountered
+    fprintf(fid_debug, '\n[Abaqus Error]: %s', exception.message);
+    fprintf('\n[ERROR] ODB Interface exited with errors');
+    fprintf(fid_debug, '\n\nRESULTS WERE NOT WRITTEN TO THE OUTPUT DATABASE');
+    return
+end
+
+%% Verify the inputs
 error = python.verify(hObject, eventdata, handles, requestedFields,...
     fieldDataPath, fieldDataName, modelDatabasePath, modelDatabaseName,...
     resultsDatabasePath, partInstanceList, stepType_m, stepName);
@@ -537,7 +573,7 @@ if exist([resultsDatabasePath, '/', resultsDatabaseName, '.odb'], 'file') == 2.0
     msg = sprintf('The output directory ''%s'' already contains a file called ''%s''.', resultsDatabasePath, [resultsDatabaseName, '.odb']);
     response = questdlg(msg, 'Quick Fatigue Tool', 'Overwrite', 'Keep file', 'Abort procedure', 'Overwrite');
     
-    if isempty(response) == 1.0 || strcmpi(response, 'Abort procedure') == 1.0
+    if (isempty(response) == 1.0) || (strcmpi(response, 'Abort procedure') == 1.0)
         enableGUI(handles)
         warning('on', 'all')
         return
@@ -564,56 +600,51 @@ if exist([resultsDatabasePath, '/', resultsDatabaseName, '.odb'], 'file') == 2.0
     end
 end
 
-% Get the Abaqus command line argument
-abqCmd = get(handles.edit_abqCmd, 'string');
-if isempty(abqCmd) == 1.0
-    abqCmd = 'abaqus';
-end
-setappdata(0, 'autoExport_abqCmd', abqCmd)
-
 % Copy the model output database to the abaqus directory
 % First, try to upgrade the ODB
 if get(handles.check_upgrade, 'value') == 1.0
-    [status, result] = system(sprintf('%s -upgrade -job "%s" -odb "%s"', abqCmd, [resultsDatabasePath, '/', resultsDatabaseName], modelDatabasePath(1:end - 4.0)));
+    [status, message] = system(sprintf('%s -upgrade -job "%s" -odb "%s"', abqCmd, [resultsDatabasePath, '/', resultsDatabaseName], modelDatabasePath(1:end - 4.0)));
     
     if status == 1.0
-        % Check the nature of the error
-        if isempty(strfind(result, 'The database is from a previous release of Abaqus.')) == 0.0
-           errordlg(sprintf('The Abaqus API returned the following error:\r\n\r\n%s\r\nPlease do one of the following:\r\n\r\nSelect "Upgrade ODB file" and specify the Abaqus command line argument of the version you wish to upgrade to (default is ''abaqus.bat'' if no command is specified).\r\n\r\nSpecify the Abaqus command line argument corresponding to the version of the model ODB file.', result), 'Quick Fatigue Tool') 
-        elseif isempty(strfind(result, 'is not recognized as an internal or external command')) == 0.0
-            errordlg(sprintf('The system prompt returned the following error:\r\n\r\n%s\r\nThe specified version of Abaqus could not be found. Make sure the Abaqus command line argument refers to an existing batch file on your system.', result), 'Quick Fatigue Tool') 
+        % An exception occurred whilst upgrading the ODB file
+        if isempty(strfind(message, 'The database is from a previous release of Abaqus.')) == 0.0
+           errordlg(sprintf('The Abaqus API returned the following error:\r\n\r\n%s\r\nPlease do one of the following:\r\n\r\nSelect "Upgrade ODB file" and specify the Abaqus command line argument of the version you wish to upgrade to (default is ''abaqus.bat'' if no command is specified).\r\n\r\nSpecify the Abaqus command line argument corresponding to the version of the model ODB file.', message), 'Quick Fatigue Tool') 
+        elseif isempty(strfind(message, 'is not recognized as an internal or external command')) == 0.0
+            errordlg(sprintf('The system prompt returned the following error:\r\n\r\n%s\r\nThe Abaqus command ''%s'' could not be found on the system. Check your Abaqus installation.', message, abqCmd), 'Quick Fatigue Tool') 
         else
-            errordlg(sprintf('The Abaqus API returned the following error:\r\n\r\n%s', result), 'Quick Fatigue Tool')
+            errordlg(sprintf('The Abaqus API returned the following error:\r\n\r\n%s', message), 'Quick Fatigue Tool')
         end
+        
+        fprintf('\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
+        fprintf(fid_debug, '\n\nRESULTS WERE NOT WRITTEN TO THE OUTPUT DATABASE');
         
         uiwait
         enableGUI(handles)
         clc
         warning('on', 'all')
         return
+    elseif strcmp(message, sprintf('ODB FILE UPGRADE COMPLETED\n')) == 1.0
+        fprintf(fid_debug, '\n%s', message);
     end
-else
-    result = '123456789';
 end
 
 % If the ODB is already up-to-date, simply copy the file instead
 if exist([resultsDatabasePath, '/', resultsDatabaseName, '.odb'], 'file') == 0.0
     try
         copyfile(modelDatabasePath, [resultsDatabasePath, '/', resultsDatabaseName, '.odb'])
-    catch
+    catch exception
         clc
         
-        if strcmp(result(1:9), '*** Error') == 1.0
-            msg1 = sprintf('The Abaqus API returned the following error:\n\n%s', result);
-            msg2 = sprintf('\n\nThe results database name is taken from the job name in the field data file.');
-            msg3 = sprintf(' If the file contains formatting errors, this could lead to an invalid file name.');
-            errordlg([msg1, msg2, msg3], 'Quick Fatigue Tool')
-        else
-            msg1 = sprintf('The model output database file\n\n''%s''\n\ncould not be copied.', [resultsDatabaseName, '.odb']);
-            msg2 = sprintf('\n\nThe results database name is taken from the job name in the field data file.');
-            msg3 = sprintf(' If the file contains formatting errors, this could lead to an invalid file name.');
-            errordlg([msg1, msg2, msg3], 'Quick Fatigue Tool')
-        end
+        fprintf(fid_debug, '\n[Abaqus Error]: %s', exception.message);
+        fprintf(fid_debug, '\nThe cause of this error could not be determined. Please contact the developer at louisvallance@hotmail.co.uk for further assistance.');
+        
+        fprintf('\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
+        fprintf(fid_debug, '\n\nRESULTS WERE NOT WRITTEN TO THE OUTPUT DATABASE');
+        
+        msg1 = sprintf('The Abaqus API returned the following error:\n\n%s', message);
+        msg2 = sprintf('\n\nThe results database name is taken from the job name in the field data file.');
+        msg3 = sprintf(' If the file contains formatting errors, this could lead to an invalid file name.');
+        errordlg([msg1, msg2, msg3], 'Quick Fatigue Tool')
         
         uiwait
         enableGUI(handles)
@@ -633,16 +664,10 @@ if exist([resultsDatabasePath, '/', modelDatabaseNameShort, '.lck'], 'file') == 
     delete([resultsDatabasePath, '/', modelDatabaseNameShort, '.lck'])
 end
 
-% Open the log file for writing
-fid_debug = fopen(sprintf('%s\\%s.log', resultsDatabasePath, resultsDatabaseName), 'w+');
-clc
-fprintf(fid_debug, 'Quick Fatigue Tool 6.11-12 ODB Interface Log');
-fprintf('Quick Fatigue Tool 6.11-12 ODB Interface Log\n');
-
-% Get the selected position
+%% Get the selected position
 userPosition = get(handles.pMenu_elementPosition, 'value');
 positions = get(handles.pMenu_elementPosition, 'string');
-fprintf(fid_debug, '\r\n\r\nUser-selected results position: %s', positions{userPosition});
+fprintf(fid_debug, '\r\nUser-selected results position: %s', positions{userPosition});
 fprintf('\nUser-selected results position: %s\n', positions{userPosition});
 
 % Check if position should be determined automatically
@@ -653,6 +678,19 @@ if autoPosition == 1.0
 else
     fprintf(fid_debug, '\r\nAllow Quick Fatigue Tool to determine results position based on field IDs: NO');
     fprintf('Allow Quick Fatigue Tool to determine results position based on field IDs: NO\n');
+end
+
+if isempty(stepName) == 1.0
+    fprintf(fid_debug, '\r\nThe step name was not specified (a default name will be used)');
+else
+    fprintf(fid_debug, '\r\nStep name: ''%s''', stepName);
+end
+if get(handles.rButton_selectFromList, 'value') == 1.0
+    fprintf(fid_debug, '\r\nField output request: SELECTED BY USER');
+elseif get(handles.rButton_preselect, 'value') == 1.0
+    fprintf(fid_debug, '\r\nField output request: PRESELECTED DEFAULTS');
+elseif get(handles.rButton_selectAll, 'value') == 1.0
+    fprintf(fid_debug, '\r\nField output request: ALL');
 end
 
 %{
@@ -675,25 +713,36 @@ for instanceNumber = 1:nInstances
     if error > 0.0
         if error == 1.0
             errordlg('No matching position labels were found in the model output database. Check the log file for details.', 'Quick Fatigue Tool')
+            fprintf(fid_debug, '\r\n[QFT Error]: No matching position labels were found in the model output database');
         elseif error == 2.0
             errordlg('An error occurred while retrieving the connectivity matrix. Check the log file for details.', 'Quick Fatigue Tool')
+            fprintf(fid_debug, '\r\n[QFT Error]: An error occurred while retrieving the connectivity matrix');
         elseif error == 3.0
             errordlg('An error occurred while reading the connectivity matrix. Check the log file for details.', 'Quick Fatigue Tool')
+            fprintf(fid_debug, '\r\n[QFT Error]: An error occurred while reading the connectivity matrix');
         elseif error == 4.0
             errordlg('An error occurred while reading the field data file. Check the log file for details.', 'Quick Fatigue Tool')
+            fprintf(fid_debug, '\r\n[QFT Error]: An error occurred while reading the field data file');
         elseif error == 5.0
             if isempty(strfind(getappdata(0, 'abqAPIError'), 'The database is from a previous release of Abaqus.')) == 0.0
                 errordlg(sprintf('The Abaqus API returned the following error:\r\n\r\n%s\r\nPlease do one of the following:\r\n\r\nSelect "Upgrade ODB file" and specify the Abaqus command line argument of the version you wish to upgrade to (default is ''abaqus.bat'' if no command is specified).\r\n\r\nSpecify the Abaqus command line argument corresponding to the version of the model ODB file.', getappdata(0, 'abqAPIError')), 'Quick Fatigue Tool') 
+                fprintf(fid_debug, '\r\n[Abaqus Error]: %s', getappdata(0, 'abqAPIError'));
             elseif isempty(strfind(getappdata(0, 'abqAPIError'), sprintf('numberOfElements = len(odb.rootAssembly.instances[''%s'']', partInstanceName))) == 0.0
                 errordlg(sprintf('The Abaqus API returned the following error:\r\n\r\n%s\r\nThe specified part instance could not be found in the output database file.', getappdata(0, 'abqAPIError')), 'Quick Fatigue Tool')
+                fprintf(fid_debug, '\r\n[Abaqus Error]: %s', getappdata(0, 'abqAPIError'));
             elseif isempty(strfind(getappdata(0, 'abqAPIError'), sprintf('''%s'' is not recognized as an internal or external command', abqCmd))) == 0.0
-                errordlg(sprintf('The system prompt returned the following error:\r\n\r\n%s\r\nThe specified version of Abaqus could not be found. Make sure the Abaqus command line argument refers to an existing batch file on your system.', getappdata(0, 'abqAPIError')), 'Quick Fatigue Tool')
+                errordlg(sprintf('The Abaqus API returned the following error:\r\n\r\n%s\r\nThe specified version of Abaqus could not be found. Make sure the Abaqus command line argument refers to an existing batch file on your system.', getappdata(0, 'abqAPIError')), 'Quick Fatigue Tool')
+                fprintf(fid_debug, '\r\n[Abaqus Error]: %s', getappdata(0, 'abqAPIError'));
             else
                 errordlg(sprintf('The Abaqus API returned the following error:\r\n\r\n%s\r\nCheck the Export Tool inputs for possible errors.', getappdata(0, 'abqAPIError')), 'Quick Fatigue Tool')
+                fprintf(fid_debug, '\r\n[Abaqus Error]: %s', getappdata(0, 'abqAPIError'));
             end
             
             rmappdata(0, 'abqAPIError')
         end
+        
+        fprintf('\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
+        fprintf(fid_debug, '\n\nRESULTS WERE NOT WRITTEN TO THE OUTPUT DATABASE');
         
         delete([resultsDatabasePath, '\', resultsDatabaseName, '.odb'])
         
@@ -708,7 +757,7 @@ for instanceNumber = 1:nInstances
     % Determine whether the FEA was from an Abaqus/Explicit procedure
     isExplicit = get(handles.check_isExplicit, 'value');
     
-    % Create the Python script
+    %% Create the Python script
     fprintf(fid_debug, '\r\n\r\nPreparing field data...');
     fprintf('Preparing field data...\n');
     [scriptFile, newLocation, stepName, error] = python.writePythonScript(resultsDatabaseName,...
@@ -744,32 +793,44 @@ for instanceNumber = 1:nInstances
         end
     end
     
-    % System command to execute python script
+    %% System command to execute python script
     if get(handles.check_writeScriptOnly, 'value') == 0.0
         fprintf(fid_debug, '\r\n\r\nWriting field data to ODB...');
         fprintf('Writing field data to ODB...\n');
         
         try
-            [status, message] = system(sprintf('%s python %s', abqCmd, scriptFile));
+            [~, message] = system(sprintf('%s python %s', abqCmd, scriptFile));
             
-            if status == 1.0
+            if isempty(message) == 0.0
+                messageA = sprintf('The Abaqus API returned the following error:\r\n\r\n%s\r\n\r\n', message);
+                
                 if isempty(strfind(message, sprintf('KeyError: ''%s''', stepName))) == 0.0
                     % The step name is invalid
-                    errordlg(sprintf('The step name ''%s'' could not be found in the ODB. Results will not be written to the output database.', stepName), 'Quick Fatigue Tool')
+                    messageB = sprintf('The step name ''%s'' could not be found in the ODB. Results will not be written to the output database.', stepName);
+                elseif isempty(strfind(message, sprintf('KeyError: ''%s''', partInstanceName))) == 0.0
+                    messageB = sprintf('The part instance name ''%s'' could not be found in the ODB. Results will not be written to the output database.', stepName);
                 elseif isempty(strfind(message, 'OdbError: Invalid node label')) == 0.0
                     %{
                         The field data does not exactly match the part
                         instance name, so an ODB element/node set could not
                         be created
                     %}
-                    errordlg(sprintf('The ODB element/node set could not be written because the field data does not exactly match the specified part instance. Results will not be written to the output database.'), 'Quick Fatigue Tool')
+                    messageB = sprintf('The ODB element/node set could not be written because the field data does not exactly match the specified part instance. Results will not be written to the output database.');
                 elseif isempty(strfind(message, 'is not recognized as an internal or external command')) == 0.0
                     % There is no Abaqus executable on the host machine
-                    errordlg(sprintf('The Abaqus command ''%s'' could not be found on the system. Check your Abaqus installation. Results will not be written to the output database.', abqCmd), 'Quick Fatigue Tool')
+                    messageB = sprintf('The Abaqus command ''%s'' could not be found on the system. Check your Abaqus installation. Results will not be written to the output database.', abqCmd);
+                elseif isempty(strfind(message, 'OdbError: illegal argument type for built-in operation')) == 0.0
+                    messageB = sprintf('The Abaqus API rejected the fatigue results data.\r\n\r\nFor element-nodal and integration point data, results for at least one element are required. For centroidal and unique-nodal data, results for at least two centroids or nodes are required, respectively.\r\n\r\nResults will not be written to the output database.');
                 else
                     % Unkown exception
-                    errordlg(sprintf('The Abaqus API returned the following error:\r\n\r\n%s\r\nResults will not be written to the output database.', message), 'Quick Fatigue Tool')
+                    messageB = sprintf('The cause of this error could not be determined. Please contact the developer at louisvallance@hotmail.co.uk for further assistance. Results will not be written to the output database.');
                 end
+                
+                errorMessage = [messageA, messageB];
+                errordlg(errorMessage, 'Quick Fatigue Tool')
+                
+                fprintf('\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
+                fprintf(fid_debug, '\n\nRESULTS WERE NOT WRITTEN TO THE OUTPUT DATABASE');
                 
                 uiwait
                 delete(scriptFile)
@@ -798,8 +859,11 @@ for instanceNumber = 1:nInstances
     end
 end
 
-fprintf(fid_debug, ' Success');
-fprintf('\nExport complete. View the log file for a detailed summary of the process\n');
+%% Additional tasks
+
+fprintf(fid_debug, ' Success\r\n\r\nFatigue results have been written to ''%s''', sprintf('%s/%s.odb', resultsDatabasePath, resultsDatabaseName));
+fprintf(fid_debug, '\r\n\r\nEND OF FILE');
+fprintf('\nExport complete. Check %s for details ', debugFileName);
 fclose(fid_debug);
 
 % Delete the Python script

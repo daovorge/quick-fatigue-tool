@@ -9,8 +9,8 @@ classdef postProcess_e < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      10 Output
 %   
-%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 04-Mar-2018 19:58:22 GMT
+%   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
+%   Last modified 12-Mar-2018 14:19:57 GMT
     
     %%
     
@@ -367,7 +367,7 @@ classdef postProcess_e < handle
                     
                     fprintf(fid, 'FIELDS [ANALYSED ITEMS ONLY]\r\nJob:\t%s\r\nLoading:\t%.3g\t%s\r\n', getappdata(0, 'jobName'), getappdata(0, 'loadEqVal'), getappdata(0, 'loadEqUnits'));
                     
-                    mainID_i = zeros(1, length(mainID) - length(coldItems));
+                    mainID_i = zeros(1.0, length(mainID) - length(coldItems));
                     subID_i = mainID_i;
                     L_i = mainID_i;
                     LL_i = mainID_i;
@@ -1089,7 +1089,7 @@ classdef postProcess_e < handle
                     
                     % If the maximum damage is zero or INF, skip this variable
                     if (max(cumulativeDamage) == 0.0) || (max(cumulativeDamage) == inf)
-                        messenger.writeMessage(299.0)
+                        messenger.writeMessage(316.0)
                     else
                         % Check whether damage crosses the infinite life envelope
                         crossing = -999.0;
@@ -1143,9 +1143,10 @@ classdef postProcess_e < handle
             %% RHIST RAINFLOW HISTOGRAM OF CYCLES
             
             % This MATLAB figure requires the Statistics Toolbox
-            isAvailable = checkToolbox('Statistics and Machine Learning Toolbox');
+            isAvailableA = checkToolbox('Statistics and Machine Learning Toolbox');
+            isAvailableB = checkToolbox('Statistics Toolbox');
             
-            if (isAvailable == 1.0) && (length(amplitudes) > 1.0)
+            if (isAvailableA == 1.0 || isAvailableB == 1.0) && (length(amplitudes) > 1.0)
                 if (outputFigure == 1.0) && (outputField == 1.0) && (getappdata(0, 'figure_RHIST') == 1.0)
                     f12 = figure('visible', figureVisibility);
                     rhistData = [Sm'; 2.0.*amplitudes]';
@@ -1206,7 +1207,7 @@ classdef postProcess_e < handle
                         postProcess.makeVisible([dir, '.fig'])
                     end
                 end
-            elseif (isAvailable == 0.0) && (outputFigure == 1.0)
+            elseif (isAvailableA == 0.0 && isAvailableB == 0.0) && (outputFigure == 1.0)
                 messenger.writeMessage(128.0)
             end
             

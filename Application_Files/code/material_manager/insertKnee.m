@@ -9,7 +9,7 @@ function varargout = insertKnee(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool User Guide
 %      5 Materials
 %   
-%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
 %   Last modified 03-Oct-2017 13:44:11 GMT
 
 % Begin initialization code - DO NOT EDIT

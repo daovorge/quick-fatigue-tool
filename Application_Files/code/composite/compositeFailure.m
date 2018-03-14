@@ -11,8 +11,8 @@ function [] = compositeFailure(N, L, mainID, fid_status)
 %   Reference section in Quick Fatigue Tool User Guide
 %      12.3 Composite failure criteria
 %
-%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 17-Jan-2018 11:19:25 GMT
+%   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
+%   Last modified 14-Mar-2018 07:24:59 GMT
     
     %%
 
@@ -370,84 +370,34 @@ LARKFCRT(abs(LARKFCRT - 1.0) < 1e-6) = 1.0;
 LARSFCRT(abs(LARSFCRT - 1.0) < 1e-6) = 1.0;
 LARTFCRT(abs(LARTFCRT - 1.0) < 1e-6) = 1.0;
 
-%% Inform the user if composite has failed
-N_MSTRS = length(MSTRS(MSTRS >= 1.0));
-N_MSTRN = length(MSTRN(MSTRN >= 1.0));
-N_TSAIH = length(TSAIH(TSAIH >= 1.0));
-N_TSAIW = length(TSAIW(TSAIW >= 1.0));
-N_TSAIWTT = length(TSAIWTT(TSAIWTT >= (1.0 - k.^2.0)));
-N_AZZIT = length(AZZIT(AZZIT >= 1.0));
-N_HSNFTCRT = length(HSNFTCRT(HSNFTCRT >= 1.0));
-N_HSNFCCRT = length(HSNFCCRT(HSNFCCRT >= 1.0));
-N_HSNMTCRT = length(HSNMTCRT(HSNMTCRT >= 1.0));
-N_HSNMCCRT = length(HSNMCCRT(HSNMCCRT >= 1.0));
-N_LARPFCRT = length(LARPFCRT(LARPFCRT >= 1.0));
-N_LARMFCRT = length(LARMFCRT(LARMFCRT >= 1.0));
-N_LARKFCRT = length(LARKFCRT(LARKFCRT >= 1.0));
-N_LARSFCRT = length(LARSFCRT(LARSFCRT >= 1.0));
-N_LARTFCRT = length(LARTFCRT(LARTFCRT >= 1.0));
+%% Round failure measures to 0 if within tolerance
+MSTRS(abs(MSTRS) < 1e-6) = 0.0;
+MSTRN(abs(MSTRN) < 1e-6) = 0.0;
+TSAIH(abs(TSAIH) < 1e-6) = 0.0;
+TSAIW(abs(TSAIW) < 1e-6) = 0.0;
+TSAIWTT(abs(TSAIWTT) < 1e-6) = 0.0;
+AZZIT(abs(AZZIT) < 1e-6) = 0.0;
+HSNFTCRT(abs(HSNFTCRT) < 1e-6) = 0.0;
+HSNFCCRT(abs(HSNFCCRT) < 1e-6) = 0.0;
+HSNMTCRT(abs(HSNMTCRT) < 1e-6) = 0.0;
+HSNMCCRT(abs(HSNMCCRT) < 1e-6) = 0.0;
+LARPFCRT(abs(LARPFCRT) < 1e-6) = 0.0;
+LARMFCRT(abs(LARMFCRT) < 1e-6) = 0.0;
+LARKFCRT(abs(LARKFCRT) < 1e-6) = 0.0;
+LARSFCRT(abs(LARSFCRT) < 1e-6) = 0.0;
+LARTFCRT(abs(LARTFCRT) < 1e-6) = 0.0;
 
-setappdata(0, 'MSTRS', N_MSTRS)
-setappdata(0, 'MSTRN', N_MSTRN)
-setappdata(0, 'TSAIH', N_TSAIH)
-setappdata(0, 'TSAIW', N_TSAIW)
-setappdata(0, 'TSAIWTT', N_TSAIWTT)
-setappdata(0, 'AZZIT', N_AZZIT)
-setappdata(0, 'HSNFTCRT', N_HSNFTCRT)
-setappdata(0, 'HSNFCCRT', N_HSNFCCRT)
-setappdata(0, 'HSNMTCRT', N_HSNMTCRT)
-setappdata(0, 'HSNMCCRT', N_HSNMCCRT)
-setappdata(0, 'LARPFCRT', N_LARPFCRT)
-setappdata(0, 'LARMFCRT', N_LARMFCRT)
-setappdata(0, 'LARKFCRT', N_LARKFCRT)
-setappdata(0, 'LARSFCRT', N_LARSFCRT)
-setappdata(0, 'LARTFCRT', N_LARTFCRT)
+%% Get whole model model summary for message file
+[N_MSTRS, N_MSTRN, N_TSAIH, N_TSAIW, N_TSAIWTT, N_AZZIT, N_HSNFTCRT,...
+    N_HSNFCCRT, N_HSNMTCRT, N_HSNMCCRT, N_LARPFCRT, N_LARMFCRT,...
+    N_LARKFCRT, N_LARSFCRT, N_LARTFCRT] =...
+    compositeOutput.getCompositeSummary(MSTRS, MSTRN, TSAIH, TSAIW,...
+    TSAIWTT, AZZIT, HSNFTCRT, HSNFCCRT, HSNMTCRT, HSNMCCRT, LARPFCRT,...
+    LARMFCRT, LARKFCRT, LARSFCRT, LARTFCRT, k, failStressGeneral,...
+    tsaiWuTT, failStrain, hashin, larc05);
 
-if N_MSTRS > 0.0
-    messenger.writeMessage(290.0)
-end
-if N_TSAIH > 0.0
-    messenger.writeMessage(291.0)
-end
-if N_TSAIW > 0.0
-    messenger.writeMessage(292.0)
-end
-if N_TSAIWTT > 0.0
-    messenger.writeMessage(293.0)
-end
-if N_AZZIT > 0.0
-    messenger.writeMessage(294.0)
-end
-if N_MSTRN > 0.0
-    messenger.writeMessage(295.0)
-end
-if N_HSNFTCRT > 0.0
-    messenger.writeMessage(296.0)
-end
-if N_HSNFCCRT > 0.0
-    messenger.writeMessage(297.0)
-end
-if N_HSNMTCRT > 0.0
-    messenger.writeMessage(298.0)
-end
-if N_HSNMCCRT > 0.0
-    messenger.writeMessage(299.0)
-end
-if N_LARPFCRT > 0.0
-    messenger.writeMessage(302.0)
-end
-if N_LARMFCRT > 0.0
-    messenger.writeMessage(303.0)
-end
-if N_LARKFCRT > 0.0
-    messenger.writeMessage(304.0)
-end
-if N_LARSFCRT > 0.0
-    messenger.writeMessage(305.0)
-end
-if N_LARTFCRT > 0.0
-    messenger.writeMessage(306.0)
-end
+%% Report results summary to the message file
+messenger.writeMessage(315.0)
 
 %% Write output to file
 if (failStressGeneral ~= -1.0) || (tsaiWuTT ~= -1.0) || (failStrain ~= -1.0) || (hashin ~= -1.0) || (larc05 ~= -1.0)

@@ -18,7 +18,7 @@
 %      2.4 Configuring and running an analysis
 %      12.3 Composite failure criteria
 %   
-%   Quick Fatigue Tool 6.11-10 Copyright Louis Vallance 2017
+%   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2017
 %   Last modified 24-Nov-2017 12:40:07 GMT
 
 job composite_load_fibre

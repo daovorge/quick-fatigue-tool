@@ -1,17 +1,17 @@
 function [] = fea(varargin)
-%FEA    QFT function to csubmit an Abaqus input file for analysis.
+%FEA    QFT function to submit an Abaqus input (.inp) file for analysis.
 %   FEA is used internally by Quick Fatigue Tool. The user is not required
 %   to run this file.
 %
-%   FEA(JOBNAME) submits 'JOBNAME.inp' for analysis.
+%   FEA(ABQCMD) submits 'ABQ_JOBNAME.inp' for analysis.
 %
-%   FEA(ABQCMD JOBNAME) submits 'JOBNAME.inp' for analysis using the
-%   Abaqus command ABQCMD.
+%   FEA(ABQCMD, ABQ_JOBNAME) submits 'ABQ_JOBNAME.inp' for analysis using
+%   the Abaqus command ABQCMD.
 %
-%   FEA(ABQCMD JOBNAME CPUS) submits 'JOBNAME.inp' for analysis using the
-%   Abaqus command ABQCMD and CPUS processors.
+%   FEA(ABQCMD, ABQ_JOBNAME, N) submits 'ABQ_JOBNAME.inp' for analysis
+%   using the Abaqus command ABQCMD.bat and N processors.
 %   
-%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
 %   Last modified 20-Feb-2018 15:43:20 GMT
     
     %%

@@ -9,14 +9,15 @@ classdef compositeOutput < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      12.3 Composite failure criteria
 %   
-%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 17-Jan-2018 11:19:25 GMT
+%   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
+%   Last modified 13-Mar-2018 18:58:10 GMT
     
     %%
     
     methods(Static = true)
-        %% WRITE COMPOSITE RESULTS FIELD DATA TO AN .ODB FILE
+        %% Write composite results field data to an .ODB file
         function [] = exportODB(fid_status, mainID)
+            %% Pre-processing tasks
             % Flag to indicate the ODB Interface is operating in auto mode
             setappdata(0, 'ODB_interface_auto', 1.0)
             
@@ -43,12 +44,14 @@ classdef compositeOutput < handle
             end
             [~, modelDatabaseNameShort, ~] = fileparts(modelDatabasePath);
             
+            % Print header
+            fprintf('\n[POST] Quick Fatigue Tool 6.11-13 ODB Interface');
+            fprintf(fid_status, '\n[POST] Quick Fatigue Tool 6.11-13 ODB Interface');
+            
             % Warn user if there is only one item in the model
             if length(mainID) == 1.0
                 messenger.writeMessage(204.0)
             end
-            
-            fprintf('\n');
             
             % Get the job name
             jobName = getappdata(0, 'jobName');
@@ -94,7 +97,34 @@ classdef compositeOutput < handle
             % Get the step name
             stepName = getappdata(0, 'stepName');
             
-            % Verify the inputs
+            % Open the log file for writing
+            debugFileName = [sprintf('Project/output/%s/Data Files/', jobName), resultsDatabaseName, '.log'];
+            fid_debug = fopen(debugFileName, 'w+');
+            fprintf(fid_debug, 'Quick Fatigue Tool 6.11-13 ODB Interface Log');
+            
+            %% Print Abaqus installation info to the debug log file
+            try
+                [status, message] = system(sprintf('%s whereami', abqCmd));
+                
+                if status == 1.0
+                    % An exception occurred whilst getting installation info
+                    fprintf(fid_debug, '\r\n\r\n[QFT Error]: Abaqus installation info was not found\r\n');
+                    fprintf(fid_debug, '\tPlease ensure that the Abaqus command line argument points to a valid Abaqus batch file');
+                    fprintf(fid_debug, '\r\n\tAn Abaqus installation is required to write fatigue results to the output database (.odb) file');
+                else
+                    fprintf(fid_debug, '\r\n\r\nAbaqus installation info:\r\n%s', message);
+                    fprintf(fid_debug, '(NOTE: The Abaqus version is determined by the autoExport_abqCmd environment variable)\r\n');
+                end
+            catch exception
+                % An unhandled exception was encountered
+                fprintf(fid_debug, '\n[Abaqus Error]: %s', exception.message);
+                fprintf('\n[ERROR] ODB Interface exited with errors');
+                fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors');
+                fprintf(fid_debug, '\n\nRESULTS WERE NOT WRITTEN TO THE OUTPUT DATABASE');
+                return
+            end
+            
+            %% Verify the inputs
             error = python.verifyAuto(1.0, fieldDataPath, fieldDataName,...
                 resultsDatabasePath, partInstanceList);
             
@@ -106,31 +136,40 @@ classdef compositeOutput < handle
             % Copy the model output database to the abaqus directory
             % Try to upgrade the ODB
             if getappdata(0, 'autoExport_upgradeODB') == 1.0
-                [status, result] = system(sprintf('%s -upgrade -job "%s" -odb "%s"', abqCmd, [resultsDatabasePath, '/', resultsDatabaseName], modelDatabasePath(1.0:end - 4.0)));
-                
+                [status, message] = system(sprintf('%s -upgrade -job "%s" -odb "%s"', abqCmd, [resultsDatabasePath, '/', resultsDatabaseName], modelDatabasePath(1.0:end - 4.0)));
+
                 if status == 1.0
-                    % There is no Abaqus executable on the host machine
-                    fprintf('[POST] ODB Error: %s', result);
-                    fprintf('\n[ERROR] ODB Interface exited with errors');
-                    fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors');
+                    % An exception occurred whilst upgrading the ODB file
+                    fprintf(fid_debug, '\n[Abaqus Error]: %s', message);
+                    
+                    if isempty(strfind(message, 'is not recognized as an internal or external command,')) == 0.0
+                        % There is no Abaqus executable on the host machine
+                        fprintf(fid_debug, '\n[QFT Error]: The Abaqus command ''%s'' could not be found on the system. Check your Abaqus installation. Results will not be written to the output database.', abqCmd);
+                    end
+                    
+                    fprintf('\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
+                    fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
+                    fprintf(fid_debug, '\n\nRESULTS WERE NOT WRITTEN TO THE OUTPUT DATABASE');
                     return
+                elseif strcmp(message, sprintf('ODB FILE UPGRADE COMPLETED\n')) == 1.0
+                    fprintf(fid_debug, '\n%s', message);
                 end
             end
             
-            % If the ODB is already up-to-date, simply copy the file
-            % instead
-            removeCarriageReturn = 0.0;
+            % If the ODB is already up-to-date, try to copy the file instead
             if exist([resultsDatabasePath, '/', resultsDatabaseName, '.odb'], 'file') == 0.0
-                copyfile(modelDatabasePath, [resultsDatabasePath, '/', resultsDatabaseName, '.odb'])
-                removeCarriageReturn = 1.0;
-            end
-            
-            if removeCarriageReturn == 1.0
-                fprintf('[POST] Starting Quick Fatigue Tool 6.11-12 ODB Interface');
-                fprintf(fid_status, '\n[POST] Starting Quick Fatigue Tool 6.11-12 ODB Interface');
-            else
-                fprintf('[POST] Quick Fatigue Tool 6.11-12 ODB Interface');
-                fprintf(fid_status, '\n[POST] Quick Fatigue Tool 6.11-12 ODB Interface');
+                try
+                    copyfile(modelDatabasePath, [resultsDatabasePath, '/', resultsDatabaseName, '.odb'])
+                catch exception
+                    % The file could not be copied
+                    fprintf(fid_debug, '\n[Abaqus Error]: %s', exception.message);
+                    fprintf(fid_debug, '\nThe cause of this error could not be determined. Please contact the developer at louisvallance@hotmail.co.uk for further assistance.');
+                    
+                    fprintf('\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
+                    fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
+                    fprintf(fid_debug, '\n\nRESULTS WERE NOT WRITTEN TO THE OUTPUT DATABASE');
+                    return
+                end
             end
             
             % Delete the upgrade log file
@@ -144,11 +183,7 @@ classdef compositeOutput < handle
                 delete([resultsDatabasePath, '/', modelDatabaseNameShort, '.lck'])
             end
             
-            % Open the log file for writing
-            fid_debug = fopen([sprintf('Project/output/%s/Data Files/', jobName), resultsDatabaseName, '.log'], 'w+');
-            fprintf(fid_debug, 'Quick Fatigue Tool 6.11-12 ODB Interface Log');
-            
-            % Get the selected position
+            %% Get the selected position
             userPosition = getappdata(0, 'odbResultPosition');
             if strcmpi('unique nodal', userPosition) == 1.0
                 userPosition = 2.0;
@@ -174,13 +209,16 @@ classdef compositeOutput < handle
             autoPosition = getappdata(0, 'autoExport_autoPosition');
             if autoPosition == 1.0
                 fprintf(fid_debug, '\r\nAllow Quick Fatigue Tool to determine results position based on field IDs: YES');
-                fprintf('\n[POST] Allow Quick Fatigue Tool to determine results position based on field IDs: YES');
-                fprintf(fid_status, '\n[POST] Allow Quick Fatigue Tool to determine results position based on field IDs: YES');
             else
                 fprintf(fid_debug, '\r\nAllow Quick Fatigue Tool to determine results position based on field IDs: NO');
-                fprintf('\n[POST] Allow Quick Fatigue Tool to determine results position based on field IDs: NO');
-                fprintf(fid_status, '\n[POST] Allow Quick Fatigue Tool to determine results position based on field IDs: NO');
             end
+            
+            if isempty(stepName) == 1.0
+                fprintf(fid_debug, '\r\nThe step name was not specified (a default name will be used)');
+            else
+                fprintf(fid_debug, '\r\nStep name: ''%s''', stepName);
+            end
+            fprintf(fid_debug, '\r\nField output request: COMPOSITE FAILURE MEASURE COMPONENTS ONLY');
             
             for instanceNumber = 1:nInstances
                 partInstanceName = partInstanceList{instanceNumber};
@@ -198,17 +236,33 @@ classdef compositeOutput < handle
                     fid_debug, resultsDatabasePath, resultsDatabaseName);
                 
                 if error > 0.0
-                    setappdata(0, 'warning_061_number', error)
-                    messenger.writeMessage(85.0)
+                    switch error
+                        case 1.0
+                            fprintf(fid_debug, 'No matching position labels were found in the model output database. Check the log file for details.');
+                        case 2.0
+                            fprintf(fid_debug, 'An error occurred while retrieving the connectivity matrix. Check the log file for details.');
+                        case 3.0
+                            fprintf(fid_debug, 'An error occurred while reading the connectivity matrix. Check the log file for details.');
+                        case 4.0
+                            fprintf(fid_debug, 'An error occurred while reading the field data file. Check the log file for details.');
+                        case 5.0
+                            fprintf(fid_debug, 'No matching position labels were found in the model output database. Check the log file for details.');
+                    end
                     
-                    fprintf('\n[ERROR] ODB Interface exited with errors. Check the results log for details (Project/output/%s/Data Files/%s.log)', getappdata(0, 'jobName'), resultsDatabaseName);
-                    fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors. Check the results log for details (Project/output/%s/Data Files/%s.log)', getappdata(0, 'jobName'), resultsDatabaseName);
+                    fprintf('\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
+                    fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
+                    fprintf(fid_debug, '\n\nRESULTS WERE NOT WRITTEN TO THE OUTPUT DATABASE');
+                    
+                    % Delete the results output database from the output directory if applicable
+                    if exist([pwd, sprintf('\\%s\\%s.odb', resultsDatabasePath, resultsDatabaseName)], 'file') == 2.0
+                        delete([pwd, sprintf('\\%s\\%s.odb', resultsDatabasePath, resultsDatabaseName)])
+                    end
                     
                     fclose(fid_debug);
                     return
                 end
                 
-                % Create the Python script
+                %% Create the Python script
                 fprintf(fid_debug, '\r\n\r\nPreparing field data...');
                 fprintf('\n[POST] Preparing field data:\n');
                 fprintf(fid_status, '\n[POST] Preparing field data\n');
@@ -238,22 +292,18 @@ classdef compositeOutput < handle
                     stepName, isExplicit, connectedElements, createODBSet,...
                     ODBSetName, stepType);
                 
-                % If there was an error while writing the field data, abort the
-                % export process
-                if error == 1.0
-                    setappdata(0, 'warning_087_partInstance', partInstanceName)
-                    messenger.writeMessage(87.0)
+                % If there was an error while writing the field data, abort the export process
+                if (error == 1.0) || (error == 2.0)
+                    if error == 1.0
+                        setappdata(0, 'warning_087_partInstance', partInstanceName)
+                        messenger.writeMessage(87.0)
+                    elseif error == 2.0
+                        messenger.writeMessage(179.0)
+                    end
                     
-                    fprintf('\n[ERROR] ODB Interface exited with errors. Check the results log for details (Project/output/%s/Data Files/%s.log)', getappdata(0, 'jobName'), resultsDatabaseName');
-                    fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors. Check the results log for details (Project/output/%s/Data Files/%s.log)', getappdata(0, 'jobName'), resultsDatabaseName');
-                    
-                    fclose(fid_debug);
-                    return
-                elseif error == 2.0
-                    messenger.writeMessage(179.0)
-                    
-                    fprintf('\n[ERROR] ODB Interface exited with errors. Check the results log for details (Project/output/%s/Data Files/%s.log)', getappdata(0, 'jobName'), resultsDatabaseName');
-                    fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors. Check the results log for details (Project/output/%s/Data Files/%s.log)', getappdata(0, 'jobName'), resultsDatabaseName');
+                    fprintf('\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
+                    fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
+                    fprintf(fid_debug, '\n\nRESULTS WERE NOT WRITTEN TO THE OUTPUT DATABASE');
                     
                     fclose(fid_debug);
                     return
@@ -276,50 +326,63 @@ classdef compositeOutput < handle
                     end
                 end
                 
-                % System command to execute python script
+                %% System command to execute python script
                 if getappdata(0, 'autoExport_executionMode') < 3.0
                     fprintf(fid_debug, '\r\n\r\nWriting field data to ODB...');
                     fprintf('[POST] Writing field data to ODB');
                     fprintf(fid_status, '[POST] Writing field data to ODB');
                     
                     try
-                        [status, message] = system(sprintf('%s python %s', abqCmd, scriptFile));
+                        [~, message] = system(sprintf('%s python %s', abqCmd, scriptFile));
                         
-                        if status == 1.0
-                            if isempty(strfind(message, sprintf('KeyError: ''%s''', stepName))) == 0.0 %#ok<*FNDSB>
+                        if isempty(message) == 0.0
+                            fprintf(fid_debug, '\n[Abaqus Error]: %s', message);
+                            
+                            if isempty(strfind(message, sprintf('KeyError: ''%s''', stepName))) == 0.0
                                 % The step name is invalid
-                                fprintf('\n[POST] ODB Error: The step name ''%s'' could not be found in the ODB. Results will not be written to the output database.', stepName)
+                                fprintf(fid_debug, '\n[QFT Error]: The step name ''%s'' could not be found in the ODB. Results will not be written to the output database.', stepName);
+                            elseif isempty(strfind(message, sprintf('KeyError: ''%s''', partInstanceName))) == 0.0
+                                % The part instance name is invalid
+                                fprintf(fid_debug, '\n[QFT Error]: The part instance name ''%s'' could not be found in the ODB. Results will not be written to the output database.', partInstanceName);
                             elseif isempty(strfind(message, 'OdbError: Invalid node label')) == 0.0
                                 %{
                                     The field data does not exactly match
                                     the part instance name, so an ODB
                                     element/node set could not be created
                                 %}
-                                fprintf('\n[POST] ODB Error: The ODB element/node set could not be written because the field data does not exactly match the specified part instance. Results will not be written to the output database.')
+                                fprintf(fid_debug, '\n[QFT Error]: The ODB element/node set could not be written because the field data does not exactly match the specified part instance. Results will not be written to the output database.');
                             elseif isempty(strfind(message, 'is not recognized as an internal or external command')) == 0.0
                                 % There is no Abaqus executable on the host machine
-                                fprintf('\n[POST] ODB Error: The Abaqus command ''%s'' could not be found on the system. Check your Abaqus installation. Results will not be written to the output database.', abqCmd)
+                                fprintf(fid_debug, '\n[QFT Error]: The Abaqus command ''%s'' could not be found on the system. Check your Abaqus installation. Results will not be written to the output database.', abqCmd);
+                            elseif isempty(strfind(message, 'OdbError: illegal argument type for built-in operation')) == 0.0
+                                % There is no Abaqus executable on the host machine
+                                fprintf(fid_debug, '\n[QFT Error]: The Abaqus API rejected the fatigue results data. For element-nodal and integration point data, results for at least one element are required. For centroidal and unique-nodal data, results for at least two centroids or nodes are required, respectively.');
                             else
                                 % Unkown exception
-                                fprintf('\n[POST] ODB Error: The Abaqus API returned the following error:\r\n\r\n%s\r\nResults will not be written to the output database.', message)
+                                fprintf(fid_debug, '\nThe cause of this error could not be determined. Please contact the developer at louisvallance@hotmail.co.uk for further assistance.');
                             end
                             
                             if getappdata(0, 'autoExport_executionMode') == 1.0
                                 delete(scriptFile)
                             end
                             
-                            fprintf('\n[ERROR] ODB Interface exited with errors');
-                            fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors');
+                            % Delete the results output database from the output directory if applicable
+                            if exist([pwd, sprintf('\\%s\\%s.odb', resultsDatabasePath, resultsDatabaseName)], 'file') == 2.0
+                                delete([pwd, sprintf('\\%s\\%s.odb', resultsDatabasePath, resultsDatabaseName)])
+                            end
+                            
+                            fprintf('\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName');
+                            fprintf(fid_status, '\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
+                            fprintf(fid_debug, '\n\nRESULTS WERE NOT WRITTEN TO THE OUTPUT DATABASE');
                             return
                         end
                     catch unhandledException
                         fprintf(fid_debug, '\r\nError: %s', unhandledException.message);
-                        fprintf('\n[POST] ODB Error: An unknown exception was encountered while writing field data to the output database')
-                        fprintf('\n[ERROR] ODB Interface exited with errors');
+                        fprintf('\n[POST] [QFT Error]: An unknown exception was encountered while writing field data to the output database. Please contact the developer at louisvallance@hotmail.co.uk for further assistance')
+                        fprintf('\n[ERROR] ODB Interface exited with errors. Check %s for details', debugFileName);
                         messenger.writeMessage(86.0)
                         
                         fclose(fid_debug);
-                        clc
                         
                         if getappdata(0, 'autoExport_executionMode') == 1.0
                             delete(scriptFile)
@@ -331,9 +394,11 @@ classdef compositeOutput < handle
                 end
             end
             
-            fprintf(fid_debug, ' Success');
-            fprintf('\n[POST] Export complete. Check the log file in Project/output/%s/Data Files for detailed information', getappdata(0, 'jobName'));
-            fprintf(fid_status, '\n[POST] Export complete. Check the log file in Project/output/%s/Data Files for detailed information', getappdata(0, 'jobName'));
+            %% Additional tasks
+            fprintf(fid_debug, ' Success\r\n\r\nFatigue results have been written to ''%s''', sprintf('%s/%s.odb', resultsDatabasePath, resultsDatabaseName));
+            fprintf(fid_debug, '\r\n\r\nEND OF FILE');
+            fprintf('\n[POST] Export complete. Check %s for details ', debugFileName);
+            fprintf(fid_status, '\n[POST] Export complete. Check %s for details', debugFileName);
             fclose(fid_debug);
             
             % Update the message file
@@ -620,7 +685,7 @@ classdef compositeOutput < handle
             
             %% Get step description
             [job, loading] = fieldDataFile.textdata{2:3};
-            stepDescription = ['version 6.11-12; ', job, ', ', loading];
+            stepDescription = ['version 6.11-13; ', job, ', ', loading];
             
             %% Get the composite field data
             fieldNamesFile = fieldDataFile.colheaders(3.0:end);
@@ -726,10 +791,381 @@ classdef compositeOutput < handle
                     connectivitySorted = zeros(numberOfLabels, 20.0);
                     for i = 1:numberOfLabels
                         newIndex = find(positionLabels == positionLabelsSorted(i));
-                        connectivitySorted(i, :) = connectivity(newIndex, :);
+                        connectivitySorted(i, :) = connectivity(newIndex, :); %#ok<FNDSB>
                     end
                     connectivity = connectivitySorted;
                 end
+            end
+        end
+        
+        %% Get whole model model summary for message file
+        function [N_MSTRS, N_MSTRN, N_TSAIH, N_TSAIW, N_TSAIWTT,...
+                N_AZZIT, N_HSNFTCRT, N_HSNFCCRT, N_HSNMTCRT, N_HSNMCCRT,...
+                N_LARPFCRT, N_LARMFCRT, N_LARKFCRT, N_LARSFCRT,...
+                N_LARTFCRT] =...
+                getCompositeSummary(MSTRS, MSTRN, TSAIH, TSAIW, TSAIWTT,...
+                AZZIT, HSNFTCRT, HSNFCCRT, HSNMTCRT, HSNMCCRT, LARPFCRT,...
+                LARMFCRT, LARKFCRT, LARSFCRT, LARTFCRT, k,...
+                failStressGeneral, tsaiWuTT, failStrain, hashin, larc05)
+            
+            %% Get the number of PASS/FAIL items            
+            N_MSTRS = length(MSTRS(MSTRS >= 1.0));
+            N_MSTRN = length(MSTRN(MSTRN >= 1.0));
+            N_TSAIH = length(TSAIH(TSAIH >= 1.0));
+            N_TSAIW = length(TSAIW(TSAIW >= 1.0));
+            N_TSAIWTT = length(TSAIWTT(TSAIWTT >= (1.0 - k.^2.0)));
+            N_AZZIT = length(AZZIT(AZZIT >= 1.0));
+            N_HSNFTCRT = length(HSNFTCRT(HSNFTCRT >= 1.0));
+            N_HSNFCCRT = length(HSNFCCRT(HSNFCCRT >= 1.0));
+            N_HSNMTCRT = length(HSNMTCRT(HSNMTCRT >= 1.0));
+            N_HSNMCCRT = length(HSNMCCRT(HSNMCCRT >= 1.0));
+            N_LARPFCRT = length(LARPFCRT(LARPFCRT >= 1.0));
+            N_LARMFCRT = length(LARMFCRT(LARMFCRT >= 1.0));
+            N_LARKFCRT = length(LARKFCRT(LARKFCRT >= 1.0));
+            N_LARSFCRT = length(LARSFCRT(LARSFCRT >= 1.0));
+            N_LARTFCRT = length(LARTFCRT(LARTFCRT >= 1.0));
+            
+            % General stress-based failure criteria
+            if failStressGeneral == 1.0
+                if N_MSTRS == 0.0
+                    setappdata(0, 'MSTRS_NL', 'ALL')
+                else
+                    setappdata(0, 'MSTRS_NL', sprintf('%s', num2str(N_MSTRS)))
+                end
+                
+                if N_TSAIH == 0.0
+                    setappdata(0, 'TSAIH_NL', 'ALL')
+                else
+                    setappdata(0, 'TSAIH_NL', sprintf('%s', num2str(N_TSAIH)))
+                end
+                
+                if N_TSAIW == 0.0
+                    setappdata(0, 'TSAIW_NL', 'ALL')
+                else
+                    setappdata(0, 'TSAIW_NL', sprintf('%s', num2str(N_TSAIW)))
+                end
+                
+                if N_AZZIT == 0.0
+                    setappdata(0, 'AZZIT_NL', 'ALL')
+                else
+                    setappdata(0, 'AZZIT_NL', sprintf('%s', num2str(N_AZZIT)))
+                end
+            else
+                setappdata(0, 'MSTRS_NL', 'N/A')
+                setappdata(0, 'TSAIH_NL', 'N/A')
+                setappdata(0, 'TSAIW_NL', 'N/A')
+                setappdata(0, 'AZZIT_NL', 'N/A')
+            end
+            
+            % Tsai-Wu for PVC foam
+            if tsaiWuTT == 1.0
+                if N_TSAIWTT == 0.0
+                    setappdata(0, 'TSAIWTT_NL', 'ALL')
+                else
+                    setappdata(0, 'TSAIWTT_NL', sprintf('%s', num2str(N_TSAIWTT)))
+                end
+            else
+                setappdata(0, 'TSAIWTT_NL', 'N/A')
+            end
+            
+            % Maximum strain failure theory
+            if failStrain == 1.0
+                if N_MSTRN == 0.0
+                    setappdata(0, 'MSTRN_NL', 'ALL')
+                else
+                    setappdata(0, 'MSTRN_NL', sprintf('%s', num2str(N_MSTRN)))
+                end
+            else
+                setappdata(0, 'MSTRN_NL', 'N/A')
+            end
+            
+            % Hashin's damage initiation criteria
+            if hashin == 1.0
+                if N_HSNFTCRT == 0.0
+                    setappdata(0, 'HSNFTCRT_NL', 'ALL')
+                else
+                    setappdata(0, 'HSNFTCRT_NL', sprintf('%s', num2str(N_HSNFTCRT)))
+                end
+                
+                if N_HSNFCCRT == 0.0
+                    setappdata(0, 'HSNFCCRT_NL', 'ALL')
+                else
+                    setappdata(0, 'HSNFCCRT_NL', sprintf('%s', num2str(N_HSNFCCRT)))
+                end
+                
+                if N_HSNMTCRT == 0.0
+                    setappdata(0, 'HSNMTCRT_NL', 'ALL')
+                else
+                    setappdata(0, 'HSNMTCRT_NL', sprintf('%s', num2str(N_HSNMTCRT)))
+                end
+                
+                if N_HSNMCCRT == 0.0
+                    setappdata(0, 'HSNMCCRT_NL', 'ALL')
+                else
+                    setappdata(0, 'HSNMCCRT_NL', sprintf('%s', num2str(N_HSNMCCRT)))
+                end
+            else
+                setappdata(0, 'HSNFTCRT_NL', 'N/A')
+                setappdata(0, 'HSNFCCRT_NL', 'N/A')
+                setappdata(0, 'HSNMTCRT_NL', 'N/A')
+                setappdata(0, 'HSNMCCRT_NL', 'N/A')
+            end
+            
+            % LaRC05 damage initiation criteria
+            if larc05 == 1.0
+                if N_LARPFCRT == 0.0
+                    setappdata(0, 'LARPFCRT_NL', 'ALL')
+                else
+                    setappdata(0, 'LARPFCRT_NL', sprintf('%s', num2str(N_LARPFCRT)))
+                end
+                
+                if N_LARMFCRT == 0.0
+                    setappdata(0, 'LARMFCRT_NL', 'ALL')
+                else
+                    setappdata(0, 'LARMFCRT_NL', sprintf('%s', num2str(N_LARMFCRT)))
+                end
+                
+                if N_LARKFCRT == 0.0
+                    setappdata(0, 'LARKFCRT_NL', 'ALL')
+                else
+                    setappdata(0, 'LARKFCRT_NL', sprintf('%s', num2str(N_LARKFCRT)))
+                end
+                
+                if N_LARSFCRT == 0.0
+                    setappdata(0, 'LARSFCRT_NL', 'ALL')
+                else
+                    setappdata(0, 'LARSFCRT_NL', sprintf('%s', num2str(N_LARSFCRT)))
+                end
+                
+                if N_LARTFCRT == 0.0
+                    setappdata(0, 'LARTFCRT_NL', 'ALL')
+                else
+                    setappdata(0, 'LARTFCRT_NL', sprintf('%s', num2str(N_LARTFCRT)))
+                end
+            else
+                setappdata(0, 'LARPFCRT_NL', 'N/A')
+                setappdata(0, 'LARMFCRT_NL', 'N/A')
+                setappdata(0, 'LARKFCRT_NL', 'N/A')
+                setappdata(0, 'LARSFCRT_NL', 'N/A')
+                setappdata(0, 'LARTFCRT_NL', 'N/A')
+            end
+            
+            %% Get PASS/FAIL status
+            
+            % General stress-based failure criteria
+            if failStressGeneral == 1.0
+                if N_MSTRS > 0.0
+                    setappdata(0, 'MSTRS_STAT', 'FAIL')
+                else
+                    setappdata(0, 'MSTRS_STAT', 'PASS')
+                end
+                
+                if N_TSAIH > 0.0
+                    setappdata(0, 'TSAIH_STAT', 'FAIL')
+                else
+                    setappdata(0, 'TSAIH_STAT', 'PASS')
+                end
+                
+                if N_TSAIW > 0.0
+                    setappdata(0, 'TSAIW_STAT', 'FAIL')
+                else
+                    setappdata(0, 'TSAIW_STAT', 'PASS')
+                end
+                
+                if N_AZZIT > 0.0
+                    setappdata(0, 'AZZIT_STAT', 'FAIL')
+                else
+                    setappdata(0, 'AZZIT_STAT', 'PASS')
+                end
+            else
+                setappdata(0, 'MSTRS_STAT', 'N/A')
+                setappdata(0, 'TSAIH_STAT', 'N/A')
+                setappdata(0, 'TSAIW_STAT', 'N/A')
+                setappdata(0, 'AZZIT_STAT', 'N/A')
+            end
+            
+            % Tsai-Wu for PVC foam
+            if tsaiWuTT == 1.0
+                if N_TSAIWTT > 0.0
+                    setappdata(0, 'TSAIWTT_STAT', 'FAIL')
+                else
+                    setappdata(0, 'TSAIWTT_STAT', 'PASS')
+                end
+            else
+                setappdata(0, 'TSAIWTT_STAT', 'N/A')
+            end
+            
+            % Maximum strain failure theory
+            if failStrain == 1.0
+                if N_MSTRN > 0.0
+                    setappdata(0, 'MSTRN_STAT', 'FAIL')
+                else
+                    setappdata(0, 'MSTRN_STAT', 'PASS')
+                end
+            else
+                setappdata(0, 'MSTRN_STAT', 'N/A')
+            end
+            
+            % Hashin's damage initiation criteria
+            if hashin == 1.0
+                if N_HSNFTCRT > 0.0
+                    setappdata(0, 'HSNFTCRT_STAT', 'FAIL')
+                else
+                    setappdata(0, 'HSNFTCRT_STAT', 'PASS')
+                end
+                
+                if N_HSNFCCRT > 0.0
+                    setappdata(0, 'HSNFCCRT_STAT', 'FAIL')
+                else
+                    setappdata(0, 'HSNFCCRT_STAT', 'PASS')
+                end
+                
+                if N_HSNMTCRT > 0.0
+                    setappdata(0, 'HSNMTCRT_STAT', 'FAIL')
+                else
+                    setappdata(0, 'HSNMTCRT_STAT', 'PASS')
+                end
+                
+                if N_HSNMCCRT > 0.0
+                    setappdata(0, 'HSNMCCRT_STAT', 'FAIL')
+                else
+                    setappdata(0, 'HSNMCCRT_STAT', 'PASS')
+                end
+            else
+                setappdata(0, 'HSNFTCRT_STAT', 'N/A')
+                setappdata(0, 'HSNFCCRT_STAT', 'N/A')
+                setappdata(0, 'HSNMTCRT_STAT', 'N/A')
+                setappdata(0, 'HSNMCCRT_STAT', 'N/A')
+            end
+            
+            % LaRC05 damage initiation criteria
+            if larc05 == 1.0
+                if N_LARPFCRT > 0.0
+                    setappdata(0, 'LARPFCRT_STAT', 'FAIL')
+                else
+                    setappdata(0, 'LARPFCRT_STAT', 'PASS')
+                end
+                
+                if N_LARMFCRT > 0.0
+                    setappdata(0, 'LARMFCRT_STAT', 'FAIL')
+                else
+                    setappdata(0, 'LARMFCRT_STAT', 'PASS')
+                end
+                
+                if N_LARKFCRT > 0.0
+                    setappdata(0, 'LARKFCRT_STAT', 'FAIL')
+                else
+                    setappdata(0, 'LARKFCRT_STAT', 'PASS')
+                end
+                
+                if N_LARSFCRT > 0.0
+                    setappdata(0, 'LARSFCRT_STAT', 'FAIL')
+                else
+                    setappdata(0, 'LARSFCRT_STAT', 'PASS')
+                end
+                
+                if N_LARTFCRT > 0.0
+                    setappdata(0, 'LARTFCRT_STAT', 'FAIL')
+                else
+                    setappdata(0, 'LARTFCRT_STAT', 'PASS')
+                end
+            else
+                setappdata(0, 'LARPFCRT_STAT', 'N/A')
+                setappdata(0, 'LARMFCRT_STAT', 'N/A')
+                setappdata(0, 'LARKFCRT_STAT', 'N/A')
+                setappdata(0, 'LARSFCRT_STAT', 'N/A')
+                setappdata(0, 'LARTFCRT_STAT', 'N/A')
+            end
+            
+            %% Get maximum value of each criterion
+            if max(MSTRS) == -1.0
+                setappdata(0, 'MSTRS_MV', 'N/A')
+            else
+                setappdata(0, 'MSTRS_MV', sprintf('%s', num2str(max(MSTRS))))
+            end
+            
+            if max(MSTRN) == -1.0
+                setappdata(0, 'MSTRN_MV', 'N/A')
+            else
+                setappdata(0, 'MSTRN_MV', sprintf('%s', num2str(max(MSTRN))))
+            end
+            
+            if max(TSAIH) == -1.0
+                setappdata(0, 'TSAIH_MV', 'N/A')
+            else
+                setappdata(0, 'TSAIH_MV', sprintf('%s', num2str(max(TSAIH))))
+            end
+            
+            if max(TSAIW) == -1.0
+                setappdata(0, 'TSAIW_MV', 'N/A')
+            else
+                setappdata(0, 'TSAIW_MV', sprintf('%s', num2str(max(TSAIW))))
+            end
+            
+            if max(TSAIWTT) == -1.0
+                setappdata(0, 'TSAIWTT_MV', 'N/A')
+            else
+                setappdata(0, 'TSAIWTT_MV', sprintf('%s', num2str(max(TSAIWTT))))
+            end
+            
+            if max(AZZIT) == -1.0
+                setappdata(0, 'AZZIT_MV', 'N/A')
+            else
+                setappdata(0, 'AZZIT_MV', sprintf('%s', num2str(max(AZZIT))))
+            end
+            
+            if max(HSNFTCRT) == -1.0
+                setappdata(0, 'HSNFTCRT_MV', 'N/A')
+            else
+                setappdata(0, 'HSNFTCRT_MV', sprintf('%s', num2str(max(HSNFTCRT))))
+            end
+            
+            if max(HSNFCCRT) == -1.0
+                setappdata(0, 'HSNFCCRT_MV', 'N/A')
+            else
+                setappdata(0, 'HSNFCCRT_MV', sprintf('%s', num2str(max(HSNFCCRT))))
+            end
+            
+            if max(HSNMTCRT) == -1.0
+                setappdata(0, 'HSNMTCRT_MV', 'N/A')
+            else
+                setappdata(0, 'HSNMTCRT_MV', sprintf('%s', num2str(max(HSNMTCRT))))
+            end
+            
+            if max(HSNMCCRT) == -1.0
+                setappdata(0, 'HSNMCCRT_MV', 'N/A')
+            else
+                setappdata(0, 'HSNMCCRT_MV', sprintf('%s', num2str(max(HSNMCCRT))))
+            end
+            
+            if max(LARPFCRT) == -1.0
+                setappdata(0, 'LARPFCRT_MV', 'N/A')
+            else
+                setappdata(0, 'LARPFCRT_MV', sprintf('%s', num2str(max(LARPFCRT))))
+            end
+            
+            if max(LARMFCRT) == -1.0
+                setappdata(0, 'LARMFCRT_MV', 'N/A')
+            else
+                setappdata(0, 'LARMFCRT_MV', sprintf('%s', num2str(max(LARMFCRT))))
+            end
+            
+            if max(LARKFCRT) == -1.0
+                setappdata(0, 'LARKFCRT_MV', 'N/A')
+            else
+                setappdata(0, 'LARKFCRT_MV', sprintf('%s', num2str(max(LARKFCRT))))
+            end
+            
+            if max(LARSFCRT) == -1.0
+                setappdata(0, 'LARSFCRT_MV', 'N/A')
+            else
+                setappdata(0, 'LARSFCRT_MV', sprintf('%s', num2str(max(LARSFCRT))))
+            end
+            
+            if max(LARTFCRT) == -1.0
+                setappdata(0, 'LARTFCRT_MV', 'N/A')
+            else
+                setappdata(0, 'LARTFCRT_MV', sprintf('%s', num2str(max(LARTFCRT))))
             end
         end
     end

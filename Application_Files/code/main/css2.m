@@ -6,7 +6,7 @@ function [rfData, epsilon, sigma, error] = css2(sigma_e, E, kp, np)
 %   CSS2 is used internally by Quick Fatigue Tool. The user
 %   is not required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
 %   Last modified 31-Jan-2018 10:48:44 GMT
     
     %%

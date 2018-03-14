@@ -6,8 +6,8 @@ classdef messenger < handle
 %   MESSENGER is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %
-%   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-%   Last modified 04-Mar-2018 19:58:22 GMT
+%   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
+%   Last modified 14-Mar-2018 07:24:59 GMT
 
     %%
 
@@ -939,22 +939,7 @@ classdef messenger < handle
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 85.0
-                        switch getappdata(0, 'warning_061_number')
-                            case 1.0
-                                fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: No matching position labels were found in the model output database. Field data will not be exported', returnType{i}]);
-                                fprintf(fidType(i), ['-> Check the definitions of OUTPUT_DATABASE and PART_INSTANCE in the job file', returnType{i}]);
-                                fprintf(fidType(i), ['-> If the stress dataset contains plane stress or axisymmetric elements, ensure that PLANE_STRESS=1', returnType{i}]);
-                            case 2.0
-                                fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: An error occurred while retrieving the connectivity matrix. Field data will not be exported', returnType{i}]);
-                            case 3.0
-                                fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: An error occurred while reading the connectivity matrix. Field data will not be exported', returnType{i}]);
-                                fprintf(fidType(i), ['-> Check the PART_INSTANCE definition in the job file', returnType{i}]);
-                            case 4.0
-                                fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: An error occurred while reading the field data file. Field data will not be exported', returnType{i}]);
-                            otherwise
-                        end
-
-                        setappdata(0, 'messageFileWarnings', 1.0)
+                        %_AVAILABLE_%
                     case 86.0
                         fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: An error occurred while writing field data to the output database. Field data will not be exported', returnType{i}]);
 
@@ -1235,7 +1220,7 @@ classdef messenger < handle
                         end
                     case 134.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: PLEASE READ THE MANUAL ACCOMPANYING THIS RELEASE', returnType{i}]);
-                        fprintf(fidType(i), ['-> For assistance or any other information please contact the author: louisvallance@hotmail.co.uk', returnType{i}]);
+                        fprintf(fidType(i), ['-> For assistance or any other information please contact the developer: louisvallance@hotmail.co.uk', returnType{i}]);
                         fprintf(fidType(i), ['-> Please rate this submission on the file exchange: http://www.mathworks.com/matlabcentral/fileexchange/51041-quick-fatigue-tool', returnType{i}]);
 
                         setappdata(0, 'messageFileNotes', 1.0)
@@ -1871,12 +1856,12 @@ classdef messenger < handle
                         fprintf(fidType(i), ['-> The value of REPEATS has been automatically adjusted to %.0f', returnType{i}], getappdata(0, 'repeats'));
                     case 227.0
                         if isempty(getappdata(0, 'vGauge_kp')) == 1.0
-                            fprintf(fidType(i), [returnType{i}, '***WARNING: The cyclic strain hardening coefficient (kp) is not defined for virtual strain gauge #%.0f', returnType{i}], getappdata(0, 'vGaugeNumber'));
+                            fprintf(fidType(i), [returnType{i}, '***NOTE: The cyclic strain hardening coefficient (kp) is not defined at virtual strain gauge #%.0f', returnType{i}], getappdata(0, 'vGaugeNumber'));
                         end
                         if isempty(getappdata(0, 'vGauge_np')) == 1.0
-                            fprintf(fidType(i), [returnType{i}, '***WARNING: The cyclic strain hardening exponent (np) is not defined for virtual strain gauge #%.0f', returnType{i}], getappdata(0, 'vGaugeNumber'));
+                            fprintf(fidType(i), [returnType{i}, '***NOTE: The cyclic strain hardening exponent (np) is not defined at virtual strain gauge #%.0f', returnType{i}], getappdata(0, 'vGaugeNumber'));
                         end
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The strains for virtual strain gauge #%.0f will not be corrected for the effect of plasticity. Results will be inaccurate for inelastic stresses', returnType{i}], getappdata(0, 'vGaugeNumber'));
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: The stresses measured at virtual strain gauge #%.0f are elastic. Results might be inaccurate', returnType{i}], getappdata(0, 'vGaugeNumber'));
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 228.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The definition of virtual gauge #%.0f was not recognised', returnType{i}], getappdata(0, 'vGaugeNumber'));
@@ -1892,7 +1877,7 @@ classdef messenger < handle
                         fprintf(fidType(i), ['-> Virtual strain gauges will not be analysed', returnType{i}]);
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 231.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: Out-of-plane stresses were found at virtual strain gauge #%.0f (item %.0f.%.0f)', returnType{i}], getappdata(0, 'vGaugeNumber'), getappdata(0, 'vGaugeMainID'),getappdata(0, 'vGaugeSubID'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Out-of-plane stresses were found at virtual strain gauge #%.0f (item ID %.0f.%.0f)', returnType{i}], getappdata(0, 'vGaugeNumber'), getappdata(0, 'vGaugeMainID'),getappdata(0, 'vGaugeSubID'));
                         fprintf(fidType(i), ['-> These stresses will not be detected by the gauge', returnType{i}]);
                         fprintf(fidType(i), ['-> Plane stress elements are recommended for best accuracy', returnType{i}]);
                     case 232.0
@@ -1963,7 +1948,7 @@ classdef messenger < handle
                         fprintf(fidType(i), ['-> It is recommended that the minimum and maximum non-zero mean stress values are defined at zero stress amplitude', returnType{i}]);
                     case 242.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The yield calculation failed in group %.0f (''%s'')', returnType{i}], getappdata(0, 'message_242_groupNumber'), getappdata(0, 'message_242_groupName'));
-                        fprintf(fidType(i), ['-> An exception was encountered during the calculation. Please contact the author.', returnType{i}]);
+                        fprintf(fidType(i), ['-> An exception was encountered during the calculation. Please contact the developer.', returnType{i}]);
                     case 243.0
                         if getappdata(0, 'outputField') == 1.0
                             fprintf(fidType(i), [returnType{i}, '***WARNING: The FRF normalization parameter ''%s'' was not recognised', returnType{i}], getappdata(0, 'message_243_paramOld'));
@@ -1985,7 +1970,7 @@ classdef messenger < handle
                         reason = getappdata(0, 'message_247_breakCondition');
                         if reason == 0.0
                             fprintf(fidType(i), [returnType{i}, '***WARNING: The FOS calculation has been stopped for an unknown reason', returnType{i}]);
-                            fprintf(fidType(i), ['-> Please contact the author for further assistance', returnType{i}]);
+                            fprintf(fidType(i), ['-> Please contact the developer for further assistance', returnType{i}]);
                             setappdata(0, 'messageFileWarnings', 1.0)
                         else
                             fprintf(fidType(i), [returnType{i}, '***NOTE: The FOS calculation has reached the following stop condition:', returnType{i}]);
@@ -2221,40 +2206,40 @@ classdef messenger < handle
                         
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 290.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The maximum stress failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'MSTRS'));
+                        %_AVAILABLE_%
                     case 291.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Tsai-Hill failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'TSAIH'));
+                        %_AVAILABLE_%
                     case 292.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Tsai-Wu failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'TSAIW'));
+                        %_AVAILABLE_%
                     case 293.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Tsai-Wu failure criterion for closed cell PVC foam has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'TSAIWTT'));
+                        %_AVAILABLE_%
                     case 294.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Azzi-Tsai-Hill failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'AZZIT'));
+                        %_AVAILABLE_%
                     case 295.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The maximum strain failure criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'MSTRN'));
+                        %_AVAILABLE_%
                     case 296.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin damage initiation (fibre tensile) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNFTCRT'));
+                        %_AVAILABLE_%
                     case 297.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin damage initiation (fibre compression) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNFCCRT'));
+                        %_AVAILABLE_%
                     case 298.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The Hashin damage initiation (matrix tensile) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'HSNMTCRT'));
+                        %_AVAILABLE_%
                     case 299.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The DAC MATLAB figure was not generated because the maximum cumulative damage is either zero or infinite', returnType{i}]);
+                        %_AVAILABLE_%
                     case 300.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The COMPOSITE_CRITERIA job file option was specified, but composite criteria were not evaluated', returnType{i}]);
                         fprintf(fidType(i), ['-> The specified composite properies are insufficient', returnType{i}]);
                     case 301.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: After evaluating composite criteria, no failure/damage initiation was detected', returnType{i}]);
                     case 302.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The LaRC05 damage initiation (plastic) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'LARPFCRT'));
+                        %_AVAILABLE_%
                     case 303.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The LaRC05 damage initiation (matrix) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'LARMFCRT'));
+                        %_AVAILABLE_%
                     case 304.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The LaRC05 damage initiation (fibre kink) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'LARKFCRT'));
+                        %_AVAILABLE_%
                     case 305.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The LaRC05 damage initiation (fibre split) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'LARSFCRT'));
+                        %_AVAILABLE_%
                     case 306.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The LaRC05 damage initiation (fibre tensile) criterion has been exceeded at %.0f locations', returnType{i}], getappdata(0, 'LARTFCRT'));
+                        %_AVAILABLE_%
                     case 307.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: One or more regions in the model are in a highly triaxial state of stress (TRF > 2)', returnType{i}]);
                         fprintf(fidType(i), ['-> The effective ductility at these regions is diminished and there is a higher likelihood of brittle fracture', returnType{i}]);
@@ -2309,6 +2294,30 @@ classdef messenger < handle
 
                             setappdata(0, 'messageFileWarnings', 1.0)
                         end
+                    case 314.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: There are multiple virtual strain gauge definitions, but only a single gauge orientation was specified', returnType{i}]);
+                        fprintf(fidType(i), ['-> Please ensure that the gauge orientation is the same for every gauge definition', returnType{i}]);
+                    case 315.0
+                        fprintf(fidType(i), [returnType{i}, '***COMPOSITE CRITERIA ANALYSIS SUMMARY', returnType{i}]);
+                        fprintf(fidType(i), [returnType{i}, '   FAILURE    STATUS    NO.    MAX. VALUE', returnType{i}]);
+                        fprintf(fidType(i), ['INDEX/MEASURE        LOCATIONS', returnType{i}]);
+                        fprintf(fidType(i), ['    MSTRS      %-4s     %-8s%s', returnType{i}], getappdata(0, 'MSTRS_STAT'), getappdata(0, 'MSTRS_NL'), getappdata(0, 'MSTRS_MV'));
+                        fprintf(fidType(i), ['    MSTRN      %-4s     %-8s%s', returnType{i}], getappdata(0, 'MSTRN_STAT'), getappdata(0, 'MSTRN_NL'), getappdata(0, 'MSTRN_MV'));
+                        fprintf(fidType(i), ['    TSAIH      %-4s     %-8s%s', returnType{i}], getappdata(0, 'TSAIH_STAT'), getappdata(0, 'TSAIH_NL'), getappdata(0, 'TSAIH_MV'));
+                        fprintf(fidType(i), ['    TSAIW      %-4s     %-8s%s', returnType{i}], getappdata(0, 'TSAIW_STAT'), getappdata(0, 'TSAIW_NL'), getappdata(0, 'TSAIW_MV'));
+                        fprintf(fidType(i), ['    TSAIWTT    %-4s     %-8s%s', returnType{i}], getappdata(0, 'TSAIWTT_STAT'), getappdata(0, 'TSAIWTT_NL'), getappdata(0, 'TSAIWTT_MV'));
+                        fprintf(fidType(i), ['    AZZIT      %-4s     %-8s%s', returnType{i}], getappdata(0, 'AZZIT_STAT'), getappdata(0, 'AZZIT_NL'), getappdata(0, 'AZZIT_MV'));
+                        fprintf(fidType(i), ['    HSNFTCRT   %-4s     %-8s%s', returnType{i}], getappdata(0, 'HSNFTCRT_STAT'), getappdata(0, 'HSNFTCRT_NL'), getappdata(0, 'HSNFTCRT_MV'));
+                        fprintf(fidType(i), ['    HSNFCCRT   %-4s     %-8s%s', returnType{i}], getappdata(0, 'HSNFCCRT_STAT'), getappdata(0, 'HSNFCCRT_NL'), getappdata(0, 'HSNFCCRT_MV'));
+                        fprintf(fidType(i), ['    HSNMTCRT   %-4s     %-8s%s', returnType{i}], getappdata(0, 'HSNMTCRT_STAT'), getappdata(0, 'HSNMTCRT_NL'), getappdata(0, 'HSNMTCRT_MV'));
+                        fprintf(fidType(i), ['    HSNMCCRT   %-4s     %-8s%s', returnType{i}], getappdata(0, 'HSNMCCRT_STAT'), getappdata(0, 'HSNMCCRT_NL'), getappdata(0, 'HSNMCCRT_MV'));
+                        fprintf(fidType(i), ['    LARPFCRT   %-4s     %-8s%s', returnType{i}], getappdata(0, 'LARPFCRT_STAT'), getappdata(0, 'LARPFCRT_NL'), getappdata(0, 'LARPFCRT_MV'));
+                        fprintf(fidType(i), ['    LARMFCRT   %-4s     %-8s%s', returnType{i}], getappdata(0, 'LARMFCRT_STAT'), getappdata(0, 'LARMFCRT_NL'), getappdata(0, 'LARMFCRT_MV'));
+                        fprintf(fidType(i), ['    LARKFCRT   %-4s     %-8s%s', returnType{i}], getappdata(0, 'LARKFCRT_STAT'), getappdata(0, 'LARKFCRT_NL'), getappdata(0, 'LARKFCRT_MV'));
+                        fprintf(fidType(i), ['    LARSFCRT   %-4s     %-8s%s', returnType{i}], getappdata(0, 'LARSFCRT_STAT'), getappdata(0, 'LARSFCRT_NL'), getappdata(0, 'LARSFCRT_MV'));
+                        fprintf(fidType(i), ['    LARTFCRT   %-4s     %-8s%s', returnType{i}], getappdata(0, 'LARTFCRT_STAT'), getappdata(0, 'LARTFCRT_NL'), getappdata(0, 'LARTFCRT_MV'));
+                    case 316.0
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: The DAC MATLAB figure was not generated because the maximum cumulative damage is either zero or infinite', returnType{i}]);
                 end
             end
         end
@@ -2362,13 +2371,13 @@ classdef messenger < handle
 
             % Write file header
             try
-                fprintf(fid, 'Quick Fatigue Tool 6.11-12 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
+                fprintf(fid, 'Quick Fatigue Tool 6.11-13 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
             catch
-                fprintf(fid, 'Quick Fatigue Tool 6.11-12\r\n');
+                fprintf(fid, 'Quick Fatigue Tool 6.11-13\r\n');
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2018\r\n');
-            fprintf(fid, 'Last modified 04-Mar-2018 19:58:22 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 14-Mar-2018 07:24:59 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
