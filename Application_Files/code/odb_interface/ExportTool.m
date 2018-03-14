@@ -12,7 +12,7 @@ function varargout = ExportTool(varargin)%#ok<*DEFNU>
 %      10.4 The ODB Interface
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 13-Mar-2018 18:58:10 GMT
+%   Last modified 14-Mar-2018 15:38:16 GMT
     
     %%
     
@@ -821,6 +821,9 @@ for instanceNumber = 1:nInstances
                     messageB = sprintf('The Abaqus command ''%s'' could not be found on the system. Check your Abaqus installation. Results will not be written to the output database.', abqCmd);
                 elseif isempty(strfind(message, 'OdbError: illegal argument type for built-in operation')) == 0.0
                     messageB = sprintf('The Abaqus API rejected the fatigue results data.\r\n\r\nFor element-nodal and integration point data, results for at least one element are required. For centroidal and unique-nodal data, results for at least two centroids or nodes are required, respectively.\r\n\r\nResults will not be written to the output database.');
+                elseif isempty(strfind(message, sprintf('OdbError: A Step named "%s" already exists.', stepName))) == 0.0
+                    % Abaqus tried to create a step whose name already exists in the .odb file
+                    messageB = sprintf('Abaqus does not permit more than one step to have the same name.\n\nEither specify a step that does not already exist in the output database or write fatigue results to an existing QFT step.');
                 else
                     % Unkown exception
                     messageB = sprintf('The cause of this error could not be determined. Please contact the developer at louisvallance@hotmail.co.uk for further assistance. Results will not be written to the output database.');

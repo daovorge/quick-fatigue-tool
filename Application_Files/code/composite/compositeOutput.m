@@ -10,7 +10,7 @@ classdef compositeOutput < handle
 %      12.3 Composite failure criteria
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 13-Mar-2018 18:58:10 GMT
+%   Last modified 14-Mar-2018 15:38:16 GMT
     
     %%
     
@@ -357,6 +357,9 @@ classdef compositeOutput < handle
                             elseif isempty(strfind(message, 'OdbError: illegal argument type for built-in operation')) == 0.0
                                 % There is no Abaqus executable on the host machine
                                 fprintf(fid_debug, '\n[QFT Error]: The Abaqus API rejected the fatigue results data. For element-nodal and integration point data, results for at least one element are required. For centroidal and unique-nodal data, results for at least two centroids or nodes are required, respectively.');
+                            elseif isempty(strfind(message, sprintf('OdbError: A Step named "%s" already exists.', stepName))) == 0.0
+                                % Abaqus tried to create a step whose name already exists in the .odb file
+                                fprintf(fid_debug, '\n[QFT Error]: Abaqus does not permit more than one step to have the same name. Use the STEP_NAME option to define a step that does not already exist in the output database.');
                             else
                                 % Unkown exception
                                 fprintf(fid_debug, '\nThe cause of this error could not be determined. Please contact the developer at louisvallance@hotmail.co.uk for further assistance.');
