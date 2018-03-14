@@ -11,7 +11,7 @@ function [] = main(flags)
 %   Developer contact: louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 14-Mar-2018 07:24:59 GMT
+%   Last modified 14-Mar-2018 15:38:16 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');
@@ -43,7 +43,7 @@ setappdata(0, 'messageFileWarnings', 0.0)
 %% PRINT COMMAND WINDOW HEADER
 fprintf('[NOTICE] Quick Fatigue Tool 6.11-13')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2018)')
-fprintf('\n[NOTICE] Last modified 14-Mar-2018 07:24:59 GMT')
+fprintf('\n[NOTICE] Last modified 14-Mar-2018 15:38:16 GMT')
 
 cleanExit = 0.0;
 
@@ -778,7 +778,6 @@ if G > 1.0
 
     if isempty(mainID_groupAll) == 1.0 || isempty(subID_groupAll) == 1.0
         worstAnalysisItem_original = worstAnalysisItem;
-        setappdata(0, 'worstAnalysisItem_original', worstAnalysisItem_original)
     else
         worstAnalysisItem_original = zeros(1.0, length(worstAnalysisItem));
 
@@ -799,12 +798,8 @@ if G > 1.0
         end
         worstAnalysisItem_original = worstAnalysisItem_original(1.0);
     end
-
-    setappdata(0, 'worstAnalysisItem_original', worstAnalysisItem_original)
 else
     worstAnalysisItem_original = worstAnalysisItem;
-    setappdata(0, 'worstAnalysisItem_original', worstAnalysisItem_original)
-    worstAnalysisItem_original = worstAnalysisItem_original(1.0);
 end
 messenger.writeMessage(18.0)
 
@@ -821,8 +816,10 @@ if length(worstAnalysisItem) > 1.0
     %}
     if isempty(find(worstAnalysisItem == maximumStressItem, 1.0)) == 1.0
         worstAnalysisItem = worstAnalysisItem(1.0);
+        worstAnalysisItem_original = worstAnalysisItem_original(1.0);
     else
         worstAnalysisItem = worstAnalysisItem(worstAnalysisItem == maximumStressItem);
+        worstAnalysisItem_original = worstAnalysisItem_original(maximumStressItem);
     end
 
     % The item with the largest stress no longer needs to be calculated
@@ -830,6 +827,7 @@ if length(worstAnalysisItem) > 1.0
 else
     setappdata(0, 'skipMaximumStressCalculation', 0.0)
 end
+setappdata(0, 'worstAnalysisItem_original', worstAnalysisItem_original)
 
 % Get the worst main and sub IDs
 worstMainID = mainID_master(worstAnalysisItem_original);
