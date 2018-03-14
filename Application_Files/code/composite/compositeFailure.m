@@ -12,7 +12,7 @@ function [] = compositeFailure(N, L, mainID, fid_status)
 %      12.3 Composite failure criteria
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 13-Mar-2018 16:24:24 GMT
+%   Last modified 14-Mar-2018 07:24:59 GMT
     
     %%
 
@@ -369,6 +369,23 @@ LARMFCRT(abs(LARMFCRT - 1.0) < 1e-6) = 1.0;
 LARKFCRT(abs(LARKFCRT - 1.0) < 1e-6) = 1.0;
 LARSFCRT(abs(LARSFCRT - 1.0) < 1e-6) = 1.0;
 LARTFCRT(abs(LARTFCRT - 1.0) < 1e-6) = 1.0;
+
+%% Round failure measures to 0 if within tolerance
+MSTRS(abs(MSTRS) < 1e-6) = 0.0;
+MSTRN(abs(MSTRN) < 1e-6) = 0.0;
+TSAIH(abs(TSAIH) < 1e-6) = 0.0;
+TSAIW(abs(TSAIW) < 1e-6) = 0.0;
+TSAIWTT(abs(TSAIWTT) < 1e-6) = 0.0;
+AZZIT(abs(AZZIT) < 1e-6) = 0.0;
+HSNFTCRT(abs(HSNFTCRT) < 1e-6) = 0.0;
+HSNFCCRT(abs(HSNFCCRT) < 1e-6) = 0.0;
+HSNMTCRT(abs(HSNMTCRT) < 1e-6) = 0.0;
+HSNMCCRT(abs(HSNMCCRT) < 1e-6) = 0.0;
+LARPFCRT(abs(LARPFCRT) < 1e-6) = 0.0;
+LARMFCRT(abs(LARMFCRT) < 1e-6) = 0.0;
+LARKFCRT(abs(LARKFCRT) < 1e-6) = 0.0;
+LARSFCRT(abs(LARSFCRT) < 1e-6) = 0.0;
+LARTFCRT(abs(LARTFCRT) < 1e-6) = 0.0;
 
 %% Get whole model model summary for message file
 [N_MSTRS, N_MSTRN, N_TSAIH, N_TSAIW, N_TSAIWTT, N_AZZIT, N_HSNFTCRT,...
