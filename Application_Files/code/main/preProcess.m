@@ -2281,7 +2281,7 @@ classdef preProcess < handle
             end
             
             %% If the user specified a dataset sequence, a scale and combine loading is not required
-            if isempty(scales)
+            if isempty(scales) == 1.0
                 [error, mainID, subID, Sxx, Syy, Szz, Txy, Tyz, Txz] = preProcess.datasetSequence(channels, items, elementType, loadingScale, loadingOffset);
                 
                 %% Warn the user if there are any duplicate IDs in the model
