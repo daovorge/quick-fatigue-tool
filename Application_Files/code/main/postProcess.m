@@ -11,7 +11,7 @@ classdef postProcess < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 14-Mar-2018 15:38:16 GMT
+%   Last modified 16-Mar-2018 13:19:57 GMT
     
     %%
     
@@ -2205,6 +2205,9 @@ classdef postProcess < handle
                             elseif isempty(strfind(message, sprintf('OdbError: A Step named "%s" already exists.', stepName))) == 0.0
                                 % Abaqus tried to create a step whose name already exists in the .odb file
                                 fprintf(fid_debug, '\n[QFT Error]: Abaqus does not permit more than one step to have the same name. Use the STEP_NAME option to define a step that does not already exist in the output database.');
+                            elseif isempty(strfind(message, 'AbaqusException: Interaction cannot be used with the current procedure')) == 0.0
+                                % Fatigue results are being written to an Abaqus/Explicit step
+                                fprintf(fid_debug, '\n[QFT Error]: The Abaqus API rejected the fatigue results data. If the model output database contains results from an Abaqus/Explicit analysis procedure, then EXPLICIT_FEA=1 must be set in the job file.');
                             else
                                 % Unkown exception
                                 fprintf(fid_debug, '\nThe cause of this error could not be determined. Please contact the developer at louisvallance@hotmail.co.uk for further assistance.');

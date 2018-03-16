@@ -12,7 +12,7 @@ function varargout = ExportTool(varargin)%#ok<*DEFNU>
 %      10.4 The ODB Interface
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 14-Mar-2018 15:38:16 GMT
+%   Last modified 16-Mar-2018 13:19:57 GMT
     
     %%
     
@@ -824,9 +824,17 @@ for instanceNumber = 1:nInstances
                 elseif isempty(strfind(message, sprintf('OdbError: A Step named "%s" already exists.', stepName))) == 0.0
                     % Abaqus tried to create a step whose name already exists in the .odb file
                     messageB = sprintf('Abaqus does not permit more than one step to have the same name.\n\nEither specify a step that does not already exist in the output database or write fatigue results to an existing QFT step.');
+                elseif isempty(strfind(message, 'AbaqusException: Interaction cannot be used with the current procedure')) == 0.0
+                    % Fatigue results are being written to an Abaqus/Explicit step
+                    messageB = sprintf('The Abaqus API rejected the fatigue results data.\r\n\r\nIf the model output database contains results from an Abaqus/Explicit analysis procedure, then select the option "Explicit FEA" and try again.');
                 else
                     % Unkown exception
                     messageB = sprintf('The cause of this error could not be determined. Please contact the developer at louisvallance@hotmail.co.uk for further assistance. Results will not be written to the output database.');
+                end
+                
+                % Delete the results output database from the output directory if applicable
+                if exist(sprintf('%s\\%s.odb', resultsDatabasePath, resultsDatabaseName), 'file') == 2.0
+                    delete(sprintf('%s\\%s.odb', resultsDatabasePath, resultsDatabaseName))
                 end
                 
                 errorMessage = [messageA, messageB];

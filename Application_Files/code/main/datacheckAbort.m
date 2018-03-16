@@ -5,7 +5,7 @@ function [continueAnalysis] = datacheckAbort(Sxx, Syy, Szz, Txy, Tyz, Txz, tic_p
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 14-Feb-2018 19:58:29 GMT
+%   Last modified 16-Mar-2018 13:19:57 GMT
     
     %%   
     
@@ -26,6 +26,25 @@ if getappdata(0, 'analysisDialogues') > 0.0
     if strcmpi(answer, 'continue') == 1.0
         continueAnalysis = 1.0;
         setappdata(0, 'dataCheck', 0.0)
+        
+        %{
+            If the user originally requested MATLAB figures, create the
+            directory now
+        %}
+        if getappdata(0, 'outputFigure') == 1.0
+            if exist([getappdata(0, 'outputDirectory'), 'MATLAB Figures'], 'dir') == 0.0
+                try
+                    mkdir([getappdata(0, 'outputDirectory'), 'MATLAB Figures'])
+                catch unhandledException
+                    setappdata(0, 'E034', 1.0)
+                    setappdata(0, 'warning_034_exceptionMessage', unhandledException.identifier)
+                    
+                    cleanup(1.0)
+                    continueAnalysis = 0.0;
+                    return
+                end
+            end
+        end
         return
     end
 end
