@@ -6,7 +6,7 @@ function [] = flushData()
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 02-Feb-2018 09:50:06 GMT
+%   Last modified 19-Mar-2018 15:52:13 GMT
     
     %%
     
@@ -241,4 +241,9 @@ if isappdata(0, 'SIGOriginalSignal') == 1.0
 end
 if isappdata(0, 'fatigueDefinitionFile') == 1.0
     rmappdata(0, 'fatigueDefinitionFile')
+end
+
+%% Remove fatigue definition
+if isappdata(0, 'fldData') == 1.0
+    rmappdata(0, 'fldData')
 end
