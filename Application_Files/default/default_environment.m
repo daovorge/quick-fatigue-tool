@@ -13,12 +13,12 @@
 %      2 Environment variables
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 22-Feb-2018 10:22:34 GMT
+%   Last modified 19-Mar-2018 07:59:59 GMT
 
 %% GATE TENSORS
 %{
     0: Off
-    1: Gate tensors (as % of max tensor)
+    1: Gate tensors (as % of max tensor) (default)
     2: Gate tensors (Nielsony's method)
 %}
 setappdata(0, 'gateTensors', 1.0)
@@ -28,7 +28,7 @@ setappdata(0, 'tensorGate', 5.0)
 
 %% PRE-GATE LOAD HISTORIES
 %{
-    0: Off
+    0: Off (default)
     1: Pre-gate load histories (as % gate)
     2: Pre-gate load histories (Nielsony's method)
 %}
@@ -43,27 +43,27 @@ setappdata(0, 'numberOfWindows', 2.0)
 
 %% GROUP DEFINITION
 %{
-    0: Program controlled
+    0: Program controlled (default)
     1: Always read group data as an FEA subset
 %}
 setappdata(0, 'groupDefinition', 0.0)
 
 %% SURFACE DETECTION
 %{
-    0: Search dataset elements only
+    0: Search dataset elements only (default)
     1: Search ODB part instance
 %}
 setappdata(0, 'searchRegion', 0.0)
 
 %{
-    0: Treat shell surface as whole shell
+    0: Treat shell surface as whole shell (default)
     1: Treat shell surface as free shell faces
 %}
 setappdata(0, 'shellFaces', 0.0)
 
 %{
-    0: Always read model surface from ODB (default)
-    1: Read model surface from surface definition file
+    0: Always read model surface from ODB
+    1: Read model surface from surface definition file if available (default)
 %}
 setappdata(0, 'surfaceMode', 1.0)
 
@@ -72,13 +72,13 @@ setappdata(0, 'surfaceMode', 1.0)
 % GOODMAN ENVELOPE DEFINITION
 %{
     0: Use standard envelope for Goodman mean stress correction
-    1: Use intersection of Buch and Goodman envelopes (if applicable)
+    1: Use intersection of Buch and Goodman envelopes if available (default)
 %}
 setappdata(0, 'modifiedGoodman', 1.0)
 
 % GOODMAN MEAN STRESS LIMIT
 %{
-    'UTS': Material UTS (Default)
+    'UTS': Material UTS (default)
     'PROOF': Material proof stress
     'S-N': S-N curve intercept
     n: User-defined
@@ -87,7 +87,7 @@ setappdata(0, 'goodmanMeanStressLimit', 'UTS')
 
 % WALKER GAMMA PARAMETER DEFINITION
 %{
-    1: Regression fit (Walker)
+    1: Regression fit (Walker) (default)
     2: Standard values (Dowling)
     3: User-defined
 %}
@@ -100,21 +100,21 @@ setappdata(0, 'userWalkerGamma', [])
 
 % RAINFLOW ALGORITHM
 %{
-    1: De Morais (Legacy)
-    2: Vallance
+    1: De Morais
+    2: Vallance (default)
 %}
 setappdata(0, 'rainflowAlgorithm', 2.0)
 
 % RAINFLOW MODE FOR TWO-PARAMETER COUNTING
 %{
-    1: Combine parameters, count cycles
+    1: Combine parameters, count cycles (default)
     2: Count parameters, combine cycles
 %}
 setappdata(0, 'rainflowMode', 1.0)
 
 %% DEFAULT SHELL SECTION POINT
 %{
-    1: Bottom face (SNEG)
+    1: Bottom face (SNEG) (default)
     2: Top face (SPOS)
 %}
 setappdata(0, 'shellLocation', 1.0)
@@ -122,7 +122,7 @@ setappdata(0, 'shellLocation', 1.0)
 %% NODAL ELIMINATION
 %{
     0: Analyse all nodes
-    1: Nodal elimination based on material's CAEL
+    1: Nodal elimination based on material's CAEL (default)
     2: Nodal elimination based on user design life
 %}
 setappdata(0, 'nodalElimination', 1.0)
@@ -142,14 +142,14 @@ setappdata(0, 'cpSample', 0.0)
 
 % SHEAR STRESS DETERMINATION
 %{
-    1: Longest chord method
+    1: Longest chord method (default)
     2: Maximum resultant shear stress
 %}
 setappdata(0, 'cpShearStress', 1.0)
 
 %% SIGN CONVENTION
 %{
-    1: Take sign from hydrostatic stress
+    1: Take sign from hydrostatic stress (default)
     2: Take sign from largest principal stress
     3: Take sign from Mohr's circle
 %}
@@ -160,7 +160,7 @@ setappdata(0, 'signConvention', 1.0)
 % ANALYSIS CONTINUATION
 %{
     0: Reset stress-strain configuration
-    1: Import stress-strain configuration
+    1: Import stress-strain configuration (default)
 %}
 setappdata(0, 'importMaterialState', 1.0)
 
@@ -168,15 +168,15 @@ setappdata(0, 'importMaterialState', 1.0)
 
 % FATIGUE DATA
 %{
-    0: Use elastic fatigue properties only
-    1: Include the effect of fatigue ductility (if applicable)
+    0: Use elastic fatigue properties only (default)
+    1: Include the effect of fatigue ductility if applicable
 %}
 setappdata(0, 'plasticSN', 0.0)
 
 % DAMAGE PARAMETER FOR PROPORTIONAL LOADS
 %{
     1: Maximum normal stress
-    2: Maximum combined (shear + direct) stress
+    2: Maximum combined (shear + direct) stress (default)
 %}
 setappdata(0, 'sbbmParameter', 2.0)
 
@@ -185,7 +185,7 @@ setappdata(0, 'sbbmParameter', 2.0)
 % NORMAL STRESS MATCHING
 %{
     1: Use maximum normal stress over loading
-    2: Use maximum normal stress over maximum shear cycle interval
+    2: Use maximum normal stress over maximum shear cycle interval (default)
     3: Use average normal stress over maximum shear cycle interval
 %}
 setappdata(0, 'findleyNormalStress', 2.0)
@@ -194,7 +194,7 @@ setappdata(0, 'findleyNormalStress', 2.0)
 
 % STRESS INVARIANT PARAMETER
 %{
-    0: Program controlled
+    0: Program controlled (default)
     1: von Mises
     2: Principal
     3: Hydrostatic
@@ -206,7 +206,7 @@ setappdata(0, 'stressInvariantParameter', 0.0)
 
 % EFFECTIVE STRESS PARAMETER
 %{
-    1: Manson-McKnight
+    1: Manson-McKnight (default)
     2: Sines
     3: Smith-Watson-Topper
     4: R-Ratio Sines
@@ -218,7 +218,7 @@ setappdata(0, 'nasalifeParameter', 1.0)
 
 % FATIGUE LIMIT DERIVATION
 %{
-    1: Calculate the fatigue limit from the standard curve
+    1: Calculate the fatigue limit from the standard curve (default)
     2: Calculate the fatigue limit from algorithm-specific equation (if applicable)
     3: User-defined
 %}
@@ -229,7 +229,7 @@ setappdata(0, 'userFatigueLimit', [])
 
 % DAMAGE BELOW ENDURANCE LIMIT
 %{
-    0: Program controlled
+    0: Program controlled (default)
     1: Calculate damage for cycles below the endurance limit
     2: Assume no damage for cycles below the endurance limit
 %}
@@ -248,7 +248,7 @@ setappdata(0, 'cyclesToRecover', 50.0)
 
 % CALCULATION TARGET
 %{
-    1: Perform FOS calculations for user-defined design life
+    1: Perform FOS calculations for user-defined design life (default)
     2: Perform FOS calculations for infinite design life (CAEL)
 %}
 setappdata(0, 'fosTarget', 1.0)
@@ -279,16 +279,16 @@ setappdata(0, 'fosDiagnostics', 1.0)
 
 % INTERPOLATION ORDER FOR USER FRF DATA
 %{
-    'NEAREST' (Nearest Neighbor)
-    'LINEAR' (Linear)
-    'SPLINE' (Cubic, Piecewise)
-    'PCHIP' (Cubic, Shape-preserving)
+    'NEAREST': (Nearest Neighbor)
+    'LINEAR': (Linear) (default)
+    'SPLINE': (Cubic, Piecewise)
+    'PCHIP': (Cubic, Shape-preserving)
 %}
 setappdata(0, 'frfInterpOrder', 'LINEAR')
 
 % MEAN STRESS NORMALIZATION PARAMETERS FOR USER FRF DATA
 %{
-    'UTS': Material ultimate tensile strength
+    'UTS': Material ultimate tensile strength (default)
     'UCS': Material ultimate compressive strength
     'PROOF': Material 0.2% proof stress
     n: User-defined
@@ -306,7 +306,7 @@ setappdata(0, 'frfNormParamAmp', 'LIMIT')
 % CALCULATION TARGET
 %{
     1: Perform FRF calculations for user-defined design life
-    2: Perform FRF calculations for infinite design life (CAEL)
+    2: Perform FRF calculations for infinite design life (CAEL) (default)
 %}
 setappdata(0, 'frfTarget', 2.0)
 
@@ -316,7 +316,7 @@ setappdata(0, 'frfMinValue', 0.1)
 
 % OUTPUT DIAGNOSTICS FOR USER FRF DATA
 %{
-    []: Disabled
+    []: Disabled (default)
     n: Item numbers
 %}
 setappdata(0, 'frfDiagnostics', [])
@@ -334,8 +334,8 @@ setappdata(0, 'notchFactorEstimation', 1.0)
 
 %% EIGENSOLVER
 %{
-    1: MATLAB (built-in)
-    2: Luong
+    1: MATLAB
+    2: Luong (default)
 %}
 setappdata(0, 'eigensolver', 2.0)
 
@@ -360,7 +360,7 @@ setappdata(0, 'figure_KDSN', 1.0)
 setappdata(0, 'figure_VM', 1.0)
 setappdata(0, 'figure_PS', 1.0)
 setappdata(0, 'figure_PE', 1.0)
-setappdata(0, 'figure_CNS', 0.0)
+setappdata(0, 'figure_CNS', 1.0)
 setappdata(0, 'figure_DPP', 1.0)
 setappdata(0, 'figure_DP', 1.0)
 setappdata(0, 'figure_LP', 1.0)
@@ -374,7 +374,7 @@ setappdata(0, 'figure_LH', 1.0)
 
 % FIGURE FILE FORMAT
 %{
-    'fig' = MATLAB Figure
+    'fig' = MATLAB Figure (default)
     'png' = Portable Netwok Graphics
     'jpg' = JPEG
 %}
@@ -407,7 +407,7 @@ setappdata(0, 'checkOverwrite', 1.0)
     1: Before
     2: After
     3: Before and after
-    4: Never
+    4: Never (default)
 %}
 setappdata(0, 'cleanAppData', 4.0)
 
@@ -415,7 +415,7 @@ setappdata(0, 'cleanAppData', 4.0)
 
 % CACHE WORKSPACE VARIABLES AND APPLICATION DATA
 %{
-    0: Disabled
+    0: Disabled (default)
     1: Every n analysis items
     2: n evenly spaced analysis items
     3: From analysis item IDs
@@ -436,15 +436,23 @@ setappdata(0, 'autoExport_ODB', 1.0)
 
 % STEP DEFINITION
 %{
-    1: Export results to new step
+    1: Export results to new step (default)
     2: Export results to existing step
 %}
 setappdata(0, 'autoExport_stepType', 1.0)
 
-% ATTEMPT TO DETERMINE DATA POSITION AUTOMATICALLY
+% ATTEMPT TO DETERMINE RESULT POSITION AUTOMATICALLY
+%{
+    0: User specifies result position (default)
+    1: Quick Fatigue Tool determines result position
+%}
 setappdata(0, 'autoExport_autoPosition', 0.0)
 
 % ATTEMPT TO UPGRADE THE ODB
+%{
+    0: Use ODB version specified by Abaqus command
+    1: Attempt to upgrade ODB to version specified by Abaqus command (default)
+%}
 setappdata(0, 'autoExport_upgradeODB', 1.0)
 
 % ABAQUS COMMAND LINE
@@ -456,7 +464,7 @@ setappdata(0, 'autoExport_ODBSetName', [])
 
 % EXECUTION MODE
 %{
-    1: Create ODB, discard Python script
+    1: Create ODB, discard Python script (default)
     2: Create ODB, retain Python script
     3: Write Python script only
 %}
@@ -465,7 +473,7 @@ setappdata(0, 'autoExport_executionMode', 1.0)
 % FIELD OUTPUT SELECTION MODE
 %{
     1: Select from list below
-    2: Preselected defaults
+    2: Preselected defaults (default)
     3: All
 %}
 setappdata(0, 'autoExport_selectionMode', 2.0)

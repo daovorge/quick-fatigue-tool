@@ -6,7 +6,7 @@ classdef jobFile < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 13-Mar-2018 10:39:43 GMT
+%   Last modified 19-Mar-2018 15:52:13 GMT
     
     %%
     
@@ -1699,8 +1699,10 @@ classdef jobFile < handle
         end
         
         %% SCALE AND COMBINE THE LOADING
-        function [scale, offset, repeats, units, N, signalLength, Sxx, Syy, Szz, Txy, Tyz, Txz, mainID, subID, gateHistories, gateTensors, tensorGate, recoverFatigueLoading, error] =...
-                getLoading(units, scale, dataCheck, algorithm, msCorrection,...
+        function [scale, offset, repeats, units, N, signalLength, Sxx,...
+                Syy, Szz, Txy, Tyz, Txz, mainID, subID, gateHistories,...
+                gateTensors, tensorGate, recoverFatigueLoading, error] =...
+                getLoading(units, scale, algorithm, msCorrection,...
                 userUnits, hfDataset, hfHistory, hfTime,...
                 hfScales, items, dataset, history, elementType, offset)
             
@@ -1810,50 +1812,32 @@ classdef jobFile < handle
             setappdata(0, 'incorrectItemList', 0.0)
             
             % If using Uniaxial Stress-Life, no scale & combine is necessary
-            if (ischar(dataCheck) == 1.0) || (dataCheck == 2.0)
-                try
-                    if ischar(dataCheck) == 1.0
-                        fatigueDefinitionFile = dataCheck;
-                    else
-                        fatigueDefinitionFile = sprintf('%s\\[J]%s_fd.mat', [pwd, '\Data\library'], getappdata(0, 'jobName'));
-                    end
-                    
-                    load(fatigueDefinitionFile)
-                    
-                    % Recall the fatigue loading
-                    Sxx = fatigueDefinition.S11;
-                    Syy = fatigueDefinition.S22;
-                    Szz = fatigueDefinition.S33;
-                    Txy = fatigueDefinition.S12;
-                    Txz = fatigueDefinition.S13;
-                    Tyz = fatigueDefinition.S23;
-                    
-                    % Recall the uniaxial history if applicable
-                    if (algorithm == 3.0) || (algorithm == 10.0)
-                        oldSignal = fatigueDefinition.uniaxial;
-                    end
-                    
-                    % recall the stress data type
-                    setappdata(0, 'dataLabel', fatigueDefinition.type)
-                    
-                    mainID = fatigueDefinition.labels(:, 1.0);
-                    subID = fatigueDefinition.labels(:, 2.0);
-                    
-                    clear('fatigueDefinition')
-                    recoverFatigueLoading = 1.0;
-                    
-					% Inform user that the library was loaded successfully
-                    setappdata(0, 'message_312_fdf', fatigueDefinitionFile)
-                    messenger.writeMessage(312.0)
-                    
-                    % Save the name of the fatigue definition file 
-                    setappdata(0, 'fatigueDefinitionFile', fatigueDefinitionFile)
-                catch exception
-                    recoverFatigueLoading = 0.0;
-                    
-                    setappdata(0, 'warning_310_exception', exception.message)
-                    messenger.writeMessage(310.0)
+            if isappdata(0, 'fldData') == 1.0
+                % Get the fatigue definition from the %APPDATA%
+                fatigueDefinition = getappdata(0, 'fldData');
+                
+                % Recall the fatigue loading
+                Sxx = fatigueDefinition.S11;
+                Syy = fatigueDefinition.S22;
+                Szz = fatigueDefinition.S33;
+                Txy = fatigueDefinition.S12;
+                Txz = fatigueDefinition.S13;
+                Tyz = fatigueDefinition.S23;
+                
+                % Recall the uniaxial history if applicable
+                if (algorithm == 3.0) || (algorithm == 10.0)
+                    oldSignal = fatigueDefinition.uniaxial;
                 end
+                
+                % recall the stress data type
+                setappdata(0, 'dataLabel', fatigueDefinition.type)
+                
+                mainID = fatigueDefinition.labels(:, 1.0);
+                subID = fatigueDefinition.labels(:, 2.0);
+                
+                % Delete the fatigue definition data from the workspace
+                clear('fatigueDefinition')
+                recoverFatigueLoading = 1.0;
             end
             
             if recoverFatigueLoading == 0.0
@@ -2406,6 +2390,41 @@ classdef jobFile < handle
                     return
                 end
             else
+                return
+            end
+        end
+        
+        %% Load the fatigue definition if applicable
+        function [] = loadFatigueDefinition(dataCheck)
+            if (ischar(dataCheck) == 1.0) || (dataCheck == 2.0)
+                % Get the fatigue definition file name
+                if ischar(dataCheck) == 1.0
+                    fileName = dataCheck;
+                else
+                    fileName = sprintf('%s\\[J]%s_fd.mat', [pwd, '\Data\library'], getappdata(0, 'jobName'));
+                end
+                
+                try
+                    % Load the MAT-file object
+                    m = matfile(fileName);
+    
+                    % Save the fatigue definition into %APPDATA%
+                    setappdata(0, sprintf('fldData'), m.fatigueDefinition)
+                    
+                    % Inform user that the library was loaded successfully
+                    setappdata(0, 'message_312_fdf', fileName)
+                    messenger.writeMessage(312.0)
+                catch exception
+                    % Something went wrong
+                    setappdata(0, 'warning_310_exception', exception.message)
+                    messenger.writeMessage(310.0)
+                end
+            else
+                % If the %APPDATA% variable exists, delete it now
+                if isappdata(0, 'fldData') == 1.0
+                    rmappdata(0, 'fldData')
+                end
+                
                 return
             end
         end

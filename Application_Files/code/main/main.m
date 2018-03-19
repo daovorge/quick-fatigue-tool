@@ -11,7 +11,7 @@ function [] = main(flags)
 %   Developer contact: louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 16-Mar-2018 13:19:57 GMT
+%   Last modified 19-Mar-2018 15:52:13 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');
@@ -43,7 +43,7 @@ setappdata(0, 'messageFileWarnings', 0.0)
 %% PRINT COMMAND WINDOW HEADER
 fprintf('[NOTICE] Quick Fatigue Tool 6.11-13')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2018)')
-fprintf('\n[NOTICE] Last modified 16-Mar-2018 13:19:57 GMT')
+fprintf('\n[NOTICE] Last modified 19-Mar-2018 15:52:13 GMT')
 
 cleanExit = 0.0;
 
@@ -221,17 +221,21 @@ if algorithm ~= 8.0
     getRMinus1Curve(useSN, msCorrection, nSets, G)
 end
 
+%% LOAD THE FATIGUE DEFINITION IF APPLICABLE
+jobFile.loadFatigueDefinition(dataCheck)
+
 %% SCALE AND COMBINE THE LOADING
 fprintf('\n[PRE] Processing datasets')
 fprintf(fid_status, '\n[PRE] Processing datasets');
 setappdata(0, 'errorDuringLoading', 1.0)
 
-[scale, offset, repeats, units, N, signalLength, Sxx, Syy, Szz, Txy, Tyz, Txz, mainID,...
-    subID, gateHistories, gateTensors, tensorGate, recoverFatigueLoading, error]...
+[scale, offset, repeats, units, N, signalLength, Sxx, Syy, Szz, Txy,...
+    Tyz, Txz, mainID, subID, gateHistories, gateTensors, tensorGate,...
+    recoverFatigueLoading, error]...
     ...
-    = jobFile.getLoading(units, scale, dataCheck,...
-    algorithm, msCorrection, userUnits, hfDataset, hfHistory,...
-    hfTime, hfScales, items, dataset, history, elementType, offset);
+    = jobFile.getLoading(units, scale, algorithm, msCorrection,...
+    userUnits, hfDataset, hfHistory, hfTime, hfScales, items, dataset,...
+    history, elementType, offset);
 
 if error == 1.0
     cleanup(1.0)
@@ -275,7 +279,7 @@ setappdata(0, 'subID', subID)
 fprintf('\n[PRE] Calculating invariants')
 fprintf(fid_status, '\n[PRE] Calculating invariants');
 
-preProcess.getPrincipalStress(N, Sxx, Syy, Szz, Txy, Tyz, Txz, algorithm, 0.0, dataCheck)
+preProcess.getPrincipalStress(N, Sxx, Syy, Szz, Txy, Tyz, Txz, algorithm, 0.0)
 
 % Save the principal stresses to a .MAT file
 if recoverFatigueLoading == 0.0
@@ -328,7 +332,7 @@ if (algorithm ~= 10.0) && (algorithm ~= 8.0) && (algorithm ~= 3.0) && (getappdat
         fprintf(fid_status, '\n[PRE] Optimizing datasets');
 
         [coldItems, removedItems, hotspotWarning] = preProcess.nodalElimination(algorithm,...
-            msCorrection, N, dataCheck);
+            msCorrection, N);
 
         setappdata(0, 'separateFieldOutput', 1.0)
         messenger.writeMessage(22.0)
