@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 19-Mar-2018 15:52:13 GMT
+%   Last modified 20-Mar-2018 13:06:18 GMT
 
     %%
 
@@ -939,7 +939,14 @@ classdef messenger < handle
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 85.0
-                        %_AVAILABLE_%
+                        dataCheck = getappdata(0, 'dataCheck');
+                        if (dataCheck == 2.0) || (exist(char(dataCheck), 'file') == 2.0)
+                            fprintf(fidType(i), [returnType{i}, '***WARNING: The analysis region cannot be limited to an items file when DATA_CHECK=2.0', returnType{i}]);
+                            fprintf(fidType(i), ['-> The ITEMS option will be ignored', returnType{i}]);
+                            fprintf(fidType(i), ['-> All of the items from the fatigue definition file will be used for analysis', returnType{i}]);
+    
+                            setappdata(0, 'messageFileWarnings', 1.0)
+                        end
                     case 86.0
                         fprintf(fidType(i), [returnType{i}, '***ODB INTERFACE ERROR: An error occurred while writing field data to the output database. Field data will not be exported', returnType{i}]);
 
@@ -2093,10 +2100,13 @@ classdef messenger < handle
                             fprintf(fidType(i), [returnType{i}, '***NOTE: Abaqus ODB Python script has been exported to ''%s\\Project\\output\\%s\\Data Files''', returnType{i}], pwd, jobName);
                         end
                     case 266.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: The fatigue loading could not be archived', returnType{i}]);
-                        fprintf(fidType(i), ['-> Error message: %s', returnType{i}], getappdata(0, 'warning_309_exception'));
-                        
-                        setappdata(0, 'messageFileWarnings', 1.0)
+                        if getappdata(0, 'suppress_ID266') == 0.0
+                            fprintf(fidType(i), [returnType{i}, '***NOTE: User-defined items were read from the file ''%s''', returnType{i}], getappdata(0, 'hotspotFile'));
+                            
+                            if i == X
+                                setappdata(0, 'suppress_ID266', 1.0)
+                            end
+                        end
                     case 267.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The environment variable ''noiseReduction'' is deprecated. Use ''gateTensors'' instead', returnType{i}]);
                         setappdata(0, 'messageFileWarnings', 1.0)
@@ -2375,7 +2385,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2018\r\n');
-            fprintf(fid, 'Last modified 19-Mar-2018 15:52:13 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 20-Mar-2018 13:06:18 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
