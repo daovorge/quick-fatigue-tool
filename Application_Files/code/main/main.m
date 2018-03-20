@@ -824,7 +824,7 @@ if length(worstAnalysisItem) > 1.0
         worstAnalysisItem_original = worstAnalysisItem_original(1.0);
     else
         worstAnalysisItem = worstAnalysisItem(worstAnalysisItem == maximumStressItem);
-        worstAnalysisItem_original = worstAnalysisItem_original(maximumStressItem);
+        worstAnalysisItem_original = worstAnalysisItem_original(worstAnalysisItem == maximumStressItem);
     end
 
     % The item with the largest stress no longer needs to be calculated
