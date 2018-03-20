@@ -6,7 +6,7 @@ classdef jobFile < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 19-Mar-2018 15:52:13 GMT
+%   Last modified 20-Mar-2018 09:36:00 GMT
     
     %%
     
@@ -278,6 +278,22 @@ classdef jobFile < handle
                         setappdata(0, 'items', 'MAXPS')
                     otherwise
                         if exist(items, 'file') == 2.0
+                            %{
+                                If DATA_CHECK=2 then the items file will be
+                                ignored and all items will be analysed. If
+                                this is the case, warn the user
+                            %}
+                            if ((dataCheck == 2.0) || (exist(char(dataCheck), 'file') == 2.0)) && (getappdata(0, 'analysisDialogues') == 1.0)
+                                msg1 = sprintf('The analysis region cannot be limited to an items file when DATA_CHECK=2.0.\n\nIf a fatigue definition for the current job exists, ');
+                                msg2 = sprintf('the ITEMS option will be ignored and all of the items from the fatigue definition file will be used for analysis.');
+                                response = questdlg([msg1, msg2], 'Quick Fatigue Tool', 'Continue from the fatigue definition', 'Cancel', 'Continue from the fatigue definition');
+                                
+                                if (strcmpi(response, 'Cancel') == 1.0) || (isempty(response) == 1.0)
+                                    fprintf('[NOTICE] Job %s was aborted by the user\n', jobName);
+                                    error = 1.0;
+                                    return
+                                end
+                            end
                             setappdata(0, 'items', items)
                         else
                             % No exact string match
@@ -287,8 +303,9 @@ classdef jobFile < handle
                             if (isempty(matchingItems) == 1.0) || (length(matchingItems) ~= 1.0)
                                 % The items could not be found in the library
                                 error = 1.0;
-                                fprintf('[ERROR] The value of ITEMS (''%s'') is not recognized\n', items)
-                                fprintf('-> A list of available inputs can be found in Section 1.2.6 of the Quick Fatigue Tool User Settings Reference Guide\n');
+                                fprintf('[ERROR] The value of ITEMS (''%s'') was not processed\n', items)
+                                fprintf('-> Either it is not a recognized keyword {''SURFACE'' | ''ALL'' | ''MAXPS''} or the items file could not be found\n');
+                                fprintf('-> Specifying the analysis region is discussed in Section 4.5.4 of the Quick Fatigue Tool User Guide\n');
                                 return
                             elseif length(itemsWords{matchingItems}) ~= length(items)
                                 % The items is a partial match
