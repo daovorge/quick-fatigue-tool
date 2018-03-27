@@ -3334,9 +3334,10 @@ classdef messenger < handle
             fprintf(fid, '    at Item %.0f.%.0f\r\n\r\n', worstMainID, worstSubID);
 
             % Number of cycles
+            numberOfCycles = getappdata(0, 'numberOfCycles') * getappdata(0, 'repeats');
             if outputField == 1.0 || getappdata(0, 'outputHistory') == 1.0 || getappdata(0, 'outputFigure') == 1.0
-                fprintf('    Number of cycles in loading           : %.0f\n\n', getappdata(0, 'numberOfCycles'))
-                fprintf(fid,'    Number of cycles in loading           : %.0f\r\n\r\n', getappdata(0, 'numberOfCycles'));
+                fprintf('    Number of cycles in loading           : %.0f\n\n', numberOfCycles)
+                fprintf(fid,'    Number of cycles in loading           : %.0f\r\n\r\n', numberOfCycles);
             end
 
             if algorithm == 8.0
