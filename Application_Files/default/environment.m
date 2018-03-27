@@ -13,7 +13,7 @@
 %      2 Environment variables
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 19-Mar-2018 07:59:59 GMT
+%   Last modified 27-Mar-2018 16:34:08 GMT
 
 %% GATE TENSORS
 %{
@@ -380,6 +380,12 @@ setappdata(0, 'figure_LH', 1.0)
 %}
 setappdata(0, 'figureFormat', 'fig')
 setappdata(0, 'figureVisibility', 'off')
+
+% COMPOSITE FAILURE CRITERIA
+setappdata(0, 'compositeFile_stress', 1.0)
+setappdata(0, 'compositeFile_strain', 1.0)
+setappdata(0, 'compositeFile_hashin', 1.0)
+setappdata(0, 'compositeFile_larc05', 1.0)
 
 % DATA FILES
 setappdata(0, 'file_F_OUTPUT_ALL', 1.0)
