@@ -13,7 +13,7 @@ function [mainID, subID, N, items, Sxx, Syy, Szz, Txy, Tyz, Txz] = getSurface(ma
 %      4.5.3 Custom analysis items
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 13-Feb-2018 20:14:48 GMT
+%   Last modified 27-Mar-2018 16:34:08 GMT
 
 %%
 
@@ -91,6 +91,14 @@ if (strcmpi(items, 'surface') == 1.0) && (exist(surfaceFile, 'file') == 2.0) && 
         Txy = Txy(items, :);
         Txz = Txz(items, :);
         Tyz = Tyz(items, :);
+        
+        % Save stress tensors in the appdata
+        setappdata(0, 'Sxx', Sxx)
+        setappdata(0, 'Syy', Syy)
+        setappdata(0, 'Szz', Szz)
+        setappdata(0, 'Txy', Txy)
+        setappdata(0, 'Txz', Txz)
+        setappdata(0, 'Tyz', Tyz)
         
         N = length(items);
         

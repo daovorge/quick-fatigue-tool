@@ -118,37 +118,45 @@ for groups = 1:G
     iterate = getappdata(0, 'larc05_iterate');
     step = getappdata(0, 'stepSize');
     
+    % Get the master flags for the composite criteria
+    [compositeFile_stress, compositeFile_strain, compositeFile_hashin,...
+        compositeFile_larc05] = compositeOutput.compositeFile();
+    
     % Check if there is enough data for maximum stress, Tsai-Hill, Tsai-Wu and Azzi-Tsai-Hill theory
-    if isempty(Xt) == 1.0 || isempty(Xc) == 1.0 || isempty(Yt) == 1.0 || isempty(Yc) == 1.0 || isempty(S) == 1.0
+    if (isempty(Xt) == 1.0 || isempty(Xc) == 1.0 || isempty(Yt) == 1.0 || isempty(Yc) == 1.0 || isempty(S) == 1.0) || (compositeFile_stress == 0.0)
         failStressGeneral = -1.0;
     else
         failStressGeneral = 1.0;
     end
     
     % Check if there is enough data for Tsai-Wu (through-thickness)
-    if isempty(Yt) == 1.0 || isempty(Yc) == 1.0 || isempty(Zt) == 1.0 || isempty(Zc) == 1.0
+    if (isempty(Yt) == 1.0 || isempty(Yc) == 1.0 || isempty(Zt) == 1.0 || isempty(Zc) == 1.0) || (compositeFile_stress == 0.0)
         tsaiWuTT = -1.0;
     else
         tsaiWuTT = 1.0;
     end
     
     % Check if there is enough data for fail strain
-    if ((isempty(G12) == 1.0 || isempty(E11) == 1.0 || isempty(E22) == 1.0)) ||...
-            (isempty(Xet) == 1.0 || isempty(Xec) == 1.0 || isempty(Yet) == 1.0 || isempty(Yec) == 1.0 || isempty(Se) == 1.0)
+    if (((isempty(G12) == 1.0 || isempty(E11) == 1.0 || isempty(E22) == 1.0)) ||...
+            (isempty(Xet) == 1.0 || isempty(Xec) == 1.0 || isempty(Yet) == 1.0...
+            || isempty(Yec) == 1.0 || isempty(Se) == 1.0)) || (compositeFile_strain == 0.0)
         failStrain = -1.0;
     else
         failStrain = 1.0;
     end
     
     % Check if there is enough data for Hashin
-    if isempty(Xht) == 1.0 || isempty(Xhc) == 1.0 || isempty(Yht) == 1.0 || isempty(Yhc) == 1.0 || isempty(Sl) == 1.0 || isempty(St) == 1.0
+    if (isempty(Xht) == 1.0 || isempty(Xhc) == 1.0 || isempty(Yht) == 1.0...
+            || isempty(Yhc) == 1.0 || isempty(Sl) == 1.0 || isempty(St) == 1.0) || (compositeFile_hashin == 0.0)
         hashin = -1.0;
     else
         hashin = 1.0;
     end
     
     % Check if there is enough data for LaRC05
-    if (isempty(Xlt) == 1.0 || isempty(Xlc) == 1.0 || isempty(Ylt) == 1.0 || isempty(Sll) == 1.0 || isempty(larc_G12) == 1.0 || isempty(nl) == 1.0) || (isempty(Ylc) == 1.0 && isempty(Slt) == 1.0)
+    if ((isempty(Xlt) == 1.0 || isempty(Xlc) == 1.0 || isempty(Ylt) == 1.0...
+            || isempty(Sll) == 1.0 || isempty(larc_G12) == 1.0 ||...
+            isempty(nl) == 1.0) || (isempty(Ylc) == 1.0 && isempty(Slt) == 1.0)) || (compositeFile_larc05 == 0.0)
         larc05 = -1.0;
     else
         larc05 = 1.0;

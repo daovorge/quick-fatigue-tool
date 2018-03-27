@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 20-Mar-2018 13:06:18 GMT
+%   Last modified 27-Mar-2018 16:34:08 GMT
 
     %%
 
@@ -143,17 +143,17 @@ classdef messenger < handle
                     case 2.0
                         % Scale factors and gating values
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The number of load gating values does not match the number of load histories', returnType{i}]);
-                        fprintf(fidType(i), ['-> Either the last gating value specified will be used for the remainder of the load histories, or excess load gating values will be ignored', returnType{i}]);
+                        fprintf(fidType(i), ['-> Either the last gating value will be propagated across all of the load histories, or excess load gating values will be ignored', returnType{i}]);
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 3.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The number of load scale factors does not match the number of load histories', returnType{i}]);
-                        fprintf(fidType(i), ['-> Either the last load scale factor specified will be used for the remainder of the load histories, or excess load scale factors will be ignored', returnType{i}]);
+                        fprintf(fidType(i), ['-> Either the last load scale factor will be propagated across all of the load histories, or excess load scale factors will be ignored', returnType{i}]);
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 4.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The number of load offset values does not match the number of load histories', returnType{i}]);
-                        fprintf(fidType(i), ['-> Either the last load offset value specified will be used for the remainder of the load histories, or excess load offset values will be ignored', returnType{i}]);
+                        fprintf(fidType(i), ['-> Either the last load offset value will be propagated across all of the load histories, or excess load offset values will be ignored', returnType{i}]);
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 5.0
@@ -163,7 +163,7 @@ classdef messenger < handle
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 6.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The number of load scale factors for the high frequency data does not match the number of load histories', returnType{i}]);
-                        fprintf(fidType(i), ['-> Either the last load scale factor specified will be used for the remainder of the load histories, or excess load scale factors will be ignored', returnType{i}]);
+                        fprintf(fidType(i), ['-> Either the last load scale factor will be propagated across all of the load histories, or excess load scale factors will be ignored', returnType{i}]);
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 7.0
@@ -2188,7 +2188,7 @@ classdef messenger < handle
                         else
                             fprintf(fidType(i), [returnType{i}, '***NOTE: The number of load scale factors does not match the number of stress datasets in the sequence', returnType{i}]);
                         end
-                        fprintf(fidType(i), ['-> Either the last load scale factor specified will be used for the remainder of the stress datasets, or excess load scale factors will be ignored', returnType{i}]);
+                        fprintf(fidType(i), ['-> Either the last load scale factor will be propagated across all of the stress datasets, or excess load scale factors will be ignored', returnType{i}]);
                     case 282.0
                         if getappdata(0, 'message_282_hf') == 1.0
                             fprintf(fidType(i), [returnType{i}, '***NOTE: In the high frequency loading, more than one load scale factor is specified, but only a single value is allowed for uniaxial loading', returnType{i}]);
@@ -2385,7 +2385,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2018\r\n');
-            fprintf(fid, 'Last modified 20-Mar-2018 13:06:18 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 27-Mar-2018 16:34:08 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

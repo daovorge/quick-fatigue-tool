@@ -1174,5 +1174,27 @@ classdef compositeOutput < handle
                 setappdata(0, 'LARTFCRT_MV', sprintf('%s', num2str(max(LARTFCRT))))
             end
         end
+        
+        %% Get master flags for composite failure output
+        function [compositeFile_stress, compositeFile_strain,...
+                compositeFile_hashin, compositeFile_larc05] = compositeFile()
+            compositeFile_stress = getappdata(0, 'compositeFile_stress');
+            compositeFile_strain = getappdata(0, 'compositeFile_strain');
+            compositeFile_hashin = getappdata(0, 'compositeFile_hashin');
+            compositeFile_larc05 = getappdata(0, 'compositeFile_larc05');
+            
+            if (isempty(compositeFile_stress) == 1.0) || (compositeFile_stress ~=0.0 && compositeFile_stress ~= 1.0)
+                compositeFile_stress = 1.0;
+            end
+            if (isempty(compositeFile_strain) == 1.0) || (compositeFile_strain ~=0.0 && compositeFile_strain ~= 1.0)
+                compositeFile_strain = 1.0;
+            end
+            if (isempty(compositeFile_hashin) == 1.0) || (compositeFile_hashin ~=0.0 && compositeFile_hashin ~= 1.0)
+                compositeFile_hashin = 1.0;
+            end
+            if (isempty(compositeFile_larc05) == 1.0) || (compositeFile_larc05 ~=0.0 && compositeFile_larc05 ~= 1.0)
+                compositeFile_larc05 = 1.0;
+            end
+        end
     end
 end
