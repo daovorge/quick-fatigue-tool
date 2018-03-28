@@ -1713,11 +1713,11 @@ classdef postProcess < handle
             
             switch getappdata(0, 'yieldCriteria')
                 case 3.0
-                    fprintf(fid, 'Item #\tMain ID\tSub ID\tSSEV, Shear Strain Energy per unit volume (mJ/mm^3)\tPSE, Plastic Strain Energy (mJ)\r\n');
+                    fprintf(fid, 'Item #\tMain ID\tSub ID\tSSE, Shear Strain Energy per unit volume (mJ/mm^3)\tPSE, Plastic Strain Energy per unit volume (mJ/mm^3)\r\n');
                 case 2.0
-                    fprintf(fid, 'Item #\tMain ID\tSub ID\tSSE, Shear Strain Energy (mJ)\tPSE, Plastic Strain Energy (mJ)\r\n');
+                    fprintf(fid, 'Item #\tMain ID\tSub ID\tSSE, Shear Strain Energy per unit volume (mJ/mm^3)\tPSE, Plastic Strain Energy per unit volume (mJ/mm^3)\r\n');
                 case 1.0
-                    fprintf(fid, 'Item #\tMain ID\tSub ID\tTSE, Total Strain Energy (mJ)\tPSE, Plastic Strain Energy (mJ)\r\n');
+                    fprintf(fid, 'Item #\tMain ID\tSub ID\tTSE, Total Strain Energy per unit volume (mJ/mm^3)\tPSE, Plastic Strain Energy per unit volume (mJ/mm^3)\r\n');
             end
             fprintf(fid, '%.0f\t%.0f\t%.0f\t%f\t%f\r\n', data');
             

@@ -4534,9 +4534,9 @@ classdef preProcess < handle
                             end
                             
                             if materialResponse == 1.0
-                                totalStrainEnergy_buffer(totalCounter) = max(tMax)^2.0/(2.0*E);
+                                totalStrainEnergy_buffer(totalCounter) = 1e6*max(tMax)^2.0/(2.0*E);
                             else
-                                totalStrainEnergy_buffer(totalCounter) = 0.5*max(tMax)*max(abs(e1_i - e3_i));
+                                totalStrainEnergy_buffer(totalCounter) = 1e6*0.5*max(tMax)*max(abs(e1_i - e3_i));
                             end
                             
                             totalCounter = totalCounter + 1.0;

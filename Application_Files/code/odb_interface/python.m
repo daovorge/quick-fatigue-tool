@@ -900,18 +900,18 @@ classdef python < handle
                     
                     switch getappdata(0, 'yieldCriteria')
                         case 3.0
-                            fieldNames{index + 1.0} = sprintf('SSEV-mJ/mm^3');
+                            fieldNames{index + 1.0} = sprintf('SSE-mJ/mm^3');
                             fieldDescriptions{index + 1.0} = sprintf('Shear strain energy per unit volume');
                         case 2.0
-                            fieldNames{index + 1.0} = sprintf('SSE-mJ');
-                            fieldDescriptions{index + 1.0} = sprintf('Shear strain energy');
+                            fieldNames{index + 1.0} = sprintf('SSE-mJ/mm^3');
+                            fieldDescriptions{index + 1.0} = sprintf('Shear strain energy per unit volume');
                         case 1.0
-                            fieldNames{index + 1.0} = sprintf('TSE-mJ');
-                            fieldDescriptions{index + 1.0} = sprintf('Total strain energy');
+                            fieldNames{index + 1.0} = sprintf('TSE-mJ/mm^3');
+                            fieldDescriptions{index + 1.0} = sprintf('Total strain energy per unit volume');
                     end
                     
-                    fieldNames{index + 2.0} = sprintf('PSE-mJ');
-                    fieldDescriptions{index + 2.0} = sprintf('Plastic strain energy');
+                    fieldNames{index + 2.0} = sprintf('PSE-mJ/mm^3');
+                    fieldDescriptions{index + 2.0} = sprintf('Plastic strain energy per unit volume');
                 else
                     columnsToDelete = columnsToDelete + 1.0;
                     fprintf(fid_debug, '\r\n\tWarning: Requested field YIELD is not available. The field will not be written to the output database');

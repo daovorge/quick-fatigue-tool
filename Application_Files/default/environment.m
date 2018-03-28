@@ -345,7 +345,7 @@ setappdata(0, 'notchFactorEstimation', 1.0)
     1: MATLAB
     2: Luong (default)
 %}
-setappdata(0, 'eigensolver', 1.0)
+setappdata(0, 'eigensolver', 2.0)
 
 %% MATLAB FIGURE APPEARANCE
 setappdata(0, 'defaultLineWidth', 1.0)

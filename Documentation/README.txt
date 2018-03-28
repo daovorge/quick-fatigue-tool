@@ -227,6 +227,7 @@ Quick Fatigue Tool User Guide.
 %
 %   Static analysis field variable identifiers:
 %		- YIELD, Yielding items
+%		- SSE, Shear strain energy per unit volume
 %		- TSE, Total strain energy per unit volume
 %		- PSE, Plastic strain energy per unit volume
 %		- MSTRS, Maximum stress theory failure measure

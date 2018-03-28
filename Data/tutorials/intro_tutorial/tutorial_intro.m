@@ -259,9 +259,9 @@ SEA_WATER = 0.0;
 % YIELD CRITERIA
 %{
     0: Do not perform yield calculations
-    1: Perform yield calculations based on the total strain energy theory
-    2: Perform yield calculations based on the shear strain energy theory
-    3: Perform yield calculations based on the Tresca yield surface
+    1: Total strain energy theory
+    2: Shear strain energy theory
+    3: Tresca yield surface
 %}
 YIELD_CRITERIA = 0.0;
 
