@@ -1679,8 +1679,11 @@ classdef postProcess < handle
                 strainLimitEnergy = getappdata(0, 'strainLimitEnergy');
                 
                 % Get the plastic strain energy for the current group
-                plasticStrainEnergy(totalCounter:totalCounter + (length(items) - 1.0)) = totalStrainEnergy - strainLimitEnergy;
-                totalCounter = totalCounter + length(items);
+                for i = 1:length(items)
+                    plasticStrainEnergy(totalCounter) = totalStrainEnergy(items(i)) - strainLimitEnergy;
+                    
+                    totalCounter = totalCounter + 1.0;
+                end
             end
             
             % Only take totalStrainEnergy values for yielding items
