@@ -11,7 +11,7 @@ classdef postProcess < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 28-Mar-2018 09:40:26 GMT
+%   Last modified 28-Mar-2018 20:47:00 GMT
     
     %%
     
@@ -1675,8 +1675,8 @@ classdef postProcess < handle
                     %items = items == yield;
                 end
                 
-                % Get the strain limit energy of the current group
-                strainLimitEnergy = getappdata(0, 'strainLimitEnergy');
+                % Get the normalised strain limit energy of the current group
+                strainLimitEnergy = 1.0;
                 
                 % Get the plastic strain energy for the current group
                 for i = 1:length(items)
@@ -1711,13 +1711,13 @@ classdef postProcess < handle
             
             switch getappdata(0, 'yieldCriteria')
                 case 4.0
-                    fprintf(fid, 'Item #\tMain ID\tSub ID\tDE, Distortion energy density (mJ/mm^3)\tPSE, Plastic strain energy density (mJ/mm^3)\r\n');
+                    fprintf(fid, 'Item #\tMain ID\tSub ID\tDE, Normalised equivalent distortion energy density\tPSE, Normalized equivalent plastic strain energy density\r\n');
                 case 3.0
-                    fprintf(fid, 'Item #\tMain ID\tSub ID\tSSE, Shear strain energy density (mJ/mm^3)\tPSE, Plastic strain energy density (mJ/mm^3)\r\n');
+                    fprintf(fid, 'Item #\tMain ID\tSub ID\tSSE, Normalised equivalent shear strain energy density\tPSE, Normalised equivalent plastic strain energy density\r\n');
                 case 2.0
-                    fprintf(fid, 'Item #\tMain ID\tSub ID\tSSE, Shear strain energy density (mJ/mm^3)\tPSE, Plastic strain energy density (mJ/mm^3)\r\n');
+                    fprintf(fid, 'Item #\tMain ID\tSub ID\tSSE, Normalised equivalent shear strain energy density\tPSE, Normalised equivalent plastic strain energy density\r\n');
                 case 1.0
-                    fprintf(fid, 'Item #\tMain ID\tSub ID\tTSE, Total strain energy density (mJ/mm^3)\tPSE, Plastic strain energy density (mJ/mm^3)\r\n');
+                    fprintf(fid, 'Item #\tMain ID\tSub ID\tTSE, Normalised equivalent total strain energy density\tPSE, Normalised equivalent plastic strain energy density\r\n');
             end
             fprintf(fid, '%.0f\t%.0f\t%.0f\t%f\t%f\r\n', data');
             

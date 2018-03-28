@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 28-Mar-2018 13:42:15 GMT
+%   Last modified 28-Mar-2018 20:47:00 GMT
     
     %%
     
@@ -4553,6 +4553,9 @@ classdef preProcess < handle
                 group_materialProps(groups).strainLimitEnergy = strainLimitEnergy;
                 setappdata(0, 'group_materialProps', group_materialProps)
                 setappdata(0, 'strainLimitEnergy', strainLimitEnergy)
+                
+                % Normalise the total strain energy by the strain limit energy
+                totalStrainEnergy_buffer = totalStrainEnergy_buffer/strainLimitEnergy;
                 
                 % Save thte total strain energy
                 setappdata(0, 'totalStrainEnergy', totalStrainEnergy_buffer)

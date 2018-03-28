@@ -11,7 +11,7 @@ classdef python < handle
 %      10.4 The ODB Interface
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 28-Mar-2018 09:40:26 GMT
+%   Last modified 28-Mar-2018 20:47:00 GMT
     
     %%
     
@@ -900,21 +900,21 @@ classdef python < handle
                     
                     switch getappdata(0, 'yieldCriteria')
                         case 4.0
-                            fieldNames{index + 1.0} = sprintf('DE-mJ/mm^3');
-                            fieldDescriptions{index + 1.0} = sprintf('Equivalent distortion energy density');
+                            fieldNames{index + 1.0} = sprintf('DEEQ');
+                            fieldDescriptions{index + 1.0} = sprintf('Normalised equivalent distortion energy density');
                         case 3.0
-                            fieldNames{index + 1.0} = sprintf('SSE-mJ/mm^3');
-                            fieldDescriptions{index + 1.0} = sprintf('Equivalent shear strain energy density');
+                            fieldNames{index + 1.0} = sprintf('SSEEQ');
+                            fieldDescriptions{index + 1.0} = sprintf('Normalised equivalent shear strain energy density');
                         case 2.0
-                            fieldNames{index + 1.0} = sprintf('SSE-mJ/mm^3');
-                            fieldDescriptions{index + 1.0} = sprintf('Equivalent shear strain energy density');
+                            fieldNames{index + 1.0} = sprintf('SSEEQ');
+                            fieldDescriptions{index + 1.0} = sprintf('Normalised equivalent shear strain energy density');
                         case 1.0
-                            fieldNames{index + 1.0} = sprintf('TSE-mJ/mm^3');
-                            fieldDescriptions{index + 1.0} = sprintf('Equivalent total strain energy density');
+                            fieldNames{index + 1.0} = sprintf('TSEEQ');
+                            fieldDescriptions{index + 1.0} = sprintf('Normalised equivalent total strain energy density');
                     end
                     
-                    fieldNames{index + 2.0} = sprintf('PSE-mJ/mm^3');
-                    fieldDescriptions{index + 2.0} = sprintf('Plastic strain energy density');
+                    fieldNames{index + 2.0} = sprintf('PSEEQ');
+                    fieldDescriptions{index + 2.0} = sprintf('Normalised equivalent plastic strain energy density');
                 else
                     columnsToDelete = columnsToDelete + 1.0;
                     fprintf(fid_debug, '\r\n\tWarning: Requested field YIELD is not available. The field will not be written to the output database');
