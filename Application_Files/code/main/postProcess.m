@@ -1679,13 +1679,8 @@ classdef postProcess < handle
                 strainLimitEnergy = getappdata(0, 'strainLimitEnergy');
                 
                 % Get the plastic strain energy for the current group
-                if getappdata(0, 'yieldCriteria') == 3.0
-                    plasticStrainEnergy(totalCounter:totalCounter + (length(items) - 1.0)) = linspace(-1.0, -1.0, length(items));
-                    totalCounter = totalCounter + length(items);
-                else
-                    plasticStrainEnergy(totalCounter:totalCounter + (length(items) - 1.0)) = totalStrainEnergy - strainLimitEnergy;
-                    totalCounter = totalCounter + length(items);
-                end
+                plasticStrainEnergy(totalCounter:totalCounter + (length(items) - 1.0)) = totalStrainEnergy - strainLimitEnergy;
+                totalCounter = totalCounter + length(items);
             end
             
             % Only take totalStrainEnergy values for yielding items
@@ -1712,12 +1707,14 @@ classdef postProcess < handle
             fprintf(fid, 'Job:\t%s\r\nLoading:\t%.3g\t%s\r\n', jobName, getappdata(0, 'loadEqVal'), getappdata(0, 'loadEqUnits'));
             
             switch getappdata(0, 'yieldCriteria')
+                case 4.0
+                    fprintf(fid, 'Item #\tMain ID\tSub ID\tDE, Distortion energy density (mJ/mm^3)\tPSE, Plastic strain energy density (mJ/mm^3)\r\n');
                 case 3.0
-                    fprintf(fid, 'Item #\tMain ID\tSub ID\tSSE, Shear Strain Energy per unit volume (mJ/mm^3)\tPSE, Plastic Strain Energy per unit volume (mJ/mm^3)\r\n');
+                    fprintf(fid, 'Item #\tMain ID\tSub ID\tSSE, Shear strain energy density (mJ/mm^3)\tPSE, Plastic strain energy density (mJ/mm^3)\r\n');
                 case 2.0
-                    fprintf(fid, 'Item #\tMain ID\tSub ID\tSSE, Shear Strain Energy per unit volume (mJ/mm^3)\tPSE, Plastic Strain Energy per unit volume (mJ/mm^3)\r\n');
+                    fprintf(fid, 'Item #\tMain ID\tSub ID\tSSE, Shear strain energy density (mJ/mm^3)\tPSE, Plastic strain energy density (mJ/mm^3)\r\n');
                 case 1.0
-                    fprintf(fid, 'Item #\tMain ID\tSub ID\tTSE, Total Strain Energy per unit volume (mJ/mm^3)\tPSE, Plastic Strain Energy per unit volume (mJ/mm^3)\r\n');
+                    fprintf(fid, 'Item #\tMain ID\tSub ID\tTSE, Total strain energy density (mJ/mm^3)\tPSE, Plastic strain energy density (mJ/mm^3)\r\n');
             end
             fprintf(fid, '%.0f\t%.0f\t%.0f\t%f\t%f\r\n', data');
             

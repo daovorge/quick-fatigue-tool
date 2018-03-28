@@ -263,6 +263,7 @@ SEA_WATER = 0.0;
     1: Total strain energy theory
     2: Shear strain energy theory
     3: Tresca yield surface
+    4: von Mises yield criterion
 %}
 YIELD_CRITERIA = 0.0;
 

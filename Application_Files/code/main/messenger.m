@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 28-Mar-2018 09:40:26 GMT
+%   Last modified 28-Mar-2018 13:42:15 GMT
 
     %%
 
@@ -804,8 +804,15 @@ classdef messenger < handle
                             end
                         end
                         
-                        if getappdata(0, 'yieldCriteria') ~= 3.0
-                            fprintf(fidType(i), ['-> The ratio between the maximum volumetric strain energy and the tensile limit strain energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group'))/getappdata(0, 'strainLimitEnergy'));
+                        switch getappdata(0, 'yieldCriteria')
+                            case 1.0
+                                fprintf(fidType(i), ['-> The ratio between the equivalent total energy density and the tensile yield energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group'))/getappdata(0, 'strainLimitEnergy'));
+                            case 2.0
+                                fprintf(fidType(i), ['-> The ratio between the equivalent shear energy density and the tensile yield energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group'))/getappdata(0, 'strainLimitEnergy'));
+                            case 3.0
+                                fprintf(fidType(i), ['-> The ratio between the equivalent shear energy density and the tensile yield energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group'))/getappdata(0, 'strainLimitEnergy'));
+                            case 4.0
+                                fprintf(fidType(i), ['-> The ratio between the equivalent distortion energy density and the tensile yield energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group'))/getappdata(0, 'strainLimitEnergy'));
                         end
                     case 67.0
                         if getappdata(0, 'suppress_ID67') == 0.0
@@ -2217,11 +2224,7 @@ classdef messenger < handle
                         
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 290.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: The elastic modulus is not defined for material %s (group %.0f)', returnType{i}], char(getappdata(0, 'message_groupMaterial')), getappdata(0, 'message_groupNumber'));
-                        fprintf(fidType(i), ['-> The Tresca criterion requires a value of the elastic modulus to determine the strain energy when the material response is linear elastic', returnType{i}]);
-                        fprintf(fidType(i), ['-> The yield calculation will not be performed for this group', returnType{i}]);
-
-                        setappdata(0, 'messageFileNotes', 1.0)
+                        %_AVAILABLE_%
                     case 291.0
                         %_AVAILABLE_%
                     case 292.0
@@ -2390,7 +2393,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2018\r\n');
-            fprintf(fid, 'Last modified 28-Mar-2018 09:40:26 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 28-Mar-2018 13:42:15 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 28-Mar-2018 09:40:26 GMT
+%   Last modified 28-Mar-2018 13:42:15 GMT
     
     %%
     
@@ -4044,6 +4044,14 @@ classdef preProcess < handle
             
             [~, L] = size(Sxx);
             
+            %{
+                If the load history contains less than three points, use
+                the MATLAB Eigensolver
+            %}
+            if L < 3.0
+                eigenSolver = 1.0;
+            end
+            
             s1 = zeros(N, L);
             s2 = s1;
             s3 = s1;
@@ -4262,7 +4270,7 @@ classdef preProcess < handle
             historyGate = getappdata(0, 'historyGate');
             
             % Check that the yield criterion definition is correct
-            if (yieldCriteria < 1.0) || (yieldCriteria > 3.0) || (algorithm == 8.0)
+            if (yieldCriteria < 1.0) || (yieldCriteria > 4.0) || (algorithm == 8.0)
                 setappdata(0, 'YIELD', linspace(-1.0, -1.0, N))
                 setappdata(0, 'warning_063', 0.0)
                 return
@@ -4338,14 +4346,6 @@ classdef preProcess < handle
                     continue
                 end
                 
-                % The Tresca criterion requires E for the strain energy calculation
-                if (yieldCriteria == 3.0) && (isempty(E) == 1.0) && (materialResponse == 1.0)
-                    setappdata(0, 'YIELD', linspace(-2.0, -2.0, N))
-                    messenger.writeMessage(290.0)
-                    totalCounter = totalCounter + 1.0;
-                    continue
-                end
-                
                 % Set the strain limit energy for the current group
                 strainLimitEnergy = proof^2.0;
                 
@@ -4397,7 +4397,7 @@ classdef preProcess < handle
                                 end
                             end
                             
-                            [~, e1_i, s1_i, error] = css2b(s1_i, E, kp, np);
+                            [~, ~, s1_i, error] = css2b(s1_i, E, kp, np);
                             
                             % Gate the history
                             gate = preProcess.autoGate(s2_i, historyGate);
@@ -4450,7 +4450,7 @@ classdef preProcess < handle
                                     end
                                 end
                                 
-                                [~, e3_i, s3_i, error] = css2b(s3_i, E, kp, np);
+                                [~, ~, s3_i, error] = css2b(s3_i, E, kp, np);
                             end
                         catch
                             error = 2.0;
@@ -4528,16 +4528,21 @@ classdef preProcess < handle
                             
                             totalCounter = totalCounter + 1.0;
                         case 3.0 % Tresca failure theory
-                            tMax = abs(s1_i - s3_i);
-                            if max(tMax) >= proof
+                            tMax = max(abs(s1_i - s3_i));
+                            if tMax >= proof
                                 yield(totalCounter) = 1.0;
                             end
                             
-                            if materialResponse == 1.0
-                                totalStrainEnergy_buffer(totalCounter) = 1e6*max(tMax)^2.0/(2.0*E);
-                            else
-                                totalStrainEnergy_buffer(totalCounter) = 1e6*0.5*max(tMax)*max(abs(e1_i - e3_i));
+                            totalStrainEnergy_buffer(totalCounter) = tMax^2.0;
+                            
+                            totalCounter = totalCounter + 1.0;
+                        case 4.0 % von Mises yield criterion
+                            sPrime = max((s1_i.^2.0 + s2_i.^2.0 + s3_i.^2.0 - s1_i.*s2_i - s2_i.*s3_i - s3_i.*s1_i).^0.5);
+                            if sPrime >= proof
+                                yield(totalCounter) = 1.0;
                             end
+                            
+                            totalStrainEnergy_buffer(totalCounter) = sPrime^2.0;
                             
                             totalCounter = totalCounter + 1.0;
                     end
