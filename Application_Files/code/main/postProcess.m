@@ -11,7 +11,7 @@ classdef postProcess < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 16-Mar-2018 13:19:57 GMT
+%   Last modified 28-Mar-2018 09:40:26 GMT
     
     %%
     
@@ -1624,6 +1624,10 @@ classdef postProcess < handle
             % Convert into list of position IDs
             yield = find(yield == 1.0);
             
+            if isempty(yield) == 1.0
+                return
+            end
+            
             % Get the strain energy associated with the yielding items
             totalStrainEnergy = getappdata(0, 'totalStrainEnergy');
             
@@ -1675,10 +1679,12 @@ classdef postProcess < handle
                 strainLimitEnergy = getappdata(0, 'strainLimitEnergy');
                 
                 % Get the plastic strain energy for the current group
-                for i = 1:length(items)
-                    plasticStrainEnergy(totalCounter) = totalStrainEnergy(items(i)) - strainLimitEnergy;
-                    
-                    totalCounter = totalCounter + 1.0;
+                if getappdata(0, 'yieldCriteria') == 3.0
+                    plasticStrainEnergy(totalCounter:totalCounter + (length(items) - 1.0)) = linspace(-1.0, -1.0, length(items));
+                    totalCounter = totalCounter + length(items);
+                else
+                    plasticStrainEnergy(totalCounter:totalCounter + (length(items) - 1.0)) = totalStrainEnergy - strainLimitEnergy;
+                    totalCounter = totalCounter + length(items);
                 end
             end
             
@@ -1702,14 +1708,22 @@ classdef postProcess < handle
             dir = [root, 'Data Files/warn_yielding_items.dat'];
             
             fid = fopen(dir, 'w+');
-            
             fprintf(fid, 'WARN_YIELDING_ITEMS\r\n');
             fprintf(fid, 'Job:\t%s\r\nLoading:\t%.3g\t%s\r\n', jobName, getappdata(0, 'loadEqVal'), getappdata(0, 'loadEqUnits'));
             
-            fprintf(fid, 'Item #\tMain ID\tSub ID\tTSE, Total Strain Energy (mJ)\tPSE, Plastic Strain Energy (mJ)\r\n');
+            switch getappdata(0, 'yieldCriteria')
+                case 3.0
+                    fprintf(fid, 'Item #\tMain ID\tSub ID\tSSEV, Shear Strain Energy per unit volume (mJ/mm^3)\tPSE, Plastic Strain Energy (mJ)\r\n');
+                case 2.0
+                    fprintf(fid, 'Item #\tMain ID\tSub ID\tSSE, Shear Strain Energy (mJ)\tPSE, Plastic Strain Energy (mJ)\r\n');
+                case 1.0
+                    fprintf(fid, 'Item #\tMain ID\tSub ID\tTSE, Total Strain Energy (mJ)\tPSE, Plastic Strain Energy (mJ)\r\n');
+            end
             fprintf(fid, '%.0f\t%.0f\t%.0f\t%f\t%f\r\n', data');
             
             fclose(fid);
+            
+            messenger.writeMessage(120.0)
         end
         
         %% WRITE HOTSPOTS TO FILE
@@ -1917,7 +1931,7 @@ classdef postProcess < handle
                         end
                         
                         % If the yield criterion was enabled
-                        if (getappdata(0, 'yieldCriteria') == 1.0) || (getappdata(0, 'yieldCriteria') == 2.0)
+                        if (getappdata(0, 'yieldCriteria') == 1.0) || (getappdata(0, 'yieldCriteria') == 2.0) || (getappdata(0, 'yieldCriteria') == 3.0)
                             requestedFields(19.0) = 1.0;
                         end
                     end

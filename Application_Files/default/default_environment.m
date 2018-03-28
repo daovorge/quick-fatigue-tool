@@ -13,7 +13,7 @@
 %      2 Environment variables
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 27-Mar-2018 16:34:08 GMT
+%   Last modified 28-Mar-2018 09:40:26 GMT
 
 %% GATE TENSORS
 %{
@@ -320,6 +320,14 @@ setappdata(0, 'frfMinValue', 0.1)
     n: Item numbers
 %}
 setappdata(0, 'frfDiagnostics', [])
+
+%% YIELD CRITERIA
+% MATERIAL RESPONSE
+%{
+    1: Linear elastic
+    2: Nonlinaer elastic
+%}
+setappdata(0, 'materialResponse', 1.0)
 
 %% NOTCH FACTOR ESTIMATION
 %{

@@ -17,7 +17,7 @@ function [] = template_job()
 %      1 Job file options
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 14-Feb-2018 10:15:26 GMT
+%   Last modified 28-Mar-2018 09:40:26 GMT
 
 %% 1: JOB
 
@@ -261,6 +261,7 @@ SEA_WATER = 0.0;
     0: Do not perform yield calculations
     1: Perform yield calculations based on the total strain energy theory
     2: Perform yield calculations based on the shear strain energy theory
+    3: Perform yield calculations based on the Tresca yield surface
 %}
 YIELD_CRITERIA = 0.0;
 

@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 20-Mar-2018 09:36:00 GMT
+%   Last modified 28-Mar-2018 09:40:26 GMT
     
     %%
     
@@ -4262,7 +4262,7 @@ classdef preProcess < handle
             historyGate = getappdata(0, 'historyGate');
             
             % Check that the yield criterion definition is correct
-            if (yieldCriteria < 1.0) || (yieldCriteria > 2.0) || (algorithm == 8.0)
+            if (yieldCriteria < 1.0) || (yieldCriteria > 3.0) || (algorithm == 8.0)
                 setappdata(0, 'YIELD', linspace(-1.0, -1.0, N))
                 setappdata(0, 'warning_063', 0.0)
                 return
@@ -4280,6 +4280,9 @@ classdef preProcess < handle
             % Initialize yield variables
             totalStrainEnergy_buffer = zeros(1.0, N);
             yield = zeros(1.0, N);
+            
+            % Flag to set the material model
+            materialResponse = getappdata(0, 'materialResponse');
             
             startID = 1.0;
             totalCounter = 1.0;
@@ -4324,14 +4327,21 @@ classdef preProcess < handle
                     messenger.writeMessage(118.0)
                     totalCounter = totalCounter + 1.0;
                     continue
-                elseif (isempty(E) == 1.0) || (isempty(kp) == 1.0) || (isempty(np) == 1.0)
-                    setappdata(0, 'YIELD', linspace(-2.0, -2.0, N))
+                elseif ((isempty(E) == 1.0) || (isempty(kp) == 1.0) || (isempty(np) == 1.0)) && (materialResponse == 2.0)
+                    % Nonlinear elastic model was requested, but material properties are insufficient
+                    materialResponse = 1.0;
                     messenger.writeMessage(119.0)
-                    totalCounter = totalCounter + 1.0;
-                    continue
                 elseif (isempty(v) == 1.0) && (yieldCriteria == 1.0)
                     setappdata(0, 'YIELD', linspace(-2.0, -2.0, N))
                     messenger.writeMessage(162.0)
+                    totalCounter = totalCounter + 1.0;
+                    continue
+                end
+                
+                % The Tresca criterion requires E for the strain energy calculation
+                if (yieldCriteria == 3.0) && (isempty(E) == 1.0) && (materialResponse == 1.0)
+                    setappdata(0, 'YIELD', linspace(-2.0, -2.0, N))
+                    messenger.writeMessage(290.0)
                     totalCounter = totalCounter + 1.0;
                     continue
                 end
@@ -4360,135 +4370,137 @@ classdef preProcess < handle
                     s2_i = s2(i, :);
                     s3_i = s3(i, :);
                     
-                    try
-                        % Gate the history
-                        gate = preProcess.autoGate(s1_i, historyGate);
-                        [peaks, valleys] = preProcess.peakdet(s1_i, gate);
-                        
-                        if isempty(peaks) == 0.0 && isempty(valleys) == 0.0
-                            % Order the P-V time values from low to high
-                            times = sort([peaks(:, 1.0)', valleys(:, 1.0)']);
+                    if materialResponse == 2.0
+                        try
+                            % Gate the history
+                            gate = preProcess.autoGate(s1_i, historyGate);
+                            [peaks, valleys] = preProcess.peakdet(s1_i, gate);
                             
-                            % Reconstruct the history signal
-                            newLength = length(times);
-                            s1_i = zeros(1.0, newLength);
-                            
-                            peak_j = 1.0; valley_j = 1.0;
-                            
-                            for j = 1.0:newLength
-                                if any(peaks(:, 1.0) == times(j))
-                                    s1_i(j) = peaks(peak_j, 2.0);
-                                    peak_j = peak_j + 1.0;
-                                else
-                                    s1_i(j) = valleys(valley_j, 2.0);
-                                    valley_j = valley_j + 1.0;
-                                end
-                            end
-                        end
-                        
-                        [~, ~, s1_i, error] = css2b(s1_i, E, kp, np);
-                        
-                        % Gate the history
-                        gate = preProcess.autoGate(s2_i, historyGate);
-                        [peaks, valleys] = preProcess.peakdet(s2_i, gate);
-                        
-                        if isempty(peaks) == 0.0 && isempty(valleys) == 0.0
-                            % Order the P-V time values from low to high
-                            times = sort([peaks(:, 1.0)', valleys(:, 1.0)']);
-                            
-                            % Reconstruct the history signal
-                            newLength = length(times);
-                            s2_i = zeros(1.0, newLength);
-                            
-                            peak_j = 1.0; valley_j = 1.0;
-                            
-                            for j = 1.0:newLength
-                                if any(peaks(:, 1.0) == times(j))
-                                    s2_i(j) = peaks(peak_j, 2.0);
-                                    peak_j = peak_j + 1.0;
-                                else
-                                    s2_i(j) = valleys(valley_j, 2.0);
-                                    valley_j = valley_j + 1.0;
+                            if isempty(peaks) == 0.0 && isempty(valleys) == 0.0
+                                % Order the P-V time values from low to high
+                                times = sort([peaks(:, 1.0)', valleys(:, 1.0)']);
+                                
+                                % Reconstruct the history signal
+                                newLength = length(times);
+                                s1_i = zeros(1.0, newLength);
+                                
+                                peak_j = 1.0; valley_j = 1.0;
+                                
+                                for j = 1.0:newLength
+                                    if any(peaks(:, 1.0) == times(j))
+                                        s1_i(j) = peaks(peak_j, 2.0);
+                                        peak_j = peak_j + 1.0;
+                                    else
+                                        s1_i(j) = valleys(valley_j, 2.0);
+                                        valley_j = valley_j + 1.0;
+                                    end
                                 end
                             end
                             
-                            [~, ~, s2_i, error] = css2b(s2_i, E, kp, np);
-                        end
-                        
-                        % Gate the history
-                        gate = preProcess.autoGate(s3_i, historyGate);
-                        [peaks, valleys] = preProcess.peakdet(s3_i, gate);
-                        
-                        if isempty(peaks) == 0.0 && isempty(valleys) == 0.0
-                            % Order the P-V time values from low to high
-                            times = sort([peaks(:, 1.0)', valleys(:, 1.0)']);
+                            [~, e1_i, s1_i, error] = css2b(s1_i, E, kp, np);
                             
-                            % Reconstruct the history signal
-                            newLength = length(times);
-                            s3_i = zeros(1.0, newLength);
+                            % Gate the history
+                            gate = preProcess.autoGate(s2_i, historyGate);
+                            [peaks, valleys] = preProcess.peakdet(s2_i, gate);
                             
-                            peak_j = 1.0; valley_j = 1.0;
-                            
-                            for j = 1.0:newLength
-                                if any(peaks(:, 1.0) == times(j))
-                                    s3_i(j) = peaks(peak_j, 2.0);
-                                    peak_j = peak_j + 1.0;
-                                else
-                                    s3_i(j) = valleys(valley_j, 2.0);
-                                    valley_j = valley_j + 1.0;
+                            if isempty(peaks) == 0.0 && isempty(valleys) == 0.0
+                                % Order the P-V time values from low to high
+                                times = sort([peaks(:, 1.0)', valleys(:, 1.0)']);
+                                
+                                % Reconstruct the history signal
+                                newLength = length(times);
+                                s2_i = zeros(1.0, newLength);
+                                
+                                peak_j = 1.0; valley_j = 1.0;
+                                
+                                for j = 1.0:newLength
+                                    if any(peaks(:, 1.0) == times(j))
+                                        s2_i(j) = peaks(peak_j, 2.0);
+                                        peak_j = peak_j + 1.0;
+                                    else
+                                        s2_i(j) = valleys(valley_j, 2.0);
+                                        valley_j = valley_j + 1.0;
+                                    end
                                 end
+                                
+                                [~, ~, s2_i, error] = css2b(s2_i, E, kp, np);
                             end
                             
-                            [~, ~, s3_i, error] = css2b(s3_i, E, kp, np);
+                            % Gate the history
+                            gate = preProcess.autoGate(s3_i, historyGate);
+                            [peaks, valleys] = preProcess.peakdet(s3_i, gate);
+                            
+                            if isempty(peaks) == 0.0 && isempty(valleys) == 0.0
+                                % Order the P-V time values from low to high
+                                times = sort([peaks(:, 1.0)', valleys(:, 1.0)']);
+                                
+                                % Reconstruct the history signal
+                                newLength = length(times);
+                                s3_i = zeros(1.0, newLength);
+                                
+                                peak_j = 1.0; valley_j = 1.0;
+                                
+                                for j = 1.0:newLength
+                                    if any(peaks(:, 1.0) == times(j))
+                                        s3_i(j) = peaks(peak_j, 2.0);
+                                        peak_j = peak_j + 1.0;
+                                    else
+                                        s3_i(j) = valleys(valley_j, 2.0);
+                                        valley_j = valley_j + 1.0;
+                                    end
+                                end
+                                
+                                [~, e3_i, s3_i, error] = css2b(s3_i, E, kp, np);
+                            end
+                        catch
+                            error = 2.0;
                         end
-                    catch
-                        error = 2.0;
-                    end
-                    
-                    %{
-                        If there was an error during the yield calculation,
-                        warn the user
-                    %}
-                    if error == 1.0
-                        yield(totalCounter:(totalCounter + N) - 1.0) = -2.0;
-                        setappdata(0, 'yieldCriteria', 0.0)
-                        setappdata(0, 'message_214_E', E)
-                        setappdata(0, 'message_214_K', kp)
-                        setappdata(0, 'message_214_N', np)
-                        setappdata(0, 'message_214_groupMaterial', groupIDBuffer(groups).material)
-                        setappdata(0, 'message_214_groupName', groupIDBuffer(groups).name)
-                        setappdata(0, 'message_214_groupNumber', groups)
-                        messenger.writeMessage(214.0)
                         
-                        totalCounter = totalCounter + N;
-                        break
-                    elseif error == 2.0
-                        yield(totalCounter:(totalCounter + N) - 1.0) = -2.0;
-                        setappdata(0, 'yieldCriteria', 0.0)
-                        setappdata(0, 'message_242_groupMaterial', groupIDBuffer(groups).material)
-                        setappdata(0, 'message_242_groupName', groupIDBuffer(groups).name)
-                        setappdata(0, 'message_242_groupNumber', groups)
-                        messenger.writeMessage(242.0)
+                        %{
+                            If there was an error during the conversion,
+                            warn the user
+                        %}
+                        if error == 1.0
+                            yield(totalCounter:(totalCounter + N) - 1.0) = -2.0;
+                            setappdata(0, 'yieldCriteria', 0.0)
+                            setappdata(0, 'message_214_E', E)
+                            setappdata(0, 'message_214_K', kp)
+                            setappdata(0, 'message_214_N', np)
+                            setappdata(0, 'message_214_groupMaterial', groupIDBuffer(groups).material)
+                            setappdata(0, 'message_214_groupName', groupIDBuffer(groups).name)
+                            setappdata(0, 'message_214_groupNumber', groups)
+                            messenger.writeMessage(214.0)
+                            
+                            totalCounter = totalCounter + N;
+                            break
+                        elseif error == 2.0
+                            yield(totalCounter:(totalCounter + N) - 1.0) = -2.0;
+                            setappdata(0, 'yieldCriteria', 0.0)
+                            setappdata(0, 'message_242_groupMaterial', groupIDBuffer(groups).material)
+                            setappdata(0, 'message_242_groupName', groupIDBuffer(groups).name)
+                            setappdata(0, 'message_242_groupNumber', groups)
+                            messenger.writeMessage(242.0)
+                            
+                            totalCounter = totalCounter + N;
+                            break
+                        end
                         
-                        totalCounter = totalCounter + N;
-                        break
-                    end
-                    
-                    %{
-                        Make sure principal stress histories are the same
-                        length after correcting for plasticity
-                    %}
-                    lengths = [length(s1_i), length(s2_i), length(s3_i)];
-                    signalLength = max(lengths);
-                    
-                    if lengths(1.0) < signalLength
-                        s1_i = [s1_i, zeros(1.0, signalLength - lengths(1.0))]; %#ok<AGROW>
-                    end
-                    if lengths(2.0) < signalLength
-                        s2_i = [s2_i, zeros(1.0, signalLength - lengths(2.0))]; %#ok<AGROW>
-                    end
-                    if lengths(3.0) < signalLength
-                        s3_i = [s3_i, zeros(1.0, signalLength - lengths(3.0))]; %#ok<AGROW>
+                        %{
+                            Make sure principal stress histories are the
+                            same length after correcting for plasticity
+                        %}
+                        lengths = [length(s1_i), length(s2_i), length(s3_i)];
+                        signalLength = max(lengths);
+                        
+                        if lengths(1.0) < signalLength
+                            s1_i = [s1_i, zeros(1.0, signalLength - lengths(1.0))]; %#ok<AGROW>
+                        end
+                        if lengths(2.0) < signalLength
+                            s2_i = [s2_i, zeros(1.0, signalLength - lengths(2.0))]; %#ok<AGROW>
+                        end
+                        if lengths(3.0) < signalLength
+                            s3_i = [s3_i, zeros(1.0, signalLength - lengths(3.0))]; %#ok<AGROW>
+                        end
                     end
                     
                     % Get the maximum strain energy in the loading for each analysis item
@@ -4513,6 +4525,19 @@ classdef preProcess < handle
                             end
                             
                             totalStrainEnergy_buffer(totalCounter) = max(totalStrainEnergy);
+                            
+                            totalCounter = totalCounter + 1.0;
+                        case 3.0 % Tresca failure theory
+                            tMax = abs(s1_i - s3_i);
+                            if max(tMax) >= proof
+                                yield(totalCounter) = 1.0;
+                            end
+                            
+                            if materialResponse == 1.0
+                                totalStrainEnergy_buffer(totalCounter) = max(tMax)^2.0/(2.0*E);
+                            else
+                                totalStrainEnergy_buffer(totalCounter) = 0.5*max(tMax)*max(abs(e1_i - e3_i));
+                            end
                             
                             totalCounter = totalCounter + 1.0;
                     end
@@ -4542,13 +4567,8 @@ classdef preProcess < handle
                 % Save the current material state
                 group.saveMaterial(groups)
                 
-                %Update the start ID
+                % Update the start ID
                 startID = startID + N;
-            end
-            
-            % Tell the user that yielded items have been exported
-            if isempty(find(yield == 1.0, 1.0)) == 0.0
-                messenger.writeMessage(120.0)
             end
             
             % Save the field variables
