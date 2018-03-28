@@ -227,8 +227,10 @@ Quick Fatigue Tool User Guide.
 %
 %   Static analysis field variable identifiers:
 %		- YIELD, Yielding items
-%		- TSE, Total strain energy per unit volume
-%		- PSE, Plastic strain energy per unit volume
+%       - DE, Distortion energy density for von Mises yield criterion
+%		- SSE, Shear strain energy density for shear strain energy theory and Tresca yield surface
+%		- TSE, Total strain energy density for total strain energy theory
+%		- PSE, Plastic strain energy density for all yield criteria
 %		- MSTRS, Maximum stress theory failure measure
 %		- MSTRN, Maximum strain theory failure measure
 %		- TSAIH, Tsai-Hill theory failure measure
@@ -304,4 +306,4 @@ Quick Fatigue Tool User Guide.
 %   louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 27-Mar-2018 16:34:08 GMT
+%   Last modified 28-Mar-2018 13:42:15 GMT

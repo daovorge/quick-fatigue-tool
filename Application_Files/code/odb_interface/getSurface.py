@@ -38,7 +38,7 @@
 #      4.5.3 Custom analysis items
 #
 #   Quick Fatigue Tool 6.11-12 Copyright Louis Vallance 2018
-#   Last modified 13-Feb-2018 20:14:48 GMT
+#   Last modified 28-Mar-2018 09:40:26 GMT
 
 import os
 from odbAccess import *
@@ -655,6 +655,7 @@ for instanceNumber in range(nInstances):
 		else:
 			# This element is not supported by the surface detection algorithm
 			unsupportedElements.append(element.type)
+			indexIncrement = 0
 			
 	# Get surface nodes from unique faces:
 	surfaceNodes = Counter([tuple(sorted(x)) for x in faces])

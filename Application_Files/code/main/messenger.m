@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 27-Mar-2018 16:34:08 GMT
+%   Last modified 28-Mar-2018 13:42:15 GMT
 
     %%
 
@@ -803,8 +803,17 @@ classdef messenger < handle
                                 fprintf(fidType(i), [returnType{i}, '***NOTE: %.0f items have yielded', returnType{i}], N);
                             end
                         end
-
-                        fprintf(fidType(i), ['-> The ratio between the maximum volumetric strain energy and the tensile limit strain energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group'))/getappdata(0, 'strainLimitEnergy'));
+                        
+                        switch getappdata(0, 'yieldCriteria')
+                            case 1.0
+                                fprintf(fidType(i), ['-> The ratio between the equivalent total energy density and the tensile yield energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group'))/getappdata(0, 'strainLimitEnergy'));
+                            case 2.0
+                                fprintf(fidType(i), ['-> The ratio between the equivalent shear energy density and the tensile yield energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group'))/getappdata(0, 'strainLimitEnergy'));
+                            case 3.0
+                                fprintf(fidType(i), ['-> The ratio between the equivalent shear energy density and the tensile yield energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group'))/getappdata(0, 'strainLimitEnergy'));
+                            case 4.0
+                                fprintf(fidType(i), ['-> The ratio between the equivalent distortion energy density and the tensile yield energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group'))/getappdata(0, 'strainLimitEnergy'));
+                        end
                     case 67.0
                         if getappdata(0, 'suppress_ID67') == 0.0
                             fprintf(fidType(i), [returnType{i}, '***WARNING: The largest stress range in the loading exceeds the yield strength by more than 200%%', returnType{i}]);
@@ -1135,11 +1144,10 @@ classdef messenger < handle
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 119.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: Cyclic properties are not defined for material %s (group %.0f)', returnType{i}], getappdata(0, 'message_groupMaterial'), getappdata(0, 'message_groupNumber'));
-                        fprintf(fidType(i), ['-> The yield calculation requires values of the elastic modulus (E), the cyclic strain hardening coefficient (K) and the cyclic strain hardening exponent (n) to correct the principal stresses for effect of plasticity', returnType{i}]);
-                        fprintf(fidType(i), ['-> The yield calculation will not be performed for this group', returnType{i}]);
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: For the yield criteria assessment, the nonlinear elastic material response is specified but cyclic properties are not defined for material %s (group %.0f)', returnType{i}], getappdata(0, 'message_groupMaterial'), getappdata(0, 'message_groupNumber'));
+                        fprintf(fidType(i), ['-> The linear elastic response will be used for all analysis groups', returnType{i}]);
 
-                        setappdata(0, 'messageFileNotes', 1.0)
+                        setappdata(0, 'messageFileWarnings', 1.0)
                     case 120.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Yielded items have been written to ''%s\\Project\\output\\%s\\Data Files\\warn_yielding_items.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
 
@@ -1796,7 +1804,7 @@ classdef messenger < handle
                         material(end - 3.0:end) = [];
 
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The yield calculation failed in group %.0f (''%s'')', returnType{i}], getappdata(0, 'message_214_groupNumber'), getappdata(0, 'message_214_groupName'));
-                        fprintf(fidType(i), ['-> The material properties in ''%s'' may be incorrectly defined:', returnType{i}], material);
+                        fprintf(fidType(i), ['-> The material properties in ''%s'' may be defined incorrectly:', returnType{i}], material);
                         fprintf(fidType(i), ['-> Young''s Modulus (E) = %.3fMPa', returnType{i}], getappdata(0, 'message_214_E'));
                         fprintf(fidType(i), ['-> Strain hardening coefficient (K) = %.3fMPa', returnType{i}], getappdata(0, 'message_214_K'));
                         fprintf(fidType(i), ['-> Strain hardening exponent (n) = %f', returnType{i}], getappdata(0, 'message_214_N'));
@@ -1955,7 +1963,7 @@ classdef messenger < handle
                         fprintf(fidType(i), ['-> It is recommended that the minimum and maximum non-zero mean stress values are defined at zero stress amplitude', returnType{i}]);
                     case 242.0
                         fprintf(fidType(i), [returnType{i}, '***WARNING: The yield calculation failed in group %.0f (''%s'')', returnType{i}], getappdata(0, 'message_242_groupNumber'), getappdata(0, 'message_242_groupName'));
-                        fprintf(fidType(i), ['-> An exception was encountered during the calculation. Please contact the developer.', returnType{i}]);
+                        fprintf(fidType(i), ['-> An exception was encountered during the calculation. Please contact the developer: louisvallance@hotmail.co.uk', returnType{i}]);
                     case 243.0
                         if getappdata(0, 'outputField') == 1.0
                             fprintf(fidType(i), [returnType{i}, '***WARNING: The FRF normalization parameter ''%s'' was not recognised', returnType{i}], getappdata(0, 'message_243_paramOld'));
@@ -1977,7 +1985,7 @@ classdef messenger < handle
                         reason = getappdata(0, 'message_247_breakCondition');
                         if reason == 0.0
                             fprintf(fidType(i), [returnType{i}, '***WARNING: The FOS calculation has been stopped for an unknown reason', returnType{i}]);
-                            fprintf(fidType(i), ['-> Please contact the developer for further assistance', returnType{i}]);
+                            fprintf(fidType(i), ['-> Please contact the developer: louisvallance@hotmail.co.uk', returnType{i}]);
                             setappdata(0, 'messageFileWarnings', 1.0)
                         else
                             fprintf(fidType(i), [returnType{i}, '***NOTE: The FOS calculation has reached the following stop condition:', returnType{i}]);
@@ -2385,7 +2393,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2018\r\n');
-            fprintf(fid, 'Last modified 27-Mar-2018 16:34:08 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 28-Mar-2018 13:42:15 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

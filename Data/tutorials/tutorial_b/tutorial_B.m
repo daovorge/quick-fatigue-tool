@@ -19,7 +19,7 @@ function [] = tutorial_B()
 %      1 Job file options
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2017
-%   Last modified 14-Feb-2018 10:15:26 GMT
+%   Last modified 28-Mar-2018 09:40:26 GMT
 
 %% JOB
 
@@ -264,8 +264,10 @@ SEA_WATER = 0.0;
 % YIELD CRITERIA
 %{
     0: Do not perform yield calculations
-    1: Perform yield calculations based on the total strain energy theory
-    2: Perform yield calculations based on the shear strain energy theory
+    1: Total strain energy theory
+    2: Shear strain energy theory
+    3: Tresca yield surface
+    4: von Mises yield criterion
 %}
 YIELD_CRITERIA = 0.0;
 
