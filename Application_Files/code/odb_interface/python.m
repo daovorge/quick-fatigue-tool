@@ -901,16 +901,16 @@ classdef python < handle
                     switch getappdata(0, 'yieldCriteria')
                         case 4.0
                             fieldNames{index + 1.0} = sprintf('DE-mJ/mm^3');
-                            fieldDescriptions{index + 1.0} = sprintf('Distortion energy density');
+                            fieldDescriptions{index + 1.0} = sprintf('Equivalent distortion energy density');
                         case 3.0
                             fieldNames{index + 1.0} = sprintf('SSE-mJ/mm^3');
-                            fieldDescriptions{index + 1.0} = sprintf('Shear strain energy density');
+                            fieldDescriptions{index + 1.0} = sprintf('Equivalent shear strain energy density');
                         case 2.0
                             fieldNames{index + 1.0} = sprintf('SSE-mJ/mm^3');
-                            fieldDescriptions{index + 1.0} = sprintf('Shear strain energy density');
+                            fieldDescriptions{index + 1.0} = sprintf('Equivalent shear strain energy density');
                         case 1.0
                             fieldNames{index + 1.0} = sprintf('TSE-mJ/mm^3');
-                            fieldDescriptions{index + 1.0} = sprintf('Total strain energy density');
+                            fieldDescriptions{index + 1.0} = sprintf('Equivalent total strain energy density');
                     end
                     
                     fieldNames{index + 2.0} = sprintf('PSE-mJ/mm^3');
