@@ -431,7 +431,7 @@ if (failStressGeneral ~= -1.0) || (tsaiWuTT ~= -1.0) || (failStrain ~= -1.0) || 
     
     fid = fopen(dir, 'w+');
     
-    fprintf(fid, 'COMPOSITE FAILURE\r\n');
+    fprintf(fid, 'COMPOSITE ASSESSMENT RESULTS\r\n');
     fprintf(fid, 'Job:\t%s\r\nLoading:\t%.3g\t%s\r\n', getappdata(0, 'jobName'), getappdata(0, 'loadEqVal'), getappdata(0, 'loadEqUnits'));
     
     fprintf(fid, 'Main ID\tSub ID\tMSTRS\tMSTRN\tTSAIH\tTSAIW\tTSAIWTT\tAZZIT\tHSNFTCRT\tHSNFCCRT\tHSNMTCRT\tHSNMCCRT\tLARPFCRT\tLARMFCRT\tLARKFCRT\tLARSFCRT\tLARTFCRT\r\n');

@@ -2395,7 +2395,7 @@ classdef jobFile < handle
         
         %% Check the loading for fatigue
         function [error] = checkFatigue(S11, algorithm)
-            % Initilize the error flag
+            % Initialize the error flag
             error = 0.0;
             
             if (algorithm == 3.0) || (algorithm == 10.0)

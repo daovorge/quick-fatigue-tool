@@ -22,7 +22,7 @@ classdef compositeOutput < handle
             setappdata(0, 'ODB_interface_auto', 1.0)
             
             % Get path and name of field data
-            fieldDataPath = [getappdata(0, 'outputDirectory'), 'Data Files/composite_criteria.datt'];
+            fieldDataPath = [getappdata(0, 'outputDirectory'), 'Data Files/composite_criteria.dat'];
             [~, fieldDataName, EXT] = fileparts(fieldDataPath);
             fieldDataName = [fieldDataName, EXT];
             

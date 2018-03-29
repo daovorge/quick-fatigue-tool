@@ -806,13 +806,13 @@ classdef messenger < handle
                         
                         switch getappdata(0, 'yieldCriteria')
                             case 1.0
-                                fprintf(fidType(i), ['-> The ratio between the equivalent total energy density and the tensile yield energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group'))/getappdata(0, 'strainLimitEnergy'));
+                                fprintf(fidType(i), ['-> The ratio between the equivalent total energy density and the tensile strain limit energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group'))/getappdata(0, 'strainLimitEnergy'));
                             case 2.0
-                                fprintf(fidType(i), ['-> The ratio between the equivalent shear energy density and the tensile yield energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group'))/getappdata(0, 'strainLimitEnergy'));
+                                fprintf(fidType(i), ['-> The ratio between the equivalent shear energy density and the tensile strain limit energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group'))/getappdata(0, 'strainLimitEnergy'));
                             case 3.0
-                                fprintf(fidType(i), ['-> The ratio between the equivalent shear energy density and the tensile yield energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group'))/getappdata(0, 'strainLimitEnergy'));
+                                fprintf(fidType(i), ['-> The ratio between the equivalent shear energy density and the tensile strain limit energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group'))/getappdata(0, 'strainLimitEnergy'));
                             case 4.0
-                                fprintf(fidType(i), ['-> The ratio between the equivalent distortion energy density and the tensile yield energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group'))/getappdata(0, 'strainLimitEnergy'));
+                                fprintf(fidType(i), ['-> The ratio between the equivalent distortion energy density and the tensile strain limit energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group'))/getappdata(0, 'strainLimitEnergy'));
                         end
                     case 67.0
                         if getappdata(0, 'suppress_ID67') == 0.0

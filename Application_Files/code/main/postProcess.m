@@ -1877,7 +1877,7 @@ classdef postProcess < handle
                         
                         % If the yield criterion was enabled
                         yieldCriteria = getappdata(0, 'yieldCriteria');
-                        if yieldCriteria == 1.0 || yieldCriteria == 2.0 || yieldCriteria == 3.0 || yieldCriteria ==41.0
+                        if yieldCriteria == 1.0 || yieldCriteria == 2.0 || yieldCriteria == 3.0 || yieldCriteria == 4.0
                             requestedFields(19.0) = 1.0;
                         end
                     end
