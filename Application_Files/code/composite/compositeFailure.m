@@ -12,7 +12,7 @@ function [] = compositeFailure(N, L, mainID, fid_status)
 %      12.3 Composite failure criteria
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 14-Mar-2018 07:24:59 GMT
+%   Last modified 29-Mar-2018 10:39:45 GMT
     
     %%
 
@@ -427,7 +427,7 @@ if (failStressGeneral ~= -1.0) || (tsaiWuTT ~= -1.0) || (failStrain ~= -1.0) || 
         mkdir(sprintf('%s/Data Files', root))
     end
     
-    dir = [root, 'Data Files/composite-criteria.dat'];
+    dir = [root, 'Data Files/composite_criteria.dat'];
     
     fid = fopen(dir, 'w+');
     

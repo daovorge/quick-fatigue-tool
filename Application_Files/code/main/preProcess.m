@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 28-Mar-2018 20:47:00 GMT
+%   Last modified 29-Mar-2018 10:39:45 GMT
     
     %%
     
@@ -4563,12 +4563,6 @@ classdef preProcess < handle
                 
                 yield_group = yield(startID:(startID + N) - 1.0);
                 setappdata(0, 'warning_066_N', length(yield_group(yield_group == 1.0)))
-                
-                if any(yield_group == 1.0) == 1.0
-                    setappdata(0, 'warning_066', 1.0)
-                else
-                    setappdata(0, 'warning_066', 0.0)
-                end
                 
                 messenger.writeMessage(66.0)
                 

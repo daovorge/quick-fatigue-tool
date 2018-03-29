@@ -10,7 +10,7 @@ classdef compositeOutput < handle
 %      12.3 Composite failure criteria
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 16-Mar-2018 13:19:57 GMT
+%   Last modified 29-Mar-2018 10:39:45 GMT
     
     %%
     
@@ -22,7 +22,7 @@ classdef compositeOutput < handle
             setappdata(0, 'ODB_interface_auto', 1.0)
             
             % Get path and name of field data
-            fieldDataPath = [getappdata(0, 'outputDirectory'), 'Data Files/composite-criteria.dat'];
+            fieldDataPath = [getappdata(0, 'outputDirectory'), 'Data Files/composite_criteria.datt'];
             [~, fieldDataName, EXT] = fileparts(fieldDataPath);
             fieldDataName = [fieldDataName, EXT];
             

@@ -11,7 +11,7 @@ classdef python < handle
 %      10.4 The ODB Interface
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 28-Mar-2018 20:47:00 GMT
+%   Last modified 29-Mar-2018 10:39:45 GMT
     
     %%
     
@@ -389,7 +389,7 @@ classdef python < handle
             fieldDescriptions = fieldNames;
             
             % Check if the plastic strain energy was calculated
-            energyFile = sprintf('Project/output/%s/Data Files/warn_yielding_items.dat', getappdata(0, 'jobName'));
+            energyFile = sprintf('Project/output/%s/Data Files/yield_assessment.dat', getappdata(0, 'jobName'));
             if (requestedFields(19.0) == true) && exist(energyFile, 'file') == 2.0
                 fieldData = zeros(length(mainIDs), 2.0 + length(requestedFields(requestedFields == true)));
                 fieldNames = cell(1.0, 2.0 + length(requestedFields(requestedFields == true)));
@@ -405,7 +405,7 @@ classdef python < handle
                     fprintf(fid_debug, '\r\n\tWarning: Requested field YIELD could not be evaluated due to insufficient material properties. The field will not be written to the output database');
                 elseif (requestedFields(19.0) == true) && (exist(energyFile, 'file') == 0.0) && (all(YIELD == -1.0) == 1.0)
                     % If YIELD was requested but the field was not enabled prior to analysis, warn the user
-                    fprintf(fid_debug, '\r\n\tWarning: Requested field YIELD was not enabled. Set YIELD_CRITERIA = 1.0 in the job file. The field will not be written to the output database');
+                    fprintf(fid_debug, '\r\n\tWarning: Requested field YIELD could not be found in the field data. Set YIELD_CRITERIA = 1.0 in the job file. The field will not be written to the output database');
                 end
                 
                 requestedFields(19.0) = false;
@@ -875,25 +875,12 @@ classdef python < handle
                     % The field exists
                     fieldData(:, index) = fieldDataFile.data(:, find(strcmp(fieldNamesFile, 'YIELD') == true));
                     fieldNames{index} = sprintf('YIELD');
-                    fieldDescriptions{index} = sprintf('Items with plastic strain energy');
+                    fieldDescriptions{index} = sprintf('Yield criterion flag');
                     
                     % Get the associated energies as well
                     fieldDataFile_energy = importdata(energyFile, '\t');
-                    
-                    energyMainIDs = fieldDataFile_energy.data(:, 2.0);
-                    energySubIDs = fieldDataFile_energy.data(:, 3.0);
-                    totalStrainEnergy_i = fieldDataFile_energy.data(:, 4.0);
-                    plasticStrainEnergy_i = fieldDataFile_energy.data(:, 5.0);
-                    totalStrainEnergy = zeros(1.0, length(mainIDs));
-                    plasticStrainEnergy = totalStrainEnergy;
-                    
-                    allItems = [mainIDs, subIDs];
-                    energyMainIDs = [energyMainIDs, energySubIDs];
-                    commonIDs = ismember(allItems, energyMainIDs, 'rows');
-                    
-                    %commonIDs = ismember(mainIDs, energyMainIDs);
-                    totalStrainEnergy(commonIDs) = totalStrainEnergy_i;
-                    plasticStrainEnergy(commonIDs) = plasticStrainEnergy_i;
+                    totalStrainEnergy = fieldDataFile_energy.data(:, 4.0);
+                    plasticStrainEnergy = fieldDataFile_energy.data(:, 5.0);
                     
                     fieldData(:, index + 1.0) = totalStrainEnergy';
                     fieldData(:, index + 2.0) = plasticStrainEnergy';
