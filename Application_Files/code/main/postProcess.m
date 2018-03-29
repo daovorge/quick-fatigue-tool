@@ -1637,8 +1637,10 @@ classdef postProcess < handle
             plasticStrainEnergy = totalStrainEnergy - strainLimitEnergy;
             plasticStrainEnergy(plasticStrainEnergy < 0.0) = 0.0;
             
+            failureIndex = totalStrainEnergy.^0.5;
+            
             % Concatenate data
-            data = [mainID'; subID'; yield; totalStrainEnergy; plasticStrainEnergy]';
+            data = [mainID'; subID'; yield; failureIndex; plasticStrainEnergy]';
             
             % Print information to file
             root = getappdata(0, 'outputDirectory');
@@ -1655,16 +1657,16 @@ classdef postProcess < handle
             
             switch yieldCriteria
                 case 4.0
-                    energyString = 'distortion';
+                    yieldIndex = 'VMCRT';
                 case 3.0
-                    energyString = 'shear strain';
+                    yieldIndex = 'TRCRT';
                 case 2.0
-                    energyString = 'shear strain';
+                    yieldIndex = 'SSCRT';
                 case 1.0
-                    energyString = 'total strain';
+                    yieldIndex = 'TSCRT';
             end
-            fprintf(fid, 'Main ID\tSub ID\tYIELD\tTSE, Normalised equivalent %s energy density\tPSE, Normalised equivalent plastic strain energy density\r\n', energyString);
-            fprintf(fid, '%.0f\t%.0f\t%.0f\t%f\t%f\r\n', data');
+            fprintf(fid, 'Main ID\tSub ID\tYIELD\t%s\tPEEQ, Normalised equivalent plastic strain energy density\r\n', yieldIndex);
+            fprintf(fid, '%.0f\t%.0f\t%.0f\t%.9f\t%f\r\n', data');
             
             fclose(fid);
             

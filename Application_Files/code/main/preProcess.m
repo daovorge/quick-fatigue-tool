@@ -4510,8 +4510,8 @@ classdef preProcess < handle
                     %}
                     switch yieldCriteria
                         case 1.0 % Total strain energy theory
-                            totalStrainEnergy = s1_i.^2.0 + s2_i.^2.0 + s3_i.^2.0 - (2.0*v).*((s1_i.*s2_i) + (s2_i.*s3_i) + (s1_i.*s3_i));
-                            if max(totalStrainEnergy) >= strainLimitEnergy
+                            totalStrainEnergy = max(s1_i.^2.0 + s2_i.^2.0 + s3_i.^2.0 - (2.0*v).*((s1_i.*s2_i) + (s2_i.*s3_i) + (s1_i.*s3_i)));
+                            if totalStrainEnergy >= strainLimitEnergy
                                 yield(totalCounter) = 1.0;
                             end
                             
@@ -4519,8 +4519,8 @@ classdef preProcess < handle
                             
                             totalCounter = totalCounter + 1.0;
                         case 2.0 % Shear strain energy theory
-                            totalStrainEnergy = 0.5.*((s1_i - s2_i).^2.0 + (s2_i - s3_i).^2.0 + (s3_i - s1_i).^2.0);
-                            if max(totalStrainEnergy) >= strainLimitEnergy
+                            totalStrainEnergy = max(0.5.*((s1_i - s2_i).^2.0 + (s2_i - s3_i).^2.0 + (s3_i - s1_i).^2.0));
+                            if totalStrainEnergy >= strainLimitEnergy
                                 yield(totalCounter) = 1.0;
                             end
                             

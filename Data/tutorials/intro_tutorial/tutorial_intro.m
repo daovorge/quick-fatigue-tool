@@ -258,10 +258,10 @@ SEA_WATER = 0.0;
 
 % YIELD CRITERIA
 %{
-    0: Do not perform yield calculations
+    0: Do not perform yield assessment
     1: Total strain energy theory
-    2: Shear strain energy theory
-    3: Tresca yield surface
+    2: Maximum shear strain energy theory
+    3: Tresca yield criterion
     4: von Mises yield criterion
 %}
 YIELD_CRITERIA = 0.0;

@@ -887,20 +887,20 @@ classdef python < handle
                     
                     switch getappdata(0, 'yieldCriteria')
                         case 4.0
-                            fieldNames{index + 1.0} = sprintf('DEEQ');
-                            fieldDescriptions{index + 1.0} = sprintf('Normalised equivalent distortion energy density');
+                            fieldNames{index + 1.0} = sprintf('VMCRT');
+                            fieldDescriptions{index + 1.0} = sprintf('von Mises criterion yield index');
                         case 3.0
-                            fieldNames{index + 1.0} = sprintf('SSEEQ');
-                            fieldDescriptions{index + 1.0} = sprintf('Normalised equivalent shear strain energy density');
+                            fieldNames{index + 1.0} = sprintf('TRCRT');
+                            fieldDescriptions{index + 1.0} = sprintf('Tresca criterion yield index');
                         case 2.0
-                            fieldNames{index + 1.0} = sprintf('SSEEQ');
-                            fieldDescriptions{index + 1.0} = sprintf('Normalised equivalent shear strain energy density');
+                            fieldNames{index + 1.0} = sprintf('SSCRT');
+                            fieldDescriptions{index + 1.0} = sprintf('Maximum shear strain energy theory yield index');
                         case 1.0
-                            fieldNames{index + 1.0} = sprintf('TSEEQ');
-                            fieldDescriptions{index + 1.0} = sprintf('Normalised equivalent total strain energy density');
+                            fieldNames{index + 1.0} = sprintf('TSCRT');
+                            fieldDescriptions{index + 1.0} = sprintf('Total strain energy theory yield index');
                     end
                     
-                    fieldNames{index + 2.0} = sprintf('PSEEQ');
+                    fieldNames{index + 2.0} = sprintf('PEEQ');
                     fieldDescriptions{index + 2.0} = sprintf('Normalised equivalent plastic strain energy density');
                 else
                     columnsToDelete = columnsToDelete + 1.0;

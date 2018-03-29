@@ -227,10 +227,11 @@ Quick Fatigue Tool User Guide.
 %
 %   Static analysis field variable identifiers:
 %		- YIELD, Yielding items
-%       - DEEQ, Normalised equivalent distortion energy density for von Mises yield criterion
-%		- SSEEQ, Normalised equivalent shear strain energy density for shear strain energy theory and Tresca yield surface
-%		- TSEEQ, Normalised equivalent total strain energy density for total strain energy theory
-%		- PSEEQ, Normalised equivalent plastic strain energy density for all yield criteria
+%       - VMCRT, von Mises criterion yield index
+%		- TRCRT, Tresca criterion yield index
+%		- SSCRT, Maximum shear strain energy theory yield index
+%		- TSCRT, Total strain energy theory yield index
+%		- PEEQ, Normalised equivalent plastic strain energy density for all yield criteria
 %		- MSTRS, Maximum stress theory failure measure
 %		- MSTRN, Maximum strain theory failure measure
 %		- TSAIH, Tsai-Hill theory failure measure
