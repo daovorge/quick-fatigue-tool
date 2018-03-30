@@ -872,7 +872,7 @@ end
 
 %% Additional tasks
 
-fprintf(fid_debug, ' Success\r\n\r\nFatigue results have been written to ''%s''', sprintf('%s/%s.odb', resultsDatabasePath, resultsDatabaseName));
+fprintf(fid_debug, ' Success\r\n\r\nResults have been written to ''%s''', sprintf('%s/%s.odb', resultsDatabasePath, resultsDatabaseName));
 fprintf(fid_debug, '\r\n\r\nEND OF FILE');
 fprintf('\nExport complete. Check %s for details ', debugFileName);
 fclose(fid_debug);

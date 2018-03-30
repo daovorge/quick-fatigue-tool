@@ -806,11 +806,11 @@ classdef messenger < handle
                         
                         switch getappdata(0, 'yieldCriteria')
                             case 1.0
-                                fprintf(fidType(i), ['-> The ratio between the equivalent total energy density and the tensile strain limit energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group'))/getappdata(0, 'strainLimitEnergy'));
+                                fprintf(fidType(i), ['-> The ratio between the equivalent total strain energy density and the tensile strain limit energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group'))/getappdata(0, 'strainLimitEnergy'));
                             case 2.0
-                                fprintf(fidType(i), ['-> The ratio between the equivalent shear energy density and the tensile strain limit energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group'))/getappdata(0, 'strainLimitEnergy'));
+                                fprintf(fidType(i), ['-> The ratio between the equivalent shear strain energy density and the tensile strain limit energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group'))/getappdata(0, 'strainLimitEnergy'));
                             case 3.0
-                                fprintf(fidType(i), ['-> The ratio between the equivalent shear energy density and the tensile strain limit energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group'))/getappdata(0, 'strainLimitEnergy'));
+                                fprintf(fidType(i), ['-> The ratio between the equivalent shear strain energy density and the tensile strain limit energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group'))/getappdata(0, 'strainLimitEnergy'));
                             case 4.0
                                 fprintf(fidType(i), ['-> The ratio between the equivalent distortion energy density and the tensile strain limit energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group'))/getappdata(0, 'strainLimitEnergy'));
                         end
