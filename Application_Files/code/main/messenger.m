@@ -1446,7 +1446,7 @@ classdef messenger < handle
                         end
                     case 162.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Poisson''s ratio is not defined for material %s (group %.0f)', returnType{i}], getappdata(0, 'message_groupMaterial'), getappdata(0, 'message_groupNumber'));
-                        fprintf(fidType(i), ['-> The total strain energy criterion requires a value of the Poisson''s ratio', returnType{i}]);
+                        fprintf(fidType(i), ['-> The total strain energy theory requires a value of the Poisson''s ratio', returnType{i}]);
                         fprintf(fidType(i), ['-> The yield calculation will not be performed for this group', returnType{i}]);
 
                         setappdata(0, 'messageFileNotes', 1.0)
