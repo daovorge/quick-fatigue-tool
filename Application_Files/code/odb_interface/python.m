@@ -11,7 +11,7 @@ classdef python < handle
 %      10.4 The ODB Interface
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 29-Mar-2018 10:39:45 GMT
+%   Last modified 03-Apr-2018 13:52:49 GMT
     
     %%
     
@@ -569,10 +569,17 @@ classdef python < handle
                         
                         if exist(fosAccuracyFile, 'file') == 2.0
                             % Get the FOS accuracy as well
-                            fieldDataFile_fosAccuracy = importdata(fosAccuracyFile, '\t');
-                            fieldData(:, index + 1.0) = fieldDataFile_fosAccuracy.data(:, 3.0);
-                            fieldNames{index + 1.0} = sprintf('FACC-%%');
-                            fieldDescriptions{index + 1.0} = sprintf('Factor of strength accuracy');
+                            try
+                                fieldDataFile_fosAccuracy = importdata(fosAccuracyFile, '\t');
+                                fieldData(:, index + 1.0) = fieldDataFile_fosAccuracy.data(:, 3.0);
+                                fieldNames{index + 1.0} = sprintf('FACC-%%');
+                                fieldDescriptions{index + 1.0} = sprintf('Factor of strength accuracy');
+                            catch exception
+                                fprintf(fid_debug, '\r\n\tError: An exception was encountered while reading the FOS accuracy data from ''%s''', fosAccuracyFile);
+                                fprintf(fid_debug, '\r\n\tError: %s', exception.message);
+                                error = 6.0;
+                                return
+                            end
                             
                             index = index + 2.0;
                         else
@@ -878,12 +885,19 @@ classdef python < handle
                     fieldDescriptions{index} = sprintf('Yield criterion flag');
                     
                     % Get the associated energies as well
-                    fieldDataFile_energy = importdata(energyFile, '\t');
-                    totalStrainEnergy = fieldDataFile_energy.data(:, 4.0);
-                    plasticStrainEnergy = fieldDataFile_energy.data(:, 5.0);
-                    
-                    fieldData(:, index + 1.0) = totalStrainEnergy';
-                    fieldData(:, index + 2.0) = plasticStrainEnergy';
+                    try
+                        fieldDataFile_energy = importdata(energyFile, '\t');
+                        totalStrainEnergy = fieldDataFile_energy.data(:, 5.0);
+                        plasticStrainEnergy = fieldDataFile_energy.data(:, 6.0);
+                        
+                        fieldData(:, index + 1.0) = totalStrainEnergy';
+                        fieldData(:, index + 2.0) = plasticStrainEnergy';
+                    catch exception
+                        fprintf(fid_debug, '\r\n\tError: An exception was encountered while reading the YIELD assessment data from ''%s''', energyFile);
+                        fprintf(fid_debug, '\r\n\tError: %s', exception.message);
+                        error = 6.0;
+                        return
+                    end
                     
                     switch getappdata(0, 'yieldCriteria')
                         case 4.0

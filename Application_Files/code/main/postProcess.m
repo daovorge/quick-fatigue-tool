@@ -11,7 +11,7 @@ classdef postProcess < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 29-Mar-2018 10:39:45 GMT
+%   Last modified 03-Apr-2018 13:52:49 GMT
     
     %%
     
@@ -1639,8 +1639,15 @@ classdef postProcess < handle
             
             failureIndex = totalStrainEnergy.^0.5;
             
+            % Get the maximum stress at each item
+            S1 = getappdata(0, 'S1');
+            S3 = getappdata(0, 'S3');
+            smax = max([max(S1, [], 2.0), min(S3, [], 2.0)], [], 2.0);
+            smin = min([max(S1, [], 2.0), min(S3, [], 2.0)], [], 2.0);
+            smax(abs(smin) > smax) = smin(abs(smin) > smax);
+            
             % Concatenate data
-            data = [mainID'; subID'; yield; failureIndex; plasticStrainEnergy]';
+            data = [mainID'; subID'; smax'; yield; failureIndex; plasticStrainEnergy]';
             
             % Print information to file
             root = getappdata(0, 'outputDirectory');
@@ -1665,8 +1672,8 @@ classdef postProcess < handle
                 case 1.0
                     yieldIndex = 'TSCRT';
             end
-            fprintf(fid, 'Main ID\tSub ID\tYIELD\t%s\tPEEQ, Normalised equivalent plastic strain energy density\r\n', yieldIndex);
-            fprintf(fid, '%.0f\t%.0f\t%.0f\t%.9f\t%f\r\n', data');
+            fprintf(fid, 'Main ID\tSub ID\tSMAX (MPa)\tYIELD\t%s\tPEEQ, Normalised equivalent plastic strain energy density\r\n', yieldIndex);
+            fprintf(fid, '%.0f\t%.0f\t%f\t%.0f\t%.9f\t%f\r\n', data');
             
             fclose(fid);
             
