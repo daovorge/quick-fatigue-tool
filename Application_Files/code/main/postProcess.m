@@ -11,7 +11,7 @@ classdef postProcess < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 03-Apr-2018 13:52:49 GMT
+%   Last modified 04-Apr-2018 15:53:10 GMT
     
     %%
     
@@ -1614,70 +1614,6 @@ classdef postProcess < handle
             fprintf(fid, '%.0f\t%.0f\t%.0f\t%.4e\r\n', data');
             
             fclose(fid);
-        end
-        
-        %% WRITE YIELDING ITEMS TO FILE
-        function [] = writeYieldingItems(jobName, mainID, subID)
-            % Get the yield criteria flag
-            yieldCriteria = getappdata(0, 'yieldCriteria');
-            if yieldCriteria == 0.0
-                return
-            end
-            
-            % Get the YIELD variable
-            yield = getappdata(0, 'YIELD');
-            
-            % Get the strain energy associated with the yielding items
-            totalStrainEnergy = getappdata(0, 'totalStrainEnergy');
-            
-            % Get the normalised strain limit energy of the current group
-            strainLimitEnergy = 1.0;
-            
-            % Get the plastic strain energy for the current group
-            plasticStrainEnergy = totalStrainEnergy - strainLimitEnergy;
-            plasticStrainEnergy(plasticStrainEnergy < 0.0) = 0.0;
-            
-            failureIndex = totalStrainEnergy.^0.5;
-            
-            % Get the maximum stress at each item
-            S1 = getappdata(0, 'S1');
-            S3 = getappdata(0, 'S3');
-            smax = max([max(S1, [], 2.0), min(S3, [], 2.0)], [], 2.0);
-            smin = min([max(S1, [], 2.0), min(S3, [], 2.0)], [], 2.0);
-            smax(abs(smin) > smax) = smin(abs(smin) > smax);
-            
-            % Concatenate data
-            data = [mainID'; subID'; smax'; yield; failureIndex; plasticStrainEnergy]';
-            
-            % Print information to file
-            root = getappdata(0, 'outputDirectory');
-            
-            if exist(sprintf('%s/Data Files', root), 'dir') == 0.0
-                mkdir(sprintf('%s/Data Files', root))
-            end
-            
-            dir = [root, 'Data Files/yield_assessment.dat'];
-            
-            fid = fopen(dir, 'w+');
-            fprintf(fid, 'YIELD ASSESSMENT RESULTS\r\n');
-            fprintf(fid, 'Job:\t%s\r\nLoading:\t%.3g\t%s\r\n', jobName, getappdata(0, 'loadEqVal'), getappdata(0, 'loadEqUnits'));
-            
-            switch yieldCriteria
-                case 4.0
-                    yieldIndex = 'VMCRT';
-                case 3.0
-                    yieldIndex = 'TRCRT';
-                case 2.0
-                    yieldIndex = 'SSCRT';
-                case 1.0
-                    yieldIndex = 'TSCRT';
-            end
-            fprintf(fid, 'Main ID\tSub ID\tSMAX (MPa)\tYIELD\t%s\tPEEQ, Normalised equivalent plastic strain energy density\r\n', yieldIndex);
-            fprintf(fid, '%.0f\t%.0f\t%f\t%.0f\t%.9f\t%f\r\n', data');
-            
-            fclose(fid);
-            
-            messenger.writeMessage(120.0)
         end
         
         %% WRITE HOTSPOTS TO FILE

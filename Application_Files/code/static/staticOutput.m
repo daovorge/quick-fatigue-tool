@@ -1,28 +1,30 @@
-classdef compositeOutput < handle
-%COMPOSITEOUTPUT    QFT class to export composite analysis results to an ODB file.
+classdef staticOutput < handle
+%STATICOUTPUT    QFT class to export static analysis results to an ODB file.
 %   
-%   COMPOSITEOUTPUT is used internally by Quick Fatigue Tool. The user is
+%   STATICOUTPUT is used internally by Quick Fatigue Tool. The user is
 %   not required to run this file.
 %
-%   See also compositeFailure, LaRC05.
+%   See also yieldCriterion, compositeFailure, LaRC05.
 %
 %   Reference section in Quick Fatigue Tool User Guide
+%      12.2 Yield criteria
 %      12.3 Composite failure criteria
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 29-Mar-2018 10:39:45 GMT
+%   Last modified 04-Apr-2018 15:53:10 GMT
     
     %%
     
     methods(Static = true)
         %% Write composite results field data to an .ODB file
-        function [] = exportODB(fid_status, mainID)
+        function [] = exportODB(fid_status, mainID, yieldOrComposite)
             %% Pre-processing tasks
             % Flag to indicate the ODB Interface is operating in auto mode
             setappdata(0, 'ODB_interface_auto', 1.0)
             
             % Get path and name of field data
-            fieldDataPath = [getappdata(0, 'outputDirectory'), 'Data Files/composite_criteria.dat'];
+            %fieldDataPath = [getappdata(0, 'outputDirectory'), 'Data Files/composite_criteria.dat'];
+            fieldDataPath = [getappdata(0, 'outputDirectory'), 'Data Files/yield_assessment.dat'];
             [~, fieldDataName, EXT] = fileparts(fieldDataPath);
             fieldDataName = [fieldDataName, EXT];
             
@@ -233,7 +235,8 @@ classdef compositeOutput < handle
                     mainIDs, subIDs, stepDescription, fieldData, fieldNames, fieldDescriptions,...
                     connectedElements, error] = compositeOutput.getFieldData(fieldDataPath,...
                     userPosition, partInstanceName, autoPosition,...
-                    fid_debug, resultsDatabasePath, resultsDatabaseName);
+                    fid_debug, resultsDatabasePath, resultsDatabaseName,...
+                    yieldOrComposite);
                 
                 if error > 0.0
                     switch error
@@ -291,6 +294,16 @@ classdef compositeOutput < handle
                     subIDs, stepDescription, fieldData, fieldNames, fieldDescriptions, fid_debug,...
                     stepName, isExplicit, connectedElements, createODBSet,...
                     ODBSetName, stepType);
+                
+                %{
+                    If the analysis is a yield criterion assessment, the
+                    user might choose to conitnue the analysis. This will
+                    ead to a an error when the same step name is used, so
+                    update the step name now just to be safe
+                %}
+                if yieldOrComposite == 1.0
+                    setappdata(0, 'stepName', [stepName, '_1'])
+                end
                 
                 % If there was an error while writing the field data, abort the export process
                 if (error == 1.0) || (error == 2.0)
@@ -422,7 +435,7 @@ classdef compositeOutput < handle
                 positionID, connectivity, mainIDs, subIDs, stepDescription,...
                 fieldData, fieldNames, fieldDescriptions, connectedElements, error] = getFieldData(fieldDataPath,...
                 userPosition, partInstanceName, autoPosition, fid_debug,...
-                resultsDatabasePath, resultsDatabaseName)
+                resultsDatabasePath, resultsDatabaseName, yieldOrComposite)
             
             error = 0.0;
             connectedElements = [];
@@ -693,28 +706,65 @@ classdef compositeOutput < handle
             [job, loading] = fieldDataFile.textdata{2:3};
             stepDescription = ['version 6.11-13; ', job, ', ', loading];
             
-            %% Get the composite field data
-            fieldNamesFile = fieldDataFile.colheaders(3.0:end);
-            allFieldData = fieldDataFile.data(:, 3.0:end);
-            fieldDescriptionsData = {'Maximum stress theory failure measure', 'Maximum strain theory failure measure', 'Tsai-Hill theory failure measure',...
-                'Tsai-Wu theory failure measure', 'Tsai-Wu theory failue measure for closed cell OVC foam', 'Azzi-Tsai-Hill theory failure measure',...
-                'Hashin''s fibre tensile damage initiation criterion', 'Hashin''s fibre compression damage initiation criterion',...
-                'Hashin''s matrix tensile damage initiation criterion', 'Hashin''s matrix compression damage initiation criterion',...
-                'LaRC05 polymer failure measure', 'LaRC05 matrix failure measure', 'LaRC05 fibre kink failure measure', 'LaRC05 fibre split failure measure',...
-                'LaRC05 fibre tensile failure measure'};
-            [R, ~] = size(allFieldData);
-            
-            fieldData = zeros(R, 0.0);
-            fieldNames = cell(1.0, 0.0);
-            fieldDescriptions = fieldNames;
-            index = 1.0;
-            for i = 1:15.0
-                if all(allFieldData(:, i) == -1.0) == 0.0
-                    fieldData(:, index) = allFieldData(:, i);
-                    fieldNames(index) = fieldNamesFile(i);
-                    fieldDescriptions(index) = fieldDescriptionsData(i);
-                    
-                    index = index + 1.0;
+            if yieldOrComposite == 1.0
+                %% Get yield criterion name
+                switch getappdata(0, 'yieldCriteria')
+                    case 4.0
+                        yieldCriterion = 'von Mises criterion yield index';
+                    case 3.0
+                        yieldCriterion = 'Tresca criterion yield index';
+                    case 2.0
+                        yieldCriterion = 'Maximum shear strain energy theory yield index';
+                    case 1.0
+                        yieldCriterion = 'Total strain energy theory yield index';
+                end
+                
+                %% Get the yield field data
+                fieldNamesFile = fieldDataFile.colheaders(3.0:end);
+                fieldNamesFile{1.0} = 'SMAX-MPa';
+                allFieldData = fieldDataFile.data(:, 3.0:end);
+                fieldDescriptionsData = {'Maximum stress in loading',...
+                    'Yield criterion flag', yieldCriterion,...
+                    'Normalised equivalent plastic strain energy density'};
+                [R, ~] = size(allFieldData);
+                
+                fieldData = zeros(R, 0.0);
+                fieldNames = cell(1.0, 0.0);
+                fieldDescriptions = fieldNames;
+                index = 1.0;
+                for i = 1:4.0
+                    if all(allFieldData(:, i) == -1.0) == 0.0
+                        fieldData(:, index) = allFieldData(:, i);
+                        fieldNames(index) = fieldNamesFile(i);
+                        fieldDescriptions(index) = fieldDescriptionsData(i);
+                        
+                        index = index + 1.0;
+                    end
+                end
+            else
+                %% Get the composite field data
+                fieldNamesFile = fieldDataFile.colheaders(3.0:end);
+                allFieldData = fieldDataFile.data(:, 3.0:end);
+                fieldDescriptionsData = {'Maximum stress theory failure measure', 'Maximum strain theory failure measure', 'Tsai-Hill theory failure measure',...
+                    'Tsai-Wu theory failure measure', 'Tsai-Wu theory failue measure for closed cell PVC foam', 'Azzi-Tsai-Hill theory failure measure',...
+                    'Hashin''s fibre tensile damage initiation criterion', 'Hashin''s fibre compression damage initiation criterion',...
+                    'Hashin''s matrix tensile damage initiation criterion', 'Hashin''s matrix compression damage initiation criterion',...
+                    'LaRC05 polymer failure measure', 'LaRC05 matrix failure measure', 'LaRC05 fibre kink failure measure', 'LaRC05 fibre split failure measure',...
+                    'LaRC05 fibre tensile failure measure'};
+                [R, ~] = size(allFieldData);
+                
+                fieldData = zeros(R, 0.0);
+                fieldNames = cell(1.0, 0.0);
+                fieldDescriptions = fieldNames;
+                index = 1.0;
+                for i = 1:15.0
+                    if all(allFieldData(:, i) == -1.0) == 0.0
+                        fieldData(:, index) = allFieldData(:, i);
+                        fieldNames(index) = fieldNamesFile(i);
+                        fieldDescriptions(index) = fieldDescriptionsData(i);
+                        
+                        index = index + 1.0;
+                    end
                 end
             end
             

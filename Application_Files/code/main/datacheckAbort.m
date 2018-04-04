@@ -5,7 +5,7 @@ function [continueAnalysis] = datacheckAbort(Sxx, Syy, Szz, Txy, Tyz, Txz, tic_p
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 19-Mar-2018 07:59:59 GMT
+%   Last modified 04-Apr-2018 15:53:10 GMT
     
     %%   
     

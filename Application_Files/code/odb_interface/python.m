@@ -11,7 +11,7 @@ classdef python < handle
 %      10.4 The ODB Interface
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 03-Apr-2018 13:52:49 GMT
+%   Last modified 04-Apr-2018 15:53:10 GMT
     
     %%
     
@@ -860,7 +860,7 @@ classdef python < handle
                 if any(strcmp(fieldNamesFile, 'WCATAN (Deg)')) == true
                     % The field exists
                     fieldData(:, index) = fieldDataFile.data(:, find(strcmp(fieldNamesFile, 'WCATAN (Deg)') == true));
-                    fieldNames{index} = sprintf('WCATAN');
+                    fieldNames{index} = sprintf('WCATAN-deg');
                     fieldDescriptions{index} = sprintf('Worst cycle arctangent');
                     
                     index = index + 1.0;

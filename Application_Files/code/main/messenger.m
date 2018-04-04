@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 03-Apr-2018 13:52:49 GMT
+%   Last modified 04-Apr-2018 15:53:10 GMT
 
     %%
 
@@ -1149,7 +1149,7 @@ classdef messenger < handle
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 120.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: Yielded items have been written to ''%s\\Project\\output\\%s\\Data Files\\warn_yielding_items.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Yield criterion results have been written to ''%s\\Project\\output\\%s\\Data Files\\warn_yielding_items.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 121.0
@@ -2393,7 +2393,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2018\r\n');
-            fprintf(fid, 'Last modified 03-Apr-2018 13:52:49 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 04-Apr-2018 15:53:10 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

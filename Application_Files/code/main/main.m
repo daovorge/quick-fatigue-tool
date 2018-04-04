@@ -11,7 +11,7 @@ function [] = main(flags)
 %   Developer contact: louisvallance@hotmail.co.uk
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 03-Apr-2018 13:52:49 GMT
+%   Last modified 04-Apr-2018 15:53:10 GMT
 
 % Begin main code - DO NOT EDIT
 format long;    clc;    warning('off', 'all');
@@ -43,7 +43,7 @@ setappdata(0, 'messageFileWarnings', 0.0)
 %% PRINT COMMAND WINDOW HEADER
 fprintf('[NOTICE] Quick Fatigue Tool 6.11-13')
 fprintf('\n[NOTICE] (Copyright Louis Vallance 2018)')
-fprintf('\n[NOTICE] Last modified 03-Apr-2018 13:52:49 GMT')
+fprintf('\n[NOTICE] Last modified 04-Apr-2018 15:53:10 GMT')
 
 cleanExit = 0.0;
 
@@ -383,8 +383,7 @@ end
 mscFileUtils.checkFRFDiagnosticItems(N)
 
 %% DETERMINE IF THE MODEL IS YIELDING
-preProcess.getPlasticItems(N, algorithm, fid_status);
-postProcess.writeYieldingItems(jobName, mainID, subID)
+yieldCriterion(N, algorithm, fid_status, jobName, mainID, subID, dataCheck);
 
 %% CALCULATE SIGNAL HISTORIES FROM VIRTUAL STRAIN GAUGES
 virtualStrainGauge(Sxx, Syy, Txy, Szz, Txz, Tyz)
@@ -748,7 +747,7 @@ for groups = 1:G
 
         % REPORT PROGRESS
         [reported, x] = status(fid_status, analysedNodes, groupItem, N2, nodalDamage, mainID, subID,...
-            reported, x0, x, tic_pre);
+            reported, x0, x, tic_main);
     end
 
     % Save the worst damage for the current group

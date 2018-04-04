@@ -6,13 +6,13 @@ function [] = compositeFailure(N, L, mainID, fid_status)
 %   COMPOSITEFAILURE is used internally by Quick Fatigue Tool. The user is
 %   not required to run this file.
 %
-%   See also composite, LaRC05.
+%   See also LaRC05.
 %
 %   Reference section in Quick Fatigue Tool User Guide
 %      12.3 Composite failure criteria
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 29-Mar-2018 10:39:45 GMT
+%   Last modified 04-Apr-2018 15:53:10 GMT
     
     %%
 
@@ -120,7 +120,7 @@ for groups = 1:G
     
     % Get the master flags for the composite criteria
     [compositeFile_stress, compositeFile_strain, compositeFile_hashin,...
-        compositeFile_larc05] = compositeOutput.compositeFile();
+        compositeFile_larc05] = staticOutput.compositeFile();
     
     % Check if there is enough data for maximum stress, Tsai-Hill, Tsai-Wu and Azzi-Tsai-Hill theory
     if (isempty(Xt) == 1.0 || isempty(Xc) == 1.0 || isempty(Yt) == 1.0 || isempty(Yc) == 1.0 || isempty(S) == 1.0) || (compositeFile_stress == 0.0)
@@ -399,7 +399,7 @@ LARTFCRT(abs(LARTFCRT) < 1e-6) = 0.0;
 [N_MSTRS, N_MSTRN, N_TSAIH, N_TSAIW, N_TSAIWTT, N_AZZIT, N_HSNFTCRT,...
     N_HSNFCCRT, N_HSNMTCRT, N_HSNMCCRT, N_LARPFCRT, N_LARMFCRT,...
     N_LARKFCRT, N_LARSFCRT, N_LARTFCRT] =...
-    compositeOutput.getCompositeSummary(MSTRS, MSTRN, TSAIH, TSAIW,...
+    staticOutput.getCompositeSummary(MSTRS, MSTRN, TSAIH, TSAIW,...
     TSAIWTT, AZZIT, HSNFTCRT, HSNFCCRT, HSNMTCRT, HSNMCCRT, LARPFCRT,...
     LARMFCRT, LARKFCRT, LARSFCRT, LARTFCRT, k, failStressGeneral,...
     tsaiWuTT, failStrain, hashin, larc05);
@@ -446,7 +446,7 @@ if (failStressGeneral ~= -1.0) || (tsaiWuTT ~= -1.0) || (failStrain ~= -1.0) || 
         if getappdata(0, 'autoExport_uniaxial') == 1.0
             messenger.writeMessage(203.0)
         else
-            compositeOutput.exportODB(fid_status, mainID)
+            staticOutput.exportODB(fid_status, mainID, 2.0)
         end
     end
 else
