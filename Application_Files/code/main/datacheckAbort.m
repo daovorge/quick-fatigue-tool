@@ -5,10 +5,21 @@ function [continueAnalysis] = datacheckAbort(Sxx, Syy, Szz, Txy, Tyz, Txz, tic_p
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 04-Apr-2018 15:53:10 GMT
+%   Last modified 05-Apr-2018 08:59:50 GMT
     
     %%   
     
+% Add output folder to current directory
+job = getappdata(0, 'jobName');
+if exist(sprintf('%s\\Project\\output\\%s', pwd, job), 'dir') ~= 7.0
+    addpath(genpath(sprintf('%s\\Project\\output\\%s', pwd, job)))
+end
+
+% Write whole model worst tensor/principal stress values to file 
+if outputField == 1.0
+    printTensor(Sxx, Syy, Szz, Txy, Tyz, Txz)
+end
+
 % Check if user wishes to continue
 continueAnalysis = 0.0;
 
@@ -52,16 +63,8 @@ if getappdata(0, 'analysisDialogues') > 0.0
     end
 end
 
-% Add output folder to current directory
-job = getappdata(0, 'jobName');
-addpath(genpath(sprintf('%s\\Project\\output\\%s', pwd, job)))
-
-if outputField == 1.0
-    printTensor(Sxx, Syy, Szz, Txy, Tyz, Txz)
-end
-
+% Print footer to command window
 setappdata(0, 'dataCheck_time', toc(tic_pre))
-
 fprintf('\n[NOTICE] Results have been written to %s', [pwd, '\Project\output\', job])
 
 if getappdata(0, 'echoMessagesToCWIN') == 1.0
