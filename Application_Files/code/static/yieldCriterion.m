@@ -60,8 +60,8 @@ for groups = 1:G
     end
     
     %{
-                    If the total strain energy theory is selected, make sure
-                    the poisson ratio is defined
+    	If the total strain energy theory is selected, make sure the
+        poisson ratio is defined
     %}
     v = getappdata(0, 'poisson');
     
@@ -81,6 +81,7 @@ for groups = 1:G
     
     % Check material properties
     if isempty(proof) == 1.0
+        yield = linspace(-2.0, -2.0, N);
         setappdata(0, 'YIELD', linspace(-2.0, -2.0, N))
         messenger.writeMessage(118.0)
         totalCounter = totalCounter + 1.0;
@@ -90,6 +91,7 @@ for groups = 1:G
         materialResponse = 1.0;
         messenger.writeMessage(119.0)
     elseif (isempty(v) == 1.0) && (yieldCriteria == 1.0)
+        yield = linspace(-2.0, -2.0, N);
         setappdata(0, 'YIELD', linspace(-2.0, -2.0, N))
         messenger.writeMessage(162.0)
         totalCounter = totalCounter + 1.0;
@@ -206,10 +208,7 @@ for groups = 1:G
                 error = 2.0;
             end
             
-            %{
-                            If there was an error during the conversion,
-                            warn the user
-            %}
+            % If there was an error during the conversion, warn the user
             if error == 1.0
                 yield(totalCounter:(totalCounter + N) - 1.0) = -2.0;
                 setappdata(0, 'yieldCriteria', 0.0)
@@ -331,14 +330,26 @@ setappdata(0, 'YIELD', yield)
 % Get the strain energy associated with the yielding items
 totalStrainEnergy = getappdata(0, 'totalStrainEnergy');
 
-% Get the normalised strain limit energy of the current group
-strainLimitEnergy = 1.0;
-
-% Get the plastic strain energy for the current group
-plasticStrainEnergy = totalStrainEnergy - strainLimitEnergy;
-plasticStrainEnergy(plasticStrainEnergy < 0.0) = 0.0;
-
-failureIndex = totalStrainEnergy.^0.5;
+% If the yield criterion could not be evaluated, set value of -2.0
+if all(isempty(totalStrainEnergy)) == 1.0
+    failureIndex = linspace(-2.0, -2.0, length(yield));
+    plasticStrainEnergy = linspace(-2.0, -2.0, length(yield));
+    
+    % Do not write results to the ODB file
+    suppressODBOutput = 1.0;
+else
+    % Get the normalised strain limit energy of the current group
+    strainLimitEnergy = 1.0;
+    
+    % Get the plastic strain energy for the current group
+    plasticStrainEnergy = totalStrainEnergy - strainLimitEnergy;
+    plasticStrainEnergy(plasticStrainEnergy < 0.0) = 0.0;
+    
+    failureIndex = totalStrainEnergy.^0.5;
+    
+    % Allow results to be written to the ODB file if applicable
+    suppressODBOutput = 0.0;
+end
 
 % Get the maximum stress at each item
 S1 = getappdata(0, 'S1');
@@ -382,8 +393,10 @@ messenger.writeMessage(120.0)
 
 %% Write results to ODB if applicable
 if (getappdata(0, 'autoExport_ODB') == 1.0) && (dataCheck == 1.0)
-    if getappdata(0, 'autoExport_uniaxial') == 1.0
+    if (getappdata(0, 'autoExport_uniaxial') == 1.0) && (suppressODBOutput == 0.0)
         messenger.writeMessage(203.0)
+    elseif suppressODBOutput == 1.0
+        messenger.writeMessage(290.0)
     else
         staticOutput.exportODB(fid_status, mainID, 1.0)
     end

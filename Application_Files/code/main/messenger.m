@@ -1149,7 +1149,7 @@ classdef messenger < handle
 
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 120.0
-                        fprintf(fidType(i), [returnType{i}, '***NOTE: Yield criterion results have been written to ''%s\\Project\\output\\%s\\Data Files\\warn_yielding_items.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Yield criterion assessment results have been written to ''%s\\Project\\output\\%s\\Data Files\\warn_yielding_items.dat''', returnType{i}], pwd, getappdata(0, 'jobName'));
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 121.0
@@ -2224,7 +2224,7 @@ classdef messenger < handle
                         
                         setappdata(0, 'messageFileWarnings', 1.0)
                     case 290.0
-                        %_AVAILABLE_%
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Yield criterion assessment results were not written to the output database due to insufficient data', returnType{i}]);
                     case 291.0
                         %_AVAILABLE_%
                     case 292.0

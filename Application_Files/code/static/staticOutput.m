@@ -220,7 +220,12 @@ classdef staticOutput < handle
             else
                 fprintf(fid_debug, '\r\nStep name: ''%s''', stepName);
             end
-            fprintf(fid_debug, '\r\nField output request: COMPOSITE FAILURE MEASURE COMPONENTS ONLY');
+            
+            if yieldOrComposite == 1.0                    
+                fprintf(fid_debug, '\r\nField output request: YIELD COMPONENTS ONLY');
+            else
+                fprintf(fid_debug, '\r\nField output request: COMPOSITE FAILURE MEASURE / DAMAGE INITIATION COMPONENTS ONLY');
+            end
             
             for instanceNumber = 1:nInstances
                 partInstanceName = partInstanceList{instanceNumber};
@@ -233,7 +238,7 @@ classdef staticOutput < handle
                 
                 [positionLabels, position, positionLabelData, positionID, connectivity,...
                     mainIDs, subIDs, stepDescription, fieldData, fieldNames, fieldDescriptions,...
-                    connectedElements, error] = compositeOutput.getFieldData(fieldDataPath,...
+                    connectedElements, error] = staticOutput.getFieldData(fieldDataPath,...
                     userPosition, partInstanceName, autoPosition,...
                     fid_debug, resultsDatabasePath, resultsDatabaseName,...
                     yieldOrComposite);
