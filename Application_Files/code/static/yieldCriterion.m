@@ -24,8 +24,11 @@ if algorithm == 8.0
     messenger.writeMessage(291.0)
     setappdata(0, 'YIELD', linspace(-1.0, -1.0, N))
     return
-elseif (yieldCriteria < 1.0) || (yieldCriteria > 4.0)
+elseif (yieldCriteria < 0.0) || (yieldCriteria > 4.0)
     messenger.writeMessage(292.0)
+    setappdata(0, 'YIELD', linspace(-1.0, -1.0, N))
+    return
+elseif yieldCriteria == 0.0
     setappdata(0, 'YIELD', linspace(-1.0, -1.0, N))
     return
 end

@@ -10,7 +10,7 @@ function [] = virtualStrainGauge(xx_o, yy_o, xy_o, zz, xz, yz)
 %      4.9 Virtual strain gauges
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 05-Mar-2018 12:59:21 GMT
+%   Last modified 05-Apr-2018 19:17:47 GMT
     
     %%
     
@@ -308,7 +308,7 @@ for gaugeNumber = 1:N
     fprintf(fid, 'Gauge A (%.3g Degrees)\tGauge B (%.3g Degrees)\tGauge C (%.3g Degrees)\r\n', alpha, (alpha + beta), (alpha + beta + gamma));
     fprintf(fid, '%f\t%f\t%f\r\n', data');
     
-    fprintf(fid, '\r\nGauge orientations are measured counterclockwise from the positive global (Cartesian) x-direction\r\n');
+    fprintf(fid, '\r\nGauge orientations are measured counterclockwise from the positive 11-direction\r\n');
     fclose(fid);
     
     %% INFORM THE USER THAT GAUGE DATA HAS BEEN WRITTEN TO FILE
