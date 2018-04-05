@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 05-Apr-2018 08:59:50 GMT
+%   Last modified 05-Apr-2018 19:17:47 GMT
 
     %%
 
@@ -379,7 +379,7 @@ classdef messenger < handle
 
                         if getappdata(0, 'outputField') == 1.0
                             fprintf(fidType(i), ['The following field variables are not available:', returnType{i}]);
-                            fprintf(fidType(i), ['-> FOS, SFA, FRFH, FRFV, FRFR, FRFW, YIELD, TSE, PSE', returnType{i}]);
+                            fprintf(fidType(i), ['-> FOS, SFA, FRFH, FRFV, FRFR, FRFW, YIELD, [YIELD ASSESSMENT CRITERIA], [COMPOSITE FAILURE ASSESSMENT CRITERIA]', returnType{i}]);
                         end
 
                         if getappdata(0, 'outputHistory') == 1.0
@@ -388,7 +388,7 @@ classdef messenger < handle
                         end
 
                         fprintf(fidType(i), ['The following job file options will be ignored:', returnType{i}]);
-                        fprintf(fidType(i), ['-> MATERIAL, USE_SN, SN_SCALE, SN_KNOCK_DOWN, MS_CORRECTION, FACTOR_OF_STRENGTH, FATIGUE_RESERVE_FACTOR, KT_DEF, KT_CURVE, NOTCH_CONSTANT, NOTCH_RADIUS, RESIDUAL', returnType{i}]);
+                        fprintf(fidType(i), ['-> MATERIAL, USE_SN, SN_SCALE, SN_KNOCK_DOWN, MS_CORRECTION, FACTOR_OF_STRENGTH, FATIGUE_RESERVE_FACTOR, KT_DEF, KT_CURVE, NOTCH_CONSTANT, NOTCH_RADIUS, RESIDUAL, YIELD_CRITERION', returnType{i}]);
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 24.0
@@ -1139,12 +1139,12 @@ classdef messenger < handle
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 118.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The proof stress is not defined for material %s (group %.0f)', returnType{i}], char(getappdata(0, 'message_groupMaterial')), getappdata(0, 'message_groupNumber'));
-                        fprintf(fidType(i), ['-> The yield calculation requires a value of the proof stress to determine the strain limit energy', returnType{i}]);
-                        fprintf(fidType(i), ['-> The yield calculation will not be performed for this group', returnType{i}]);
+                        fprintf(fidType(i), ['-> The yield criterion assessment requires a value of the proof stress to determine the strain limit energy', returnType{i}]);
+                        fprintf(fidType(i), ['-> The yield criterion assessment will not be performed for this group', returnType{i}]);
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 119.0
-                        fprintf(fidType(i), [returnType{i}, '***WARNING: For the yield criteria assessment, the nonlinear elastic material response is specified but cyclic properties are not defined for material %s (group %.0f)', returnType{i}], getappdata(0, 'message_groupMaterial'), getappdata(0, 'message_groupNumber'));
+                        fprintf(fidType(i), [returnType{i}, '***WARNING: For the yield criterion assessment, the nonlinear elastic material response is specified but cyclic properties are not defined for material %s (group %.0f)', returnType{i}], getappdata(0, 'message_groupMaterial'), getappdata(0, 'message_groupNumber'));
                         fprintf(fidType(i), ['-> The linear elastic response will be used for all analysis groups', returnType{i}]);
 
                         setappdata(0, 'messageFileWarnings', 1.0)
@@ -1447,7 +1447,7 @@ classdef messenger < handle
                     case 162.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Poisson''s ratio is not defined for material %s (group %.0f)', returnType{i}], getappdata(0, 'message_groupMaterial'), getappdata(0, 'message_groupNumber'));
                         fprintf(fidType(i), ['-> The total strain energy theory requires a value of the Poisson''s ratio', returnType{i}]);
-                        fprintf(fidType(i), ['-> The yield calculation will not be performed for this group', returnType{i}]);
+                        fprintf(fidType(i), ['-> The yield criterion assessment will not be performed for this group', returnType{i}]);
 
                         setappdata(0, 'messageFileNotes', 1.0)
                     case 163.0
@@ -2226,9 +2226,10 @@ classdef messenger < handle
                     case 290.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: Yield criterion assessment results were not written to the output database due to insufficient data', returnType{i}]);
                     case 291.0
-                        %_AVAILABLE_%
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: Yield criterion assessment cannot be performed during a BS 7608 analysis', returnType{i}]);
                     case 292.0
-                        %_AVAILABLE_%
+                        fprintf(fidType(i), [returnType{i}, '***NOTE: An invalid value of YIELD_CRITERION was specified', returnType{i}]);
+                        fprintf(fidType(i), ['-> The yield criterion assessment will not be performed', returnType{i}]);
                     case 293.0
                         %_AVAILABLE_%
                     case 294.0
@@ -2393,7 +2394,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2018\r\n');
-            fprintf(fid, 'Last modified 05-Apr-2018 08:59:50 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 05-Apr-2018 19:17:47 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

@@ -9,7 +9,7 @@ function [] = yieldCriterion(N, algorithm, fid_status, jobName, mainID, subID, d
 %      12.2 Yield criteria
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 04-Apr-2018 15:53:10 GMT
+%   Last modified 05-Apr-2018 19:17:47 GMT
     
     %%
 
@@ -20,9 +20,13 @@ yieldCriteria = getappdata(0, 'yieldCriteria');
 historyGate = getappdata(0, 'historyGate');
 
 % Check that the yield criterion definition is correct
-if (yieldCriteria < 1.0) || (yieldCriteria > 4.0) || (algorithm == 8.0)
+if algorithm == 8.0
+    messenger.writeMessage(291.0)
     setappdata(0, 'YIELD', linspace(-1.0, -1.0, N))
-    setappdata(0, 'warning_063', 0.0)
+    return
+elseif (yieldCriteria < 1.0) || (yieldCriteria > 4.0)
+    messenger.writeMessage(292.0)
+    setappdata(0, 'YIELD', linspace(-1.0, -1.0, N))
     return
 end
 
