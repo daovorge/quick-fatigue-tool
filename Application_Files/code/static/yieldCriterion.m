@@ -89,7 +89,9 @@ for groups = 1:G
     % Check material properties
     if isempty(proof) == 1.0
         yield = linspace(-2.0, -2.0, N);
+        totalStrainEnergy_buffer = linspace(-2.0, -2.0, N);
         setappdata(0, 'YIELD', linspace(-2.0, -2.0, N))
+        
         messenger.writeMessage(118.0)
         totalCounter = totalCounter + 1.0;
         continue
@@ -99,7 +101,9 @@ for groups = 1:G
         messenger.writeMessage(119.0)
     elseif (isempty(v) == 1.0) && (yieldCriteria == 1.0)
         yield = linspace(-2.0, -2.0, N);
+        totalStrainEnergy_buffer = linspace(-2.0, -2.0, N);
         setappdata(0, 'YIELD', linspace(-2.0, -2.0, N))
+        
         messenger.writeMessage(162.0)
         totalCounter = totalCounter + 1.0;
         continue
@@ -333,12 +337,8 @@ end
 setappdata(0, 'YIELD', yield)
 
 %% Write items to file
-
-% Get the strain energy associated with the yielding items
-totalStrainEnergy = getappdata(0, 'totalStrainEnergy');
-
 % If the yield criterion could not be evaluated, set value of -2.0
-if all(isempty(totalStrainEnergy)) == 1.0
+if all(isempty(totalStrainEnergy_buffer)) == 1.0 || all(totalStrainEnergy_buffer == -2.0)
     failureIndex = linspace(-2.0, -2.0, length(yield));
     plasticStrainEnergy = linspace(-2.0, -2.0, length(yield));
     
@@ -349,10 +349,10 @@ else
     strainLimitEnergy = 1.0;
     
     % Get the plastic strain energy for the current group
-    plasticStrainEnergy = totalStrainEnergy - strainLimitEnergy;
+    plasticStrainEnergy = totalStrainEnergy_buffer - strainLimitEnergy;
     plasticStrainEnergy(plasticStrainEnergy < 0.0) = 0.0;
     
-    failureIndex = totalStrainEnergy.^0.5;
+    failureIndex = totalStrainEnergy_buffer.^0.5;
     
     % Allow results to be written to the ODB file if applicable
     suppressODBOutput = 0.0;

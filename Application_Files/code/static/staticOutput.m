@@ -11,7 +11,7 @@ classdef staticOutput < handle
 %      12.3 Composite failure criteria
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 04-Apr-2018 15:53:10 GMT
+%   Last modified 06-Apr-2018 14:01:20 GMT
     
     %%
     
@@ -23,8 +23,12 @@ classdef staticOutput < handle
             setappdata(0, 'ODB_interface_auto', 1.0)
             
             % Get path and name of field data
-            %fieldDataPath = [getappdata(0, 'outputDirectory'), 'Data Files/composite_criteria.dat'];
-            fieldDataPath = [getappdata(0, 'outputDirectory'), 'Data Files/yield_assessment.dat'];
+            if yieldOrComposite == 1.0
+                fieldDataPath = [getappdata(0, 'outputDirectory'), 'Data Files/yield_assessment.dat'];
+            else
+                fieldDataPath = [getappdata(0, 'outputDirectory'), 'Data Files/composite_criteria.dat'];
+            end
+            
             [~, fieldDataName, EXT] = fileparts(fieldDataPath);
             fieldDataName = [fieldDataName, EXT];
             
@@ -232,9 +236,14 @@ classdef staticOutput < handle
                 stepType = stepType_m(instanceNumber);
                 
                 % Get the field data
-                fprintf(fid_debug, '\r\n\r\nCollecting composite field data for instance ''%s''...', partInstanceName);
-                fprintf('\n[POST] Collecting composite field data for instance ''%s''', partInstanceName);
-                fprintf(fid_status, '\n[POST] Collecting composite field data');
+                if yieldOrComposite == 1.0
+                    string = 'yield';
+                else
+                    string = 'composite';
+                end
+                fprintf(fid_debug, '\r\n\r\nCollecting %s field data for instance ''%s''...', string, partInstanceName);
+                fprintf('\n[POST] Collecting %s field data for instance ''%s''', string, partInstanceName);
+                fprintf(fid_status, '\n[POST] Collecting %s field data', string);
                 
                 [positionLabels, position, positionLabelData, positionID, connectivity,...
                     mainIDs, subIDs, stepDescription, fieldData, fieldNames, fieldDescriptions,...

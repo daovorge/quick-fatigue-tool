@@ -22,6 +22,7 @@ end
 
 % Check if user wishes to continue
 continueAnalysis = 0.0;
+datacheckTime = toc(tic_pre);
 
 if getappdata(0, 'analysisDialogues') > 0.0
     message = sprintf('Results of the data check have been written to:\n\n''%s''', [pwd, '\Project\output\', getappdata(0, 'jobName')]);
@@ -64,13 +65,13 @@ if getappdata(0, 'analysisDialogues') > 0.0
 end
 
 % Print footer to command window
-setappdata(0, 'dataCheck_time', toc(tic_pre))
+setappdata(0, 'dataCheck_time', datacheckTime)
 fprintf('\n[NOTICE] Results have been written to %s', [pwd, '\Project\output\', job])
 
 if getappdata(0, 'echoMessagesToCWIN') == 1.0
-    fprintf('\n[NOTICE] Data Check complete. Scroll up for details (%fs)\n', toc(tic_pre))
+    fprintf('\n[NOTICE] Data Check complete. Scroll up for details (%fs)\n', datacheckTime)
 else
-    fprintf('\n[NOTICE] Data Check complete (%fs)\n', toc(tic_pre))
+    fprintf('\n[NOTICE] Data Check complete (%fs)\n', datacheckTime)
 end
 messenger.writeMessage(-999.0)
 fprintf(fid_status, '\r\n\r\nTHE ANALYSIS HAS COMPLETED SUCCESSFULLY');

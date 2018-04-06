@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 05-Apr-2018 19:17:47 GMT
+%   Last modified 06-Apr-2018 14:01:20 GMT
 
     %%
 
@@ -806,13 +806,13 @@ classdef messenger < handle
                         
                         switch getappdata(0, 'yieldCriteria')
                             case 1.0
-                                fprintf(fidType(i), ['-> The ratio between the equivalent total strain energy density and the tensile strain limit energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group'))/getappdata(0, 'strainLimitEnergy'));
+                                fprintf(fidType(i), ['-> The ratio between the equivalent total strain energy density and the tensile strain limit energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group')));
                             case 2.0
-                                fprintf(fidType(i), ['-> The ratio between the equivalent shear strain energy density and the tensile strain limit energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group'))/getappdata(0, 'strainLimitEnergy'));
+                                fprintf(fidType(i), ['-> The ratio between the equivalent shear strain energy density and the tensile strain limit energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group')));
                             case 3.0
-                                fprintf(fidType(i), ['-> The ratio between the equivalent shear strain energy density and the tensile strain limit energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group'))/getappdata(0, 'strainLimitEnergy'));
+                                fprintf(fidType(i), ['-> The ratio between the equivalent shear strain energy density and the tensile strain limit energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group')));
                             case 4.0
-                                fprintf(fidType(i), ['-> The ratio between the equivalent distortion energy density and the tensile strain limit energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group'))/getappdata(0, 'strainLimitEnergy'));
+                                fprintf(fidType(i), ['-> The ratio between the equivalent distortion energy density and the tensile strain limit energy is %.4g', returnType{i}], max(getappdata(0, 'totalStrainEnergy_group')));
                         end
                     case 67.0
                         if getappdata(0, 'suppress_ID67') == 0.0
@@ -2394,7 +2394,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2018\r\n');
-            fprintf(fid, 'Last modified 05-Apr-2018 19:17:47 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 06-Apr-2018 14:01:20 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');
