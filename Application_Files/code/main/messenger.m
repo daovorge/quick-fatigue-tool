@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 06-Apr-2018 14:01:20 GMT
+%   Last modified 11-Apr-2018 18:45:19 GMT
 
     %%
 
@@ -2231,7 +2231,18 @@ classdef messenger < handle
                         fprintf(fidType(i), [returnType{i}, '***NOTE: An invalid value of YIELD_CRITERION was specified', returnType{i}]);
                         fprintf(fidType(i), ['-> The yield criterion assessment will not be performed', returnType{i}]);
                     case 293.0
-                        %_AVAILABLE_%
+                        maxYieldIndexValue = max(getappdata(0, 'yieldIndex'));
+                        
+                        switch getappdata(0, 'yieldCriteria')
+                            case 1.0
+                                fprintf(fidType(i), [returnType{i}, '***NOTE: The worst total strain energy theory yield index is %.9f', returnType{i}], maxYieldIndexValue);
+                            case 2.0
+                                fprintf(fidType(i), [returnType{i}, '***NOTE: The worst maximum shear strain energy theory yield index is %.9f', returnType{i}], maxYieldIndexValue);
+                            case 3.0
+                                fprintf(fidType(i), [returnType{i}, '***NOTE: The worst tresca criterion yield index is %.9f', returnType{i}], maxYieldIndexValue);
+                            case 4.0
+                                fprintf(fidType(i), [returnType{i}, '***NOTE: The worst von Mises criterion yield index is %.9f', returnType{i}], maxYieldIndexValue);
+                        end
                     case 294.0
                         %_AVAILABLE_%
                     case 295.0
@@ -2394,7 +2405,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2018\r\n');
-            fprintf(fid, 'Last modified 06-Apr-2018 14:01:20 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 11-Apr-2018 18:45:19 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

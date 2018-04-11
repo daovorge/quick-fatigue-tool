@@ -511,7 +511,7 @@ classdef jobFile < handle
                             error = 1.0;
                             fprintf('[ERROR] The value of RESULT_POSITION (''%s'') is not recognized\n', odbResultPosition)
                             fprintf('-> Available result positions are: ''ELEMENT NODAL'', ''UNIQUE NODAL'', ''INTEGRATION POINT'' and ''CENTROID''\n');
-                            fprintf('-> Defining output requests to an output database is discussed in Section 10.4 of the Quick Fatigue Tool User Guide\n');
+                            fprintf('-> Defining output requests to an output database is discussed in Section 10.5 of the Quick Fatigue Tool User Guide\n');
                             return
                         elseif length(resultWords{matchingResults}) ~= length(odbResultPosition)
                             % The result position is a partial match

@@ -9,7 +9,7 @@ function [] = yieldCriterion(N, algorithm, fid_status, jobName, mainID, subID, d
 %      12.2 Yield criteria
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 05-Apr-2018 19:17:47 GMT
+%   Last modified 11-Apr-2018 18:45:19 GMT
     
     %%
 
@@ -339,7 +339,7 @@ setappdata(0, 'YIELD', yield)
 %% Write items to file
 % If the yield criterion could not be evaluated, set value of -2.0
 if all(isempty(totalStrainEnergy_buffer)) == 1.0 || all(totalStrainEnergy_buffer == -2.0)
-    failureIndex = linspace(-2.0, -2.0, length(yield));
+    yieldIndex = linspace(-2.0, -2.0, length(yield));
     plasticStrainEnergy = linspace(-2.0, -2.0, length(yield));
     
     % Do not write results to the ODB file
@@ -352,11 +352,16 @@ else
     plasticStrainEnergy = totalStrainEnergy_buffer - strainLimitEnergy;
     plasticStrainEnergy(plasticStrainEnergy < 0.0) = 0.0;
     
-    failureIndex = totalStrainEnergy_buffer.^0.5;
+    yieldIndex = totalStrainEnergy_buffer.^0.5;
     
     % Allow results to be written to the ODB file if applicable
     suppressODBOutput = 0.0;
 end
+
+% Report the worst value of the yield index to the message file
+setappdata(0, 'yieldIndex', yieldIndex)
+messenger.writeMessage(293.0)
+rmappdata(0, 'yieldIndex')
 
 % Get the maximum stress at each item
 S1 = getappdata(0, 'S1');
@@ -366,7 +371,7 @@ smin = min([max(S1, [], 2.0), min(S3, [], 2.0)], [], 2.0);
 smax(abs(smin) > smax) = smin(abs(smin) > smax);
 
 % Concatenate data
-data = [mainID'; subID'; smax'; yield; failureIndex; plasticStrainEnergy]';
+data = [mainID'; subID'; smax'; yield; yieldIndex; plasticStrainEnergy]';
 
 % Print information to file
 root = getappdata(0, 'outputDirectory');

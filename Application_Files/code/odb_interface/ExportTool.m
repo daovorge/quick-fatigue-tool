@@ -9,7 +9,7 @@ function varargout = ExportTool(varargin)%#ok<*DEFNU>
 %   See also python.
 %
 %   Reference section in Quick Fatigue Tool User Guide
-%      10.4 The ODB Interface
+%      10.5 The ODB Interface
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
 %   Last modified 16-Mar-2018 13:19:57 GMT
