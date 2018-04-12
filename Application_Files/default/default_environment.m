@@ -511,4 +511,4 @@ setappdata(0, 'autoExport_WCM', 1.0)    % Worst cycle mean stress
 setappdata(0, 'autoExport_WCA', 1.0)    % Worst cycle stress amplitude
 setappdata(0, 'autoExport_WCDP', 0.0)   % Worst cycle damage parameter
 setappdata(0, 'autoExport_WCATAN', 0.0) % Worst cycle arctangent
-setappdata(0, 'autoExport_YIELD', 0.0)  % Items with plastic strain energy
+setappdata(0, 'autoExport_YIELD', 0.0)  % Yield index and associated energies

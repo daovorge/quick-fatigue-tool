@@ -9,7 +9,7 @@ function [] = yieldCriterion(N, algorithm, fid_status, jobName, mainID, subID, d
 %      12.2 Yield criteria
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 12-Apr-2018 11:24:32 GMT
+%   Last modified 12-Apr-2018 17:56:12 GMT
     
     %%
 
@@ -410,7 +410,7 @@ fclose(fid);
 messenger.writeMessage(120.0)
 
 %% Write results to ODB if applicable
-if (getappdata(0, 'autoExport_ODB') == 1.0) && (dataCheck == 1.0)
+if (getappdata(0, 'autoExport_ODB') == 1.0) && (dataCheck == 1.0) && (getappdata(0, 'autoExport_YIELD') == 1.0)
     if (getappdata(0, 'autoExport_uniaxial') == 1.0) && (suppressODBOutput == 0.0)
         messenger.writeMessage(203.0)
     elseif suppressODBOutput == 1.0
