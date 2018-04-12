@@ -9,7 +9,7 @@ function [] = yieldCriterion(N, algorithm, fid_status, jobName, mainID, subID, d
 %      12.2 Yield criteria
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 11-Apr-2018 18:45:19 GMT
+%   Last modified 12-Apr-2018 11:24:32 GMT
     
     %%
 
@@ -20,7 +20,7 @@ yieldCriteria = getappdata(0, 'yieldCriteria');
 historyGate = getappdata(0, 'historyGate');
 
 % Check that the yield criterion definition is correct
-if algorithm == 8.0
+if (algorithm == 8.0) && (yieldCriteria ~= 0.0)
     messenger.writeMessage(291.0)
     setappdata(0, 'YIELD', linspace(-1.0, -1.0, N))
     return
@@ -246,8 +246,8 @@ for groups = 1:G
             end
             
             %{
-                            Make sure principal stress histories are the
-                            same length after correcting for plasticity
+            	Make sure principal stress histories are the same length
+                after correcting for plasticity
             %}
             lengths = [length(s1_i), length(s2_i), length(s3_i)];
             signalLength = max(lengths);
@@ -265,8 +265,8 @@ for groups = 1:G
         
         % Get the maximum strain energy in the loading for each analysis item
         %{
-                        Evaluate the principal stresses based on the
-                        selected yield criterion
+        	Evaluate the principal stresses based on the selected yield
+            criterion
         %}
         switch yieldCriteria
             case 1.0 % Total strain energy theory
@@ -360,6 +360,12 @@ end
 
 % Report the worst value of the yield index to the message file
 setappdata(0, 'yieldIndex', yieldIndex)
+
+yieldIndex_MainID = mainID(yieldIndex == max(yieldIndex));
+setappdata(0, 'yieldIndex_MainID', yieldIndex_MainID(1.0))
+yieldIndex_SubID = subID(yieldIndex == max(yieldIndex));
+setappdata(0, 'yieldIndex_SubID', yieldIndex_SubID(1.0))
+
 messenger.writeMessage(293.0)
 rmappdata(0, 'yieldIndex')
 

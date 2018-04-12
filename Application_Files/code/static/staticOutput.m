@@ -11,7 +11,7 @@ classdef staticOutput < handle
 %      12.3 Composite failure criteria
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 06-Apr-2018 14:01:20 GMT
+%   Last modified 12-Apr-2018 09:52:19 GMT
     
     %%
     
@@ -876,7 +876,8 @@ classdef staticOutput < handle
                 getCompositeSummary(MSTRS, MSTRN, TSAIH, TSAIW, TSAIWTT,...
                 AZZIT, HSNFTCRT, HSNFCCRT, HSNMTCRT, HSNMCCRT, LARPFCRT,...
                 LARMFCRT, LARKFCRT, LARSFCRT, LARTFCRT, k,...
-                failStressGeneral, tsaiWuTT, failStrain, hashin, larc05)
+                failStressGeneral, tsaiWuTT, failStrain, hashin, larc05,...
+                mainIDs, subIDs)
             
             %% Get the number of PASS/FAIL items            
             N_MSTRS = length(MSTRS(MSTRS >= 1.0));
@@ -1236,6 +1237,172 @@ classdef staticOutput < handle
                 setappdata(0, 'LARTFCRT_MV', 'N/A')
             else
                 setappdata(0, 'LARTFCRT_MV', sprintf('%s', num2str(max(LARTFCRT))))
+            end
+            
+            %% Get Main/Sub IDs of worst item
+            if max(MSTRS) == -1.0
+                setappdata(0, 'MSTRS_MV_MainID', 'N/A')
+                setappdata(0, 'MSTRS_MV_SubID', 'N/A')
+            else
+                MSTRS_MV_MainID = mainIDs(MSTRS == max(MSTRS));
+                setappdata(0, 'MSTRS_MV_MainID', sprintf('%s', num2str(MSTRS_MV_MainID(1.0))))
+                
+                MSTRS_MV_SubID = subIDs(MSTRS == max(MSTRS));
+                setappdata(0, 'MSTRS_MV_SubID', sprintf('%s', num2str(MSTRS_MV_SubID(1.0))))
+            end
+            
+            if max(MSTRN) == -1.0
+                setappdata(0, 'MSTRN_MV_MainID', 'N/A')
+                setappdata(0, 'MSTRN_MV_SubID', 'N/A')
+            else
+                MSTRN_MV_MainID = mainIDs(MSTRN == max(MSTRN));
+                setappdata(0, 'MSTRN_MV_MainID', sprintf('%s', num2str(MSTRN_MV_MainID(1.0))))
+                
+                MSTRN_MV_SubID = subIDs(MSTRN == max(MSTRN));
+                setappdata(0, 'MSTRN_MV_SubID', sprintf('%s', num2str(MSTRN_MV_SubID(1.0))))
+            end
+            
+            if max(TSAIH) == -1.0
+                setappdata(0, 'TSAIH_MV_MainID', 'N/A')
+                setappdata(0, 'TSAIH_MV_SubID', 'N/A')
+            else
+                TSAIH_MV_MainID = mainIDs(TSAIH == max(TSAIH));
+                setappdata(0, 'TSAIH_MV_MainID', sprintf('%s', num2str(TSAIH_MV_MainID(1.0))))
+                
+                TSAIH_MV_SubID = subIDs(TSAIH == max(TSAIH));
+                setappdata(0, 'TSAIH_MV_SubID', sprintf('%s', num2str(TSAIH_MV_SubID(1.0))))
+            end
+            
+            if max(TSAIW) == -1.0
+                setappdata(0, 'TSAIW_MV_MainID', 'N/A')
+                setappdata(0, 'TSAIW_MV_SubID', 'N/A')
+            else
+                TSAIW_MV_MainID = mainIDs(TSAIW == max(TSAIW));
+                setappdata(0, 'TSAIW_MV_MainID', sprintf('%s', num2str(TSAIW_MV_MainID(1.0))))
+                
+                TSAIW_MV_SubID = subIDs(TSAIW == max(TSAIW));
+                setappdata(0, 'TSAIW_MV_SubID', sprintf('%s', num2str(TSAIW_MV_SubID(1.0))))
+            end
+            
+            if max(TSAIWTT) == -1.0
+                setappdata(0, 'TSAIWTT_MV_MainID', 'N/A')
+                setappdata(0, 'TSAIWTT_MV_SubID', 'N/A')
+            else
+                TSAIWTT_MV_MainID = mainIDs(TSAIWTT == max(TSAIWTT));
+                setappdata(0, 'TSAIWTT_MV_MainID', sprintf('%s', num2str(TSAIWTT_MV_MainID(1.0))))
+                
+                TSAIWTT_MV_SubID = subIDs(TSAIWTT == max(TSAIWTT));
+                setappdata(0, 'TSAIWTT_MV_SubID', sprintf('%s', num2str(TSAIWTT_MV_SubID(1.0))))
+            end
+            
+            if max(AZZIT) == -1.0
+                setappdata(0, 'AZZIT_MV_MainID', 'N/A')
+                setappdata(0, 'AZZIT_MV_SubID', 'N/A')
+            else
+                AZZIT_MV_MainID = mainIDs(AZZIT == max(AZZIT));
+                setappdata(0, 'AZZIT_MV_MainID', sprintf('%s', num2str(AZZIT_MV_MainID(1.0))))
+                
+                AZZIT_MV_SubID = subIDs(AZZIT == max(AZZIT));
+                setappdata(0, 'AZZIT_MV_SubID', sprintf('%s', num2str(AZZIT_MV_SubID(1.0))))
+            end
+            
+            if max(HSNFTCRT) == -1.0
+                setappdata(0, 'HSNFTCRT_MV_MainID', 'N/A')
+                setappdata(0, 'HSNFTCRT_MV_SubID', 'N/A')
+            else
+                HSNFTCRT_MV_MainID = mainIDs(HSNFTCRT == max(HSNFTCRT));
+                setappdata(0, 'HSNFTCRT_MV_MainID', sprintf('%s', num2str(HSNFTCRT_MV_MainID(1.0))))
+                
+                HSNFTCRT_MV_SubID = subIDs(HSNFTCRT == max(HSNFTCRT));
+                setappdata(0, 'HSNFTCRT_MV_SubID', sprintf('%s', num2str(HSNFTCRT_MV_SubID(1.0))))
+            end
+            
+            if max(HSNFCCRT) == -1.0
+                setappdata(0, 'HSNFCCRT_MV_MainID', 'N/A')
+                setappdata(0, 'HSNFCCRT_MV_SubID', 'N/A')
+            else
+                HSNFCCRT_MV_MainID = mainIDs(HSNFCCRT == max(HSNFCCRT));
+                setappdata(0, 'HSNFCCRT_MV_MainID', sprintf('%s', num2str(HSNFCCRT_MV_MainID(1.0))))
+                
+                HSNFCCRT_MV_SubID = subIDs(HSNFCCRT == max(HSNFCCRT));
+                setappdata(0, 'HSNFCCRT_MV_SubID', sprintf('%s', num2str(HSNFCCRT_MV_SubID(1.0))))
+            end
+            
+            if max(HSNMTCRT) == -1.0
+                setappdata(0, 'HSNMTCRT_MV_MainID', 'N/A')
+                setappdata(0, 'HSNMTCRT_MV_SubID', 'N/A')
+            else
+                HSNMTCRT_MV_MainID = mainIDs(HSNMTCRT == max(HSNMTCRT));
+                setappdata(0, 'HSNMTCRT_MV_MainID', sprintf('%s', num2str(HSNMTCRT_MV_MainID(1.0))))
+                
+                HSNMTCRT_MV_SubID = subIDs(HSNMTCRT == max(HSNMTCRT));
+                setappdata(0, 'HSNMTCRT_MV_SubID', sprintf('%s', num2str(HSNMTCRT_MV_SubID(1.0))))
+            end
+            
+            if max(HSNMCCRT) == -1.0
+                setappdata(0, 'HSNMCCRT_MV_MainID', 'N/A')
+                setappdata(0, 'HSNMCCRT_MV_SubID', 'N/A')
+            else
+                HSNMCCRT_MV_MainID = mainIDs(HSNMCCRT == max(HSNMCCRT));
+                setappdata(0, 'HSNMCCRT_MV_MainID', sprintf('%s', num2str(HSNMCCRT_MV_MainID(1.0))))
+                
+                HSNMCCRT_MV_SubID = subIDs(HSNMCCRT == max(HSNMCCRT));
+                setappdata(0, 'HSNMCCRT_MV_SubID', sprintf('%s', num2str(HSNMCCRT_MV_SubID(1.0))))
+            end
+            
+            if max(LARPFCRT) == -1.0
+                setappdata(0, 'LARPFCRT_MV_MainID', 'N/A')
+                setappdata(0, 'LARPFCRT_MV_SubID', 'N/A')
+            else
+                LARPFCRT_MV_MainID = mainIDs(LARPFCRT == max(LARPFCRT));
+                setappdata(0, 'LARPFCRT_MV_MainID', sprintf('%s', num2str(LARPFCRT_MV_MainID(1.0))))
+                
+                LARPFCRT_MV_SubID = subIDs(LARPFCRT == max(LARPFCRT));
+                setappdata(0, 'LARPFCRT_MV_SubID', sprintf('%s', num2str(LARPFCRT_MV_SubID(1.0))))
+            end
+            
+            if max(LARMFCRT) == -1.0
+                setappdata(0, 'LARMFCRT_MV_MainID', 'N/A')
+                setappdata(0, 'LARMFCRT_MV_SubID', 'N/A')
+            else
+                LARMFCRT_MV_MainID = mainIDs(LARMFCRT == max(LARMFCRT));
+                setappdata(0, 'LARMFCRT_MV_MainID', sprintf('%s', num2str(LARMFCRT_MV_MainID(1.0))))
+                
+                LARMFCRT_MV_SubID = subIDs(LARMFCRT == max(LARMFCRT));
+                setappdata(0, 'LARMFCRT_MV_SubID', sprintf('%s', num2str(LARMFCRT_MV_SubID(1.0))))
+            end
+            
+            if max(LARKFCRT) == -1.0
+                setappdata(0, 'LARKFCRT_MV_MainID', 'N/A')
+                setappdata(0, 'LARKFCRT_MV_SubID', 'N/A')
+            else
+                LARKFCRT_MV_MainID = mainIDs(LARKFCRT == max(LARKFCRT));
+                setappdata(0, 'LARKFCRT_MV_MainID', sprintf('%s', num2str(LARKFCRT_MV_MainID(1.0))))
+                
+                LARKFCRT_MV_SubID = subIDs(LARKFCRT == max(LARKFCRT));
+                setappdata(0, 'LARKFCRT_MV_SubID', sprintf('%s', num2str(LARKFCRT_MV_SubID(1.0))))
+            end
+            
+            if max(LARSFCRT) == -1.0
+                setappdata(0, 'LARSFCRT_MV_MainID', 'N/A')
+                setappdata(0, 'LARSFCRT_MV_SubID', 'N/A')
+            else
+                LARSFCRT_MV_MainID = mainIDs(LARSFCRT == max(LARSFCRT));
+                setappdata(0, 'LARSFCRT_MV_MainID', sprintf('%s', num2str(LARSFCRT_MV_MainID(1.0))))
+                
+                LARSFCRT_MV_SubID = subIDs(LARSFCRT == max(LARSFCRT));
+                setappdata(0, 'LARSFCRT_MV_SubID', sprintf('%s', num2str(LARSFCRT_MV_SubID(1.0))))
+            end
+            
+            if max(LARTFCRT) == -1.0
+                setappdata(0, 'LARTFCRT_MV_MainID', 'N/A')
+                setappdata(0, 'LARTFCRT_MV_SubID', 'N/A')
+            else
+                LARTFCRT_MV_MainID = mainIDs(LARTFCRT == max(LARTFCRT));
+                setappdata(0, 'LARTFCRT_MV_MainID', sprintf('%s', num2str(LARTFCRT_MV_MainID(1.0))))
+                
+                LARTFCRT_MV_SubID = subIDs(LARTFCRT == max(LARTFCRT));
+                setappdata(0, 'LARTFCRT_MV_SubID', sprintf('%s', num2str(LARTFCRT_MV_SubID(1.0))))
             end
         end
         

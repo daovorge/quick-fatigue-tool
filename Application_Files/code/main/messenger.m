@@ -7,7 +7,7 @@ classdef messenger < handle
 %   required to run this file.
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 11-Apr-2018 18:45:19 GMT
+%   Last modified 12-Apr-2018 11:24:32 GMT
 
     %%
 
@@ -2232,16 +2232,18 @@ classdef messenger < handle
                         fprintf(fidType(i), ['-> The yield criterion assessment will not be performed', returnType{i}]);
                     case 293.0
                         maxYieldIndexValue = max(getappdata(0, 'yieldIndex'));
+                        yieldIndex_MainID = getappdata(0, 'yieldIndex_MainID');
+                        yieldIndex_SubID = getappdata(0, 'yieldIndex_SubID');
                         
                         switch getappdata(0, 'yieldCriteria')
                             case 1.0
-                                fprintf(fidType(i), [returnType{i}, '***NOTE: The worst total strain energy theory yield index is %.9f', returnType{i}], maxYieldIndexValue);
+                                fprintf(fidType(i), [returnType{i}, '***NOTE: The worst total strain energy theory yield index is %.9f at item ID %.0f.%.0f', returnType{i}], maxYieldIndexValue, yieldIndex_MainID, yieldIndex_SubID);
                             case 2.0
-                                fprintf(fidType(i), [returnType{i}, '***NOTE: The worst maximum shear strain energy theory yield index is %.9f', returnType{i}], maxYieldIndexValue);
+                                fprintf(fidType(i), [returnType{i}, '***NOTE: The worst maximum shear strain energy theory yield index is %.9f at item ID %.0f.%.0f', returnType{i}], maxYieldIndexValue, yieldIndex_MainID, yieldIndex_SubID);
                             case 3.0
-                                fprintf(fidType(i), [returnType{i}, '***NOTE: The worst tresca criterion yield index is %.9f', returnType{i}], maxYieldIndexValue);
+                                fprintf(fidType(i), [returnType{i}, '***NOTE: The worst tresca criterion yield index is %.9f at item ID %.0f.%.0f', returnType{i}], maxYieldIndexValue, yieldIndex_MainID, yieldIndex_SubID);
                             case 4.0
-                                fprintf(fidType(i), [returnType{i}, '***NOTE: The worst von Mises criterion yield index is %.9f', returnType{i}], maxYieldIndexValue);
+                                fprintf(fidType(i), [returnType{i}, '***NOTE: The worst von Mises criterion yield index is %.9f at item ID %.0f.%.0f', returnType{i}], maxYieldIndexValue, yieldIndex_MainID, yieldIndex_SubID);
                         end
                     case 294.0
                         %_AVAILABLE_%
@@ -2327,23 +2329,23 @@ classdef messenger < handle
                         fprintf(fidType(i), ['-> Please ensure that the gauge orientation is the same for every gauge definition', returnType{i}]);
                     case 315.0
                         fprintf(fidType(i), [returnType{i}, '***COMPOSITE CRITERIA ANALYSIS SUMMARY', returnType{i}]);
-                        fprintf(fidType(i), [returnType{i}, '   FAILURE    STATUS    NO.    MAX. VALUE', returnType{i}]);
-                        fprintf(fidType(i), ['INDEX/MEASURE        LOCATIONS', returnType{i}]);
-                        fprintf(fidType(i), ['    MSTRS      %-4s     %-8s%s', returnType{i}], getappdata(0, 'MSTRS_STAT'), getappdata(0, 'MSTRS_NL'), getappdata(0, 'MSTRS_MV'));
-                        fprintf(fidType(i), ['    MSTRN      %-4s     %-8s%s', returnType{i}], getappdata(0, 'MSTRN_STAT'), getappdata(0, 'MSTRN_NL'), getappdata(0, 'MSTRN_MV'));
-                        fprintf(fidType(i), ['    TSAIH      %-4s     %-8s%s', returnType{i}], getappdata(0, 'TSAIH_STAT'), getappdata(0, 'TSAIH_NL'), getappdata(0, 'TSAIH_MV'));
-                        fprintf(fidType(i), ['    TSAIW      %-4s     %-8s%s', returnType{i}], getappdata(0, 'TSAIW_STAT'), getappdata(0, 'TSAIW_NL'), getappdata(0, 'TSAIW_MV'));
-                        fprintf(fidType(i), ['    TSAIWTT    %-4s     %-8s%s', returnType{i}], getappdata(0, 'TSAIWTT_STAT'), getappdata(0, 'TSAIWTT_NL'), getappdata(0, 'TSAIWTT_MV'));
-                        fprintf(fidType(i), ['    AZZIT      %-4s     %-8s%s', returnType{i}], getappdata(0, 'AZZIT_STAT'), getappdata(0, 'AZZIT_NL'), getappdata(0, 'AZZIT_MV'));
-                        fprintf(fidType(i), ['    HSNFTCRT   %-4s     %-8s%s', returnType{i}], getappdata(0, 'HSNFTCRT_STAT'), getappdata(0, 'HSNFTCRT_NL'), getappdata(0, 'HSNFTCRT_MV'));
-                        fprintf(fidType(i), ['    HSNFCCRT   %-4s     %-8s%s', returnType{i}], getappdata(0, 'HSNFCCRT_STAT'), getappdata(0, 'HSNFCCRT_NL'), getappdata(0, 'HSNFCCRT_MV'));
-                        fprintf(fidType(i), ['    HSNMTCRT   %-4s     %-8s%s', returnType{i}], getappdata(0, 'HSNMTCRT_STAT'), getappdata(0, 'HSNMTCRT_NL'), getappdata(0, 'HSNMTCRT_MV'));
-                        fprintf(fidType(i), ['    HSNMCCRT   %-4s     %-8s%s', returnType{i}], getappdata(0, 'HSNMCCRT_STAT'), getappdata(0, 'HSNMCCRT_NL'), getappdata(0, 'HSNMCCRT_MV'));
-                        fprintf(fidType(i), ['    LARPFCRT   %-4s     %-8s%s', returnType{i}], getappdata(0, 'LARPFCRT_STAT'), getappdata(0, 'LARPFCRT_NL'), getappdata(0, 'LARPFCRT_MV'));
-                        fprintf(fidType(i), ['    LARMFCRT   %-4s     %-8s%s', returnType{i}], getappdata(0, 'LARMFCRT_STAT'), getappdata(0, 'LARMFCRT_NL'), getappdata(0, 'LARMFCRT_MV'));
-                        fprintf(fidType(i), ['    LARKFCRT   %-4s     %-8s%s', returnType{i}], getappdata(0, 'LARKFCRT_STAT'), getappdata(0, 'LARKFCRT_NL'), getappdata(0, 'LARKFCRT_MV'));
-                        fprintf(fidType(i), ['    LARSFCRT   %-4s     %-8s%s', returnType{i}], getappdata(0, 'LARSFCRT_STAT'), getappdata(0, 'LARSFCRT_NL'), getappdata(0, 'LARSFCRT_MV'));
-                        fprintf(fidType(i), ['    LARTFCRT   %-4s     %-8s%s', returnType{i}], getappdata(0, 'LARTFCRT_STAT'), getappdata(0, 'LARTFCRT_NL'), getappdata(0, 'LARTFCRT_MV'));
+                        fprintf(fidType(i), [returnType{i}, '   FAILURE    STATUS    NO.    MAX. VALUE    MAIN    SUB', returnType{i}]);
+                        fprintf(fidType(i), ['INDEX/MEASURE        LOCATIONS                ID     ID', returnType{i}]);
+                        fprintf(fidType(i), ['    MSTRS      %-4s     %-8s%-13s%-8s%s', returnType{i}], getappdata(0, 'MSTRS_STAT'), getappdata(0, 'MSTRS_NL'), getappdata(0, 'MSTRS_MV'), getappdata(0, 'MSTRS_MV_MainID'), getappdata(0, 'MSTRS_MV_SubID'));
+                        fprintf(fidType(i), ['    MSTRN      %-4s     %-8s%-13s%-8s%s', returnType{i}], getappdata(0, 'MSTRN_STAT'), getappdata(0, 'MSTRN_NL'), getappdata(0, 'MSTRN_MV'), getappdata(0, 'MSTRN_MV_MainID'), getappdata(0, 'MSTRN_MV_SubID'));
+                        fprintf(fidType(i), ['    TSAIH      %-4s     %-8s%-13s%-8s%s', returnType{i}], getappdata(0, 'TSAIH_STAT'), getappdata(0, 'TSAIH_NL'), getappdata(0, 'TSAIH_MV'), getappdata(0, 'TSAIH_MV_MainID'), getappdata(0, 'TSAIH_MV_SubID'));
+                        fprintf(fidType(i), ['    TSAIW      %-4s     %-8s%-13s%-8s%s', returnType{i}], getappdata(0, 'TSAIW_STAT'), getappdata(0, 'TSAIW_NL'), getappdata(0, 'TSAIW_MV'), getappdata(0, 'TSAIW_MV_MainID'), getappdata(0, 'TSAIW_MV_SubID'));
+                        fprintf(fidType(i), ['    TSAIWTT    %-4s     %-8s%-13s%-8s%s', returnType{i}], getappdata(0, 'TSAIWTT_STAT'), getappdata(0, 'TSAIWTT_NL'), getappdata(0, 'TSAIWTT_MV'), getappdata(0, 'TSAIWTT_MV_MainID'), getappdata(0, 'TSAIWTT_MV_SubID'));
+                        fprintf(fidType(i), ['    AZZIT      %-4s     %-8s%-13s%-8s%s', returnType{i}], getappdata(0, 'AZZIT_STAT'), getappdata(0, 'AZZIT_NL'), getappdata(0, 'AZZIT_MV'), getappdata(0, 'AZZIT_MV_MainID'), getappdata(0, 'AZZIT_MV_SubID'));
+                        fprintf(fidType(i), ['    HSNFTCRT   %-4s     %-8s%-13s%-8s%s', returnType{i}], getappdata(0, 'HSNFTCRT_STAT'), getappdata(0, 'HSNFTCRT_NL'), getappdata(0, 'HSNFTCRT_MV'), getappdata(0, 'HSNFTCRT_MV_MainID'), getappdata(0, 'HSNFTCRT_MV_SubID'));
+                        fprintf(fidType(i), ['    HSNFCCRT   %-4s     %-8s%-13s%-8s%s', returnType{i}], getappdata(0, 'HSNFCCRT_STAT'), getappdata(0, 'HSNFCCRT_NL'), getappdata(0, 'HSNFCCRT_MV'), getappdata(0, 'HSNFCCRT_MV_MainID'), getappdata(0, 'HSNFCCRT_MV_SubID'));
+                        fprintf(fidType(i), ['    HSNMTCRT   %-4s     %-8s%-13s%-8s%s', returnType{i}], getappdata(0, 'HSNMTCRT_STAT'), getappdata(0, 'HSNMTCRT_NL'), getappdata(0, 'HSNMTCRT_MV'), getappdata(0, 'HSNMTCRT_MV_MainID'), getappdata(0, 'HSNMTCRT_MV_SubID'));
+                        fprintf(fidType(i), ['    HSNMCCRT   %-4s     %-8s%-13s%-8s%s', returnType{i}], getappdata(0, 'HSNMCCRT_STAT'), getappdata(0, 'HSNMCCRT_NL'), getappdata(0, 'HSNMCCRT_MV'), getappdata(0, 'HSNMCCRT_MV_MainID'), getappdata(0, 'HSNMCCRT_MV_SubID'));
+                        fprintf(fidType(i), ['    LARPFCRT   %-4s     %-8s%-13s%-8s%s', returnType{i}], getappdata(0, 'LARPFCRT_STAT'), getappdata(0, 'LARPFCRT_NL'), getappdata(0, 'LARPFCRT_MV'), getappdata(0, 'LARPFCRT_MV_MainID'), getappdata(0, 'LARPFCRT_MV_SubID'));
+                        fprintf(fidType(i), ['    LARMFCRT   %-4s     %-8s%-13s%-8s%s', returnType{i}], getappdata(0, 'LARMFCRT_STAT'), getappdata(0, 'LARMFCRT_NL'), getappdata(0, 'LARMFCRT_MV'), getappdata(0, 'LARMFCRT_MV_MainID'), getappdata(0, 'LARMFCRT_MV_SubID'));
+                        fprintf(fidType(i), ['    LARKFCRT   %-4s     %-8s%-13s%-8s%s', returnType{i}], getappdata(0, 'LARKFCRT_STAT'), getappdata(0, 'LARKFCRT_NL'), getappdata(0, 'LARKFCRT_MV'), getappdata(0, 'LARKFCRT_MV_MainID'), getappdata(0, 'LARKFCRT_MV_SubID'));
+                        fprintf(fidType(i), ['    LARSFCRT   %-4s     %-8s%-13s%-8s%s', returnType{i}], getappdata(0, 'LARSFCRT_STAT'), getappdata(0, 'LARSFCRT_NL'), getappdata(0, 'LARSFCRT_MV'), getappdata(0, 'LARSFCRT_MV_MainID'), getappdata(0, 'LARSFCRT_MV_SubID'));
+                        fprintf(fidType(i), ['    LARTFCRT   %-4s     %-8s%-13s%-8s%s', returnType{i}], getappdata(0, 'LARTFCRT_STAT'), getappdata(0, 'LARTFCRT_NL'), getappdata(0, 'LARTFCRT_MV'), getappdata(0, 'LARTFCRT_MV_MainID'), getappdata(0, 'LARTFCRT_MV_SubID'));
                     case 316.0
                         fprintf(fidType(i), [returnType{i}, '***NOTE: The DAC MATLAB figure was not generated because the maximum cumulative damage is either zero or infinite', returnType{i}]);
                 end
@@ -2405,7 +2407,7 @@ classdef messenger < handle
             end
             fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
             fprintf(fid, 'Copyright Louis Vallance 2018\r\n');
-            fprintf(fid, 'Last modified 11-Apr-2018 18:45:19 GMT\r\n\r\n');
+            fprintf(fid, 'Last modified 12-Apr-2018 11:24:32 GMT\r\n\r\n');
 
             %% Write the input summary
             fprintf(fid, 'INPUT SUMMARY:\r\n=======\r\n');

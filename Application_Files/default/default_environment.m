@@ -324,7 +324,7 @@ setappdata(0, 'frfDiagnostics', [])
 %% YIELD CRITERIA
 % MATERIAL RESPONSE
 %{
-    1: Linear elastic
+    1: Linear elastic (default)
     2: Nonlinaer elastic
 %}
 setappdata(0, 'materialResponse', 1.0)

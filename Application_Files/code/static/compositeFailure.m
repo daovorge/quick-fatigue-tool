@@ -12,7 +12,7 @@ function [] = compositeFailure(N, L, mainID, fid_status)
 %      12.3 Composite failure criteria
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 06-Apr-2018 14:01:20 GMT
+%   Last modified 12-Apr-2018 09:52:19 GMT
     
     %%
 
@@ -396,13 +396,16 @@ LARSFCRT(abs(LARSFCRT) < 1e-6) = 0.0;
 LARTFCRT(abs(LARTFCRT) < 1e-6) = 0.0;
 
 %% Get whole model model summary for message file
+mainIDs = getappdata(0, 'mainID');
+subIDs = getappdata(0, 'subID');
+
 [N_MSTRS, N_MSTRN, N_TSAIH, N_TSAIW, N_TSAIWTT, N_AZZIT, N_HSNFTCRT,...
     N_HSNFCCRT, N_HSNMTCRT, N_HSNMCCRT, N_LARPFCRT, N_LARMFCRT,...
     N_LARKFCRT, N_LARSFCRT, N_LARTFCRT] =...
     staticOutput.getCompositeSummary(MSTRS, MSTRN, TSAIH, TSAIW,...
     TSAIWTT, AZZIT, HSNFTCRT, HSNFCCRT, HSNMTCRT, HSNMCCRT, LARPFCRT,...
     LARMFCRT, LARKFCRT, LARSFCRT, LARTFCRT, k, failStressGeneral,...
-    tsaiWuTT, failStrain, hashin, larc05);
+    tsaiWuTT, failStrain, hashin, larc05, mainIDs, subIDs);
 
 %% Report results summary to the message file
 messenger.writeMessage(315.0)
@@ -414,9 +417,6 @@ if (failStressGeneral ~= -1.0) || (tsaiWuTT ~= -1.0) || (failStrain ~= -1.0) || 
     if any(FAIL_ALL) == 0.0
         messenger.writeMessage(301.0)
     end
-    
-    mainIDs = getappdata(0, 'mainID');
-    subIDs = getappdata(0, 'subID');
     
     data = [mainIDs'; subIDs'; MSTRS; MSTRN; TSAIH; TSAIW; TSAIWTT; AZZIT; HSNFTCRT; HSNFCCRT; HSNMTCRT; HSNMCCRT; LARPFCRT; LARMFCRT; LARKFCRT; LARSFCRT; LARTFCRT]';
     
