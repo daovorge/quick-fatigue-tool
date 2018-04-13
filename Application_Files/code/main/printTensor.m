@@ -10,17 +10,28 @@ function [] = printTensor(Sxx, Syy, Szz, Txy, Tyz, Txz)
 %      2.4.2 Configuring a data check analysis
 %    
 %    Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%    Last modified 15-Jun-2017 12:32:06 GMT
+%    Last modified 05-Apr-2018 08:59:50 GMT
     
     %%
     
 %% Get the maximum tensor components
-s11 = max(Sxx, [], 2.0);
-s22 = max(Syy, [], 2.0);
-s33 = max(Szz, [], 2.0);
-s12 = max(Txy, [], 2.0);
-s13 = max(Txz, [], 2.0);
-s23 = max(Tyz, [], 2.0);
+s11 = max(Sxx, [], 2.0); s11min = min(Sxx, [], 2.0);
+s11(abs(s11min) > s11) = s11min(abs(s11min) > s11);
+
+s22 = max(Syy, [], 2.0); s22min = min(Syy, [], 2.0);
+s22(abs(s22min) > s22) = s22min(abs(s22min) > s22);
+
+s33 = max(Szz, [], 2.0); s33min = min(Szz, [], 2.0);
+s33(abs(s33min) > s33) = s33min(abs(s33min) > s33);
+
+s12 = max(Txy, [], 2.0); s12min = min(Txy, [], 2.0);
+s12(abs(s12min) > s12) = s12min(abs(s12min) > s12);
+
+s13 = max(Txz, [], 2.0); s13min = min(Txz, [], 2.0);
+s13(abs(s13min) > s13) = s13min(abs(s13min) > s13);
+
+s23 = max(Tyz, [], 2.0); s23min = min(Tyz, [], 2.0);
+s23(abs(s23min) > s23) = s23min(abs(s23min) > s23);
 
 [A, ~] = size(s11);
 if A > 1.0

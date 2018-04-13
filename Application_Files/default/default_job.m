@@ -256,15 +256,15 @@ SEA_WATER = 0.0;
 
 %% 12: SUPPLEMENTARY ANALYSIS OPTIONS
 
-% YIELD CRITERIA
+% YIELD CRITERION
 %{
-    0: Do not perform yield calculations
+    0: Do not perform yield criterion assessment
     1: Total strain energy theory
-    2: Shear strain energy theory
-    3: Tresca yield surface
+    2: Maximum shear strain energy theory
+    3: Tresca yield criterion
     4: von Mises yield criterion
 %}
-YIELD_CRITERIA = 0.0;
+YIELD_CRITERION = 0.0;
 
 % COMPOSITE FAILURE/DAMAGE INITIATION CRITERIA
 COMPOSITE_CRITERIA = 0.0;
@@ -280,6 +280,6 @@ flags = {ITEMS, UNITS, SCALE, REPEATS, USE_SN, DESIGN_LIFE, ALGORITHM,...
     NOTCH_RADIUS, GAUGE_LOCATION, GAUGE_ORIENTATION, JOB_NAME,...
     JOB_DESCRIPTION, MATERIAL, DATASET, HISTORY, HF_DATASET, HF_HISTORY,...
     HF_TIME, HF_SCALE, FATIGUE_RESERVE_FACTOR, COMPOSITE_CRITERIA,...
-    YIELD_CRITERIA};
+    YIELD_CRITERION};
 
 main(flags)

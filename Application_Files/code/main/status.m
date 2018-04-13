@@ -1,5 +1,5 @@
 function [reported, x] = status(fid_status, analysedNodes, node, N2, nodalDamage, mainID, subID,...
-        reported, x0, x, tic_pre)
+        reported, x0, x, tic_main)
 %status    QFT function for status file.
 %   This function contains code to write information to the status (.sta)
 %   file.
@@ -13,7 +13,7 @@ function [reported, x] = status(fid_status, analysedNodes, node, N2, nodalDamage
     %%
     
     %% REPORT PROGRESS
-    currentTime = toc(tic_pre);
+    currentTime = toc(tic_main);
     if ((analysedNodes == 1.0) || (analysedNodes == N2)) || ((currentTime - x > 0.0) && (reported == 0.0))
         hrs = floor(currentTime/3600);
         mins = floor((currentTime - (3600*hrs))/60);

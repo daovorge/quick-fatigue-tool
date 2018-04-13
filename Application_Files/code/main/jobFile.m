@@ -6,7 +6,7 @@ classdef jobFile < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 20-Mar-2018 09:36:00 GMT
+%   Last modified 04-Apr-2018 15:53:10 GMT
     
     %%
     
@@ -236,34 +236,42 @@ classdef jobFile < handle
                 setappdata(0, 'outputDatabase', outputDatabase)
             end
             
-            if isempty(compositeCriteria) == 1.0
-                compositeCriteria = 0.0;
-                setappdata(0, 'compositeCriteria', compositeCriteria)
-            elseif compositeCriteria > 0.0
-                useSN = 0.0;
-                setappdata(0, 'useSN', 0.0)
-                setappdata(0, 'dataCheck', 1.0)
+            if (compositeCriteria == 1.0) && (yieldCriteria > 0.0)
+                error = 1.0;
                 
-                msCorrection = 8.0;    setappdata(0, 'msCorrection', 8.0)
-                
-                % Determine the algorithm automatically
-                if isempty(dataset) == 1.0 && isempty(history) == 1.0
-                    fprintf('[ERROR] No loadings are defined for composite criteria analysis\n')
-                    fprintf('-> Loadings are defined using the DATASET and HISTORY job file options\n');
-                    fprintf('-> Loading methods are described in Section 3 of the Quick Fatigue Tool User Guide\n');
+                fprintf('[ERROR] Yield and composite criteria assessments cannot be specified simultaneously in a single job\n')
+                fprintf('-> Set either YIELD_CRITERION or COMPOSITE_CRITERIA to zero\n');
+                return
+            else
+                if isempty(compositeCriteria) == 1.0
+                    compositeCriteria = 0.0;
+                    setappdata(0, 'compositeCriteria', compositeCriteria)
+                elseif compositeCriteria > 0.0
+                    useSN = 0.0;
+                    setappdata(0, 'useSN', 0.0)
+                    setappdata(0, 'dataCheck', 1.0)
                     
-                    error = 1.0;
-                    return
-                elseif isempty(dataset) == 0.0
-                    algorithm = 5.0;    setappdata(0, 'algorithm', 5.0)
-                else
-                    algorithm = 10.0;    setappdata(0, 'algorithm', 10.0)
+                    msCorrection = 8.0;    setappdata(0, 'msCorrection', 8.0)
+                    
+                    % Determine the algorithm automatically
+                    if isempty(dataset) == 1.0 && isempty(history) == 1.0
+                        fprintf('[ERROR] No loadings are defined for composite criteria analysis\n')
+                        fprintf('-> Loadings are defined using the DATASET and HISTORY job file options\n');
+                        fprintf('-> Loading methods are described in Section 3 of the Quick Fatigue Tool User Guide\n');
+                        
+                        error = 1.0;
+                        return
+                    elseif isempty(dataset) == 0.0
+                        algorithm = 5.0;    setappdata(0, 'algorithm', 5.0)
+                    else
+                        algorithm = 10.0;    setappdata(0, 'algorithm', 10.0)
+                    end
                 end
-            end
-            
-            if isempty(yieldCriteria) == 1.0
-                yieldCriteria = 0.0;
-                setappdata(0, 'yieldCriteria', yieldCriteria)
+                
+                if isempty(yieldCriteria) == 1.0
+                    yieldCriteria = 0.0;
+                    setappdata(0, 'yieldCriteria', yieldCriteria)
+                end
             end
             
             %% CHECK CERTAIN FLAGS FOR STRING INPUT
@@ -503,7 +511,7 @@ classdef jobFile < handle
                             error = 1.0;
                             fprintf('[ERROR] The value of RESULT_POSITION (''%s'') is not recognized\n', odbResultPosition)
                             fprintf('-> Available result positions are: ''ELEMENT NODAL'', ''UNIQUE NODAL'', ''INTEGRATION POINT'' and ''CENTROID''\n');
-                            fprintf('-> Defining output requests to an output database is discussed in Section 10.4 of the Quick Fatigue Tool User Guide\n');
+                            fprintf('-> Defining output requests to an output database is discussed in Section 10.5 of the Quick Fatigue Tool User Guide\n');
                             return
                         elseif length(resultWords{matchingResults}) ~= length(odbResultPosition)
                             % The result position is a partial match
@@ -2395,7 +2403,7 @@ classdef jobFile < handle
         
         %% Check the loading for fatigue
         function [error] = checkFatigue(S11, algorithm)
-            % Initilize the error flag
+            % Initialize the error flag
             error = 0.0;
             
             if (algorithm == 3.0) || (algorithm == 10.0)

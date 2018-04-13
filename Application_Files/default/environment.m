@@ -324,7 +324,7 @@ setappdata(0, 'frfDiagnostics', [])
 %% YIELD CRITERIA
 % MATERIAL RESPONSE
 %{
-    1: Linear elastic
+    1: Linear elastic (default)
     2: Nonlinaer elastic
 %}
 setappdata(0, 'materialResponse', 1.0)
@@ -511,4 +511,4 @@ setappdata(0, 'autoExport_WCM', 1.0)    % Worst cycle mean stress
 setappdata(0, 'autoExport_WCA', 1.0)    % Worst cycle stress amplitude
 setappdata(0, 'autoExport_WCDP', 0.0)   % Worst cycle damage parameter
 setappdata(0, 'autoExport_WCATAN', 0.0) % Worst cycle arctangent
-setappdata(0, 'autoExport_YIELD', 0.0)  % Items with plastic strain energy
+setappdata(0, 'autoExport_YIELD', 0.0)  % Yield index and associated energies

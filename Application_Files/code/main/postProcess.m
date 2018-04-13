@@ -11,7 +11,7 @@ classdef postProcess < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 28-Mar-2018 09:40:26 GMT
+%   Last modified 04-Apr-2018 15:53:10 GMT
     
     %%
     
@@ -1616,116 +1616,6 @@ classdef postProcess < handle
             fclose(fid);
         end
         
-        %% WRITE YIELDING ITEMS TO FILE
-        function [] = writeYieldingItems(jobName, mainID, subID)
-            % Get the list of items which are yielding
-            yield = getappdata(0, 'YIELD');
-            
-            % Convert into list of position IDs
-            yield = find(yield == 1.0);
-            
-            if isempty(yield) == 1.0
-                return
-            end
-            
-            % Get the strain energy associated with the yielding items
-            totalStrainEnergy = getappdata(0, 'totalStrainEnergy');
-            
-            % Initialize the plastic strain energy variable
-            plasticStrainEnergy = zeros(1.0, length(yield));
-            
-            % Calculate the plastic strain energy for each analysis group
-            G = getappdata(0, 'numberOfGroups');
-            
-            % Get the group ID buffer
-            groupIDBuffer = getappdata(0, 'groupIDBuffer');
-            
-            totalCounter = 1.0;
-            
-            for groups = 1:G
-                %{
-                    If the analysis is a MAXPS analysis, override the value of GROUP to
-                    the group containing the MAXPS item
-                %}
-                if getappdata(0, 'peekAnalysis') == 1.0
-                    groups = getappdata(0, 'peekGroup'); %#ok<FXSET>
-                end
-                
-                if strcmpi(groupIDBuffer(1.0).name, 'default') == 1.0
-                    % There is one, default group
-                    items = yield;
-                else
-                    % Assign group parameters to the current set of analysis IDs
-                    [~, groupIDs] = group.switchProperties(groups, groupIDBuffer(groups));
-                    
-                    %{
-                        Get the group IDs assiciated with yielding items in
-                        the current group
-                    %}
-                    items = intersect(yield, groupIDs);
-                end
-                
-                if isempty(items) == 1.0
-                    %{
-                        There are no yielded items in the current group.
-                        Continue to the next group
-                    %}
-                    continue
-                else
-                    %items = items == yield;
-                end
-                
-                % Get the strain limit energy of the current group
-                strainLimitEnergy = getappdata(0, 'strainLimitEnergy');
-                
-                % Get the plastic strain energy for the current group
-                for i = 1:length(items)
-                    plasticStrainEnergy(totalCounter) = totalStrainEnergy(items(i)) - strainLimitEnergy;
-                    
-                    totalCounter = totalCounter + 1.0;
-                end
-            end
-            
-            % Only take totalStrainEnergy values for yielding items
-            totalStrainEnergy = totalStrainEnergy(yield);
-            
-            % Get the IDs associated with these items
-            mainIDs = mainID(yield);
-            subIDs = subID(yield);
-            
-            % Concatenate data
-            data = [yield; mainIDs'; subIDs'; totalStrainEnergy; plasticStrainEnergy]';
-            
-            % Print information to file
-            root = getappdata(0, 'outputDirectory');
-            
-            if exist(sprintf('%s/Data Files', root), 'dir') == 0.0
-                mkdir(sprintf('%s/Data Files', root))
-            end
-            
-            dir = [root, 'Data Files/warn_yielding_items.dat'];
-            
-            fid = fopen(dir, 'w+');
-            fprintf(fid, 'WARN_YIELDING_ITEMS\r\n');
-            fprintf(fid, 'Job:\t%s\r\nLoading:\t%.3g\t%s\r\n', jobName, getappdata(0, 'loadEqVal'), getappdata(0, 'loadEqUnits'));
-            
-            switch getappdata(0, 'yieldCriteria')
-                case 4.0
-                    fprintf(fid, 'Item #\tMain ID\tSub ID\tDE, Distortion energy density (mJ/mm^3)\tPSE, Plastic strain energy density (mJ/mm^3)\r\n');
-                case 3.0
-                    fprintf(fid, 'Item #\tMain ID\tSub ID\tSSE, Shear strain energy density (mJ/mm^3)\tPSE, Plastic strain energy density (mJ/mm^3)\r\n');
-                case 2.0
-                    fprintf(fid, 'Item #\tMain ID\tSub ID\tSSE, Shear strain energy density (mJ/mm^3)\tPSE, Plastic strain energy density (mJ/mm^3)\r\n');
-                case 1.0
-                    fprintf(fid, 'Item #\tMain ID\tSub ID\tTSE, Total strain energy density (mJ/mm^3)\tPSE, Plastic strain energy density (mJ/mm^3)\r\n');
-            end
-            fprintf(fid, '%.0f\t%.0f\t%.0f\t%f\t%f\r\n', data');
-            
-            fclose(fid);
-            
-            messenger.writeMessage(120.0)
-        end
-        
         %% WRITE HOTSPOTS TO FILE
         function [] = writeHotSpots(nodalDamage, mainID, subID, jobName, loadEqUnits)
             % Get the design life
@@ -1931,7 +1821,8 @@ classdef postProcess < handle
                         end
                         
                         % If the yield criterion was enabled
-                        if (getappdata(0, 'yieldCriteria') == 1.0) || (getappdata(0, 'yieldCriteria') == 2.0) || (getappdata(0, 'yieldCriteria') == 3.0)
+                        yieldCriteria = getappdata(0, 'yieldCriteria');
+                        if yieldCriteria == 1.0 || yieldCriteria == 2.0 || yieldCriteria == 3.0 || yieldCriteria == 4.0
                             requestedFields(19.0) = 1.0;
                         end
                     end
@@ -1983,6 +1874,10 @@ classdef postProcess < handle
             
             % If there was an error whilst verifying the inputs, stop execution
             if error == 1.0
+                if exist(debugFileName, 'file') == 2.0
+                    fclose(fid_debug);
+                    delete([pwd, '\', debugFileName])
+                end
                 return
             end
             
@@ -2260,7 +2155,7 @@ classdef postProcess < handle
             end
             
             %% Additional tasks
-            fprintf(fid_debug, ' Success\r\n\r\nFatigue results have been written to ''%s''', sprintf('%s/%s.odb', resultsDatabasePath, resultsDatabaseName));
+            fprintf(fid_debug, ' Success\r\n\r\nResults have been written to ''%s''', sprintf('%s/%s.odb', resultsDatabasePath, resultsDatabaseName));
             fprintf(fid_debug, '\r\n\r\nEND OF FILE');
             fprintf('\n[POST] Export complete. Check %s for details ', debugFileName);
             fprintf(fid_status, '\n[POST] Export complete. Check %s for details', debugFileName);

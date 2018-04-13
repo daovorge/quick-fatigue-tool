@@ -9,7 +9,7 @@ function varargout = ExportTool(varargin)%#ok<*DEFNU>
 %   See also python.
 %
 %   Reference section in Quick Fatigue Tool User Guide
-%      10.4 The ODB Interface
+%      10.5 The ODB Interface
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
 %   Last modified 16-Mar-2018 13:19:57 GMT
@@ -872,7 +872,7 @@ end
 
 %% Additional tasks
 
-fprintf(fid_debug, ' Success\r\n\r\nFatigue results have been written to ''%s''', sprintf('%s/%s.odb', resultsDatabasePath, resultsDatabaseName));
+fprintf(fid_debug, ' Success\r\n\r\nResults have been written to ''%s''', sprintf('%s/%s.odb', resultsDatabasePath, resultsDatabaseName));
 fprintf(fid_debug, '\r\n\r\nEND OF FILE');
 fprintf('\nExport complete. Check %s for details ', debugFileName);
 fclose(fid_debug);

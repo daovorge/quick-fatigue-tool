@@ -8,10 +8,10 @@ classdef python < handle
 %   See also ExportTool.
 %   
 %   Reference section in Quick Fatigue Tool Appendices
-%      10.4 The ODB Interface
+%      10.5 The ODB Interface
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 28-Mar-2018 09:40:26 GMT
+%   Last modified 04-Apr-2018 15:53:10 GMT
     
     %%
     
@@ -389,7 +389,7 @@ classdef python < handle
             fieldDescriptions = fieldNames;
             
             % Check if the plastic strain energy was calculated
-            energyFile = sprintf('Project/output/%s/Data Files/warn_yielding_items.dat', getappdata(0, 'jobName'));
+            energyFile = sprintf('Project/output/%s/Data Files/yield_assessment.dat', getappdata(0, 'jobName'));
             if (requestedFields(19.0) == true) && exist(energyFile, 'file') == 2.0
                 fieldData = zeros(length(mainIDs), 2.0 + length(requestedFields(requestedFields == true)));
                 fieldNames = cell(1.0, 2.0 + length(requestedFields(requestedFields == true)));
@@ -405,7 +405,7 @@ classdef python < handle
                     fprintf(fid_debug, '\r\n\tWarning: Requested field YIELD could not be evaluated due to insufficient material properties. The field will not be written to the output database');
                 elseif (requestedFields(19.0) == true) && (exist(energyFile, 'file') == 0.0) && (all(YIELD == -1.0) == 1.0)
                     % If YIELD was requested but the field was not enabled prior to analysis, warn the user
-                    fprintf(fid_debug, '\r\n\tWarning: Requested field YIELD was not enabled. Set YIELD_CRITERIA = 1.0 in the job file. The field will not be written to the output database');
+                    fprintf(fid_debug, '\r\n\tWarning: Requested field YIELD could not be found in the field data. Set YIELD_CRITERIA = 1.0 in the job file. The field will not be written to the output database');
                 end
                 
                 requestedFields(19.0) = false;
@@ -569,10 +569,17 @@ classdef python < handle
                         
                         if exist(fosAccuracyFile, 'file') == 2.0
                             % Get the FOS accuracy as well
-                            fieldDataFile_fosAccuracy = importdata(fosAccuracyFile, '\t');
-                            fieldData(:, index + 1.0) = fieldDataFile_fosAccuracy.data(:, 3.0);
-                            fieldNames{index + 1.0} = sprintf('FACC-%%');
-                            fieldDescriptions{index + 1.0} = sprintf('Factor of strength accuracy');
+                            try
+                                fieldDataFile_fosAccuracy = importdata(fosAccuracyFile, '\t');
+                                fieldData(:, index + 1.0) = fieldDataFile_fosAccuracy.data(:, 3.0);
+                                fieldNames{index + 1.0} = sprintf('FACC-%%');
+                                fieldDescriptions{index + 1.0} = sprintf('Factor of strength accuracy');
+                            catch exception
+                                fprintf(fid_debug, '\r\n\tError: An exception was encountered while reading the FOS accuracy data from ''%s''', fosAccuracyFile);
+                                fprintf(fid_debug, '\r\n\tError: %s', exception.message);
+                                error = 6.0;
+                                return
+                            end
                             
                             index = index + 2.0;
                         else
@@ -853,7 +860,7 @@ classdef python < handle
                 if any(strcmp(fieldNamesFile, 'WCATAN (Deg)')) == true
                     % The field exists
                     fieldData(:, index) = fieldDataFile.data(:, find(strcmp(fieldNamesFile, 'WCATAN (Deg)') == true));
-                    fieldNames{index} = sprintf('WCATAN');
+                    fieldNames{index} = sprintf('WCATAN-deg');
                     fieldDescriptions{index} = sprintf('Worst cycle arctangent');
                     
                     index = index + 1.0;
@@ -875,46 +882,40 @@ classdef python < handle
                     % The field exists
                     fieldData(:, index) = fieldDataFile.data(:, find(strcmp(fieldNamesFile, 'YIELD') == true));
                     fieldNames{index} = sprintf('YIELD');
-                    fieldDescriptions{index} = sprintf('Items with plastic strain energy');
+                    fieldDescriptions{index} = sprintf('Yield criterion flag');
                     
                     % Get the associated energies as well
-                    fieldDataFile_energy = importdata(energyFile, '\t');
-                    
-                    energyMainIDs = fieldDataFile_energy.data(:, 2.0);
-                    energySubIDs = fieldDataFile_energy.data(:, 3.0);
-                    totalStrainEnergy_i = fieldDataFile_energy.data(:, 4.0);
-                    plasticStrainEnergy_i = fieldDataFile_energy.data(:, 5.0);
-                    totalStrainEnergy = zeros(1.0, length(mainIDs));
-                    plasticStrainEnergy = totalStrainEnergy;
-                    
-                    allItems = [mainIDs, subIDs];
-                    energyMainIDs = [energyMainIDs, energySubIDs];
-                    commonIDs = ismember(allItems, energyMainIDs, 'rows');
-                    
-                    %commonIDs = ismember(mainIDs, energyMainIDs);
-                    totalStrainEnergy(commonIDs) = totalStrainEnergy_i;
-                    plasticStrainEnergy(commonIDs) = plasticStrainEnergy_i;
-                    
-                    fieldData(:, index + 1.0) = totalStrainEnergy';
-                    fieldData(:, index + 2.0) = plasticStrainEnergy';
+                    try
+                        fieldDataFile_energy = importdata(energyFile, '\t');
+                        totalStrainEnergy = fieldDataFile_energy.data(:, 5.0);
+                        plasticStrainEnergy = fieldDataFile_energy.data(:, 6.0);
+                        
+                        fieldData(:, index + 1.0) = totalStrainEnergy';
+                        fieldData(:, index + 2.0) = plasticStrainEnergy';
+                    catch exception
+                        fprintf(fid_debug, '\r\n\tError: An exception was encountered while reading the YIELD assessment data from ''%s''', energyFile);
+                        fprintf(fid_debug, '\r\n\tError: %s', exception.message);
+                        error = 6.0;
+                        return
+                    end
                     
                     switch getappdata(0, 'yieldCriteria')
                         case 4.0
-                            fieldNames{index + 1.0} = sprintf('DE-mJ/mm^3');
-                            fieldDescriptions{index + 1.0} = sprintf('Equivalent distortion energy density');
+                            fieldNames{index + 1.0} = sprintf('VMCRT');
+                            fieldDescriptions{index + 1.0} = sprintf('von Mises criterion yield index');
                         case 3.0
-                            fieldNames{index + 1.0} = sprintf('SSE-mJ/mm^3');
-                            fieldDescriptions{index + 1.0} = sprintf('Equivalent shear strain energy density');
+                            fieldNames{index + 1.0} = sprintf('TRCRT');
+                            fieldDescriptions{index + 1.0} = sprintf('Tresca criterion yield index');
                         case 2.0
-                            fieldNames{index + 1.0} = sprintf('SSE-mJ/mm^3');
-                            fieldDescriptions{index + 1.0} = sprintf('Equivalent shear strain energy density');
+                            fieldNames{index + 1.0} = sprintf('SSCRT');
+                            fieldDescriptions{index + 1.0} = sprintf('Maximum shear strain energy theory yield index');
                         case 1.0
-                            fieldNames{index + 1.0} = sprintf('TSE-mJ/mm^3');
-                            fieldDescriptions{index + 1.0} = sprintf('Equivalent total strain energy density');
+                            fieldNames{index + 1.0} = sprintf('TSCRT');
+                            fieldDescriptions{index + 1.0} = sprintf('Total strain energy theory yield index');
                     end
                     
-                    fieldNames{index + 2.0} = sprintf('PSE-mJ/mm^3');
-                    fieldDescriptions{index + 2.0} = sprintf('Plastic strain energy density');
+                    fieldNames{index + 2.0} = sprintf('PEEQ');
+                    fieldDescriptions{index + 2.0} = sprintf('Normalised equivalent plastic strain energy density');
                 else
                     columnsToDelete = columnsToDelete + 1.0;
                     fprintf(fid_debug, '\r\n\tWarning: Requested field YIELD is not available. The field will not be written to the output database');
