@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 29-Mar-2018 10:39:45 GMT
+%   Last modified 13-Apr-2018 13:33:19 GMT
     
     %%
     
@@ -5548,7 +5548,17 @@ classdef preProcess < handle
             readUserItems = 0.0;
             
             if (strcmpi(items, 'all') == 1.0) || (strcmpi(items, 'maxps') == 1.0) || (strcmpi(items, 'surface') == 1.0)
+                % The user defined ITEMS as a parameter
                 items = [];
+            elseif (length(items) > 12.0) && (strcmp(items(end - 11.0:end), '_surface.mat') == 1.0)
+                % The user specified a surface definition file
+                load(items)
+                setappdata(0, 'hotspotFile', items)
+                items = surfaceData.items;
+                
+                setappdata(0, 'itemsFile', 'SURFACE')
+                setappdata(0, 'surfaceFromFile', 1.0)
+                messenger.writeMessage(285.0)
             elseif isnumeric(items) == 0.0
                 if exist(items, 'file') == 2.0
                     setappdata(0, 'hotspotFile', items)
