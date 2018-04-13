@@ -6,7 +6,7 @@ function [] = cleanup(status)
 %   is not required to run this file.
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 12-Apr-2018 17:56:12 GMT
+%   Last modified 13-Apr-2018 13:33:19 GMT
     
     %%
     
@@ -61,7 +61,7 @@ if status == 1.0
     end
     fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
     fprintf(fid, 'Copyright Louis Vallance 2018\r\n');
-    fprintf(fid, 'Last modified 12-Apr-2018 17:56:12 GMT\r\n\r\n');
+    fprintf(fid, 'Last modified 13-Apr-2018 13:33:19 GMT\r\n\r\n');
     
     % Continue writing the file
     fprintf(fid, 'THE ANALYSIS WAS ABORTED FOR THE FOLLOWING REASON(S):');
@@ -591,6 +591,7 @@ if status == 1.0
     if getappdata(0, 'E033') == 1.0
         fprintf(fid, '\r\n\r\n***ERROR: The number of items specified by ITEMS is greater than the number of items in the stress dataset');
         fprintf(fid, '\r\n-> When setting the value of ITEMS in the job file, its length must be equal to or less than the total number of items in the stress dataset');
+        fprintf(fid, '\r\n-> If the analysis region was specified by a surface definition file, the dataset/model definitions might be inconsistent');
         fprintf(fid, '\r\n\r\nError code: E033');
         rmappdata(0, 'E033')
     end
