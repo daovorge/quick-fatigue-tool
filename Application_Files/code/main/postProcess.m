@@ -11,7 +11,7 @@ classdef postProcess < handle
 %      10 Output
 %   
 %   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
-%   Last modified 04-Apr-2018 15:53:10 GMT
+%   Last modified 15-Apr-2018 12:41:53 GMT
     
     %%
     
@@ -1438,7 +1438,7 @@ classdef postProcess < handle
                 
                 fprintf(fid, 'Units:\tMPa\r\n');
                 
-                fprintf(fid, 'Item #\tMean stress\tStress amplitude\tLoad ratio\t\tCycle #\tMean stress\tStress amplitude\tLoad ratio\r\n');
+                fprintf(fid, 'Item ID\tMean stress\tStress amplitude\tLoad ratio\t\tCycle #\tMean stress\tStress amplitude\tLoad ratio\r\n');
                 fprintf(fid, sprintf('%%.0f.%%.0f\t%%%s\t%%%s\t%%%s\t\t%%.0f\t%%%s\t%%%s\t%%%s\r\n', h, h, h, h, h, h), [dataA(1.0:shortLength, :), dataB(1.0:shortLength, :)]');
                 
                 if lengthA > lengthB
