@@ -13,7 +13,7 @@ classdef algorithm_sbbm < handle
 %   Reference section in Quick Fatigue Tool User Guide
 %      6.2 Stress-based Brown-Miller
 %   
-%   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.12-00 Copyright Louis Vallance 2018
 %   Last modified 16-Jan-2018 14:46:08 GMT
     
     %%

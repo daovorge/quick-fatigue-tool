@@ -10,7 +10,7 @@ classdef staticOutput < handle
 %      12.2 Yield criteria
 %      12.3 Composite failure criteria
 %   
-%   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.12-00 Copyright Louis Vallance 2018
 %   Last modified 12-Apr-2018 09:52:19 GMT
     
     %%
@@ -51,8 +51,8 @@ classdef staticOutput < handle
             [~, modelDatabaseNameShort, ~] = fileparts(modelDatabasePath);
             
             % Print header
-            fprintf('\n[POST] Quick Fatigue Tool 6.11-13 ODB Interface');
-            fprintf(fid_status, '\n[POST] Quick Fatigue Tool 6.11-13 ODB Interface');
+            fprintf('\n[POST] Quick Fatigue Tool 6.12-00 ODB Interface');
+            fprintf(fid_status, '\n[POST] Quick Fatigue Tool 6.12-00 ODB Interface');
             
             % Warn user if there is only one item in the model
             if length(mainID) == 1.0
@@ -106,7 +106,7 @@ classdef staticOutput < handle
             % Open the log file for writing
             debugFileName = [sprintf('Project/output/%s/Data Files/', jobName), resultsDatabaseName, '.log'];
             fid_debug = fopen(debugFileName, 'w+');
-            fprintf(fid_debug, 'Quick Fatigue Tool 6.11-13 ODB Interface Log');
+            fprintf(fid_debug, 'Quick Fatigue Tool 6.12-00 ODB Interface Log');
             
             %% Print Abaqus installation info to the debug log file
             try
@@ -718,7 +718,7 @@ classdef staticOutput < handle
             
             %% Get step description
             [job, loading] = fieldDataFile.textdata{2:3};
-            stepDescription = ['version 6.11-13; ', job, ', ', loading];
+            stepDescription = ['version 6.12-00; ', job, ', ', loading];
             
             if yieldOrComposite == 1.0
                 %% Get yield criterion name

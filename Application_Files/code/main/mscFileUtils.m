@@ -6,7 +6,7 @@ classdef mscFileUtils < handle
 %   MSCFILEUTILS is used internally by Quick Fatigue Tool. The user is not
 %   required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.12-00 Copyright Louis Vallance 2018
 %   Last modified 18-Dec-2017 10:16:35 GMT
     
     %%
@@ -113,7 +113,7 @@ classdef mscFileUtils < handle
                     
                     %% Sa AT Sm=0 CHECK
                     %{
-                        For greater ease in the calculation, interpolate
+                        For greater ease in the calculation, interpolate to
                         find an Sa value at Sm=0 if one does not already
                         exist
                     %}
@@ -328,6 +328,7 @@ classdef mscFileUtils < handle
             end
         end
         
+        %% GET USER-DEFINED DIAGNOSTIC ITEMS
         function [] = checkFRFDiagnosticItems(N)
             frfDiagnostics = getappdata(0, 'frfDiagnostics');
             N = linspace(1.0, N, N);

@@ -11,7 +11,7 @@ function [] = fea(varargin)
 %   FEA(ABQCMD, ABQ_JOBNAME, N) submits 'ABQ_JOBNAME.inp' for analysis
 %   using the Abaqus command ABQCMD.bat and N processors.
 %   
-%   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.12-00 Copyright Louis Vallance 2018
 %   Last modified 20-Feb-2018 15:43:20 GMT
     
     %%

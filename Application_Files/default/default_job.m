@@ -16,7 +16,7 @@ function [] = default_job()
 %   Reference section in Quick Fatigue Tool User Settings Reference Guide
 %      1 Job file options
 %   
-%   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.12-00 Copyright Louis Vallance 2018
 %   Last modified 28-Mar-2018 09:40:26 GMT
 
 %% 1: JOB

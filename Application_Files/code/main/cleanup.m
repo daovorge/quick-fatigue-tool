@@ -5,7 +5,7 @@ function [] = cleanup(status)
 %   CLEANUP is used internally by Quick Fatigue Tool. The user
 %   is not required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.12-00 Copyright Louis Vallance 2018
 %   Last modified 15-Apr-2018 12:41:53 GMT
     
     %%
@@ -55,9 +55,9 @@ if status == 1.0
     
     % Write file header
     try
-        fprintf(fid, 'Quick Fatigue Tool 6.11-13 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
+        fprintf(fid, 'Quick Fatigue Tool 6.12-00 on machine %s (User is %s)\r\n', char(java.net.InetAddress.getLocalHost().getHostName()), char(java.lang.System.getProperty('user.name')));
     catch
-        fprintf(fid, 'Quick Fatigue Tool 6.11-13\r\n');
+        fprintf(fid, 'Quick Fatigue Tool 6.12-00\r\n');
     end
     fprintf(fid, 'MATLAB version %s\r\n\r\n', version);
     fprintf(fid, 'Copyright Louis Vallance 2018\r\n');

@@ -11,7 +11,7 @@ function varargout = ExportTool(varargin)%#ok<*DEFNU>
 %   Reference section in Quick Fatigue Tool User Guide
 %      10.5 The ODB Interface
 %   
-%   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.12-00 Copyright Louis Vallance 2018
 %   Last modified 16-Mar-2018 13:19:57 GMT
     
     %%
@@ -527,9 +527,9 @@ end
 % Open the log file for writing
 debugFileName = sprintf('%s\\%s.log', resultsDatabasePath, resultsDatabaseName);
 fid_debug = fopen(debugFileName, 'w+');
-fprintf(fid_debug, 'Quick Fatigue Tool 6.11-13 ODB Interface Log');
+fprintf(fid_debug, 'Quick Fatigue Tool 6.12-00 ODB Interface Log');
 clc
-fprintf('Quick Fatigue Tool 6.11-13 ODB Interface Log\n');
+fprintf('Quick Fatigue Tool 6.12-00 ODB Interface Log\n');
 
 %% Print Abaqus installation info to the debug log file
 try

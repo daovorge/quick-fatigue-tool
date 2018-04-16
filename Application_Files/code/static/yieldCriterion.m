@@ -8,7 +8,7 @@ function [] = yieldCriterion(N, algorithm, fid_status, jobName, mainID, subID, d
 %   Reference section in Quick Fatigue Tool User Guide
 %      12.2 Yield criteria
 %
-%   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.12-00 Copyright Louis Vallance 2018
 %   Last modified 12-Apr-2018 17:56:12 GMT
     
     %%

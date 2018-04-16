@@ -4,7 +4,7 @@ function [continueAnalysis] = datacheckAbort(Sxx, Syy, Szz, Txy, Tyz, Txz, tic_p
 %   DATACHECKABORT is used internally by Quick Fatigue Tool. The user
 %   is not required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.12-00 Copyright Louis Vallance 2018
 %   Last modified 05-Apr-2018 08:59:50 GMT
     
     %%   

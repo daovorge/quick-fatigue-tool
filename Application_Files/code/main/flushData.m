@@ -5,7 +5,7 @@ function [] = flushData()
 %   FLUSHDATA is used internally by Quick Fatigue Tool. The user
 %   is not required to run this file.
 %   
-%   Quick Fatigue Tool 6.11-13 Copyright Louis Vallance 2018
+%   Quick Fatigue Tool 6.12-00 Copyright Louis Vallance 2018
 %   Last modified 19-Mar-2018 15:52:13 GMT
     
     %%
