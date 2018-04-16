@@ -28,7 +28,7 @@ classdef damageAccumulation < handle
             enduranceLimit = 1e7;
             
             %% Forward extrapolation (iterative solver)
-            forwardExtrapolation = 0.0;
+            forwardExtrapolation = 1.0;
             extrapolationFactor = 0.001;
             
             %% Fatigue loading
@@ -67,19 +67,17 @@ classdef damageAccumulation < handle
                 iteration = iteration + 1.0;
                 
                 % Get the damage for the first cycle
-                Di = (1.0/0.18).*(a0 + (0.18 - a0).*((n2./Nf(1.0)).^((2.0/3.0).*Nf(1.0).^alpha)));
+                D = (1.0/0.18).*(a0 + (0.18 - a0).*((n2./Nf(1.0)).^((2.0/3.0).*Nf(1.0).^alpha)));
                 
                 for i = 2:nCycles
                     %{
                         Find the equivalent number of cycles for the same
                         damage on the next curve
                     %}
-                    equivalentCycles = round(Nf(i)*((0.18*Di - a0)/(0.18 - a0))^(1.0/((2.0/3.0)*(Nf(i))^0.4)));
+                    equivalentCycles = round(Nf(i)*((0.18*D - a0)/(0.18 - a0))^(1.0/((2.0/3.0)*(Nf(i))^0.4)));
                     
-                    Di = (1.0/0.18).*(a0 + (0.18 - a0).*(((n2 + equivalentCycles)./Nf(i)).^((2.0/3.0).*Nf(i).^alpha)));
+                    D = (1.0/0.18).*(a0 + (0.18 - a0).*(((n2 + equivalentCycles)./Nf(i)).^((2.0/3.0).*Nf(i).^alpha)));
                 end
-                
-                D = D + (Di - D);
                 
                 if n2 > enduranceLimit
                     n2 = n2 - cyclesForward;
@@ -134,7 +132,7 @@ classdef damageAccumulation < handle
             damageAccumulationFile = 'data.txt';
             
             % Check quality of data
-            [damageAccumulationData, error] = damageAccumulation.tabularCheck(damageAccumulationFile);
+            [damageAccumulationData, damageAccumulationLives, error] = damageAccumulation.tabularCheck(damageAccumulationFile);
             
             % Check error status
             if error == 1.0
@@ -188,18 +186,16 @@ classdef damageAccumulation < handle
                 iteration = iteration + 1.0;
                 
                 % Get the damage for the first cycle
-                Di = interp1(nOverNf_values, D_values, (n/Nf(1.0)), 'linear', 'extrap');
+                D = interp1(nOverNf_values, D_values, (n/Nf(1.0)), 'linear', 'extrap');
                 
                 for i = 2:nCycles
                     %{
                         Find the equivalent number of cycles for the same
                         damage on the next curve
                     %}
-                    equivalentCycles = round(interp1(D_values, nOverNf_values, Di));
-                    Di = interp1(nOverNf_values, D_values, ((n + equivalentCycles)/Nf(i)), 'linear', 'extrap');
+                    equivalentCycles = round(interp1(D_values, nOverNf_values, D));
+                    D = interp1(nOverNf_values, D_values, ((n + equivalentCycles)/Nf(i)), 'linear', 'extrap');
                 end
-                
-                D = D + (Di - D);
                 
                 d_buffer(iteration) = D; %#ok<AGROW> % Debug
                 
@@ -234,7 +230,7 @@ classdef damageAccumulation < handle
         end
         
         %% Check tabular damage accumulation data
-        function [damageAccumulationData, error] = tabularCheck(damageAccumulationFile)
+        function [damageAccumulationData, damageAccumulationLives, error] = tabularCheck(damageAccumulationFile)
             error = 0.0;
             setappdata(0, 'damageAccumulationFile', damageAccumulationFile)
             
@@ -258,7 +254,7 @@ classdef damageAccumulation < handle
                 
                 %% COLUMN NUMBER CHECK
                 [rows, cols] = size(damageAccumulationData);
-                if cols ~= 2.0
+                if cols < 3.0
                     error = 1.0;
                     setappdata(0, 'E139', 1.0)
                     
@@ -266,11 +262,11 @@ classdef damageAccumulation < handle
                 end
                 
                 % Get the (n/Nf) and D values
-                nNf_values = damageAccumulationData(:, 1.0);
-                D_values = damageAccumulationData(:, 2.0);
+                nNf_values = damageAccumulationData(2.0:end, 1.0);
+                D_values = damageAccumulationData(2.0:end, 2.0:end);
                 
                 %% MINIMUM PAIR CHECK
-                if rows < 2.0
+                if rows < 3.0
                     error = 1.0;
                     setappdata(0, 'E140', 1.0)
                     
@@ -294,7 +290,7 @@ classdef damageAccumulation < handle
                 end
                 
                 %% INCREASING n/Nf CHECK
-                for i = 2:rows
+                for i = 2:(rows - 1.0)
                     if nNf_values(i) <= nNf_values(i - 1.0)
                         setappdata(0, 'E048', 1.0)
                         error = 1.0;
@@ -303,29 +299,20 @@ classdef damageAccumulation < handle
                     end
                 end
                 
-                %% NEGATIVE n/Nf-D CHECK
-                if (any(D_values < 0.0) == 1.0) || (any(nNf_values < 0.0) == 1.0)
+                %% NEGATIVE n/Nf CHECK
+                if any(nNf_values < 0.0) == 1.0
                     error = 1.0;
                     setappdata(0, 'E138', 1.0)
                     
                     return
                 end
                 
-                %% INTERMEDIATE POINT CHECK
-                if length(D_values) > 2.0
-                    markForDelete = [];
+                %% NEGATIVE D CHECK
+                if any(D_values < 0.0) == 1.0
+                    error = 1.0;
+                    setappdata(0, 'E138', 1.0)
                     
-                    for i = 2:length(D_values) - 1.0
-                        m1 = (D_values(i) - D_values(i - 1.0))/(nNf_values(i) - nNf_values(i - 1.0));
-                        m2 = (D_values(i + 1.0) - D_values(i))/(nNf_values(i + 1.0) - nNf_values(i));
-                        
-                        if (m1/m2 < 1.000000000000007) && (m1/m2 > 0.999999999999993)
-                            markForDelete = [markForDelete, i]; %#ok<AGROW>
-                        end
-                    end
-                    
-                    D_values(markForDelete) = [];
-                    nNf_values(markForDelete) = [];
+                    return
                 end
                 
                 %% ADJACENT D VALUE CHECK
@@ -335,51 +322,49 @@ classdef damageAccumulation < handle
                     different
                 %}
                 message240Warning = 0.0;
-                
-                index = 1.0;
                 maxIterations = length(D_values);
-                while index < (maxIterations - 1.0)
-                    if D_values(index) == D_values(index + 1.0)
-                        if maxIterations == 2.0
-                            % e.g. [1.0, 1.0]
-                            D_values(index + 1.0) = D_values(index + 1.0) + 1e-6;
-                        elseif (index + 1.0 == maxIterations) && (D_values(index - 1.0) < D_values(index))
-                            % e.g. [..., 1.0, 2.0, 2.0]
-                            D_values(index) = D_values(index) - 1e-6;
-                        elseif (index + 1.0 == maxIterations) && (D_values(index - 1.0) > D_values(index))
-                            % e.g. [..., 2.0, 1.0, 1.0]
-                            D_values(index) = D_values(index) + 1e-6;
-                        elseif (index == 1.0) && (D_values(index + 2.0) > D_values(index + 1.0))
-                            % e.g. [1.0, 1.0, 2.0,...]
-                            D_values(index + 1.0) = D_values(index + 1.0) + 1e-6;
-                        elseif (index == 1.0) && (D_values(index + 2.0) < D_values(index + 1.0))
-                            % e.g. [2.0, 2.0, 1.0,...]
-                            D_values(index + 1.0) = D_values(index + 1.0) - 1e-6;
-                        elseif D_values(index + 2.0) < D_values(index + 1.0)
-                            % e.g. [..., 2.0, 2.0, 1.0,...]
-                            D_values(index + 1.0) = D_values(index + 1.0) - 1e-6;
-                        elseif D_values(index + 2.0) > D_values(index + 1.0)
-                            % e.g. [..., 1.0, 1.0, 2.0,...]
-                            D_values(index + 1.0) = D_values(index + 1.0) + 1e-6;
-                        elseif D_values(index + 2.0) == D_values(index + 1.0)
-                            % e.g. [..., 1.0, 1.0, 1.0,...]
-                            if nNf_values(index + 1.0) ~= 0.0
-                                D_values(index + 1.0) = [];
-                                nNf_values(index + 1.0) = [];
-                                
-                                maxIterations = maxIterations - 1.0;
-                            elseif D_values(index - 1.0) < D_values(index)
-                                D_values(index) = D_values(index + 1.0) - 1e-6;
-                            else
-                                D_values(index) = D_values(index + 1.0) + 1e-6;
+                
+                for i = 1:(cols - 1.0)
+                    index = 1.0;
+                    
+                    while index < (maxIterations - 1.0)
+                        if D_values(index, i) == D_values(index + 1.0, i)
+                            if maxIterations == 2.0
+                                % e.g. [1.0, 1.0]
+                                D_values(index + 1.0, i) = D_values(index + 1.0, i) + 1e-6;
+                            elseif (index + 1.0 == maxIterations) && (D_values(index - 1.0, i) < D_values(index, i))
+                                % e.g. [..., 1.0, 2.0, 2.0]
+                                D_values(index, i) = D_values(index, i) - 1e-6;
+                            elseif (index + 1.0 == maxIterations) && (D_values(index - 1.0, i) > D_values(index, i))
+                                % e.g. [..., 2.0, 1.0, 1.0]
+                                D_values(index, i) = D_values(index, i) + 1e-6;
+                            elseif (index == 1.0) && (D_values(index + 2.0, i) > D_values(index + 1.0, i))
+                                % e.g. [1.0, 1.0, 2.0,...]
+                                D_values(index + 1.0, i) = D_values(index + 1.0, i) + 1e-6;
+                            elseif (index == 1.0) && (D_values(index + 2.0, i) < D_values(index + 1.0, i))
+                                % e.g. [2.0, 2.0, 1.0,...]
+                                D_values(index + 1.0, i) = D_values(index + 1.0, i) - 1e-6;
+                            elseif D_values(index + 2.0, i) < D_values(index + 1.0, i)
+                                % e.g. [..., 2.0, 2.0, 1.0,...]
+                                D_values(index + 1.0, i) = D_values(index + 1.0, i) - 1e-6;
+                            elseif D_values(index + 2.0, i) > D_values(index + 1.0, i)
+                                % e.g. [..., 1.0, 1.0, 2.0,...]
+                                D_values(index + 1.0, i) = D_values(index + 1.0, i) + 1e-6;
+                            elseif D_values(index + 2.0, i) == D_values(index + 1.0, i)
+                                % e.g. [..., 1.0, 1.0, 1.0,...]
+                                if D_values(index - 1.0, i) < D_values(index, i)
+                                    D_values(index, i) = D_values(index + 1.0, i) - 1e-6;
+                                else
+                                    D_values(index, i) = D_values(index + 1.0, i) + 1e-6;
+                                end
                             end
+                            
+                            message240Warning = 1.0;
+                            
+                            index = index + 1.0;
+                        else
+                            index = index + 1.0;
                         end
-                        
-                        message240Warning = 1.0;
-                        
-                        index = index + 1.0;
-                    else
-                        index = index + 1.0;
                     end
                 end
                 
@@ -387,40 +372,13 @@ classdef damageAccumulation < handle
                 if message240Warning == 1.0
                     messenger.writeMessage(240.0)
                 end
-                
-                %% UNCLOSED ENVELOPE CHECK
-                if (nNf_values(end) < 0.0) && (D_values(end) > 0.0)
-                    messenger.writeMessage(241.0)
-                end
-                
-                %% D VALUE CURVATURE CHECK
-                positiveIndexes = nNf_values > 0.0;
-                D_values_p = D_values(positiveIndexes);
-                sm_values_p = nNf_values(positiveIndexes);
-                
-                if isempty(D_values_p) == 0.0
-                    for i = 1:length(D_values_p)
-                        %{
-                            Get the equation of the straight line from the
-                            origin to the current D-n/Nf value
-                        %}
-                        i2 = length(D_values_p) - (i - 1.0);
-                        for j = 1:(i - 1.0)
-                            j2 = length(D_values_p) - (j - 1.0);
-                            if D_values_p(j2) <= ((D_values_p(i2)/sm_values_p(i2))*sm_values_p(j2))
-                                error = 1.0;
-                                setappdata(0, 'E137', 1.0)
-                                
-                                return
-                            end
-                        end
-                    end
-                end
             end
             
             %% CONCATENATE NEW n/Nf-D VALUES
+            damageAccumulationLives = damageAccumulationData(1.0, 1:(end - 1.0));
             damageAccumulationData = [nNf_values, D_values];
             setappdata(0, 'damageAccumulationData', damageAccumulationData)
+            setappdata(0, 'damageAccumulationLives', damageAccumulationLives)
         end
     end
 end
