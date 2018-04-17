@@ -39,8 +39,7 @@ classdef damageAccumulation < handle
             tol = 1.110223024625157e-16;
             
             %% Fatigue loading
-            %cycles = [451.7364129, 291.6655254];
-            cycles = 930;
+            cycles = [250, 500];
             quotient = cycles./Sf;
             
             % Reference life for damage accumulation curves
@@ -155,6 +154,8 @@ classdef damageAccumulation < handle
                                     cycles cannnot be reduced any further.
                                     Accpet the current damage solution
                                 %}
+                                cf_buffer = [cf_buffer, cyclesForward]; %#ok<AGROW>
+                                
                                 break
                             end
                             
