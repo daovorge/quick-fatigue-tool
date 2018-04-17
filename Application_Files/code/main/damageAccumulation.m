@@ -7,7 +7,7 @@ classdef damageAccumulation < handle
 %   is not required to run this file.
 %
 %   Quick Fatigue Tool 6.12-00 Copyright Louis Vallance 2018
-%   Last modified 16-Apr-2018 16:14:08 GMT
+%   Last modified 17-Apr-2018 14:49:17 GMT
 
     %%
 
@@ -29,10 +29,14 @@ classdef damageAccumulation < handle
             
             %% Forward extrapolation (iterative solver)
             forwardExtrapolation = 1.0;
-            extrapolationFactor = 0.001;
+            maxCycles = 500.0;
+            minCycleIncremnet = 1.0;
+            maxCycleIncremnet = 1000.0;
+            extrapolationTolerance = 1.0;
             
             %% Fatigue loading
-            cycles = [451.7364129, 291.6655254];
+%             cycles = [451.7364129, 291.6655254, 300, 200, 180];
+            cycles = 300.0;
             quotient = cycles./Sf;
             
             % Reference life for damage accumulation curves
@@ -44,22 +48,25 @@ classdef damageAccumulation < handle
                 linearLife = enduranceLimit;
             end
             
-            %% Method A (iterative)
+            %% Iterative solver
             % Initialise damage variable
             nCycles = length(Nf);
             D = 0.0;
             n2 = 0.0;
             iteration = 0.0;
             
+            % Track iteration-by-iteraion damage values
+            d_buffer = [];
+            % Track iteration-by-iteraion cycle numbers
+            cf_buffer = [];
+            
             % Calculate number of forward extrapolation cycles
             if forwardExtrapolation == 1.0
-                cyclesForward = round(extrapolationFactor*linearLife);
-                if cyclesForward < 1.0
-                    cyclesForward = 1.0;
-                end
+                cyclesForward = maxCycles;
             else
                 cyclesForward = 1.0;
             end
+            cf_buffer(1.0) = cyclesForward;
             
             timer = tic;
             while D < 1.0
@@ -79,12 +86,71 @@ classdef damageAccumulation < handle
                     D = (1.0/0.18).*(a0 + (0.18 - a0).*(((n2 + equivalentCycles)./Nf(i)).^((2.0/3.0).*Nf(i).^alpha)));
                 end
                 
+                % If the endurance limit is reached, abandon the calculation
                 if n2 > enduranceLimit
                     n2 = n2 - cyclesForward;
                     iteration = iteration - 1.0;
                     
                     break
                 end
+                
+                % Adjust the forward damage extrapolation if necessary
+                if forwardExtrapolation == 1.0
+                    if D > extrapolationTolerance
+                        while D > extrapolationTolerance
+                            %{
+                                The current damage increment exceeds the
+                                damage extrapolation tolerance. Reduce the
+                                number of cycles if possible, and retry the
+                                iteration
+                            %}
+                            if (0.25*cyclesForward) >= minCycleIncremnet
+                                % Reverse the cycle number
+                                n2 = n2 - cyclesForward;
+                                
+                                cyclesForward = round(0.25*cyclesForward);  cf_buffer = [cf_buffer, cyclesForward]; %#ok<AGROW>
+                                
+                                % Increment the cycle with the new value
+                                n2 = n2 + cyclesForward;
+                                
+                                % Get the damage for the first cycle in the loading
+                                D = (1.0/0.18).*(a0 + (0.18 - a0).*((n2./Nf(1.0)).^((2.0/3.0).*Nf(1.0).^alpha)));
+                                
+                                for i = 2:nCycles
+                                    %{
+                                        Find the equivalent number of
+                                        cycles for the same damage on the
+                                        next curve
+                                    %}
+                                    equivalentCycles = round(Nf(i)*((0.18*D - a0)/(0.18 - a0))^(1.0/((2.0/3.0)*(Nf(i))^0.4)));
+                                    
+                                    D = (1.0/0.18).*(a0 + (0.18 - a0).*(((n2 + equivalentCycles)./Nf(i)).^((2.0/3.0).*Nf(i).^alpha)));
+                                end
+                            else
+                                %{
+                                    The number of forawrd extrapolation
+                                    cycles cannnot be reduced any further.
+                                    Accpet the current damage solution
+                                %}
+                                break
+                            end
+                        end
+                    elseif D < (0.5*extrapolationTolerance)
+                        %{
+                            The current damage increment is less than 50%
+                            of the damage extrapolation tolerance. Increase
+                            the number of cycles
+                        %}
+                        if cyclesForward + 0.25*cyclesForward <= maxCycleIncremnet
+                            cyclesForward = cyclesForward + round(0.25*cyclesForward);  cf_buffer = [cf_buffer, cyclesForward]; %#ok<AGROW>
+                        end
+                    end
+                else
+                    cf_buffer = [cf_buffer, cyclesForward]; %#ok<AGROW>
+                end
+                
+                % Update the damage buffer
+                d_buffer(iteration) = D; %#ok<AGROW>
             end
             time = toc(timer);
             
@@ -92,37 +158,34 @@ classdef damageAccumulation < handle
             if D > 1.0
                 n2 = n2 - cyclesForward;
                 iteration = iteration - 1.0;
+                d_buffer(end) = [];
             end
             
-            %% Method B (direct)
-%             timer = tic;
-%             n2 = linspace(1.0, enduranceLimit, enduranceLimit);
-%             nCycles = length(Nf);
-%             F = zeros(nCycles, enduranceLimit);
-%             for i = 1:nCycles
-%                 F(i, :) = (1.0./0.18).*(a0 + (1.0./(1.0 + (2.0./3.0).*(Nf(i).^0.4))).*((0.18 - a0).*n2.*(n2./Nf(i)).^((2.0./3.0).*Nf(i).^0.4)));
-%             end
-%             [A, n2] = min(abs(F - 1.0));
-%             if A == 1.0
-%                 n2 = enduranceLimit;
-%             elseif F(n2) > 1.0
-%                 n2 = n2 - 1.0;
-%             end
-%             time2 = toc(timer);
-            
             %% Plot result (debug)
-%             nRatios = linspace(0.0, 1.0, index + 1.0);
-%             P1 = plot(nRatios, [0.0, d_buffer], '-r', 'linewidth', 2.0);
-%             hold on
-%             P2 = plot([0.0, 1.0], [0.0, 1.0], '-g', 'linewidth', 2.0);
-%             axis tight; grid
-%             legend([P1, P2], 'Nonlinear Life', 'Linear Life')
-%             xlabel('Cycle ratio (n/Nf)');  ylabel('Damage')
+            clf
             
-            %% Print result to command window
-            fprintf('Nonlinear Life (Method A) = %.0f cycles, %.0f iterations (%fs)\n', n2, iteration, time)
-%             fprintf('Nonlinear Life (Method B) = %.0f cycles (%fs)\n', n2, time2)
+            subplot(1.0, 2.0, 1.0)
+            nRatios = linspace(0.0, 1.0, iteration + 1.0);
+            P1 = plot(nRatios, [0.0, d_buffer], '-r', 'linewidth', 2.0);
+            hold on
+            P2 = plot([0.0, 1.0], [0.0, 1.0], '-g', 'linewidth', 2.0);
+            axis tight; grid on
+            legend([P1, P2], 'Nonlinear Life', 'Linear Life')
+            xlabel('Cycle ratio (n/Nf)');  ylabel('Damage')
+            
+            subplot(1.0, 2.0, 2.0)
+            plot(linspace(1.0, length(cf_buffer), length(cf_buffer)), cf_buffer, '-r', 'linewidth', 2.0);
+            xlabel('Iteration');  ylabel('Number of cycles')
+            axis tight; grid on
+            
+            %% Print result to command window (debug)
+            fprintf('Nonlinear Life = %.0f cycles, %.0f iterations, D = %f, (%fs)\n', n2, iteration, d_buffer(end), time)
             fprintf('Linear Life = %.0f cycles\n', linearLife)
+            
+            quality = 1.0 - abs(d_buffer(end) - 1.0);
+            if quality < 0.5
+                fprintf('BAD QUALITY (%f)\n', quality)
+            end
         end
         
         %% Tabular damage accumulation
