@@ -8,7 +8,7 @@ classdef preProcess < handle
 %   See also postProcess.
 %
 %   Quick Fatigue Tool 6.12-00 Copyright Louis Vallance 2018
-%   Last modified 13-Apr-2018 13:33:19 GMT
+%   Last modified 18-Apr-2018 15:33:56 GMT
     
     %%
     
@@ -5631,19 +5631,13 @@ classdef preProcess < handle
                 end
                 
                 if isempty(find(items > R, 1.0)) == 0.0
-                    mainIDs2 = mainIDs';
-                    subIDs2 = subIDs';
-                    
                     messenger.writeMessage(59.0)
                     
                     error = 2.0;
-                else
-                    mainIDs2 = mainIDs(items);
-                    subIDs2 = subIDs(items);
                 end
                 
-                mainIDs = mainIDs2;
-                subIDs = subIDs2;
+                mainIDs = items_data(:, 2.0);
+                subIDs = items_data(:, 3.0);
             end
         end
         
