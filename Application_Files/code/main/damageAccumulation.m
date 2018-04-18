@@ -39,7 +39,7 @@ classdef damageAccumulation < handle
             tol = 1.110223024625157e-16;
             
             %% Fatigue loading
-            cycles = [250, 500];
+            cycles = [250.0, 200.0];
             quotient = cycles./Sf;
             
             % Reference life for damage accumulation curves
@@ -154,12 +154,8 @@ classdef damageAccumulation < handle
                                     cycles cannnot be reduced any further.
                                     Accpet the current damage solution
                                 %}
-                                cf_buffer = [cf_buffer, cyclesForward]; %#ok<AGROW>
-                                
                                 break
                             end
-                            
-                            cf_buffer = [cf_buffer, cyclesForward]; %#ok<AGROW>
                         end
                     elseif D < (0.5*extrapolationTolerance)
                         %{
@@ -170,17 +166,12 @@ classdef damageAccumulation < handle
                         if cyclesForward + 0.25*cyclesForward <= maxCycleIncremnet
                             cyclesForward = cyclesForward + round(0.25*cyclesForward);
                         end
-                        
-                        cf_buffer = [cf_buffer, cyclesForward]; %#ok<AGROW>
-                    else
-                        cf_buffer = [cf_buffer, cyclesForward]; %#ok<AGROW>
                     end
-                else
-                    cf_buffer = [cf_buffer, cyclesForward]; %#ok<AGROW>
                 end
                 
                 % Update the damage buffer
                 d_buffer(iteration) = D; %#ok<AGROW>
+                cf_buffer = [cf_buffer, cyclesForward]; %#ok<AGROW>
             end
             time = toc(timer);
             
@@ -194,6 +185,7 @@ classdef damageAccumulation < handle
                 n2 = n2 - cyclesForward;
                 iteration = iteration - 1.0;
                 d_buffer(end) = [];
+                cf_buffer(end) = [];
             end
             
             %% Plot result (debug)
