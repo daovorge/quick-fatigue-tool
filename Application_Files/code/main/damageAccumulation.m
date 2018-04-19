@@ -20,6 +20,8 @@ classdef damageAccumulation < handle
         
         %% Nonlinear damage accumulation
         function nonlinear()
+            clc
+            
             %% Material properties
             Sf = 930.0;
             b = -0.095;
@@ -29,9 +31,9 @@ classdef damageAccumulation < handle
             
             %% Forward extrapolation (iterative solver)
             forwardExtrapolation = 1.0;
-            maxCycles = 500.0;
             minCycleIncremnet = 1.0;
             maxCycleIncremnet = 1e5;
+            maxCycles = 500.0;
             maxIterations = 200.0;
             extrapolationTolerance = 1.0;
             
@@ -39,7 +41,7 @@ classdef damageAccumulation < handle
             tol = 1.110223024625157e-16;
             
             %% Fatigue loading
-            cycles = [250.0, 200.0];
+            cycles = [350, 200, 240];
             quotient = cycles./Sf;
             
             % Reference life for damage accumulation curves
@@ -112,6 +114,7 @@ classdef damageAccumulation < handle
                     
                     % Update the damage buffer
                     d_buffer(iteration) = D; %#ok<AGROW>
+                    cf_buffer = [cf_buffer, cyclesForward]; %#ok<AGROW>
                     
                     break
                 end
