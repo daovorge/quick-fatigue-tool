@@ -41,7 +41,7 @@ classdef damageAccumulation < handle
             tol = 1.110223024625157e-16;
             
             %% Fatigue loading
-            cycles = [350, 200, 240];
+            cycles = [250, 500];
             quotient = cycles./Sf;
             
             % Reference life for damage accumulation curves
