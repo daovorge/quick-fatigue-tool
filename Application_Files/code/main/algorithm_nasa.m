@@ -14,7 +14,7 @@ classdef algorithm_nasa < handle
 %      6.7 NASALIFE
 %   
 %   Quick Fatigue Tool 6.12-00 Copyright Louis Vallance 2018
-%   Last modified 14-Dec-2017 08:08:52 GMT
+%   Last modified 26-Apr-2018 16:29:37 GMT
     
     %%
     
@@ -525,7 +525,7 @@ classdef algorithm_nasa < handle
             scaleFactors = ones(1.0, length(Sa));
             
             if useSN == 1.0 % S-N curve was defined directly
-                [cumulativeDamage] = interpolate(cumulativeDamage, pairs, 4.0, numberOfCycles, Sa, scaleFactors, 0.0, 0.0);
+                [cumulativeDamage, ~] = interpolate(cumulativeDamage, pairs, 4.0, numberOfCycles, Sa, scaleFactors, 0.0, 0.0, []);
             else % S-N curve is derived
                 Sf = getappdata(0, 'Sf');
                 b = getappdata(0, 'b');
@@ -573,7 +573,7 @@ classdef algorithm_nasa < handle
                             radius = getappdata(0, 'notchRootRadius');
                             constant = getappdata(0, 'notchSensitivityConstant');
                             
-                            ktn = analysis.getKtn(life, constant, radius);
+                            ktn = analysis.getKtn(kt, life, constant, radius);
    
                             quotient = (ktn*Sa(index))/Sf;
 

@@ -169,7 +169,7 @@ classdef algorithm_uel < handle
                 radius = getappdata(0, 'notchRootRadius');
                 constant = getappdata(0, 'notchSensitivityConstant');
 
-                ktn = analysis.getKtn(Nf, constant, radius);
+                ktn = analysis.getKtn(kt, Nf, constant, radius);
             else
                 ktn = ones(1.0, length(Nf));
             end

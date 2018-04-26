@@ -36,7 +36,7 @@ for groups = 1:G
         radius = group_materialProps(groups).notchRootRadius;
         
         if kt ~= 1.0
-            ktn = analysis.getKtn(Ni, constant, radius);
+            ktn = analysis.getKtn(kt, Ni, constant, radius);
             group_materialProps(groups).sValues = S.*(1.0./ktn);
             
             % Save the material properties for the current group

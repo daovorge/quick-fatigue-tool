@@ -14,7 +14,7 @@ classdef algorithm_usl < handle
 %      6.8 Uniaxial Stress-Life
 %   
 %   Quick Fatigue Tool 6.12-00 Copyright Louis Vallance 2018
-%   Last modified 31-Jan-2018 10:48:44 GMT
+%   Last modified 26-Apr-2018 16:29:37 GMT
     
     %%
     
@@ -92,6 +92,7 @@ classdef algorithm_usl < handle
             repeats = getappdata(0, 'repeats');
             numberOfCycles = length(cycles);
             cumulativeDamage = zeros(1.0, numberOfCycles);
+            life_buffer = cumulativeDamage;
             
             % Get the fatigue limit
             modifyEnduranceLimit = getappdata(0, 'modifyEnduranceLimit');
@@ -112,7 +113,7 @@ classdef algorithm_usl < handle
             scaleFactors = ones(1.0, length(cycles));
             
             if useSN == 1.0 % S-N curve was defined directly
-                [cumulativeDamage] = interpolate(cumulativeDamage, pairs, msCorrection, numberOfCycles, cycles, scaleFactors, mscWarning, overflowCycles);
+                [cumulativeDamage, life_buffer] = interpolate(cumulativeDamage, pairs, msCorrection, numberOfCycles, cycles, scaleFactors, mscWarning, overflowCycles, life_buffer);
             else % S-N curve is derived
                 Sf = getappdata(0, 'Sf');
                 b = getappdata(0, 'b');
@@ -124,6 +125,9 @@ classdef algorithm_usl < handle
                     % If the cycle is purely compressive, assume no damage
                     if (min(pairs(index, :)) < 0.0 && max(pairs(index, :)) <= 0.0) && (getappdata(0, 'ndCompression') == 1.0)
                         cumulativeDamage(index) = 0.0;
+                        
+                        % Update the life buffer
+                        life_buffer(index) = inf;
                         continue
                     end
                     
@@ -140,6 +144,9 @@ classdef algorithm_usl < handle
                     [fatigueLimit, zeroDamage] = analysis.modifyEnduranceLimit(modifyEnduranceLimit, ndEndurance, fatigueLimit, fatigueLimit_original, cycles(index), cyclesToRecover, residualStress, enduranceScale);
                     if (zeroDamage == 1.0) && (kt == 1.0)
                         cumulativeDamage(index) = 0.0;
+                        
+                        % Update the life buffer
+                        life_buffer(index) = inf;
                         continue
                     end
                     
@@ -169,7 +176,7 @@ classdef algorithm_usl < handle
                             radius = getappdata(0, 'notchRootRadius');
                             constant = getappdata(0, 'notchSensitivityConstant');
                             
-                            ktn = analysis.getKtn(life, constant, radius);
+                            ktn = analysis.getKtn(kt, life, constant, radius);
                             
                             quotient = (ktn*cycles(index))/Sf;
                             
@@ -183,16 +190,23 @@ classdef algorithm_usl < handle
                         % Invert the life value to get the damage
                         cumulativeDamage(index) = 1.0/life;
                     end
+                    
+                    % Update the life buffer
+                    life_buffer(index) = life;
                 end
             end
             
             %% SAVE THE CUMULATIVE DAMAGE
-            
             setappdata(0, 'cumulativeDamage', cumulativeDamage);
             
             %% SUM CUMULATIVE DAMAGE TO GET TOTAL DAMAGE FOR CURRENT NODE
-            
             damage = sum(cumulativeDamage)*repeats;
+            
+            %% CORRECT THE FATIGUE LIFE FOR NONLINEAR DAMAGE ACCUMULATION
+            if getappdata(0, 'damageAccumulation') == 2.0
+                life = damageAccumulation.nonlinear(life_buffer);
+                damage = (1.0/life)*repeats;
+            end
         end
         
         %% POST ANALYSIS AT WORST ITEM

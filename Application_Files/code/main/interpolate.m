@@ -1,4 +1,4 @@
-function [cumulativeDamage] = interpolate(cumulativeDamage, pairs, msCorrection, numberOfCycles, cycles, scaleFactors, mscWarning, overflowCycles)
+function [cumulativeDamage, life_buffer] = interpolate(cumulativeDamage, pairs, msCorrection, numberOfCycles, cycles, scaleFactors, mscWarning, overflowCycles, life_buffer)
 %INTERPOLATE    QFT function to interpolate stress-life data.
 %   This function calculates the S-N curve based on the current load ratio
 %   if the R-ratio S-N Curves mean stress correction is used. The function
@@ -70,6 +70,9 @@ if (sets == 1.0) || (sets > 1.0 && msCorrection ~= 7.0)
         % If the cycle is purely compressive, assume no damage
         if (min(pairs(index, :)) < 0.0 && max(pairs(index, :)) <= 0.0) && (getappdata(0, 'ndCompression') == 1.0)
             cumulativeDamage(index) = 0.0;
+            
+            % Update the life buffer
+            life_buffer(index) = inf;
             continue
         end
         
@@ -83,6 +86,9 @@ if (sets == 1.0) || (sets > 1.0 && msCorrection ~= 7.0)
         [fatigueLimit, zeroDamage] = analysis.modifyEnduranceLimit(modifyEnduranceLimit, ndEndurance, fatigueLimit, fatigueLimit_original, cycles(index), cyclesToRecover, residualStress, enduranceScale);
         if (zeroDamage == 1.0) && (kt == 1.0)
             cumulativeDamage(index) = 0.0;
+            
+            % Update the life buffer
+            life_buffer(index) = inf;
             continue
         end
         
@@ -100,6 +106,9 @@ if (sets == 1.0) || (sets > 1.0 && msCorrection ~= 7.0)
                 cumulativeDamage(index) = 1.0;
             end
         end
+        
+        % Update the life buffer
+        life_buffer(index) = 1.0/cumulativeDamage(index);
     end
 elseif msCorrection == 7.0
     %{
@@ -354,7 +363,7 @@ elseif msCorrection == 7.0
                 datapoints if applicable
             %}
             if kt ~= 1.0
-                ktn = analysis.getKtn(N, constant, radius);
+                ktn = analysis.getKtn(kt, N, constant, radius);
                 Si = Si.*(1.0./ktn);
             end
             

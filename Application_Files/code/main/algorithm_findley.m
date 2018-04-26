@@ -14,7 +14,7 @@ classdef algorithm_findley < handle
 %      6.4 Findley's Method
 %   
 %   Quick Fatigue Tool 6.12-00 Copyright Louis Vallance 2018
-%   Last modified 10-Jan-2017 09:33:05 GMT
+%   Last modified 26-Apr-2018 16:29:37 GMT
     
     %%
     
@@ -287,7 +287,7 @@ classdef algorithm_findley < handle
             scaleFactors = ones(1.0, length(combinations));
             
             if use_sn == 1.0 % S-N curve was defined directly
-                [cumulativeDamage] = interpolate(cumulativeDamage, pairs, msCorrection, numberOfCycles, combinations, scaleFactors, 0.0, 0.0);
+                [cumulativeDamage, ~] = interpolate(cumulativeDamage, pairs, msCorrection, numberOfCycles, combinations, scaleFactors, 0.0, 0.0, []);
             else % S-N curve is derived
                 Tfs = getappdata(0, 'Tfs');
                 b = getappdata(0, 'b');
@@ -335,7 +335,7 @@ classdef algorithm_findley < handle
                             radius = getappdata(0, 'notchRootRadius');
                             constant = getappdata(0, 'notchSensitivityConstant');
                             
-                            ktn = analysis.getKtn(life, constant, radius);
+                            ktn = analysis.getKtn(kt, life, constant, radius);
                             
                             quotient = (ktn*combinations(index) + residualStress)/Tfs;
                             

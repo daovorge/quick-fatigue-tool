@@ -623,9 +623,7 @@ classdef analysis < handle
         end
         
         %% Get the value of Kt for a given life N
-        function ktn = getKtn(N, notchConstant, notchRadius)
-            % Get the reference (un-notched) value of Kt
-            kt = getappdata(0, 'kt');
+        function ktn = getKtn(kt, N, notchConstant, notchRadius)
             
             if (isempty(notchConstant) == 1.0) || (isempty(notchRadius) == 1.0)
                 ktn = 1.0 + ((kt - 1.0)./(0.915 + ((200.0)./((log10(N)).^4.0))));
@@ -650,15 +648,15 @@ classdef analysis < handle
                 case 1.0 % Peterson (default)
                     ktn = 1.0 + ((kt - 1.0)./(0.915 + ((200.0)./((log10(N)).^4.0))));
                 case 2.0 % Peterson B
-                    ktn = 1.0 + ((kt - 1.0)/(1.0 + (notchConstant/notchRadius)));
+                    ktn = 1.0 + ((kt - 1.0)./(1.0 + (notchConstant./notchRadius)));
                 case 3.0 % Neuber
-                    ktn = 1.0 + ((kt - 1.0)/(1.0 + sqrt(notchConstant/notchRadius)));
+                    ktn = 1.0 + ((kt - 1.0)./(1.0 + sqrt(notchConstant./notchRadius)));
                 case 4.0 % Harris
-                    ktn = exp(-notchRadius/notchConstant) + kt^(1.0 - exp(-notchRadius/notchConstant));
+                    ktn = exp(-notchRadius./notchConstant) + kt.^(1.0 - exp(-notchRadius./notchConstant));
                 case 5.0 % Heywood
-                    ktn = (kt)/(1.0 + 2.0*sqrt(notchConstant/notchRadius));
+                    ktn = (kt)./(1.0 + 2.0.*sqrt(notchConstant./notchRadius));
                 case 6.0 % Notch sensitivity
-                    ktn = 1.0 + notchConstant*(kt - 1.0);
+                    ktn = 1.0 + notchConstant.*(kt - 1.0);
                 otherwise % Peterson (default)
                     ktn = 1.0 + ((kt - 1.0)./(0.915 + ((200.0)./((log10(N)).^4.0))));
             end

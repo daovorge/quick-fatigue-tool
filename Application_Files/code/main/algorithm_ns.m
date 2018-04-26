@@ -14,7 +14,7 @@ classdef algorithm_ns < handle
 %      6.3 Normal Stress
 %   
 %   Quick Fatigue Tool 6.12-00 Copyright Louis Vallance 2018
-%   Last modified 08-Jan-2018 08:53:45 GMT
+%   Last modified 26-Apr-2018 16:29:37 GMT
     
     %%
         
@@ -285,7 +285,7 @@ classdef algorithm_ns < handle
             scaleFactors = ones(1.0, length(cycles));
             
             if useSN == 1.0 % S-N curve was defined directly
-                [cumulativeDamage] = interpolate(cumulativeDamage, pairs, msCorrection, numberOfCycles, cycles, scaleFactors, mscWarning, overflowCycles);
+                [cumulativeDamage, ~] = interpolate(cumulativeDamage, pairs, msCorrection, numberOfCycles, cycles, scaleFactors, mscWarning, overflowCycles, []);
             else % S-N curve is derived
                 Sf = getappdata(0, 'Sf');
                 b = getappdata(0, 'b');
@@ -349,7 +349,7 @@ classdef algorithm_ns < handle
                             radius = getappdata(0, 'notchRootRadius');
                             constant = getappdata(0, 'notchSensitivityConstant');
                             
-                            ktn = analysis.getKtn(life, constant, radius);
+                            ktn = analysis.getKtn(kt, life, constant, radius);
                             
                             if msCorrection == 1.0
                                 quotient = (ktn*cycles(index))/morrowSf(index);
