@@ -4,7 +4,7 @@ classdef analysis < handle
 %   required to run this file.
 %   
 %   Quick Fatigue Tool 6.12-00 Copyright Louis Vallance 2018
-%   Last modified 23-Jan-2018 09:53:00 GMT
+%   Last modified 01-May-2018 14:50:42 GMT
     
     %%
     
@@ -756,13 +756,11 @@ classdef analysis < handle
                         morrowSf = Sf - Sm;
                         
                         % Check for negative values
-                        for i = 1:length(Sm)
-                            if morrowSf(i) < 0.0
-                                morrowSf(i) = 1e-06;
-                                
-                                % Warn the user
-                                messenger.writeMessage(257.0)
-                            end
+                        if any(morrowSf < 0.0) == 1.0
+                            morrowSf(morrowSf < 0.0) = 1e-06;
+                            
+                            % Warn the user
+                            messenger.writeMessage(257.0)
                         end
                         setappdata(0, 'morrowSf', morrowSf)
                         mscCycles = cycles;
@@ -770,13 +768,11 @@ classdef analysis < handle
                         mscCycles = cycles.*((1.0 - ((Sm')./(Sf))).^-1.0);
                         
                         % Check for negative values
-                        for i = 1:length(Sm)
-                            if mscCycles(i) < 0.0
-                                mscCycles(i) = Sf;
-                                
-                                % Warn the user
-                                messenger.writeMessage(159.0)
-                            end
+                        if any(mscCycles < 0.0) == 1.0
+                            mscCycles(mscCycles < 0.0) = Sf;
+                            
+                            % Warn the user
+                            messenger.writeMessage(159.0)
                         end
                     end
                 case 2.0 % Goodman
@@ -784,8 +780,10 @@ classdef analysis < handle
                     mscCycles = zeros(1.0, length(Sm));
                     
                     if isempty(twops) == 0.0 && getappdata(0, 'modifiedGoodman') == 1.0
-                        % The proof stress is defined, so use the enhanced
-                        % Goodman correction if requested
+                        %{
+                            The proof stress is defined, so use the
+                            enhanced Goodman correction if requested
+                        %}
                         
                         % Get the fatigue limit stress
                         S0 = getappdata(0, 'fatigueLimit');
@@ -797,8 +795,10 @@ classdef analysis < handle
                         
                         for i = 1:length(Sm)
                             if abs(Sm(i)) > twops
-                                % If the mean stress exceeds the proof
-                                % stress (positive or negative)
+                                %{
+                                    If the mean stress exceeds the proof
+                                    stress (positive or negative)
+                                %}
                                 mscCycles(i) = cycles(i);
                                 warning = 1.0;
                                 
@@ -808,16 +808,20 @@ classdef analysis < handle
                                 % Warn the user
                                 messenger.writeMessage(160.0)
                             elseif (Sm(i) == 0.0) || (Sm(i) < 0.0 && Sm(i) >= (S0 - twops))
-                                % If the mean stress zero, or in the
-                                % flat negative region
+                                %{
+                                    If the mean stress zero, or in the flat
+                                    negative region
+                                %}
                                 mscCycles(i) = cycles(i);
                             elseif (Sm(i) > 0.0) && (Sm(i) < (twops - S0)/(1.0 - (S0/uts)))
                                 % If the mean stress lies between 0 and yield intercept
                                 mscCycles(i) = cycles(i)/(1.0 - (Sm(i)/uts));
                             elseif (Sm(i) >= (twops - S0)/(1.0 - (S0/uts)) && Sm(i) <= twops) || (Sm(i) < (S0 - twops) && abs(Sm(i)) <= twops)
-                                % If the mean stress lies between the yield
-                                % intercept and the yield stress (positive
-                                % or negative)
+                                %{
+                                    If the mean stress lies between the
+                                    yield intercept and the yield stress
+                                    (positive or negative)
+                                %}
                                 Sm(i) = abs(Sm(i));
                                 mscCycles(i) = cycles(i)/(1.0 - (Sm(i)/twops));
                             end
@@ -949,15 +953,20 @@ classdef analysis < handle
                     % Initialise the MSC cycles buffer
                     mscCycles = zeros(1.0, length(Sm));
                     
-                    % Normalize the mean stress of the cycle with the UTS
-                    % or the UCS
+                    %{
+                        Normalize the mean stress of the cycle with the UTS
+                        or the UCS
+                    %}
                     Sm(Sm > 0.0) = Sm(Sm > 0.0)/uts;
                     Sm(Sm < 0.0) = Sm(Sm < 0.0)/ucs;
                     
                     % For each cycle, find the MSC factor
                     for i = 1:length(Sm)
-                        % If the mean stress of the cycle is outside the
-                        % range of the data, take the edge amplitude value
+                        %{
+                            If the mean stress of the cycle is outside the
+                            range of the data, take the edge amplitude
+                            value
+                        %}
                         if Sm(i) < mscData_m(end)
                             Sa_prime = mscData_a(end);
                             
@@ -969,8 +978,10 @@ classdef analysis < handle
                             % Calculate the MSC scaling factor
                             MSC = 1.0/Sa_prime;
                             
-                            % Scale the current cycle to its equivalent
-                            % value
+                            %{
+                                Scale the current cycle to its equivalent
+                                value
+                            %}
                             mscCycles(i) = cycles(i)*MSC;
                             
                             messenger.writeMessage(58.0)
@@ -985,15 +996,18 @@ classdef analysis < handle
                             % Calculate the MSC scaling factor
                             MSC = 1.0/Sa_prime;
                             
-                            % Scale the current cycle to its equivalent
-                            % value
+                            %{
+                                Scale the current cycle to its equivalent
+                                value
+                            %}
                             mscCycles(i) = cycles(i)*MSC;
                             
                             messenger.writeMessage(58.0)
                         elseif isempty(find(mscData_m == Sm(i), 1.0)) == 0.0
-                            % The mean stress of the current cycle is an 
-                            % exact match so there is no need to interpolate
-                            
+                            %{
+                                The mean stress of the current cycle is an 
+                                exact match so there is no need to interpolate
+                            %}
                             Sa_prime = mscData_a(find(mscData_m == Sm(i), 1.0));
                             
                             % Avoid division by zero
@@ -1004,12 +1018,16 @@ classdef analysis < handle
                             % Calculate the MSC scaling factor
                             MSC = 1.0/Sa_prime;
                             
-                            % Scale the current cycle to its equivalent
-                            % value
+                            %{
+                                Scale the current cycle to its equivalent
+                                value
+                            %}
                             mscCycles(i) = cycles(i)*MSC;
                         else
-                            % Find which two mean stress points the cycle lies
-                            % between
+                            %{
+                                Find which two mean stress points the cycle
+                                lies between
+                            %}
                             for j = 1:length(mscData_m) - 1.0
                                 if (Sm(i) < mscData_m(j)) && (Sm(i) > mscData_m(j + 1.0))
                                     Sm_lo = mscData_m(j);
@@ -1021,13 +1039,17 @@ classdef analysis < handle
                                 end
                             end
                             
-                            % Get the corresponding values of the stress
-                            % amplitude data points
+                            %{
+                                Get the corresponding values of the stress
+                                amplitude data points
+                            %}
                             Sa_lo = mscData_a(Sm_lo_j);
                             Sa_hi = mscData_a(Sm_hi_j);
                             
-                            % Make the equation of the straight line
-                            % joining the two Sm-Sa data points
+                            %{
+                                Make the equation of the straight line
+                                joining the two Sm-Sa data points
+                            %}
                             m = (Sa_hi - Sa_lo)/(Sm_hi - Sm_lo);
                             
                             Sa_prime = m.*(Sm(i) - Sm_hi) + Sa_hi;
@@ -1040,8 +1062,10 @@ classdef analysis < handle
                             % Calculate the MSC scaling factor
                             MSC = 1.0/Sa_prime;
                             
-                            % Scale the current cycle to its equivalent
-                            % value
+                            %{
+                                Scale the current cycle to its equivalent
+                                value
+                            %}
                             mscCycles(i) = cycles(i)*MSC;
                         end
                     end
