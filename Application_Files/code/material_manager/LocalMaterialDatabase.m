@@ -198,7 +198,7 @@ else
 end
 
 % Define the start path
-outputDirectory = uigetdir(startPath, 'Output Directory');
+outputDirectory = uigetdir(startPath, 'Local Material Directory');
 
 if isequal(outputDirectory, 0.0) == 1.0
     % User cancelled operation
